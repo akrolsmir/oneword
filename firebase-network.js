@@ -1,12 +1,12 @@
 const firebaseConfig = {
-  apiKey: "AIzaSyBMQKaakJbv0H1D-vNj1aA8ebS0IcsQemA",
-  authDomain: "runetiera.firebaseapp.com",
-  databaseURL: "https://runetiera.firebaseio.com",
-  projectId: "runetiera",
-  storageBucket: "runetiera.appspot.com",
-  messagingSenderId: "533615885683",
-  appId: "1:533615885683:web:a39e1fe7c2a5754827d906",
-  measurementId: "G-28YZE23KHB"
+  apiKey: "AIzaSyA2JfA8ZGxT6pKV87TwhGfUGR1kAdcPMyU",
+  authDomain: "oneword-cf74a.firebaseapp.com",
+  databaseURL: "https://oneword-cf74a.firebaseio.com",
+  projectId: "oneword-cf74a",
+  storageBucket: "oneword-cf74a.appspot.com",
+  messagingSenderId: "340753176141",
+  appId: "1:340753176141:web:d51695ab8606909dda2e04",
+  measurementId: "G-3EQ36WVM0W"
 };
 // Initialize Firebase
 if (!firebase.apps.length) {
