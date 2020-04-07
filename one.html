@@ -35,20 +35,6 @@
       width: 560px;
     }
 
-    table {
-      border-collapse: collapse;
-    }
-
-    table,
-    th,
-    td {
-      border: 1px solid black;
-      padding: 4px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
     .spacy {
       white-space: pre-wrap;
     }
@@ -266,6 +252,7 @@
 <script type="module" src="./timer-vue.js"></script>
 <script type="module">
   import { nouns, compounds, verbs, adjectives } from './many-words.js';
+  import { setRoom, updateRoom, getRoom, listRooms, listenRoom } from './firebase-network.js';
   /**
    Room: {
      name: apple,
@@ -485,59 +472,9 @@
     return result;
   }
 
-
-  const db = firebase.firestore();
-  async function setRoom(room) {
-    await db.collection('rooms').doc(room.name).set(room);
-  }
-
-  async function updateRoom(room, update) {
-    await db.collection('rooms').doc(room.name).update(update);
-  }
-
-  async function getRoom(room) {
-    const doc = await db.collection('rooms').doc(room.name).get();
-    return doc.data();
-  }
-
-  async function listRooms() {
-    const db = firebase.firestore();
-    const docs = await db.collection('rooms')
-      .where('public', '==', true)
-      .orderBy('lastUpdateTime', 'desc')
-      // TODO: limit to last 7 days instead.
-      .limit(20)
-      .get();
-    
-    const rooms = [];
-    docs.forEach((doc) => rooms.push(doc.data()));
-    return rooms.filter(room => room.players.length > 0);
-  }
-
-  let unsubscribe;
-  function listenRoom(vueApp) {
-    // Detach listener before listening to a new room.
-    if (unsubscribe) {
-      unsubscribe();
-    }
-    unsubscribe = db.collection("rooms").doc(vueApp.room.name)
-      .onSnapshot(function (doc) {
-        console.log("Current data: ", doc.data());
-        vueApp.room = doc.data();
-      });
-  }
-
   function nextGuesser(lastGuesser, players) {
     const nextIndex = (players.indexOf(lastGuesser) + 1 + players.length) % players.length;
     return players[nextIndex];
-  }
-
-  function rot13(str) {
-    var input = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-    var output = 'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm';
-    var index = x => input.indexOf(x);
-    var translate = x => index(x) > -1 ? output[index(x)] : x;
-    return str.split('').map(translate).join('');
   }
 
   function randomWord(category='nouns', customWords='') {

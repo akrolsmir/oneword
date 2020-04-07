@@ -13,81 +13,52 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
   firebase.analytics();
 }
-const db = firebase.firestore();
 
-// User structure: {id: xxx, runs: [{expedition}... ]}
+const db = firebase.firestore();
+export async function setRoom(room) {
+  await db.collection('rooms').doc(room.name).set(room);
+}
+
+export async function updateRoom(room, update) {
+  await db.collection('rooms').doc(room.name).update(update);
+}
+
+export async function getRoom(room) {
+  const doc = await db.collection('rooms').doc(room.name).get();
+  return doc.data();
+}
+
+export async function listRooms() {
+  const db = firebase.firestore();
+  const docs = await db.collection('rooms')
+    .where('public', '==', true)
+    .orderBy('lastUpdateTime', 'desc')
+    // TODO: limit to last 7 days instead.
+    .limit(20)
+    .get();
+
+  const rooms = [];
+  docs.forEach((doc) => rooms.push(doc.data()));
+  return rooms.filter(room => room.players.length > 0);
+}
+
+let unsubscribe;
+export function listenRoom(vueApp) {
+  // Detach listener before listening to a new room.
+  if (unsubscribe) {
+    unsubscribe();
+  }
+  unsubscribe = db.collection("rooms").doc(vueApp.room.name)
+    .onSnapshot(function (doc) {
+      console.log("Current data: ", doc.data());
+      vueApp.room = doc.data();
+    });
+}
+
 // May return null.
-async function getUser(userId) {
+export async function getUser(userId) {
   const doc = await db.collection("users").doc(userId).get();
   return doc.data();
-}
-
-export async function updateUsername(userId, username) {
-  return await db.collection("users").doc(userId).update({ username });
-}
-
-export async function getAllUsers() {
-  const usersQuery = await db.collection("users").get();
-  const users = [];
-  usersQuery.forEach(user => users.push(user.data()));
-  return users;
-}
-
-// Returns whether the run was successfully saved.
-export async function saveRun(expedition, user) {
-  if (expedition.userId && expedition.userId != user.id) {
-    swal('Huh.', 'That expedition already belongs to someone else!', 'error');
-    return false;
-  }
-
-  const runIndex = user.runs.findIndex(e => e.id == expedition.id);
-  if (runIndex >= 0) {
-    const oldExpedition = user.runs[runIndex];
-    // Copy over old metadata, if found.
-    expedition.time = oldExpedition.time ? oldExpedition.time : Date.now();
-    expedition.userId = oldExpedition.userId ? oldExpedition.userId : user.id;
-    // Reactive equivalent of: user.runs[runIndex] = expedition;
-    Vue.set(user.runs, runIndex, expedition);
-  } else {
-    // New run for this user; save run metadata.
-    expedition.time = Date.now();
-    expedition.userId = user.id;
-    user.runs.push(expedition);
-  }
-
-  // Denormalize project id & name to Users table
-  // TODO: If there are too many runs for a user, migrate to subcollections.
-  user.lastUpdateTime = Date.now();
-  await db.collection("users").doc(user.id).set(user);
-
-  // Save the run itself
-  await db.collection("runs").doc(expedition.id).set(expedition);
-
-  return true;
-}
-
-export async function loadRun(id) {
-  const doc = await db.collection("runs").doc(id).get();
-  return doc.data();
-}
-
-export async function getCollection(userId) {
-  const doc = await db.collection("collections").doc(userId).get();
-  return doc.data();
-}
-
-// A collection is a map of {cardId: cardCount, ...}
-export async function saveCollection(userId, collection) {
-  await db.collection("users").doc(userId).update({ lastUpdateTime: Date.now() });
-  collection.lastUpdateTime = Date.now();
-  return await db.collection("collections").doc(userId).set(collection);
-}
-
-export async function getAllCollections() {
-  const usersQuery = await db.collection("collections").get();
-  const collections = {};
-  usersQuery.forEach(doc => collections[doc.id] = doc.data());
-  return collections;
 }
 
 export function listenForLogin(vueApp) {
@@ -98,7 +69,6 @@ export function listenForLogin(vueApp) {
         // User just created an account; save them to our database.
         fetchedUser = {
           id: user.uid,
-          runs: [],
           name: user.displayName,
           email: user.email,
           createTime: Date.now(),
@@ -118,20 +88,4 @@ export function listenForLogin(vueApp) {
 export function runUrl(runId) {
   const parsedUrl = new URL(window.location.href);
   return `${parsedUrl.origin}/draft-viewer?run=${runId}`
-}
-
-export function sendMail(to, subject, text, html, live=false) {
-  const email = {
-    to,
-    message: {
-      subject,
-      text,
-      html,
-    }
-  }
-  if (live) {
-
-    db.collection('mail').add(email);  
-  }
-  return email;
 }
