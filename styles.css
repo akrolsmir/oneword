@@ -1,0 +1,104 @@
+#tierlist {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  margin-left: 48px;
+  margin-right: 48px;
+}
+
+input {
+  margin-left: 18px;
+}
+
+body {
+  /* font-family: 'Sriracha', cursive; */
+  /* font-family: 'Fjalla One', sans-serif; */
+  /* font-family: 'Righteous', cursive; */
+  color: #333;
+}
+
+#banner {
+  grid-column: 1/7;
+  text-align: center;
+  background-color: lightgreen;
+  padding: 5px;
+}
+
+h1 {
+  /* Bring subtitle closer to title*/
+  margin-bottom: 4px;
+}
+
+h1, h2, h3 {
+  font-family: 'Merienda One', cursive;
+}
+
+h2 {
+  /* Slight adjustment to get tier titles looking good.*/
+  margin-left: 20px;
+}
+
+.card {
+  border: 1px solid lightgray;
+  padding: 2px;
+  font-weight: 500;
+}
+
+.card.preview {
+  display: grid;
+  grid-template-columns: 20px 1fr 20px;
+}
+
+.champion {
+  background: gold
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin-left: 8px;
+}
+
+.title-left {
+  grid-column: 1/5
+}
+
+.title-right {
+  text-align: right;
+  grid-column: 5/7;
+}
+
+#search-bar {
+  font-size: 16pt;
+  width: 440px;
+}
+
+.filters {
+  display: flex;
+  flex-direction: column;
+  padding-top: 20px;
+  grid-column: 1/7;
+}
+
+.rankS {
+  grid-column: 1;
+}
+
+.rankA {
+  grid-column: 2;
+}
+
+.rankB {
+  grid-column: 3;
+}
+
+.rankC {
+  grid-column: 4;
+}
+
+.rankD {
+  grid-column: 5;
+}
+
+.rankF {
+  grid-column: 6;
+}

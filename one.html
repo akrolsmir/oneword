@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<head>
+  <title>One Word</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css?family=Fjalla+One|Merienda+One|Righteous|Sriracha&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
+  <link rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+  <style>
+    html {
+      margin: 0;
+      height: 100%;
+      background-color: #f0e68c55;
+      position: relative;
+      overflow: auto;
+
+    }
+
+    h1 {
+      font-size: 40px;
+    }
+
+    h2 {
+      margin-top: 16px;
+      font-size: 24px;
+    }
+
+    body {
+      margin: 48px;
+      width: 560px;
+    }
+
+    table {
+      border-collapse: collapse;
+    }
+
+    table,
+    th,
+    td {
+      border: 1px solid black;
+      padding: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .spacy {
+      white-space: pre-wrap;
+    }
+
+    .label {
+      margin-top: 20px;
+    }
+
+    .newline {
+      white-space: pre;
+    }
+
+    .capitalize {
+      text-transform: capitalize;
+    }
+
+    .panel {
+      background-color: white;
+    }
+
+    [v-cloak] {
+      display: none;
+    }
+  </style>
+
+  <meta name="description" content="Online implementation of Just One!">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="images/logo/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="images/logo/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="images/logo/favicon/favicon-16x16.png">
+  <link rel="manifest" href="images/logo/favicon/site.webmanifest">
+</head>
+
+<body>
+  <div id="vue">
+    <div v-if="!room.players">
+      <h1>One Word</h1>
+      Online implementation of <a href="https://boardgamegeek.com/boardgame/254640/just-one">Just One</a>.
+      <label class="label">Player</label>
+      <input class="input" type="text" v-model="player.name" placeholder="Ringo">
+      <label class="label">Room</label>
+      <input class="input" type="text" v-model="room.name" placeholder="apple" @keyup.enter="enterRoom"><br><br>
+      <button class="button" @click="enterRoom">Enter Room</button>
+      
+      <br><br>
+      <h2>Open Rooms</h2>
+      <template v-for="openRoom in allRooms">
+        <p>
+          <a @click="room.name = openRoom.name; enterRoom()"><b>{{ openRoom.name }}</b></a>,
+          with {{ openRoom.players.join(', ') }}
+          ({{ moment(openRoom.lastUpdateTime).fromNow() }})
+        </p>
+      </template>
+    </div>
+    <div v-cloak v-else>
+      <article class="message">
+        <div class="message-header">
+          <h1>{{ room.name }}</h1>
+          <h2 class="capitalize">Round {{ room.history.length + 1 }} ({{ room.currentRound.category }})</h2>
+        </div>
+        <div class="message-body">
+          <template v-if="room.players.includes(player.name)">
+            <b>{{ player.name }}</b>,
+            you are
+            {{ room.currentRound.guesser == player.name ? 'now guessing' : `clueing ${room.currentRound.guesser}` }}.
+            <button class="button is-small" @click="kickPlayer(player.name)">Leave</button>
+          </template>
+          <template v-else>
+            <button class="button" @click="goHome">Another Room</button>
+            <button class="button" @click="joinRoom">Rejoin Game</button>
+          </template>
+          <br><br>
+          Players:
+          <template v-for="(player, i) in room.players">
+            <span :class="{'has-text-primary has-text-weight-bold': 
+            room.currentRound.clues[player] || room.currentRound.guesser == player}">
+              {{ player + (i == 0 ? ' (mod)' : '')}}</span><span v-if="i + 1 < room.players.length">, </span>
+          </template>
+        </div>
+      </article>
+      <timer :length='timerLength' :on-finish='nextStage'></timer>
+
+      <div v-if="room.currentRound.state == 'CLUEING'">
+        <div v-if="room.players.length < 3">
+          <h2>Waiting for 3 players...</h2>
+        </div>
+        <div v-else-if="room.currentRound.guesser == player.name">
+          <h2>Waiting for clues...</h2>
+        </div>
+        <div v-else>
+          <div class="box">
+            <h2>The word is "{{ room.currentRound.word }}".</h2><br>
+            <label class="label">Your Clue</label>
+            <div class="field has-addons">
+              <div class="control is-expanded">
+                <input class="input" type="text" v-model="player.clue" @keyup.enter="submitClue"
+                  :class="{'is-primary': room.currentRound.clues[player.name]}">
+              </div>
+              <div class="control">
+                <button class="button" @click="submitClue">Submit</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="room.currentRound.state == 'GUESSING'">
+        <div v-if="room.currentRound.guesser == player.name">
+          <div class="box">
+            <h2>Your clues are:</h2>
+            <h2 class="newline">{{ dedupe(room.currentRound.clues, false) }}</h2>
+            <label class="label">Your Guess</label>
+            <div class="field has-addons">
+              <div class="control is-expanded">
+                <input class="input" type="text" v-model="player.guess" @keyup.enter="submitGuess">
+              </div>
+              <div class="control">
+                <button class="button" @click="submitGuess">Submit</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-else>
+          <h2>The clues were:</h2>
+          <h2 class="newline">{{ dedupe(room.currentRound.clues) }}</h2>
+          <h2>Waiting for {{ room.currentRound.guesser }} to guess...</h2>
+        </div>
+      </div>
+
+      <div v-if="room.currentRound.state == 'DONE'">
+        <div v-if="room.currentRound.guess == room.currentRound.word">
+          <h2>Correct! The word was "{{ room.currentRound.word }}". Good job!</h2>
+        </div>
+        <div v-else>
+          <h2>Aww, {{ room.currentRound.guesser }} guessed "{{ room.currentRound.guess }}",
+            but it was "{{ room.currentRound.word }}"...</h2>
+        </div>
+        <br>
+        <button class="button" @click="newRound(false)">Next Round</button>
+      </div>
+
+      <br><br><br><br><br><br><br><br>
+
+      <nav class="panel" v-if="room.players[0] == player.name">
+        <p class="panel-heading">Mod Tools</p>
+        <div class="panel-block field is-grouped">
+          <button class="button is-small" @click="nextStage">Next Stage</button>
+          <button class="button is-small" @click="newRound(true)">Skip Word</button>
+          <button class="button is-small" @click="resetRoom">Reset Room</button>
+          <div class="field has-addons">
+            <div class="control">
+              <button class="button is-small" @click="kickPlayer(player.kick)">Kick</button>
+            </div>
+            <div class="control">
+              <input class="input is-small" type="text" v-model="player.kick" placeholder="Player Name">
+            </div>
+          </div>
+        </div>
+        <div class="panel-block">
+          <div class="field has-addons">
+            <div class="control">
+              <button class="button is-small" @click="toggleTimers">
+                {{ room.timers.running ? 'Stop' : 'Start' }} Timers
+              </button>
+            </div>
+            <div class="control">
+              <input class="input is-small" type="text" placeholder="Clue Timer"
+                v-model.number="room.timers.CLUEING" :disabled="room.timers.running">
+            </div>
+            <div class="control">
+              <input class="input is-small" type="text" placeholder="Guess Timer"
+                v-model.number="room.timers.GUESSING" :disabled="room.timers.running">
+            </div>
+          </div>
+        </div>
+        <div class="panel-block">
+          <div class="field is-grouped-multiline">
+            <div class="control" style="margin-bottom: 8px;">
+              <button class="button is-small" @click="setCategories()">Update Categories</button>
+            </div>
+            <template v-for="category in ['nouns', 'verbs', 'adjectives', 'compounds', 'custom']">
+              <label class="capitalize">{{ category }}
+                <input type="checkbox" v-model="room.categories[category]">
+              </label>
+            </template>
+          </div>
+        </div>
+        <div class="panel-block">
+          <textarea class="textarea is-small" placeholder="Input your own word list"
+          v-model="room.customWords" :disabled="!room.categories.custom"></textarea>
+        </div>
+      </nav>
+
+      <h2>History</h2>
+      <template v-for="(round, i) in room.history.slice().reverse()">
+        <h3 class="capitalize" :class="{'has-text-success': round.word == round.guess, 'has-text-danger': round.word != round.guess}">
+          Round {{ room.history.length - i }} ({{ round.category }})</h3>
+        <p>The word was "{{ round.word }}"; {{ round.guesser }} guessed "{{ round.guess }}".</p>
+        <p class="newline">{{ dedupe(round.clues) }}</p>
+        <br>
+      </template>
+    </div>
+  </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.2/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert@2.1.2/dist/sweetalert.min.js"></script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-firestore.js"></script>
+
+<!-- My code -->
+<script type="module" src="firebase-network.js"></script>
+<script type="module" src="./timer-vue.js"></script>
+<script type="module">
+  import { nouns, compounds, verbs, adjectives } from './many-words.js';
+  /**
+   Room: {
+     name: apple,
+     players: ['alice', 'bob', 'carol'],
+     currentRound: {
+       state: 'clueing' // or 'guessing', or 'done'
+       guesser: 'alice',
+       word: 'company'
+       clues: {
+         alice: 'corporation',
+         bob: 'collected'
+         carol: 'collected'
+       }
+     }
+     history: [{round1}, ...]
+   }
+  */
+  const vueApp = new Vue({
+    el: '#vue',
+    data: {
+      allRooms: [],
+      room: {
+        name: '',
+        history: [],
+      },
+      player: {
+        name: '',
+        clue: '',
+        guess: '',
+        kick: '',
+      },
+    },
+    async mounted() {
+      this.allRooms = await listRooms();
+      const parsedUrl = new URL(window.location.href);
+      const roomName = parsedUrl.searchParams.get('room');
+      const playerName = parsedUrl.searchParams.get('player');
+      if (playerName) {
+        this.player.name = playerName;
+      }
+      if (roomName) {
+        this.room.name = roomName;
+        await this.enterRoom();
+      }
+    },
+    watch: {
+      'room.currentRound.state'(state) {
+        this.$emit('reset-timer');
+        // Clean up past inputs when the round moves forward.
+        if (state == 'GUESSING') {
+          this.player.clue = '';
+        }
+        else if (state == 'DONE') {
+          this.player.guess = '';
+        }
+      },
+    },
+    computed: {
+      timerLength() {
+        if (this.room.currentRound && this.room.timers && this.room.timers.running) {
+          return this.room.timers[this.room.currentRound.state];
+        }
+        return 0;
+      }
+    },
+    methods: {
+      moment,
+      listRooms,
+      dedupe,
+      async enterRoom() {
+        if (!this.player.name) {
+          this.player.name = await promptForName();
+        }
+        const room = await getRoom(this.room);
+        if (room) {
+          this.room = room;
+          return await this.joinRoom();
+        } else {
+          // Create a new room
+          listenRoom(this);
+          return await this.resetRoom();
+        }
+      },
+      async resetRoom() {
+        this.room = {
+          name: this.room.name,
+          players: [this.player.name],
+          currentRound: {
+            state: 'CLUEING',
+            guesser: this.player.name,
+            guess: '',
+            word: randomWord(),
+            clues: {},
+            category: 'nouns',
+          },
+          history: [],
+          public: true,
+          lastUpdateTime: Date.now(),
+          timers: { 'CLUEING': '', 'GUESSING': '', 'DONE': '', running: false },
+          categories: { 'nouns': true, 'verbs': false, 'adjectives': false, 'compounds': false, 'custom': false },
+          customWords: ''
+        }
+        await setRoom(this.room);
+      },
+      // Only call if room already exists.
+      async joinRoom() {
+        listenRoom(this);
+
+        if (!this.room.players.includes(this.player.name)) {
+          this.room.players.push(this.player.name);
+          await updateRoom(this.room, { 'players': this.room.players });
+        }
+      },
+      goHome() {
+        if (unsubscribe) {
+          unsubscribe();
+        }
+        this.room = { name: '' };
+      },
+      async kickPlayer(name) {
+        if (this.room.players.includes(name)) {
+          const index = this.room.players.indexOf(name);
+          this.room.players.splice(index, 1);
+          await updateRoom(this.room, { 'players': this.room.players });
+        }
+      },
+      async submitClue() {
+        this.player.clue = this.player.clue.toLowerCase().trim();
+        const update = {};
+        update[`currentRound.clues.${this.player.name}`] = this.player.clue;
+        await updateRoom(this.room, update);
+
+        // If all clues are in, move to guessing
+        const doneCluing = this.room.players.every(p =>
+          this.room.currentRound.clues[p] || p == this.room.currentRound.guesser);
+        if (doneCluing) {
+          await updateRoom(this.room, { 'currentRound.state': 'GUESSING' });
+        }
+      },
+      async nextStage() {
+        if (this.room.currentRound.state == 'CLUEING') {
+          return await updateRoom(this.room, { 'currentRound.state': 'GUESSING' });
+        } else if (this.room.currentRound.state == 'GUESSING') {
+          return await updateRoom(this.room, {'currentRound.state': 'DONE'});
+        } else {
+          return await this.newRound();
+        }
+      },
+      async submitGuess() {
+        const update = {
+          'currentRound.guess': this.player.guess.toLowerCase().trim(),
+          'currentRound.state': 'DONE'
+        };
+        await updateRoom(this.room, update);
+      },
+      async newRound(sameGuesser = false) {
+        this.room.history.push(this.room.currentRound);
+        const category = nextCategory(this.room.categories);
+        this.room.currentRound = {
+          state: 'CLUEING',
+          guesser: sameGuesser ? this.room.currentRound.guesser
+            : nextGuesser(this.room.currentRound.guesser, this.room.players),
+          guess: '',
+          word: nextWord(this.room.history, category, this.room.customWords),
+          clues: {},
+          category,
+        };
+        this.room.lastUpdateTime = Date.now();
+
+        // Overwrite existing room;
+        await setRoom(this.room);
+      },
+      async toggleTimers() {
+        this.room.timers.running = !this.room.timers.running;
+        await updateRoom(this.room, { 'timers': this.room.timers });
+      },
+      async setCategories() {
+        const update = {
+          'categories': this.room.categories,
+          'customWords': this.room.customWords,
+        }
+        await updateRoom(this.room, update);
+      }
+    }
+  });
+
+  async function promptForName() {
+    const name = await swal({
+      text: 'Enter your name...',
+      content: 'input',
+      button: "That's me!",
+    });
+    return name ? name : promptForName();
+  }
+
+  function dedupe(clues, showCollisions = true) {
+    const cluesToPlayers = {};
+    for (let [player, clue] of Object.entries(clues)) {
+      if (!cluesToPlayers[clue]) {
+        cluesToPlayers[clue] = [];
+      }
+      cluesToPlayers[clue].push(player);
+    }
+    const deduped = Object.entries(cluesToPlayers)
+      .filter(([clue, cluers]) => cluers.length == 1)
+      .map(([clue, cluers]) => `${cluers[0]} - ${clue}`);
+    const conflicts = Object.entries(cluesToPlayers)
+      .filter(([clue, cluers]) => cluers.length > 1)
+      .map(([clue, cluers]) => cluers.join(' & ') + (showCollisions ? ` - ${clue}` : ''));
+    let result = showCollisions ? '' : '(Uh, good luck.)';
+    if (deduped.length > 0) {
+      result = `${deduped.join('\n')}`
+    }
+    if (conflicts.length > 0) {
+      result += `\n\nCollisions:\n${conflicts.join('\n')}`;
+    }
+    return result;
+  }
+
+
+  const db = firebase.firestore();
+  async function setRoom(room) {
+    await db.collection('rooms').doc(room.name).set(room);
+  }
+
+  async function updateRoom(room, update) {
+    await db.collection('rooms').doc(room.name).update(update);
+  }
+
+  async function getRoom(room) {
+    const doc = await db.collection('rooms').doc(room.name).get();
+    return doc.data();
+  }
+
+  async function listRooms() {
+    const db = firebase.firestore();
+    const docs = await db.collection('rooms')
+      .where('public', '==', true)
+      .orderBy('lastUpdateTime', 'desc')
+      // TODO: limit to last 7 days instead.
+      .limit(20)
+      .get();
+    
+    const rooms = [];
+    docs.forEach((doc) => rooms.push(doc.data()));
+    return rooms.filter(room => room.players.length > 0);
+  }
+
+  let unsubscribe;
+  function listenRoom(vueApp) {
+    // Detach listener before listening to a new room.
+    if (unsubscribe) {
+      unsubscribe();
+    }
+    unsubscribe = db.collection("rooms").doc(vueApp.room.name)
+      .onSnapshot(function (doc) {
+        console.log("Current data: ", doc.data());
+        vueApp.room = doc.data();
+      });
+  }
+
+  function nextGuesser(lastGuesser, players) {
+    const nextIndex = (players.indexOf(lastGuesser) + 1 + players.length) % players.length;
+    return players[nextIndex];
+  }
+
+  function rot13(str) {
+    var input = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    var output = 'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm';
+    var index = x => input.indexOf(x);
+    var translate = x => index(x) > -1 ? output[index(x)] : x;
+    return str.split('').map(translate).join('');
+  }
+
+  function randomWord(category='nouns', customWords='') {
+    const custom = customWords.split(/\s/);
+    const categories = { nouns, compounds, verbs, adjectives, custom };
+    const words = categories[category];
+    return words[Math.floor(Math.random() * words.length)];
+  }
+
+  function nextWord(history, category='nouns', customWords='') {
+    let word;
+    let loops = 0;
+    do {
+      loops++;
+      if (loops > 10000) {
+        return "You're out of custom words..."
+      }
+      // TODO: consider generating a stable next word using seeded RNG.
+      word = randomWord(category, customWords);
+    } while (history.map(round => round.word).includes(word));
+    return word;
+  }
+
+  function nextCategory(categories) {
+    const enabled = Object.keys(categories).filter(c => categories[c]);
+    return enabled[Math.floor(Math.random() * enabled.length)];
+  }
+</script>
