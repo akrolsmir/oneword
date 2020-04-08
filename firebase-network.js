@@ -45,14 +45,18 @@ export async function listRooms() {
 let unsubscribe;
 export function listenRoom(vueApp) {
   // Detach listener before listening to a new room.
-  if (unsubscribe) {
-    unsubscribe();
-  }
+  unlistenRoom();
   unsubscribe = db.collection("rooms").doc(vueApp.room.name)
     .onSnapshot(function (doc) {
       console.log("Current data: ", doc.data());
       vueApp.room = doc.data();
     });
+}
+
+export function unlistenRoom() {
+  if (unsubscribe) {
+    unsubscribe();
+  }
 }
 
 // May return null.

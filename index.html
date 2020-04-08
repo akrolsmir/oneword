@@ -252,7 +252,7 @@
 <script type="module" src="./timer-vue.js"></script>
 <script type="module">
   import { nouns, compounds, verbs, adjectives } from './many-words.js';
-  import { setRoom, updateRoom, getRoom, listRooms, listenRoom } from './firebase-network.js';
+  import { setRoom, updateRoom, getRoom, listRooms, listenRoom, unlistenRoom } from './firebase-network.js';
   /**
    Room: {
      name: apple,
@@ -367,9 +367,7 @@
         }
       },
       goHome() {
-        if (unsubscribe) {
-          unsubscribe();
-        }
+        unlistenRoom();
         this.room = { name: '' };
       },
       async kickPlayer(name) {
