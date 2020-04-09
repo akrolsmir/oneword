@@ -140,6 +140,9 @@
                 <button class="button" @click="submitClue">Submit</button>
               </div>
             </div>
+            <div class="notification is-danger" v-show="player.clue.includes(' ')">
+              Is that really just one word?
+            </div>
           </div>
         </div>
       </div>
