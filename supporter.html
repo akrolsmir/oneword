@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<head>
+  <title>Support One Word</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css?family=Fjalla+One|Merienda+One|Righteous|Sriracha&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bulma-extensions@6.2.7/bulma-pricingtable/dist/css/bulma-pricingtable.min.css">
+  <style>
+    html {
+      margin: 0;
+      height: 100%;
+      background-color: #eaeff6;
+      position: relative;
+      overflow: auto;
+    }
+
+    h1, h2, h3 {
+      font-family: 'Merienda One', cursive;
+    }
+
+    body {
+      margin: 40px;
+      margin-left: 140px;
+      margin-right: 140px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 60px;
+    }
+
+    h2 {
+      margin-bottom: 6px;
+      font-size: 24px;
+    }
+
+    .border {
+      border: solid;
+    }
+
+    .message {
+      width: 800px;
+    }
+
+    .caption {
+      margin: 6px;
+      text-align: center;
+      font-style: italic;
+    }
+  </style>
+
+  <meta name="description" content="Support One Word and get some awesome rewards!">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="images/logo/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="images/logo/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="images/logo/favicon/favicon-16x16.png">
+  <link rel="manifest" href="images/logo/favicon/site.webmanifest">
+</head>
+
+<body class="has-navbar-fixed-top">
+  <div id="premium">
+    <navbar></navbar>
+    <h1>Support One Word</h1>
+    <article class="message container">
+      <div class="message-header">
+        Can't stop at just One Word?
+      </div>
+      <div class="message-body">
+        Hi there! I'm Austin, the lead developer behind One Word. 
+        If you've been enjoying the game, consider becoming a supporter!<br>
+        <br>
+        You'll be helping cover our server and development costs,
+        and we offer a bunch of rewards in exchange:<br>
+        <br>
+        <h2>Supporter</h2>
+        At this tier, you'll unlock a customizable user avatar, which replaces
+        your screen name everywhere you're playing the game.<br>
+        <br>
+        You'll also get the ability to create private rooms -- those are rooms
+        which are not visible from the home page, and are invite-only.<br>
+        <br>
+        <h2>Sponsor</h2>
+        Hey! Thanks for your sponsorship. Besides all the rewards that supporters
+        get, you'll also be credited on our home page for everyone to see.<br>
+        <br>
+        Plus, you'll have your own, static room where you're always in charge.
+        You can customize the theme, manage your invite list, and choose your own word lists!<br>
+        <br>
+        <h2>Producer</h2>
+        Interested in promoting your own game or website here on One Word?
+        Reach out to me at <a href="mailto:austin@oneword.games">austin@oneword.games</a>!
+      </div>
+    </article>
+
+    <div id="error-message"></div>
+
+    <div class="pricing-table container">
+
+      <div class="pricing-plan is-danger">
+        <div class="plan-header">Supporter</div>
+        <div class="plan-price"><span class="plan-price-amount"><span
+              class="plan-price-currency">$</span>2.99</span>/month</div>
+        <div class="plan-items">
+          <div class="plan-item"><b>Custom user avatar!</b></div>
+          <div class="plan-item"><b>Private rooms!</b></div>
+          <div class="plan-item">Priority support</div>
+          <div class="plan-item">Ad-free experience</div>
+          <div class="plan-item">-</div>
+          <div class="plan-item">-</div>
+        </div>
+        <div class="plan-footer">
+          <button class="button is-fullwidth" @click="checkout('supporter')">Checkout</button>
+        </div>
+      </div>
+
+      <div class="pricing-plan is-active">
+        <div class="plan-header">Sponsor</div>
+        <div class="plan-price"><span class="plan-price-amount"><span
+              class="plan-price-currency">$</span>9.99</span>/month</div>
+        <div class="plan-items">
+          <div class="plan-item"><b>Frontpage Sponsor listing!</b></div>
+          <div class="plan-item"><b>Reserve your premium room!</b></div>
+          <div class="plan-item">Custom user avatar</div>
+          <div class="plan-item">Private rooms</div>
+          <div class="plan-item">Priority Support</div>
+          <div class="plan-item">Ad-Free Experience</div>
+          <div class="plan-item">-</div>
+        </div>
+        <div class="plan-footer">
+          <button class="button is-fullwidth" @click="checkout('sponsor')">Checkout</button>
+        </div>
+      </div>
+
+      <div class="pricing-plan">
+        <div class="plan-header">Producer</div>
+        <div class="plan-price"><span class="plan-price-amount">Contact Us</div>
+        <div class="plan-items">
+          <div class="plan-item"><b>Promote your own game!</b></div>
+          <div class="plan-item"><b>Frontpage Sponsor listing!</b></div>
+          <div class="plan-item"><b>Reserve your premium room!</b></div>
+          <div class="plan-item">Custom user avatar</div>
+          <div class="plan-item">Private rooms</div>
+          <div class="plan-item">Priority Support</div>
+          <div class="plan-item">Ad-Free Experience</div>
+        </div>
+        <div class="plan-footer">
+          <button class="button is-fullwidth is-warning" @click="contactUs()">Get in touch</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+<!-- Load Stripe.js on your website. -->
+<script src="https://js.stripe.com/v3"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.2/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert@2.1.2/dist/sweetalert.min.js"></script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-firestore.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bulma-extensions@6.2.7/dist/js/bulma-extensions.min.js"></script>
+
+<!-- My code -->
+<script type="module" src="navbar-vue.js"></script>
+<script type="module" src="firebase-network.js"></script>
+<script type="module">
+  const vueApp = new Vue({
+    el: '#premium',
+    methods: {
+      contactUs() {
+        firebase.analytics().logEvent('contact-us');
+        swal('Hey there!', 'Thanks for your interest in becoming a One Word producer! Shoot me an email at austin@oneword.games and we\'ll work something out :)', 'success');
+      },
+      checkout(planName) {
+        const planValues = { supporter: 2.99, sponsor: 9.99 };
+        firebase.analytics().logEvent('purchase', {
+          value: planValues[planName],
+          currency: 'USD',
+        });
+
+        // Test APIs
+        var stripe = Stripe('pk_test_TBbJ3UlK3uxu5fIiaFa1fEgq00F66fSFTg');
+        const plans = {
+          supporter: 'plan_H44e4fQHCaUePD',
+          sponsor: 'plan_H44fh9HqtqTb9B',
+        }
+
+        // Prod APIs
+        // var stripe = Stripe('pk_live_V662ekSpUVB7NK0YRz6mZRrg00VtBZqQ6k');
+        // const plans = {
+        //   supporter: 'plan_H3IEHNqkNsWgXz',
+        //   sponsor: 'plan_H3ICnHNAVRYziM',
+        // }
+       
+        // When the customer clicks on the button, redirect
+        // them to Checkout.
+        stripe.redirectToCheckout({
+          items: [{ plan: plans[planName], quantity: 1 }],
+
+          // Do not rely on the redirect to the successUrl for fulfilling
+          // purchases, customers may not always reach the success_url after
+          // a successful payment.
+          // Instead use one of the strategies described in
+          // https://stripe.com/docs/payments/checkout/fulfillment
+          successUrl: window.location.origin + '/thanks.html',
+          cancelUrl: window.location.origin + '/premium.html',
+        })
+          .then(function (result) {
+            if (result.error) {
+              // If `redirectToCheckout` fails due to a browser or network
+              // error, display the localized error message to your customer.
+              var displayError = document.getElementById('error-message');
+              displayError.textContent = result.error.message;
+            }
+          });
+      }
+    }
+  });
+</script>

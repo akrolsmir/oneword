@@ -24,7 +24,7 @@ Vue.component('navbar', {
       firebase.analytics().logEvent('view_promotion', {
         source: 'navbar',
       });
-      window.location = './premium.html';
+      window.location = './supporter.html';
     }
   },
   template: `
