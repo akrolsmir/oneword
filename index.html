@@ -68,10 +68,11 @@
   <link rel="manifest" href="images/logo/favicon/site.webmanifest">
 </head>
 
-<body>
+<body class="has-navbar-fixed-top">
   <div id="vue">
+    <navbar v-model="user"></navbar>
     <div v-if="!room.players">
-      <h1>One Word</h1>
+      <h1>Welcome!</h1>
       This is the online version of <a href="https://boardgamegeek.com/boardgame/254640/just-one">Just One</a>, a co-op word game for 3+ players.<br>
       Each round, come up with a one-word hint for the guesser...<br>
       But beware: duplicate hints are discarded!<br>
@@ -247,14 +248,16 @@
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-firestore.js"></script>
 
 <!-- My code -->
 <script type="module" src="firebase-network.js"></script>
+<script type="module" src="./navbar-vue.js"></script>
 <script type="module" src="./timer-vue.js"></script>
 <script type="module">
   import { nouns, compounds, verbs, adjectives } from './many-words.js';
-  import { setRoom, updateRoom, getRoom, listRooms, listenRoom, unlistenRoom } from './firebase-network.js';
+  import { setRoom, updateRoom, getRoom, listRooms, listenRoom, unlistenRoom, listenForLogin } from './firebase-network.js';
   /**
    Room: {
      name: apple,
@@ -275,6 +278,7 @@
   const vueApp = new Vue({
     el: '#vue',
     data: {
+      user: {},
       allRooms: [],
       room: {
         name: '',
@@ -438,6 +442,8 @@
       }
     }
   });
+
+  listenForLogin(vueApp);
 
   async function promptForName() {
     const name = await swal({

@@ -85,6 +85,7 @@ export function listenForLogin(vueApp) {
         fetchedUser.email = user.email;
       }
       vueApp.user = fetchedUser;
+      vueApp.player.name = fetchedUser.name.split(' ')[0];
     }
   });
 }
