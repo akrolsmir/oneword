@@ -186,18 +186,18 @@
         });
 
         // Test APIs
-        var stripe = Stripe('pk_test_TBbJ3UlK3uxu5fIiaFa1fEgq00F66fSFTg');
-        const plans = {
-          supporter: 'plan_H44e4fQHCaUePD',
-          sponsor: 'plan_H44fh9HqtqTb9B',
-        }
+        // var stripe = Stripe('pk_test_TBbJ3UlK3uxu5fIiaFa1fEgq00F66fSFTg');
+        // const plans = {
+        //   supporter: 'plan_H44e4fQHCaUePD',
+        //   sponsor: 'plan_H44fh9HqtqTb9B',
+        // }
 
         // Prod APIs
-        // var stripe = Stripe('pk_live_V662ekSpUVB7NK0YRz6mZRrg00VtBZqQ6k');
-        // const plans = {
-        //   supporter: 'plan_H3IEHNqkNsWgXz',
-        //   sponsor: 'plan_H3ICnHNAVRYziM',
-        // }
+        var stripe = Stripe('pk_live_V662ekSpUVB7NK0YRz6mZRrg00VtBZqQ6k');
+        const plans = {
+          supporter: 'plan_H3IEHNqkNsWgXz',
+          sponsor: 'plan_H3ICnHNAVRYziM',
+        }
        
         // When the customer clicks on the button, redirect
         // them to Checkout.
