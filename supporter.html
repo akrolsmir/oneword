@@ -3,7 +3,6 @@
 
 <head>
   <title>Support One Word</title>
-  <link rel="stylesheet" href="styles.css">
   <link href="https://fonts.googleapis.com/css?family=Fjalla+One|Merienda+One|Righteous|Sriracha&display=swap"
     rel="stylesheet">
   <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
@@ -195,8 +194,8 @@
         // Prod APIs
         var stripe = Stripe('pk_live_V662ekSpUVB7NK0YRz6mZRrg00VtBZqQ6k');
         const plans = {
-          supporter: 'plan_H3IEHNqkNsWgXz',
-          sponsor: 'plan_H3ICnHNAVRYziM',
+          supporter: 'plan_H3ICnHNAVRYziM',
+          sponsor: 'plan_H3IEHNqkNsWgXz',
         }
        
         // When the customer clicks on the button, redirect
@@ -210,7 +209,7 @@
           // Instead use one of the strategies described in
           // https://stripe.com/docs/payments/checkout/fulfillment
           successUrl: window.location.origin + '/thanks.html',
-          cancelUrl: window.location.origin + '/premium.html',
+          cancelUrl: window.location.origin + '/supporter.html',
         })
           .then(function (result) {
             if (result.error) {

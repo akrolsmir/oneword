@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<head>
+  <title>Thanks for your support! | Legends of Runeterra</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css?family=Fjalla+One|Merienda+One|Righteous|Sriracha&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+  <style>
+    html {
+      margin: 0;
+      height: 100%;
+      background-color: #eaeff6;
+      position: relative;
+      overflow: auto;
+    }
+
+    h1, h2, h3 {
+      font-family: 'Merienda One', cursive;
+    }
+
+    body {
+      margin: 40px;
+    }
+
+    #thanks {
+      width: 600px;
+      margin: 0 auto;
+    }
+  </style>
+
+  <meta name="description" content="Thanks for supporting RuneTiera!">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="images/logo/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="images/logo/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="images/logo/favicon/favicon-16x16.png">
+  <link rel="manifest" href="images/logo/favicon/site.webmanifest">
+</head>
+
+<body class="has-navbar-fixed-top">
+  <div id="thanks">
+    <navbar></navbar>
+    <section class="hero is-primary is-bold">
+      <div class="hero-body">
+        <div class="container">
+          <h1 class="title">
+            THANK YOU!
+          </h1>
+          <div class="subtitle">
+            Seriously, you're the literal best.
+          </div>
+        </div>
+      </div>
+    </section>
+    <article class="message">
+      <div class="message-body">
+        I super-appreciate your support. Mega-appreciate. Hyper-appreciate?<br>
+        If you got any custom rewards, I'll be emailing you soon to follow up.<br>
+        Again, from the bottom of my heart,<br>
+        <img src="images/shen-gg.png">
+      </div>
+    </article>
+  </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.2/dist/vue.js"></script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-analytics.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bulma-extensions@6.2.7/dist/js/bulma-extensions.min.js"></script>
+
+<!-- My code -->
+<script type="module" src="header-vue.js"></script>
+<script type="module" src="firebase-network.js"></script>
+<script type="module">
+  const vueApp = new Vue({ el: '#thanks' });
+</script>
