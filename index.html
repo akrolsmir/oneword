@@ -143,10 +143,10 @@
             <div class="field has-addons">
               <div class="control is-expanded">
                 <input class="input" type="text" v-model="player.clue" @keyup.enter="submitClue"
-                  :class="{'is-primary': room.currentRound.clues[player.name]}">
+                  :class="{'is-primary': room.currentRound.clues[player.name]}" :disabled="!room.players.includes(player.name)">
               </div>
               <div class="control">
-                <button class="button" @click="submitClue">Submit</button>
+                <button class="button" @click="submitClue" :disabled="!room.players.includes(player.name)">Submit</button>
               </div>
             </div>
             <div class="notification is-danger" v-show="player.clue.includes(' ')">
