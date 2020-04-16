@@ -342,7 +342,8 @@
       dedupe,
       async enterRoom() {
         if (!this.player.name) {
-          this.player.name = await promptForName();
+          this.$refs.navbar.logIn();
+          return;
         }
         const room = await getRoom(this.room);
         if (room) {
@@ -456,15 +457,6 @@
   });
 
   listenForLogin(vueApp);
-
-  async function promptForName() {
-    const name = await swal({
-      text: 'Enter your name...',
-      content: 'input',
-      button: "That's me!",
-    });
-    return name ? name : promptForName();
-  }
 
   function dedupe(clues, showCollisions = true) {
     const cluesToPlayers = {};
