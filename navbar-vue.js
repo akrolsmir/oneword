@@ -6,9 +6,6 @@ Vue.component('navbar', {
       default() { return { hideLogin: false } }
     }
   },
-  data() {
-    return { burgerActive: false };
-  },
   methods: {
     logIn() {
       firebase.analytics().logEvent('login');
@@ -38,37 +35,19 @@ Vue.component('navbar', {
     </h3>
     </a>
 
-    <a role="button" class="navbar-burger" data-target="navMenu" aria-label="menu" aria-expanded="false"
-      :class="{'is-active': burgerActive}" @click="burgerActive = !burgerActive">
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-    </a>
-  </div>
-  <div class="navbar-menu"  :class="{'is-active': burgerActive}">
-    <!--
-    <div class="navbar-start">
-      <a class="navbar-item" href="./">
-        Home
+    <div class="navbar-item">
+      <a v-if="value.id" class="button" @click="logOut">
+        Sign out, {{ value.name.split(' ')[0] }}?
+      </a>
+      <a v-else-if="!value.hideLogin" class="button" @click="logIn">
+        Sign in
       </a>
     </div>
-    -->
-    
-    <div class="navbar-end">
-      <div class="navbar-item">
-        <a v-if="value.id" class="button" @click="logOut">
-          Sign out, {{ value.name.split(' ')[0] }}?
+    <div class="navbar-item">
+      <div class="buttons">
+        <a class="button is-warning" @click="referPremium">
+          <strong>Become a supporter!</strong>
         </a>
-        <a v-else-if="!value.hideLogin" class="button" @click="logIn">
-          Sign in
-        </a>
-      </div>
-      <div class="navbar-item">
-        <div class="buttons">
-          <a class="button is-warning" @click="referPremium">
-            <strong>Become a supporter!</strong>
-          </a>
-        </div>
       </div>
     </div>
   </div>
