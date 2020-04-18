@@ -195,6 +195,11 @@
 
       <nav class="panel" v-if="room.players[0] == player.name">
         <p class="panel-heading">Mod Tools</p>
+        <div class="panel-block" v-if="$refs.navbar.isSupporter">
+          <h3 style="padding-right: 20px;">Supporter Options</h3>
+          <button class="button is-small" @click="togglePublic">Make room {{ room.public ? 'private' : 'public' }}</button>
+          <button class="button is-small" @click="shareRoom">Share room link</button>
+        </div>
         <div class="panel-block field is-grouped">
           <button class="button is-small" @click="nextStage">Next Stage</button>
           <button class="button is-small" @click="newRound(true)">Skip Word</button>
@@ -452,6 +457,22 @@
           'customWords': this.room.customWords,
         }
         await updateRoom(this.room, update);
+      },
+      async togglePublic() {
+        this.room.public = !this.room.public;
+        await updateRoom(this.room, { 'public': this.room.public });
+      },
+      async shareRoom() {
+        const link = document.createElement("input");
+        link.value = `http://oneword.games/?room=${this.room.name}`;
+        link.setAttribute('readonly', 'true');
+        link.setAttribute('onclick', 'this.select()');
+        link.setAttribute('size', '45');
+        swal({
+          title: "Share this link:",
+          icon: "success",
+          content: link
+        });
       }
     }
   });

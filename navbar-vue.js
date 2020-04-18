@@ -24,6 +24,14 @@ Vue.component('navbar', {
       window.location = './supporter.html';
     }
   },
+  computed: {
+    isSupporter() {
+      return this.value.supporter == 'BASE' || this.value.supporter == 'SPONSOR';
+    },
+    isSponsor() {
+      return this.value.supporter == 'SPONSOR';
+    }
+  },
   template: `
 <nav class="navbar has-shadow is-fixed-top"
   style="font-weight: 500; height: 52px;">
