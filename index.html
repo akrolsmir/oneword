@@ -195,10 +195,10 @@
 
       <nav class="panel" v-if="room.players[0] == player.name">
         <p class="panel-heading">Mod Tools</p>
-        <div class="panel-block" v-if="$refs.navbar.isSupporter">
-          <h3 style="padding-right: 20px;">Supporter Options</h3>
-          <button class="button is-small" @click="togglePublic">Make room {{ room.public ? 'private' : 'public' }}</button>
-          <button class="button is-small" @click="shareRoom">Share room link</button>
+        <div class="panel-block" style="background: #ffd70066;">
+          <h3 style="padding-right: 20px;">Supporter Tools</h3>
+          <button class="button is-small" @click="togglePublic" :disabled='!$refs.navbar.isSupporter'>Make room {{ room.public ? 'private' : 'public' }}</button>
+          <button class="button is-small" @click="shareRoom" :disabled='!$refs.navbar.isSupporter'>Share room link</button>
         </div>
         <div class="panel-block field is-grouped">
           <button class="button is-small" @click="nextStage">Next Stage</button>
