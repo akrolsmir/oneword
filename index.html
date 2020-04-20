@@ -181,12 +181,13 @@
 
       <div v-if="room.currentRound.state == 'DONE'">
         <div v-if="room.currentRound.guess == room.currentRound.word">
-          <h2>Correct! The word was "{{ room.currentRound.word }}". Good job!</h2>
+          <h2 class="has-text-success">Correct! The word was "{{ room.currentRound.word }}". Good job!</h2>
         </div>
         <div v-else>
-          <h2>Aww, {{ room.currentRound.guesser }} guessed "{{ room.currentRound.guess }}",
+          <h2 class="has-text-danger">Aww, {{ room.currentRound.guesser }} guessed "{{ room.currentRound.guess }}",
             but it was "{{ room.currentRound.word }}"...</h2>
         </div>
+        <h2 class="newline">{{ dedupe(room.currentRound.clues) }}</h2>
         <br>
         <button class="button" @click="newRound(false)">Next Round</button>
       </div>
