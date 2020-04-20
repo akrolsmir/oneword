@@ -37,11 +37,12 @@ Vue.component('navbar', {
   style="font-weight: 500; height: 52px;">
   <div class="navbar-brand">
     <a href="./">
-    <h3 style="font-size: 24px; margin: 8px; margin-left: 32px; display: flex;">
-      <!-- <img src="images/logo/icon-clear.svg" width="36px" height="36px"> -->
+    <h3 style="font-size: 24px; margin: 8px; margin-left: 32px; margin-right: 32px; display: flex;">
       <div style="margin-left: 8px; color: #4a4a4a">One Word</div>
     </h3>
     </a>
+
+    <a class="navbar-item" href="https://amzn.to/3amGu99">Buy the original</a>
 
     <div class="navbar-item">
       <a v-if="value.id" class="button" @click="logOut">
