@@ -19,7 +19,7 @@ Vue.component('timer', {
           this.startMs = timestamp;
         }
         this.secondsElapsed = (timestamp - this.startMs) / 1000;
-        if (this.secondsElapsed >= this.length + 0.3 /* 300ms padding*/) {
+        if (this.secondsElapsed >= this.length + 2 /* 2s padding*/) {
           await this.onFinish();
           this.startMs = 0;
         }
