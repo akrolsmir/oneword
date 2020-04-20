@@ -17,11 +17,17 @@ Vue.component('navbar', {
       // Reset user id to indicate logged out.
       this.value.id = '';
     },
+    referAmazon() {
+      firebase.analytics().logEvent('view_amazon', {
+        source: 'navbar',
+      });
+      window.open('https://amzn.to/3amGu99', '_blank');
+    },
     referPremium() {
       firebase.analytics().logEvent('view_promotion', {
         source: 'navbar',
       });
-      window.location = './supporter.html';
+      window.open('./supporter.html', '_blank');
     }
   },
   computed: {
@@ -42,7 +48,7 @@ Vue.component('navbar', {
     </h3>
     </a>
 
-    <a class="navbar-item" href="https://amzn.to/3amGu99">Buy the original</a>
+    <a class="navbar-item" @click="referAmazon">Buy the original</a>
 
     <div class="navbar-item">
       <a v-if="value.id" class="button" @click="logOut">
