@@ -480,13 +480,40 @@
 
   listenForLogin(vueApp);
 
+  // "ha" and "ha" are dupes, as are "gold" and "golden", but not "hahahaha" and "hah".
+  function dupes(clue1, clue2) {
+    if (clue1 == clue2) {
+      return true;
+    }
+    if (clue1.length >= 3 && clue2.length >= 3 && (clue1.includes(clue2) || clue2.includes(clue1))) {
+      return true;
+    }
+    return false;
+  }
+
+  // Return whether the candidate is a dupe of any of the existing clues.
+  function anyDupes(clues, candidate) {
+    return clues.some(c => dupes(c, candidate));
+  }
+
   function dedupe(clues, showCollisions = true) {
     const cluesToPlayers = {};
-    for (let [player, clue] of Object.entries(clues)) {
-      if (!cluesToPlayers[clue]) {
-        cluesToPlayers[clue] = [];
+    for (const [player, clue] of Object.entries(clues)) {
+      let foundDupe = false;
+      for (const existingClue of Object.keys(cluesToPlayers)) {
+        // If an existing dupe is found, join the strings into the new clue
+        if (anyDupes(existingClue.split(' / '), clue)) {
+          foundDupe = true;
+          cluesToPlayers[existingClue].push(player);
+          cluesToPlayers[existingClue + ' / ' + clue] = cluesToPlayers[existingClue];
+          delete cluesToPlayers[existingClue];
+          break;
+        }
       }
-      cluesToPlayers[clue].push(player);
+      // Otherwise, create a new array for this clue.
+      if (!foundDupe) {
+        cluesToPlayers[clue] = [player];
+      }
     }
     const deduped = Object.entries(cluesToPlayers)
       .filter(([clue, cluers]) => cluers.length == 1)
