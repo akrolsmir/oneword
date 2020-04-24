@@ -25,7 +25,7 @@ Vue.component('scoreboard', {
     showNextRound: false,
   },
   mounted() {
-    startFireworks();
+    startFireworks(this.correct);
   },
   computed: {
     rounds() {
@@ -67,7 +67,7 @@ Vue.component('scoreboard', {
 
 // Fireworks effect shamelessly stolen from:
 // https://www.html5canvastutorials.com/advanced/html5-canvas-fireworks-effect/
-function startFireworks() {
+function startFireworks(correct) {
   // VARIABLEZ
   // play with them
   var c = document.querySelector('#fireworks'),
@@ -75,7 +75,7 @@ function startFireworks() {
     width = c.width = 600,
     height = c.height = 200,
 
-    n_stars = 150, //num of stars
+    n_stars = 20 + correct * 10, //num of stars
     stars = [], //array to store generated stars
     twinkleFactor = .4, //how much stars 'twinkle'
     maxStarRadius = 3,
