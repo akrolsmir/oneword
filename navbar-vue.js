@@ -21,7 +21,7 @@ Vue.component('navbar', {
       firebase.analytics().logEvent('view_amazon', {
         source: 'navbar',
       });
-      window.open('https://amzn.to/3amGu99', '_blank');
+      window.open('https://amzn.to/2xV5lUm', '_blank');
     },
     referPremium() {
       firebase.analytics().logEvent('view_promotion', {
