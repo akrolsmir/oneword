@@ -32,7 +32,7 @@
 
     body {
       margin: 48px;
-      width: 560px;
+      width: 600px;
     }
 
     .spacy {
@@ -195,7 +195,9 @@
         </div>
         <h2 class="newline">{{ dedupe(room.currentRound.clues) }}</h2>
         <br>
-        <button class="button" @click="newRound(false)">Next Round</button>
+        <scoreboard :history="room.history" :current-round="room.currentRound">
+          <button class="button" @click="newRound(false)">Next Round</button>
+        </scoreboard>
       </div>
 
       <br><br><br><br><br><br><br><br>
@@ -281,6 +283,7 @@
 <script type="module" src="firebase-network.js"></script>
 <script type="module" src="./navbar-vue.js"></script>
 <script type="module" src="./timer-vue.js"></script>
+<script type="module" src="./scoreboard-vue.js"></script>
 <script type="module">
   import { nouns, compounds, verbs, adjectives } from './many-words.js';
   import { setRoom, updateRoom, getRoom, listRooms, listenRoom, unlistenRoom, listenForLogin } from './firebase-network.js';
