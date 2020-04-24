@@ -73,6 +73,7 @@
 <body class="has-navbar-fixed-top">
   <div id="vue">
     <navbar ref="navbar" v-model="user"></navbar>
+    <!-- Home page -->
     <div v-if="!room.players">
       <h1>Welcome!</h1>
       This is the online version of <a target="_blank" rel="noopener noreferrer" href="https://amzn.to/3amGu99">Just One</a>, a co-op word game for 3+ players.<br>
@@ -101,7 +102,9 @@
         </p>
       </template>
     </div>
+    <!-- In game -->
     <div v-cloak v-else>
+      <!-- Room header -->
       <article class="message">
         <div class="message-header">
           <h1>{{ room.name }}</h1>
@@ -129,6 +132,7 @@
       </article>
       <timer :length='timerLength' :on-finish='nextStage'></timer>
 
+      <!-- Input area (clueing) -->
       <div v-if="room.currentRound.state == 'CLUEING'">
         <div v-if="room.players.length < 3">
           <h2>Waiting for 3 players...</h2>
@@ -156,6 +160,7 @@
         </div>
       </div>
 
+      <!-- Input area (guessing) -->
       <div v-if="room.currentRound.state == 'GUESSING'">
         <div v-if="room.currentRound.guesser == player.name">
           <div class="box">
@@ -179,6 +184,7 @@
         </div>
       </div>
 
+      <!-- Input area (done) -->
       <div v-if="room.currentRound.state == 'DONE'">
         <div v-if="room.currentRound.guess == room.currentRound.word">
           <h2 class="has-text-success">Correct! The word was "{{ room.currentRound.word }}". Good job!</h2>
@@ -194,6 +200,7 @@
 
       <br><br><br><br><br><br><br><br>
 
+      <!-- Mod tools -->
       <nav class="panel" v-if="room.players[0] == player.name">
         <p class="panel-heading">Mod Tools</p>
         <div class="panel-block" style="background: #ffd70066;">
@@ -249,6 +256,7 @@
         </div>
       </nav>
 
+      <!-- History -->
       <h2>History</h2>
       <template v-for="(round, i) in room.history.slice().reverse()">
         <h3 class="capitalize" :class="{'has-text-success': round.word == round.guess, 'has-text-danger': round.word != round.guess}">
