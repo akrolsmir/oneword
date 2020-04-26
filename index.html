@@ -210,18 +210,15 @@
           <button class="button is-small" @click="togglePublic" :disabled='!$refs.navbar.isSupporter'>Make room {{ room.public ? 'private' : 'public' }}</button>
           <button class="button is-small" @click="shareRoom" :disabled='!$refs.navbar.isSupporter'>Share room link</button>
         </div>
-        <div class="panel-block field is-grouped">
+        <div class="panel-block is-grouped">
           <button class="button is-small" @click="nextStage">Next Stage</button>
           <button class="button is-small" @click="newRound(true)">Skip Word</button>
           <button class="button is-small" @click="resetRoom">Reset Room</button>
-          <div class="field has-addons">
-            <div class="control">
-              <button class="button is-small" @click="kickPlayer(player.kick)">Kick</button>
+          <div class="field has-addons" style="padding-left: 20px">
+            <button class="button is-small" @click="kickPlayer(player.kick)">Kick</button>
+            <button class="button is-small" @click="makeMod(player.kick)">Transfer Mod</button>
+            <input class="input is-small" type="text" v-model="player.kick" placeholder="Player Name">
             </div>
-            <div class="control">
-              <input class="input is-small" type="text" v-model="player.kick" placeholder="Player Name">
-            </div>
-          </div>
         </div>
         <div class="panel-block">
           <div class="field has-addons">
@@ -410,6 +407,14 @@
         if (this.room.players.includes(name)) {
           const index = this.room.players.indexOf(name);
           this.room.players.splice(index, 1);
+          await updateRoom(this.room, { 'players': this.room.players });
+        }
+      },
+      async makeMod(name) {
+        if (this.room.players.includes(name)) {
+          const index = this.room.players.indexOf(name);
+          this.room.players[index] = this.player.name;
+          this.room.players[0] = name;
           await updateRoom(this.room, { 'players': this.room.players });
         }
       },
