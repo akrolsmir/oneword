@@ -195,7 +195,7 @@
         </div>
         <h2 class="newline">{{ dedupe(room.currentRound.clues) }}</h2>
         <br>
-        <scoreboard :history="room.history" :current-round="room.currentRound">
+        <scoreboard :history="room.history" :current-round="room.currentRound" :rounds-in-game="room.roundsInGame">
           <button class="button" @click="newRound(false)">Next Round</button>
         </scoreboard>
       </div>
@@ -207,8 +207,15 @@
         <p class="panel-heading">Mod Tools</p>
         <div class="panel-block" style="background: #ffd70066;">
           <h3 style="padding-right: 20px;">Supporter Tools</h3>
-          <button class="button is-small" @click="togglePublic" :disabled='!$refs.navbar.isSupporter'>Make room {{ room.public ? 'private' : 'public' }}</button>
-          <button class="button is-small" @click="shareRoom" :disabled='!$refs.navbar.isSupporter'>Share room link</button>
+          <button class="button is-small" @click="togglePublic" :disabled='!$refs.navbar.isSupporter'>
+            {{ room.public ? 'Private' : 'Public' }} room
+          </button>
+          <button class="button is-small" @click="setRounds" :disabled='!$refs.navbar.isSupporter'>
+            {{ room.roundsInGame }} rounds
+          </button>
+          <button class="button is-small" @click="shareRoom" :disabled='!$refs.navbar.isSupporter'>
+            Share room link
+          </button>
         </div>
         <div class="panel-block is-grouped">
           <button class="button is-small" @click="nextStage">Next Stage</button>
@@ -383,6 +390,7 @@
           },
           history: [],
           public: true,
+          roundsInGame: 13,
           lastUpdateTime: Date.now(),
           timers: { 'CLUEING': '', 'GUESSING': '', 'DONE': '', running: false },
           categories: { 'nouns': true, 'verbs': false, 'adjectives': false, 'compounds': false, 'custom': false },
@@ -478,6 +486,14 @@
       async togglePublic() {
         this.room.public = !this.room.public;
         await updateRoom(this.room, { 'public': this.room.public });
+      },
+      async setRounds() {
+        if (this.room.roundsInGame != 13) {
+          this.room.roundsInGame = 13;
+        } else {
+          this.room.roundsInGame = 'Unlimited';
+        }
+        await updateRoom(this.room, { 'roundsInGame': this.room.roundsInGame });
       },
       async shareRoom() {
         const link = document.createElement("input");

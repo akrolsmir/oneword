@@ -1,4 +1,3 @@
-const WINDOW = 13;
 const MESSAGES = {
   0: "You do understand this is supposed to be a COOPERATIVE game, right?",
   1: "At least you can't do much worse next time!",
@@ -17,12 +16,15 @@ const MESSAGES = {
 
 Vue.component('scoreboard', {
   data() {
-    return { WINDOW, MESSAGES };
+    return {
+      MESSAGES,
+      showNextRound: false,
+    };
   },
   props: {
     history: Array,
     currentRound: Object,
-    showNextRound: false,
+    roundsInGame: Object,
   },
   mounted() {
     startFireworks(this.correct);
@@ -31,21 +33,24 @@ Vue.component('scoreboard', {
     rounds() {
       return [...this.history.slice(), this.currentRound];
     },
+    window() {
+      return this.roundsInGame == 'Unlimited' ? 1024 /* Basically unlimited */ : this.roundsInGame;
+    },
     correct() {
       return this.rounds
-        .splice(-WINDOW) // Only count the last WINDOW rounds
+        .splice(-this.window) // Only count the last window rounds
         .map(r => r.guess == r.word ? 1 : 0)
-        .reduce((a, b) => a + b);
+        .reduce((a, b) => a + b, 0);
     }
   },
   template: `
   <div>
-    <div v-if="rounds.length % WINDOW == 0">
+    <div v-if="rounds.length % window == 0">
       <h1>And that's a wrap!</h1><br>
 
       <canvas id="fireworks"></canvas>
 
-      <h2>Final score: {{ correct }} correct / {{ WINDOW }} rounds </h2>
+      <h2>Final score: {{ correct }} correct / {{ window }} rounds </h2>
       ({{ MESSAGES[correct] }})<br>
       <br>
 
@@ -58,7 +63,7 @@ Vue.component('scoreboard', {
       
       <a @click="showNextRound = !showNextRound">(Not done playing? Alright, click here to continue.)</a>
     </div>
-    <div v-if="rounds.length % WINDOW != 0 || showNextRound">
+    <div v-if="rounds.length % window != 0 || showNextRound">
       <slot></slot>
     </div>
   </div>
