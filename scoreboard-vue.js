@@ -34,7 +34,10 @@ Vue.component('scoreboard', {
       return [...this.history.slice(), this.currentRound];
     },
     window() {
-      return this.roundsInGame == 'Unlimited' ? 1024 /* Basically unlimited */ : this.roundsInGame;
+      if (this.roundsInGame == 'Unlimted') {
+        return 1024;
+      }
+      return this.roundsInGame || 13;
     },
     correct() {
       return this.rounds
