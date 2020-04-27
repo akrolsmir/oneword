@@ -208,7 +208,7 @@
         <div class="panel-block" style="background: #ffd70066;">
           <h3 style="padding-right: 20px;">Supporter Tools</h3>
           <button class="button is-small" @click="togglePublic" :disabled='!$refs.navbar.isSupporter'>
-            {{ room.public ? 'Private' : 'Public' }} room
+            {{ room.public ? 'Public' : 'Private' }} room
           </button>
           <button class="button is-small" @click="setRounds" :disabled='!$refs.navbar.isSupporter'>
             {{ room.roundsInGame }} rounds
