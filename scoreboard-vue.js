@@ -8,6 +8,7 @@ const MESSAGES = {
   6: "Respectable attempt. Want to try again?",
   7: "Okay... At least it's a lucky number?",
   8: "Not bad! Now we're getting somewhere.",
+  9: "Pretty good job -- but can you make it to double digits?",
   10: "Huh, color me impressed. Was it a fluke?",
   11: "You really dialed it to the next level. Try a harder category next time!",
   12: "You all must be cheating somehow, I just know it...",
