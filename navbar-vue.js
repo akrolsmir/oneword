@@ -1,3 +1,44 @@
+Vue.component('avatar', {
+  props: {
+    name: String,
+    email: String,
+    submitted: Boolean,
+    index: Number,
+  },
+  data() {
+    return {
+      md5,
+    };
+  },
+  computed: {
+    modStyle() {
+      return {
+        border: this.email ? '2px solid gold' : '',
+      };
+    },
+    supporterMargin() {
+      const style = { margin: '4px' };
+      if (this.email) {
+        style['margin-left'] = 0;
+      }
+      return style;
+    },
+  },
+  template: `
+<div class="card" style="display: inline-block;" :style="modStyle">
+  <img
+    style="margin-bottom: -6px;"
+    v-if="email"
+    :src="'https://www.gravatar.com/avatar/' + md5(email) + '?size=24'"
+    height="24"
+    width="24">
+  <span :class="{ 'has-text-primary has-text-weight-bold': submitted }" :style="supporterMargin">
+    {{ name }}
+  </span>
+</div>
+  `,
+});
+
 Vue.component('navbar', {
   props: {
     value: {

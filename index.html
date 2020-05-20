@@ -124,9 +124,12 @@
           <br><br>
           Players:
           <template v-for="(player, i) in room.players">
-            <span :class="{'has-text-primary has-text-weight-bold': 
-            room.currentRound.clues[player] || room.currentRound.guesser == player}">
-              {{ player + (i == 0 ? ' (mod)' : '')}}</span><span v-if="i + 1 < room.players.length">, </span>
+            <avatar
+              :name="player" 
+              :email="room.namesToEmails && room.namesToEmails[player]"
+              :index="i"
+              :submitted="room.currentRound.clues[player] || room.currentRound.guesser == player">
+            </avatar><span v-if="i + 1 < room.players.length">, </span>              
           </template>
         </div>
       </article>
@@ -210,6 +213,9 @@
           <button class="button is-small" @click="togglePublic" :disabled='!$refs.navbar.isSupporter'>
             {{ room.public ? 'Public' : 'Private' }} room
           </button>
+          <button class="button is-small" @click="showAvatar" :disabled='!$refs.navbar.isSupporter'>
+            Show custom avatar
+          </button>
           <button class="button is-small" @click="setRounds" :disabled='!$refs.navbar.isSupporter'>
             {{ room.roundsInGame }} rounds
           </button>
@@ -277,6 +283,7 @@
 <script src="https://cdn.jsdelivr.net/npm/vue@2.6.2/dist/vue.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert@2.1.2/dist/sweetalert.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/blueimp-md5@2.13.0/js/md5.min.js"></script>
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-analytics.js"></script>
@@ -358,6 +365,7 @@
       }
     },
     methods: {
+      md5,
       moment,
       listRooms,
       dedupe,
@@ -394,7 +402,8 @@
           lastUpdateTime: Date.now(),
           timers: { 'CLUEING': '', 'GUESSING': '', 'DONE': '', running: false },
           categories: { 'nouns': true, 'verbs': false, 'adjectives': false, 'compounds': false, 'custom': false },
-          customWords: ''
+          customWords: '',
+          namesToEmails: {}, // For rendering gravatars
         }
         await setRoom(this.room);
       },
@@ -486,6 +495,15 @@
       async togglePublic() {
         this.room.public = !this.room.public;
         await updateRoom(this.room, { 'public': this.room.public });
+      },
+      async showAvatar() {
+        if (!this.room.namesToEmails) {
+          // TODO: Maybe remove null check after soaking a while?
+          this.room.namesToEmails = {};
+        }
+        const email = this.$refs.navbar.value.email;
+        this.room.namesToEmails[this.player.name] = email;
+        await updateRoom(this.room, { namesToEmails: this.room.namesToEmails });
       },
       async setRounds() {
         if (this.room.roundsInGame != 13) {
