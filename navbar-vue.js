@@ -3,8 +3,10 @@ Vue.component('navbar', {
     value: {
       type: Object, // Should be a user object
       // Only show login button on pages that use it.
-      default() { return { hideLogin: false } }
-    }
+      default() {
+        return { hideLogin: false };
+      },
+    },
   },
   methods: {
     logIn() {
@@ -28,15 +30,17 @@ Vue.component('navbar', {
         source: 'navbar',
       });
       window.open('./supporter.html', '_blank');
-    }
+    },
   },
   computed: {
     isSupporter() {
-      return this.value.supporter == 'BASE' || this.value.supporter == 'SPONSOR';
+      return (
+        this.value.supporter == 'BASE' || this.value.supporter == 'SPONSOR'
+      );
     },
     isSponsor() {
       return this.value.supporter == 'SPONSOR';
-    }
+    },
   },
   template: `
 <nav class="navbar has-shadow is-fixed-top"
@@ -67,5 +71,5 @@ Vue.component('navbar', {
     </div>
   </div>
 </nav>
-  `
+  `,
 });
