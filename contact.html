@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+
+<head>
+  <title>One Word</title>
+  <link
+    href="https://fonts.googleapis.com/css?family=Fjalla+One|Merienda+One|Righteous|Sriracha&display=swap"
+    rel="stylesheet"
+  />
+  <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
+  <link
+    rel="stylesheet"
+    href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css"
+  />
+  <style>
+    html {
+      margin: 0;
+      height: 100%;
+      background-color: #aeecef;
+      position: relative;
+      overflow: auto;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: 'Merienda One', cursive;
+    }
+
+    body {
+      margin: 48px;
+      width: 600px;
+    }
+  </style>
+  <meta name="description" content="Play the word game Contact online!" />
+
+  <body>
+    <div id="vue">
+      <div>
+        <!-- Room header -->
+        <article class="message">
+          <div class="message-header">
+            <h1>{{ room.name }}</h1>
+            <h2 class="capitalize">
+              Round ####
+            </h2>
+          </div>
+          <div class="message-body">
+            {{ room.players }}
+          </div>
+        </article>
+
+        <!-- Word -->
+        <h2 class="title">{{ room.currentRound.word.toUpperCase() }}</h2>
+
+        <!-- Clues -->
+        <h3>Clues</h3>
+        <template v-for="(clue, cluer) in room.currentRound.clues">
+          <div class="card">
+            Cluer: {{ cluer }} <br />
+            Clue: {{ clue.word }} <br />
+            Match: <input class="input" />
+          </div>
+        </template>
+        <br /><br />
+
+        <!-- Banned -->
+        <h3>Banned</h3>
+        <div class="card">
+          NOT: <input class="input" /> <br />
+          <ul v-for="word in banned">
+            <li>{{ word }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.2/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert@2.1.2/dist/sweetalert.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/blueimp-md5@2.13.0/js/md5.min.js"></script>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-analytics.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-firestore.js"></script>
+
+  <!-- My code -->
+  <script type="module" src="firebase-network.js"></script>
+  <script type="module" src="./navbar-vue.js"></script>
+  <script type="module" src="./timer-vue.js"></script>
+  <script type="module" src="./scoreboard-vue.js"></script>
+  <script type="module">
+    /**
+    Room: {
+      name: 'apple',
+      players: ['alice', 'bob', 'carol'],
+      currentRound: {
+        revealed: 2,
+        wordmaster: 'alice',
+        word: 'company'
+        banned: ['cloak', 'collar', 'condone'],
+        clues: {
+          bob: {
+            hint: 'square',
+            word: 'corner',
+            contact: 'carol',
+            contactedWord: 'corner',
+          },
+          carol: ...
+        }
+      }
+      history: [{round1}, ...]
+    }
+    */
+    const vueApp = new Vue({
+      el: '#vue',
+      data: {
+        user: {},
+        allRooms: [],
+        room: {
+          name: 'default-room',
+          history: [],
+        },
+        player: {
+          name: '',
+        },
+      },
+    });
+
+    const dummyRoom = {
+      name: 'apple',
+      players: ['alice', 'bob', 'carol'],
+      currentRound: {
+        revealed: 2,
+        wordmaster: 'alice',
+        word: 'company',
+        banned: ['cloak', 'collar', 'condone'],
+        clues: {
+          bob: {
+            hint: 'square',
+            word: 'corner',
+            contact: 'carol',
+            contactedWord: 'corner',
+          },
+        },
+      },
+    };
+    vueApp.room = dummyRoom;
+  </script>
+</head>
