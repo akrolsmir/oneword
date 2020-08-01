@@ -1,12 +1,12 @@
 const firebaseConfig = {
-  apiKey: "AIzaSyA2JfA8ZGxT6pKV87TwhGfUGR1kAdcPMyU",
-  authDomain: "oneword-cf74a.firebaseapp.com",
-  databaseURL: "https://oneword-cf74a.firebaseio.com",
-  projectId: "oneword-cf74a",
-  storageBucket: "oneword-cf74a.appspot.com",
-  messagingSenderId: "340753176141",
-  appId: "1:340753176141:web:d51695ab8606909dda2e04",
-  measurementId: "G-3EQ36WVM0W"
+  apiKey: 'AIzaSyA2JfA8ZGxT6pKV87TwhGfUGR1kAdcPMyU',
+  authDomain: 'oneword-cf74a.firebaseapp.com',
+  databaseURL: 'https://oneword-cf74a.firebaseio.com',
+  projectId: 'oneword-cf74a',
+  storageBucket: 'oneword-cf74a.appspot.com',
+  messagingSenderId: '340753176141',
+  appId: '1:340753176141:web:d51695ab8606909dda2e04',
+  measurementId: 'G-3EQ36WVM0W',
 };
 // Initialize Firebase
 if (!firebase.apps.length) {
@@ -30,7 +30,8 @@ export async function getRoom(room) {
 
 export async function listRooms() {
   const db = firebase.firestore();
-  const docs = await db.collection('rooms')
+  const docs = await db
+    .collection('rooms')
     .where('public', '==', true)
     .orderBy('lastUpdateTime', 'desc')
     // TODO: limit to last 7 days instead.
@@ -39,16 +40,18 @@ export async function listRooms() {
 
   const rooms = [];
   docs.forEach((doc) => rooms.push(doc.data()));
-  return rooms.filter(room => room.players.length > 0);
+  return rooms.filter((room) => room.players.length > 0);
 }
 
 let unsubscribe;
 export function listenRoom(vueApp) {
   // Detach listener before listening to a new room.
   unlistenRoom();
-  unsubscribe = db.collection("rooms").doc(vueApp.room.name)
+  unsubscribe = db
+    .collection('rooms')
+    .doc(vueApp.room.name)
     .onSnapshot(function (doc) {
-      console.log("Current data: ", doc.data());
+      console.log('Current data: ', doc.data());
       vueApp.room = doc.data();
     });
 }
@@ -61,7 +64,7 @@ export function unlistenRoom() {
 
 // May return null.
 export async function getUser(userId) {
-  const doc = await db.collection("users").doc(userId).get();
+  const doc = await db.collection('users').doc(userId).get();
   return doc.data();
 }
 
@@ -78,7 +81,7 @@ export function listenForLogin(vueApp) {
           createTime: Date.now(),
           lastUpdateTime: Date.now(),
         };
-        await db.collection("users").doc(fetchedUser.id).set(fetchedUser);
+        await db.collection('users').doc(fetchedUser.id).set(fetchedUser);
       } else {
         // Just update the email and name provided by Firebase Auth.
         fetchedUser.name = user.displayName;
@@ -92,5 +95,5 @@ export function listenForLogin(vueApp) {
 
 export function runUrl(runId) {
   const parsedUrl = new URL(window.location.href);
-  return `${parsedUrl.origin}/draft-viewer?run=${runId}`
+  return `${parsedUrl.origin}/draft-viewer?run=${runId}`;
 }
