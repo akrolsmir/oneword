@@ -46,38 +46,61 @@
   <body>
     <div id="vue">
       Player Name: <input v-model="player.name" /> <br />
-      Room Name: <input v-model="room.name" /> <br /><br />
-      <div>
+      Room Name: <input v-model="room.name" /> <br />
+      <button @click="resetRoom">Reset room</button>
+      <button @click="enterRoom">Enter room</button>
+      <br /><br />
+      <div v-if="room && room.currentRound">
         <!-- Room header -->
         <article class="message">
           <div class="message-header">
             <h1>{{ room.name }}</h1>
             <h2 class="capitalize">
-              Round ####
+              Round ???
             </h2>
           </div>
           <div class="message-body">
-            {{ room.players }}
+            Players: {{ room.players.join(', ') }} <br />
+            Wordmaster: {{ room.currentRound.wordmaster }}
           </div>
         </article>
 
         <!-- Word -->
-        <h2 class="title">{{ room.currentRound.word.toUpperCase() }}</h2>
+        <h3>Word</h3>
+        <h2 class="title">
+          {{ room.currentRound.word.toUpperCase().slice(0,
+          room.currentRound.revealed) }}...?
+        </h2>
 
         <!-- Clues -->
         <h3>Clues</h3>
         <div v-if="!clueGiven">
           <div class="card">
             <h3>Add a clue!</h3>
-            Hint: <input class="input" /> <br />
-            Word: <input class="input" />
+            Hint: <input class="input" v-model="player.hint" /> <br />
+            Word: <input class="input" v-model="player.word" /> <br />
+            <button class="button" @click="createClue()">Create clue</button>
           </div>
         </div>
         <template v-for="(clue, cluer) in room.currentRound.clues">
           <div class="card">
-            <h3>{{ cluer }}'s clue</h3>
-            Hint: {{ clue.hint }} <br />
-            Match: <input class="input" />
+            <h3>{{ cluer }}'s clue: {{ clue.hint }}</h3>
+            <template v-if="clue.contact">
+              Contacted {{clue.contact}}!
+              <!-- TODO countdown -->
+            </template>
+            <template v-else-if="cluer === player.name">
+              <!-- TODO implement remove -->
+              {{ clue.word }} <button>Remove</button>
+            </template>
+            <template v-else>
+              <input
+                class="input"
+                placeholder=""
+                v-model="clue.contactedWord"
+              />
+              <button class="button" @click="contact(cluer)">Contact!</button>
+            </template>
           </div>
         </template>
         <br /><br />
@@ -111,6 +134,16 @@
   <script type="module" src="./timer-vue.js"></script>
   <script type="module" src="./scoreboard-vue.js"></script>
   <script type="module">
+    import {
+      setRoom,
+      updateRoom,
+      getRoom,
+      listRooms,
+      listenRoom,
+      unlistenRoom,
+      listenForLogin,
+    } from './firebase-network.js';
+
     /**
     Room: {
       name: 'apple',
@@ -144,6 +177,75 @@
         },
         player: {
           name: '',
+          // Cluing but not yet set to firebase
+          hint: '',
+          word: '',
+        },
+      },
+      methods: {
+        async enterRoom() {
+          if (!this.player.name) {
+            this.$refs.navbar.logIn();
+            return;
+          }
+          const room = await getRoom(this.room);
+          if (room) {
+            this.room = room;
+            return await this.joinRoom();
+          } else {
+            // Create a new room
+            listenRoom(this);
+            return await this.resetRoom();
+          }
+        },
+        async resetRoom() {
+          this.room = {
+            name: this.room.name,
+            players: ['alice', 'bob', 'carol'],
+            currentRound: {
+              revealed: 2,
+              wordmaster: 'alice',
+              word: 'company',
+              banned: ['cloak', 'collar', 'condone'],
+              clues: {
+                bob: {
+                  hint: 'square',
+                  word: 'corner',
+                  contact: 'carol',
+                  contactedWord: 'corner',
+                },
+              },
+            },
+          };
+          await setRoom(this.room);
+        },
+        // Only call if room already exists.
+        async joinRoom() {
+          listenRoom(this);
+
+          if (!this.room.players.includes(this.player.name)) {
+            this.room.players.push(this.player.name);
+            await updateRoom(this.room, { players: this.room.players });
+          }
+        },
+        async createClue() {
+          const update = {
+            [`currentRound.clues.${this.player.name}`]: {
+              hint: this.player.hint,
+              word: this.player.word,
+              contact: '',
+              contactedWord: '',
+            },
+          };
+          await updateRoom(this.room, update);
+        },
+        async contact(cluer) {
+          const update = {
+            [`currentRound.clues.${cluer}.contact`]: this.player.name,
+            [`currentRound.clues.${cluer}.contactedWord`]: this.room
+              .currentRound.clues[cluer].contactedWord,
+          };
+          await updateRoom(this.room, update);
         },
       },
       computed: {
@@ -155,25 +257,5 @@
         },
       },
     });
-
-    const dummyRoom = {
-      name: 'apple',
-      players: ['alice', 'bob', 'carol'],
-      currentRound: {
-        revealed: 2,
-        wordmaster: 'alice',
-        word: 'company',
-        banned: ['cloak', 'collar', 'condone'],
-        clues: {
-          bob: {
-            hint: 'square',
-            word: 'corner',
-            contact: 'carol',
-            contactedWord: 'corner',
-          },
-        },
-      },
-    };
-    vueApp.room = dummyRoom;
   </script>
 </head>
