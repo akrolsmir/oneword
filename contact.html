@@ -35,11 +35,18 @@
       margin: 48px;
       width: 600px;
     }
+
+    .card {
+      padding: 8px;
+      margin-bottom: 8px;
+    }
   </style>
   <meta name="description" content="Play the word game Contact online!" />
 
   <body>
     <div id="vue">
+      Player Name: <input v-model="player.name" /> <br />
+      Room Name: <input v-model="room.name" /> <br /><br />
       <div>
         <!-- Room header -->
         <article class="message">
@@ -59,10 +66,17 @@
 
         <!-- Clues -->
         <h3>Clues</h3>
+        <div v-if="!clueGiven">
+          <div class="card">
+            <h3>Add a clue!</h3>
+            Hint: <input class="input" /> <br />
+            Word: <input class="input" />
+          </div>
+        </div>
         <template v-for="(clue, cluer) in room.currentRound.clues">
           <div class="card">
-            Cluer: {{ cluer }} <br />
-            Clue: {{ clue.word }} <br />
+            <h3>{{ cluer }}'s clue</h3>
+            Hint: {{ clue.hint }} <br />
             Match: <input class="input" />
           </div>
         </template>
@@ -71,8 +85,10 @@
         <!-- Banned -->
         <h3>Banned</h3>
         <div class="card">
-          NOT: <input class="input" /> <br />
-          <ul v-for="word in banned">
+          <div v-if="player.name == room.currentRound.wordmaster">
+            NOT: <input class="input" /> <br />
+          </div>
+          <ul v-for="word in room.currentRound.banned">
             <li>{{ word }}</li>
           </ul>
         </div>
@@ -128,6 +144,14 @@
         },
         player: {
           name: '',
+        },
+      },
+      computed: {
+        clueGiven() {
+          return (
+            this.room.currentRound.wordmaster === this.player.name ||
+            Object.keys(this.room.currentRound.clues).includes(this.player.name)
+          );
         },
       },
     });
