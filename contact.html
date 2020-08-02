@@ -87,11 +87,17 @@
             <h3>{{ cluer }}'s clue: {{ clue.hint }}</h3>
             <template v-if="clue.contact">
               Contacted {{clue.contact}}!
-              <!-- TODO countdown -->
+              <!-- Need to debug this... -->
+              <!-- <timer :length="5" :on-finish="onContact(cluer, clue)"></timer> -->
+              <button
+                v-if="player.name == room.currentRound.wordmaster"
+                @click="onContact(cluer, clue)()"
+              >
+                Resolve
+              </button>
             </template>
             <template v-else-if="cluer === player.name">
-              <!-- TODO implement remove -->
-              {{ clue.word }} <button>Remove</button>
+              {{ clue.word }} <button @click="withdrawClue">Withdraw</button>
             </template>
             <template v-else>
               <input
@@ -239,6 +245,12 @@
           };
           await updateRoom(this.room, update);
         },
+        async withdrawClue() {
+          delete this.room.currentRound.clues[this.player.name];
+          await updateRoom(this.room, {
+            'currentRound.clues': this.room.currentRound.clues,
+          });
+        },
         async contact(cluer) {
           const update = {
             [`currentRound.clues.${cluer}.contact`]: this.player.name,
@@ -246,6 +258,30 @@
               .currentRound.clues[cluer].contactedWord,
           };
           await updateRoom(this.room, update);
+        },
+        // Wrapper, since timer onFinish expects a function.
+        onContact(cluer, clue) {
+          return async () => {
+            // TODO: Make this appear for everyone...?
+            const message = `CONTACT!\n${cluer}: ${clue.word}\n${clue.contact}: ${clue.contactedWord}`;
+            swal(message);
+            if (this.player.name !== this.room.currentRound.wordmaster) {
+              return;
+            }
+
+            if (clue.word === clue.contactedWord) {
+              this.room.currentRound.revealed++;
+              delete this.room.currentRound.clues;
+            } else {
+              // Ban both words and reset
+              this.room.currentRound.banned.push(clue.word);
+              this.room.currentRound.banned.push(clue.contactedWord);
+              delete this.room.currentRound.clues[cluer];
+            }
+            await updateRoom(this.room, {
+              currentRound: this.room.currentRound,
+            });
+          };
         },
       },
       computed: {
