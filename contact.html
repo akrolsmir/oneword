@@ -49,6 +49,7 @@
       Room Name: <input v-model="room.name" /> <br />
       <button @click="resetRoom">Reset room</button>
       <button @click="enterRoom">Enter room</button>
+      <button @click="nextRound">Next round</button>
       <br /><br />
       <div v-if="room && room.currentRound">
         <!-- Room header -->
@@ -67,10 +68,17 @@
 
         <!-- Word -->
         <h3>Word</h3>
-        <h2 class="title">
-          {{ room.currentRound.word.toUpperCase().slice(0,
-          room.currentRound.revealed) }}...?
-        </h2>
+        <div v-if="room.currentRound.word">
+          <h2 class="title">
+            {{ room.currentRound.word.toUpperCase().slice(0,
+            room.currentRound.revealed) }}...?
+          </h2>
+        </div>
+        <div v-else-if="player.name == room.currentRound.wordmaster">
+          Choose a word:
+          <input class="input" v-model="player.word" />
+          <button class="button" @click="chooseWord">Let's go!</button>
+        </div>
 
         <!-- Clues -->
         <h3>Clues</h3>
@@ -212,21 +220,15 @@
         async resetRoom() {
           this.room = {
             name: this.room.name,
-            players: ['alice', 'bob', 'carol'],
+            players: [],
             currentRound: {
               revealed: 2,
-              wordmaster: 'alice',
-              word: 'company',
-              banned: ['cloak', 'collar', 'condone'],
-              clues: {
-                bob: {
-                  hint: 'square',
-                  word: 'corner',
-                  contact: 'carol',
-                  contactedWord: 'corner',
-                },
-              },
+              wordmaster: this.player.name,
+              word: '',
+              banned: [],
+              clues: {},
             },
+            history: [],
           };
           await setRoom(this.room);
         },
@@ -275,6 +277,7 @@
             }
 
             if (clue.word === clue.contactedWord) {
+              this.room.currentRound.banned.push(clue.word);
               this.room.currentRound.revealed++;
               delete this.room.currentRound.clues;
               this.room.currentRound.clues = {};
@@ -303,6 +306,24 @@
             currentRound: this.room.currentRound,
           });
           this.player.toBan = '';
+        },
+        async chooseWord() {
+          await updateRoom(this.room, {
+            'currentRound.word': this.player.word,
+          });
+        },
+        async nextRound() {
+          const newRound = {
+            revealed: 1,
+            wordmaster: this.player.name,
+            word: '',
+            banned: [],
+            clues: {},
+          };
+          await updateRoom(this.room, {
+            currentRound: newRound,
+            history: [...this.room.history, this.room.currentRound],
+          });
         },
       },
       computed: {
