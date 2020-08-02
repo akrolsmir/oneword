@@ -99,7 +99,7 @@
             <template v-else-if="cluer === player.name">
               {{ clue.word }} <button @click="withdrawClue">Withdraw</button>
             </template>
-            <template v-else>
+            <template v-else-if="player.name !== room.currentRound.wordmaster">
               <input
                 class="input"
                 placeholder=""
@@ -115,7 +115,8 @@
         <h3>Banned</h3>
         <div class="card">
           <div v-if="player.name == room.currentRound.wordmaster">
-            NOT: <input class="input" /> <br />
+            <input class="input" v-model="player.toBan" /> <br />
+            <button class="button" @click="banWord(player.toBan)">Ban!</button>
           </div>
           <ul v-for="word in room.currentRound.banned">
             <li>{{ word }}</li>
@@ -186,6 +187,7 @@
           // Cluing but not yet set to firebase
           hint: '',
           word: '',
+          toBan: '',
         },
       },
       methods: {
@@ -272,6 +274,7 @@
             if (clue.word === clue.contactedWord) {
               this.room.currentRound.revealed++;
               delete this.room.currentRound.clues;
+              this.room.currentRound.clues = {};
             } else {
               // Ban both words and reset
               this.room.currentRound.banned.push(clue.word);
@@ -282,6 +285,21 @@
               currentRound: this.room.currentRound,
             });
           };
+        },
+        async banWord() {
+          const toBan = this.player.toBan;
+          this.room.currentRound.banned.push(toBan);
+          for (const [cluer, clue] of Object.entries(
+            this.room.currentRound.clues,
+          )) {
+            if (clue.word === toBan) {
+              delete this.room.currentRound.clues[cluer];
+            }
+          }
+          await updateRoom(this.room, {
+            currentRound: this.room.currentRound,
+          });
+          this.player.toBan = '';
         },
       },
       computed: {
