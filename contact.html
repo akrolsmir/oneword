@@ -69,16 +69,20 @@
         <!-- Word -->
         <h3>Word</h3>
         <div v-if="room.currentRound.word">
-          <h2 class="title">
+          <h2 class="title has-text-centered is-size-1">
             {{ room.currentRound.word.toUpperCase().slice(0,
             room.currentRound.revealed) }}...?
           </h2>
         </div>
         <div v-else-if="player.name == room.currentRound.wordmaster">
-          Choose a word:
-          <input class="input" v-model="player.word" />
-          <button class="button" @click="chooseWord">Let's go!</button>
+          <input
+            class="input"
+            v-model="player.word"
+            @keyup.enter="chooseWord"
+          />
+          <button class="button" @click="chooseWord">Choose!</button>
         </div>
+        <br /><br />
 
         <div class="columns">
           <!-- Clues -->
@@ -87,9 +91,16 @@
             <div v-if="!clueGiven">
               <div class="card">
                 <h3>Add a clue!</h3>
-                Hint: <input class="input" v-model="player.hint" /> <br />
-                Word: <input class="input" v-model="player.word" /> <br />
-                <button class="button" @click="createClue()">
+                <input class="input" v-model="player.word" placeholder="Word" />
+                <br /><br />
+                <input
+                  class="input"
+                  v-model="player.hint"
+                  placeholder="Hint"
+                  @keyup.enter="createClue"
+                />
+                <br /><br />
+                <button class="button" @click="createClue">
                   Create clue
                 </button>
               </div>
@@ -117,8 +128,8 @@
                 >
                   <input
                     class="input"
-                    placeholder=""
                     v-model="clue.contactedWord"
+                    @keyup.enter="contact(cluer)"
                   />
                   <button class="button" @click="contact(cluer)">
                     Contact!
@@ -133,8 +144,13 @@
             <h3>Banned</h3>
             <div class="card">
               <div v-if="player.name == room.currentRound.wordmaster">
-                <input class="input" v-model="player.toBan" /> <br />
-                <button class="button" @click="banWord(player.toBan)">
+                <input
+                  class="input"
+                  v-model="player.toBan"
+                  @keyup.enter="banWord"
+                />
+                <br />
+                <button class="button" @click="banWord">
                   Ban!
                 </button>
               </div>
@@ -316,10 +332,10 @@
               delete this.room.currentRound.clues[cluer];
             }
           }
+          this.player.toBan = '';
           await updateRoom(this.room, {
             currentRound: this.room.currentRound,
           });
-          this.player.toBan = '';
         },
         async chooseWord() {
           await updateRoom(this.room, {
