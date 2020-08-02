@@ -70,8 +70,7 @@
         <h3>Word</h3>
         <div v-if="room.currentRound.word">
           <h2 class="title has-text-centered is-size-1">
-            {{ room.currentRound.word.toUpperCase().slice(0,
-            room.currentRound.revealed) }}...?
+            {{ prefix.toUpperCase() }}...?
           </h2>
         </div>
         <div v-else-if="player.name == room.currentRound.wordmaster">
@@ -91,18 +90,13 @@
             <div v-if="!clueGiven">
               <div class="card">
                 <h3>Add a clue!</h3>
-                <input class="input" v-model="player.word" placeholder="Word" />
-                <br /><br />
-                <input
-                  class="input"
-                  v-model="player.hint"
-                  placeholder="Hint"
-                  @keyup.enter="createClue"
+                <input class="input" v-model="player.hint" placeholder="Hint" />
+                <Submit
+                  placeholder="Word"
+                  button-text="Create"
+                  :on-submit="createClue"
+                  :invalid="(word) => room.currentRound.banned.includes(word) || !word.startsWith(prefix)"
                 />
-                <br /><br />
-                <button class="button" @click="createClue">
-                  Create clue
-                </button>
               </div>
             </div>
             <template v-for="(clue, cluer) in room.currentRound.clues">
@@ -126,14 +120,12 @@
                 <template
                   v-else-if="player.name !== room.currentRound.wordmaster"
                 >
-                  <input
-                    class="input"
-                    v-model="clue.contactedWord"
-                    @keyup.enter="contact(cluer)"
+                  <Submit
+                    placeholder="Word"
+                    button-text="Contact!"
+                    :on-submit="contact(cluer)"
+                    :invalid="(word) => room.currentRound.banned.includes(word) || !word.startsWith(prefix)"
                   />
-                  <button class="button" @click="contact(cluer)">
-                    Contact!
-                  </button>
                 </template>
               </div>
             </template>
@@ -144,15 +136,12 @@
             <h3>Banned</h3>
             <div class="card">
               <div v-if="player.name == room.currentRound.wordmaster">
-                <input
-                  class="input"
-                  v-model="player.toBan"
-                  @keyup.enter="banWord"
+                <Submit
+                  placeholder="Word"
+                  button-text="Ban!"
+                  :on-submit="banWord"
+                  :invalid="(word) => room.currentRound.banned.includes(word) || !word.startsWith(prefix)"
                 />
-                <br />
-                <button class="button" @click="banWord">
-                  Ban!
-                </button>
               </div>
               <ul v-for="word in room.currentRound.banned">
                 <li>{{ word }}</li>
@@ -181,6 +170,7 @@
   <script type="module" src="./navbar-vue.js"></script>
   <script type="module" src="./timer-vue.js"></script>
   <script type="module" src="./scoreboard-vue.js"></script>
+  <script type="module" src="./submit-vue.js"></script>
   <script type="module">
     import {
       setRoom,
@@ -271,11 +261,11 @@
             await updateRoom(this.room, { players: this.room.players });
           }
         },
-        async createClue() {
+        async createClue(word) {
           const update = {
             [`currentRound.clues.${this.player.name}`]: {
+              word,
               hint: this.player.hint,
-              word: this.player.word,
               contact: '',
               contactedWord: '',
             },
@@ -288,13 +278,15 @@
             'currentRound.clues': this.room.currentRound.clues,
           });
         },
-        async contact(cluer) {
-          const update = {
-            [`currentRound.clues.${cluer}.contact`]: this.player.name,
-            [`currentRound.clues.${cluer}.contactedWord`]: this.room
-              .currentRound.clues[cluer].contactedWord,
+        // Wrapper, since Submit onEnter expects a function.
+        contact(cluer) {
+          return async (word) => {
+            const update = {
+              [`currentRound.clues.${cluer}.contact`]: this.player.name,
+              [`currentRound.clues.${cluer}.contactedWord`]: word,
+            };
+            await updateRoom(this.room, update);
           };
-          await updateRoom(this.room, update);
         },
         // Wrapper, since timer onFinish expects a function.
         onContact(cluer, clue) {
@@ -322,8 +314,11 @@
             });
           };
         },
-        async banWord() {
-          const toBan = this.player.toBan;
+        async banWord(toBan) {
+          if (this.room.currentRound.banned.includes(toBan)) {
+            return; // Word is already banned.
+          }
+
           this.room.currentRound.banned.push(toBan);
           for (const [cluer, clue] of Object.entries(
             this.room.currentRound.clues,
@@ -332,7 +327,6 @@
               delete this.room.currentRound.clues[cluer];
             }
           }
-          this.player.toBan = '';
           await updateRoom(this.room, {
             currentRound: this.room.currentRound,
           });
@@ -361,6 +355,12 @@
           return (
             this.room.currentRound.wordmaster === this.player.name ||
             Object.keys(this.room.currentRound.clues).includes(this.player.name)
+          );
+        },
+        prefix() {
+          return this.room.currentRound.word.slice(
+            0,
+            this.room.currentRound.revealed,
           );
         },
       },
