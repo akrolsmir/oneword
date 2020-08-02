@@ -14,24 +14,26 @@ if (!firebase.apps.length) {
   firebase.analytics();
 }
 
+const COLLECTION = window.COLLECTION || 'rooms';
+
 const db = firebase.firestore();
 export async function setRoom(room) {
-  await db.collection('rooms').doc(room.name).set(room);
+  await db.collection(COLLECTION).doc(room.name).set(room);
 }
 
 export async function updateRoom(room, update) {
-  await db.collection('rooms').doc(room.name).update(update);
+  await db.collection(COLLECTION).doc(room.name).update(update);
 }
 
 export async function getRoom(room) {
-  const doc = await db.collection('rooms').doc(room.name).get();
+  const doc = await db.collection(COLLECTION).doc(room.name).get();
   return doc.data();
 }
 
 export async function listRooms() {
   const db = firebase.firestore();
   const docs = await db
-    .collection('rooms')
+    .collection(COLLECTION)
     .where('public', '==', true)
     .orderBy('lastUpdateTime', 'desc')
     // TODO: limit to last 7 days instead.
@@ -48,7 +50,7 @@ export function listenRoom(vueApp) {
   // Detach listener before listening to a new room.
   unlistenRoom();
   unsubscribe = db
-    .collection('rooms')
+    .collection(COLLECTION)
     .doc(vueApp.room.name)
     .onSnapshot(function (doc) {
       console.log('Current data: ', doc.data());
