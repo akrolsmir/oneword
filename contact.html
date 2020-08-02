@@ -80,55 +80,69 @@
           <button class="button" @click="chooseWord">Let's go!</button>
         </div>
 
-        <!-- Clues -->
-        <h3>Clues</h3>
-        <div v-if="!clueGiven">
-          <div class="card">
-            <h3>Add a clue!</h3>
-            Hint: <input class="input" v-model="player.hint" /> <br />
-            Word: <input class="input" v-model="player.word" /> <br />
-            <button class="button" @click="createClue()">Create clue</button>
+        <div class="columns">
+          <!-- Clues -->
+          <div class="column">
+            <h3>Clues</h3>
+            <div v-if="!clueGiven">
+              <div class="card">
+                <h3>Add a clue!</h3>
+                Hint: <input class="input" v-model="player.hint" /> <br />
+                Word: <input class="input" v-model="player.word" /> <br />
+                <button class="button" @click="createClue()">
+                  Create clue
+                </button>
+              </div>
+            </div>
+            <template v-for="(clue, cluer) in room.currentRound.clues">
+              <div class="card">
+                <h3>{{ cluer }}'s clue: {{ clue.hint }}</h3>
+                <template v-if="clue.contact">
+                  Contacted {{clue.contact}}!
+                  <!-- Need to debug this... -->
+                  <!-- <timer :length="5" :on-finish="onContact(cluer, clue)"></timer> -->
+                  <button
+                    v-if="player.name == room.currentRound.wordmaster"
+                    @click="onContact(cluer, clue)()"
+                  >
+                    Resolve
+                  </button>
+                </template>
+                <template v-else-if="cluer === player.name">
+                  {{ clue.word }}
+                  <button @click="withdrawClue">Withdraw</button>
+                </template>
+                <template
+                  v-else-if="player.name !== room.currentRound.wordmaster"
+                >
+                  <input
+                    class="input"
+                    placeholder=""
+                    v-model="clue.contactedWord"
+                  />
+                  <button class="button" @click="contact(cluer)">
+                    Contact!
+                  </button>
+                </template>
+              </div>
+            </template>
           </div>
-        </div>
-        <template v-for="(clue, cluer) in room.currentRound.clues">
-          <div class="card">
-            <h3>{{ cluer }}'s clue: {{ clue.hint }}</h3>
-            <template v-if="clue.contact">
-              Contacted {{clue.contact}}!
-              <!-- Need to debug this... -->
-              <!-- <timer :length="5" :on-finish="onContact(cluer, clue)"></timer> -->
-              <button
-                v-if="player.name == room.currentRound.wordmaster"
-                @click="onContact(cluer, clue)()"
-              >
-                Resolve
-              </button>
-            </template>
-            <template v-else-if="cluer === player.name">
-              {{ clue.word }} <button @click="withdrawClue">Withdraw</button>
-            </template>
-            <template v-else-if="player.name !== room.currentRound.wordmaster">
-              <input
-                class="input"
-                placeholder=""
-                v-model="clue.contactedWord"
-              />
-              <button class="button" @click="contact(cluer)">Contact!</button>
-            </template>
-          </div>
-        </template>
-        <br /><br />
 
-        <!-- Banned -->
-        <h3>Banned</h3>
-        <div class="card">
-          <div v-if="player.name == room.currentRound.wordmaster">
-            <input class="input" v-model="player.toBan" /> <br />
-            <button class="button" @click="banWord(player.toBan)">Ban!</button>
+          <!-- Banned -->
+          <div class="column">
+            <h3>Banned</h3>
+            <div class="card">
+              <div v-if="player.name == room.currentRound.wordmaster">
+                <input class="input" v-model="player.toBan" /> <br />
+                <button class="button" @click="banWord(player.toBan)">
+                  Ban!
+                </button>
+              </div>
+              <ul v-for="word in room.currentRound.banned">
+                <li>{{ word }}</li>
+              </ul>
+            </div>
           </div>
-          <ul v-for="word in room.currentRound.banned">
-            <li>{{ word }}</li>
-          </ul>
         </div>
       </div>
     </div>
@@ -222,7 +236,7 @@
             name: this.room.name,
             players: [],
             currentRound: {
-              revealed: 2,
+              revealed: 1,
               wordmaster: this.player.name,
               word: '',
               banned: [],
