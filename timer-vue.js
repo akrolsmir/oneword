@@ -3,6 +3,7 @@ Vue.component('timer', {
     return {
       startMs: 0,
       secondsElapsed: 0,
+      destroyed: false,
     };
   },
   props: {
@@ -20,13 +21,22 @@ Vue.component('timer', {
         }
         this.secondsElapsed = (timestamp - this.startMs) / 1000;
         if (this.secondsElapsed >= this.length + 2 /* 2s padding*/) {
-          await this.onFinish();
+          // We're done! Run onFinish if the timer's still visible.
+          if (!this.destroyed) {
+            await this.onFinish();
+          }
           this.startMs = 0;
+        } else {
+          // Continue updating the progress bar on next frame.
+          window.requestAnimationFrame(updateProgress);
         }
       }
-      window.requestAnimationFrame(updateProgress);
     };
     window.requestAnimationFrame(updateProgress);
+  },
+  beforeDestroy() {
+    // Timer was removed from the DOM.
+    this.destroyed = true;
   },
   template: `
 <progress class="progress" :value="secondsElapsed" :max="length"

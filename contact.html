@@ -105,7 +105,10 @@
                 <template v-if="clue.contact">
                   Contacted {{clue.contact}}!
                   <!-- Need to debug this... -->
-                  <!-- <timer :length="5" :on-finish="onContact(cluer, clue)"></timer> -->
+                  <timer
+                    :length="10"
+                    :on-finish="onContact(cluer, clue)"
+                  ></timer>
                   <button
                     v-if="player.name == room.currentRound.wordmaster"
                     @click="onContact(cluer, clue)()"
@@ -291,14 +294,16 @@
         // Wrapper, since timer onFinish expects a function.
         onContact(cluer, clue) {
           return async () => {
-            // TODO: Make this appear for everyone...?
+            // Show everyone the "Contact message"
             const message = `CONTACT!\n${cluer}: ${clue.word}\n${clue.contact}: ${clue.contactedWord}`;
             swal(message);
+
             if (this.player.name !== this.room.currentRound.wordmaster) {
               return;
             }
 
             if (clue.word === clue.contactedWord) {
+              // Words matched.
               this.room.currentRound.banned.push(clue.word);
               this.room.currentRound.revealed++;
               delete this.room.currentRound.clues;
@@ -324,7 +329,12 @@
             this.room.currentRound.clues,
           )) {
             if (clue.word === toBan) {
+              // Remove the clue entirely
               delete this.room.currentRound.clues[cluer];
+            } else if (clue.contactedWord === toBan) {
+              // Remove the contacted information, but NOT the original clue.
+              clue.contact = '';
+              clue.contactedWord = '';
             }
           }
           await updateRoom(this.room, {
