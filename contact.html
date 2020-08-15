@@ -224,6 +224,19 @@
           toBan: '',
         },
       },
+      async mounted() {
+        // Detect url params like ?room=party&player=austin
+        const parsedUrl = new URL(window.location.href);
+        const roomName = parsedUrl.searchParams.get('room');
+        const playerName = parsedUrl.searchParams.get('player');
+        if (playerName) {
+          this.player.name = playerName;
+        }
+        if (roomName) {
+          this.room.name = roomName;
+          await this.enterRoom();
+        }
+      },
       methods: {
         async enterRoom() {
           if (!this.player.name) {
