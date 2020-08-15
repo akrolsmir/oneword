@@ -23,7 +23,7 @@ Vue.component('Submit', {
   <div class="field has-addons">
     <div class="control is-expanded">
       <input class="input" :placeholder="placeholder" v-model="contents" @keyup.enter="submit"
-        :class="{'is-danger': invalid(contents)}">
+        :class="{'is-danger': contents && invalid(contents)}">
     </div>
     <div class="control">
       <button class="button" @click="submit" :disabled="invalid(contents)">
