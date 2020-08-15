@@ -308,15 +308,17 @@
         onContact(cluer, clue) {
           return async () => {
             // Show everyone the "Contact message"
-            const message = `CONTACT!\n${cluer}: ${clue.word}\n${clue.contact}: ${clue.contactedWord}`;
+            const matched = clue.word === clue.contactedWord;
+            const message = `${matched ? '' : 'NO '} CONTACT!\n${cluer}: ${
+              clue.word
+            }\n${clue.contact}: ${clue.contactedWord}`;
             swal(message);
 
             if (this.player.name !== this.room.currentRound.wordmaster) {
               return;
             }
 
-            if (clue.word === clue.contactedWord) {
-              // Words matched.
+            if (matched) {
               this.room.currentRound.banned.push(clue.word);
               this.room.currentRound.revealed++;
               delete this.room.currentRound.clues;
