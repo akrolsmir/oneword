@@ -11,7 +11,11 @@ const firebaseConfig = {
 // Initialize Firebase
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
-  firebase.analytics();
+  try {
+    firebase.analytics();
+  } catch (e) {
+    console.warn('Firebase analytics not enabled (probably got blocked.)');
+  }
 }
 
 const COLLECTION = window.COLLECTION || 'rooms';
