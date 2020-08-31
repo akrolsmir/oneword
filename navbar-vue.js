@@ -86,7 +86,7 @@ Vue.component('navbar', {
   template: `
 <nav class="navbar has-shadow is-fixed-top"
   style="font-weight: 500; height: 52px;">
-  <div class="navbar-brand">
+  <div class="navbar-brand" style="margin: 0 auto;">
     <a href="./">
     <h3 style="font-size: 24px; margin: 8px; margin-left: 32px; margin-right: 32px; display: flex;">
       <div style="margin-left: 8px; color: #4a4a4a">One Word</div>
