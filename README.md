@@ -5,6 +5,7 @@ Just One, online! Available at http://oneword.games
 
 One Word is built on top of:
 - VueJS on the frontend
+- Bulma for CSS
 - Netlify for hosting
 - Firestore on the backend
 - Firebase Auth for login
@@ -20,7 +21,9 @@ python -m http.server 8020
 ```
 And then open http://localhost:8020.
 
-Prettier is mandatory, VSCode is recommended
+While developing: Prettier is mandatory, VSCode is recommended.
+
+To deploy: just push to master, and Netlify will update the site!
 
 ## Code structure
 - One Word is basically a single page app, and that page is index.html.
