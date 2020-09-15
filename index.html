@@ -124,7 +124,7 @@
               :name="player" 
               :email="room.namesToEmails && room.namesToEmails[player]"
               :index="i"
-              :submitted="room.currentRound.clues[player] || room.currentRound.guesser == player">
+              :submitted="!!room.currentRound.clues[player] || room.currentRound.guesser == player">
             </avatar><span v-if="i + 1 < room.players.length">, </span>              
           </template>
         </div>

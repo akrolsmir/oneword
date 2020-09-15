@@ -25,7 +25,7 @@ Vue.component('scoreboard', {
   props: {
     history: Array,
     currentRound: Object,
-    roundsInGame: Object,
+    roundsInGame: [Number, String],
   },
   mounted() {
     startFireworks(this.correct);
@@ -35,7 +35,7 @@ Vue.component('scoreboard', {
       return [...this.history.slice(), this.currentRound];
     },
     window() {
-      if (this.roundsInGame == 'Unlimted') {
+      if (this.roundsInGame == 'Unlimited') {
         return 1024;
       }
       return this.roundsInGame || 13;
