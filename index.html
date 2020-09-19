@@ -185,7 +185,7 @@
 
       <!-- Input area (done) -->
       <div v-if="room.currentRound.state == 'DONE'">
-        <div v-if="room.currentRound.guess == room.currentRound.word">
+        <div v-if="correct(room.currentRound)">
           <h2 class="has-text-success">Correct! The word was "{{ room.currentRound.word }}". Good job!</h2>
         </div>
         <div v-else>
@@ -194,9 +194,9 @@
         </div>
         <h2 class="newline">{{ dedupe(room.currentRound.clues) }}</h2>
         <br>
-        <scoreboard :history="room.history" :current-round="room.currentRound" :rounds-in-game="room.roundsInGame">
-          <button class="button" @click="newRound(false)">Next Round</button>
-        </scoreboard>
+        <scoreboard v-if="isEnd(room)" :score="score(room)" :rounds-in-game="room.roundsInGame"
+          @continue-game="newRound(false)"></scoreboard>
+        <button v-else class="button" @click="newRound(false)">Next Round</button>
       </div>
 
       <br><br><br><br><br><br><br><br>
@@ -267,7 +267,7 @@
       <!-- History -->
       <h2>History</h2>
       <template v-for="(round, i) in room.history.slice().reverse()">
-        <h3 class="capitalize" :class="{'has-text-success': round.word == round.guess, 'has-text-danger': round.word != round.guess}">
+        <h3 class="capitalize" :class="correct(round) ? 'has-text-success' : 'has-text-danger'">
           Round {{ room.history.length - i }} ({{ round.category }})</h3>
         <p>The word was "{{ round.word }}"; {{ round.guesser }} guessed "{{ round.guess }}".</p>
         <p class="newline">{{ dedupe(round.clues) }}</p>
@@ -520,11 +520,29 @@
           icon: "success",
           content: link
         });
-      }
+      },
+      correct,
+      isEnd,
+      score,
     }
   });
 
   listenForLogin(vueApp);
+
+  // Returns whether a round's guess is correct.
+  function correct(round) {
+    return round.guess === round.word 
+      || (["nouns", "compounds"].includes(round.category) && round.guess === round.word + "s");
+  }
+  function totalRounds(room) {
+    return room.roundsInGame == "Unlimited" ? 1024 : room.roundsInGame;
+  }
+  function isEnd(room) {
+    return (room.history.length + 1) % totalRounds(room) == 0
+  }
+  function score(room) {
+    return [...room.history, room.currentRound].slice(-totalRounds(room)).filter(correct).length;
+  }
 
   // "ha" and "ha" are dupes, as are "gold" and "golden", but not "hahahaha" and "hah".
   function dupes(clue1, clue2) {

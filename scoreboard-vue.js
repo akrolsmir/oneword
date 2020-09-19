@@ -19,60 +19,41 @@ Vue.component('scoreboard', {
   data() {
     return {
       MESSAGES,
-      showNextRound: false,
     };
   },
   props: {
-    history: Array,
-    currentRound: Object,
+    score: Number,
     roundsInGame: [Number, String],
   },
-  mounted() {
-    startFireworks(this.correct);
-  },
-  computed: {
-    rounds() {
-      return [...this.history.slice(), this.currentRound];
-    },
-    window() {
-      if (this.roundsInGame == 'Unlimited') {
-        return 1024;
-      }
-      return this.roundsInGame || 13;
-    },
-    correct() {
-      return this.rounds
-        .splice(-this.window) // Only count the last window rounds
-        .map(r => r.guess == r.word ? 1 : 0)
-        .reduce((a, b) => a + b, 0);
+  methods: {
+    continuePlaying() {
+      this.$emit('continue-game');
     }
+  },
+  mounted() {
+    startFireworks(this.score);
   },
   template: `
   <div>
-    <div v-if="rounds.length % window == 0">
-      <h1>And that's a wrap!</h1><br>
+    <h1>And that's a wrap!</h1><br>
 
-      <canvas id="fireworks"></canvas>
+    <canvas id="fireworks"></canvas>
 
-      <h2>Final score: {{ correct }} correct / {{ window }} rounds </h2>
-      ({{ MESSAGES[correct] }})<br>
-      <br>
+    <h2>Final score: {{ score }} correct / {{ roundsInGame }} rounds </h2>
+    ({{ MESSAGES[score] }})<br>
+    <br>
 
-      If you enjoyed One Word, consider becoming a supporter!<br>
-      You can earn nice perks like private rooms, while helping cover our server costs.<br>
-      <br>
+    If you enjoyed One Word, consider becoming a supporter!<br>
+    You can earn nice perks like private rooms, while helping cover our server costs.<br>
+    <br>
 
-      <a target="_blank" rel="noopener noreferrer" href="./supporter.html" class="button is-link">Become a supporter!</a><br>
-      <br>
-      
-      <a @click="showNextRound = !showNextRound">(Not done playing? Alright, click here to continue.)</a>
-    </div>
-    <div v-if="rounds.length % window != 0 || showNextRound">
-      <slot></slot>
-    </div>
+    <a target="_blank" rel="noopener noreferrer" href="./supporter.html" class="button is-link">Become a supporter!</a><br>
+    <br>
+    
+    <a @click="continuePlaying()">(Not done playing? Alright, click here to continue.)</a>
   </div>
-`
-})
+`,
+});
 
 // Fireworks effect shamelessly stolen from:
 // https://www.html5canvastutorials.com/advanced/html5-canvas-fireworks-effect/
