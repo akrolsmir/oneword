@@ -7,7 +7,7 @@
     rel="stylesheet">
   <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
   <link rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
   <style>
     html {
       margin: 0;
@@ -54,6 +54,7 @@
     .panel {
       background-color: white;
     }
+
 
     [v-cloak] {
       display: none;
@@ -141,7 +142,7 @@
         </div>
         <div v-else>
           <div class="box">
-            <h2>The word is "{{ room.currentRound.word }}".</h2><br>
+            <h2>The word is "{{ room.currentRound.word }}"</h2><br>
             <label class="label">Your Clue</label>
             <div class="field has-addons">
               <div class="control is-expanded">
@@ -206,60 +207,96 @@
         <p class="panel-heading">Mod Tools</p>
         <div class="panel-block" style="background: #ffd70066;">
           <h3 style="padding-right: 20px;">Supporter Tools</h3>
-          <button class="button is-small" @click="togglePublic" :disabled='!$refs.navbar.isSupporter'>
-            {{ room.public ? 'Public' : 'Private' }} room
-          </button>
-          <button class="button is-small" @click="showAvatar" :disabled='!$refs.navbar.isSupporter'>
-            Show custom avatar
-          </button>
-          <button class="button is-small" @click="setRounds" :disabled='!$refs.navbar.isSupporter'>
-            {{ room.roundsInGame }} rounds
-          </button>
-          <button class="button is-small" @click="shareRoom" :disabled='!$refs.navbar.isSupporter'>
-            Share room link
-          </button>
-        </div>
-        <div class="panel-block is-grouped">
-          <button class="button is-small" @click="nextStage">Next Stage</button>
-          <button class="button is-small" @click="newRound(true)">Skip Word</button>
-          <button class="button is-small" @click="resetRoom">Reset Room</button>
-          <div class="field has-addons" style="padding-left: 20px">
-            <button class="button is-small" @click="kickPlayer(player.kick)">Kick</button>
-            <button class="button is-small" @click="makeMod(player.kick)">Transfer Mod</button>
-            <input class="input is-small" type="text" v-model="player.kick" placeholder="Player Name">
-            </div>
-        </div>
-        <div class="panel-block">
-          <div class="field has-addons">
+          <div class="field is-horizontal has-addons">
             <div class="control">
-              <button class="button is-small" @click="toggleTimers">
-                {{ room.timers.running ? 'Stop' : 'Start' }} Timers
+              <button class="button is-small is-outlined is-inverted" @click="togglePublic" :disabled='!$refs.navbar.isSupporter'>
+                {{ room.public ? 'Public' : 'Private' }} room
               </button>
             </div>
             <div class="control">
-              <input class="input is-small" type="text" placeholder="Clue Timer"
-                v-model.number="room.timers.CLUEING" :disabled="room.timers.running">
+              <button class="button is-small" @click="showAvatar" :disabled='!$refs.navbar.isSupporter'>
+                Show avatar
+              </button>
             </div>
             <div class="control">
-              <input class="input is-small" type="text" placeholder="Guess Timer"
-                v-model.number="room.timers.GUESSING" :disabled="room.timers.running">
+              <button class="button is-small" @click="setRounds" :disabled='!$refs.navbar.isSupporter'>
+                {{ room.roundsInGame }} rounds
+              </button>
+            </div>
+            <div class="control">
+              <button class="button is-small" @click="shareRoom" :disabled='!$refs.navbar.isSupporter'>
+                Share room link
+              </button>
             </div>
           </div>
         </div>
         <div class="panel-block">
-          <div class="field is-grouped-multiline">
-            <div class="control" style="margin-bottom: 8px;">
-              <button class="button is-small" @click="setCategories()">Update Categories</button>
+          <div class="field is-horizontal">
+            <div class="field-body">
+              <div class="field has-addons">
+                <span class="control">
+                  <button class="button is-small" @click="nextStage">Next Stage</button>
+                </span>
+                <span class="control">
+                  <button class="button is-small" @click="newRound(true)">Skip Word</button>
+                </span>
+                <span class="control">
+                  <button class="button is-small" @click="resetRoom">Reset Room</button>
+                </span>
+              </div>
+              <div class="field has-addons" style="padding-left: 20px">
+                <span class="control">
+                  <button class="button is-small" @click="kickPlayer(player.kick)">Kick</button>
+                </span>
+                <span class="control">
+                  <button class="button is-small" @click="makeMod(player.kick)">Transfer Mod</button>
+                </span>
+                <span class="control">
+                  <input class="input is-small" type="text" v-model="player.kick" placeholder="Player Name">
+                </span>
+              </div>
             </div>
+          </div>
+        </div>
+        <div class="panel-block">
+          <div class="field is-horizontal">
+            <label for="clue-timer" style="margin-right: 12px">Clue Timer:</label>
+            <div class="field-body">
+              
+                <div class="control">
+                  <input class="input is-small" id="clue-timer" type="number" min="1" max="999" placeholder="e.g. 30"
+                      v-model.number="room.timers.CLUEING" :disabled="room.timers.running">
+                </div>
+              
+            </div>
+            <label for="guess-timer" style="margin-right: 12px">Guess Timer:</label>
+            <div class="field-body">
+              <div class="field is-grouped">
+                <div class="control">
+                  <input class="input is-small"  id="guess-timer" type="number" min="1" max="999" placeholder="e.g. 30"
+                    v-model.number="room.timers.GUESSING" :disabled="room.timers.running">
+                </div>
+                <div class="control">
+                  <button class="button is-small" @click="toggleTimers">{{ room.timers.running ? 'Stop' : 'Start' }} Timers</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel-block">
+          <div class="field is-grouped is-horizontal">
             <template v-for="category in ['nouns', 'verbs', 'adjectives', 'compounds', 'custom']">
               <label class="capitalize">{{ category }}
                 <input type="checkbox" v-model="room.categories[category]">
               </label>
             </template>
+            <div class="control">
+              <button class="button is-small" @click="setCategories()">Update Categories</button>
+            </div>
           </div>
         </div>
         <div class="panel-block">
-          <textarea class="textarea is-small" placeholder="Input your own word list"
+          <textarea class="textarea is-small has-fixed-size" placeholder="Input your own word list"
           v-model="room.customWords" :disabled="!room.categories.custom"></textarea>
         </div>
       </nav>
@@ -267,9 +304,16 @@
       <!-- History -->
       <h2>History</h2>
       <template v-for="(round, i) in room.history.slice().reverse()">
-        <h3 class="capitalize" :class="correct(round) ? 'has-text-success' : 'has-text-danger'">
-          Round {{ room.history.length - i }} ({{ round.category }})</h3>
-        <p>The word was "{{ round.word }}"; {{ round.guesser }} guessed "{{ round.guess }}".</p>
+        <div class="level">
+          <div class="level-left">
+            <span class="icon level-item" :class="correct(round) ? 'has-text-success' : 'has-text-danger'">
+              {{ correct(round) ? '✔' : '✖' }}
+            </span>
+            <h3 class="level-item">{{ room.history.length - i }}. {{ round.word }} ({{ round.category }})</h3>
+            <p class="level-item">
+              {{ round.guesser }} guessed "<b :class="correct(round) ? 'has-text-success' : 'has-text-danger'">{{ round.guess }}</b>"</p>
+          </div>
+        </div>
         <p class="newline">{{ dedupe(round.clues) }}</p>
         <br>
       </template>
