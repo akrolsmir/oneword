@@ -86,28 +86,30 @@ Vue.component('navbar', {
   template: `
 <nav class="navbar has-shadow is-fixed-top"
   style="font-weight: 500; height: 52px;">
-  <div class="navbar-brand" style="margin: 0 auto;">
-    <a href="./">
+  <div class="navbar-brand">
+    <a class="navbar-item" href="./">
     <h3 style="font-size: 24px; margin: 8px; margin-left: 32px; margin-right: 32px; display: flex;">
       <div style="margin-left: 8px; color: #4a4a4a">One Word</div>
     </h3>
     </a>
-
-    <a class="navbar-item" @click="referAmazon">Buy the original</a>
-
-    <div class="navbar-item">
-      <a v-if="value.id" class="button" @click="logOut">
-        Sign out, {{ value.name.split(' ')[0] }}?
-      </a>
-      <a v-else-if="!value.hideLogin" class="button" @click="logIn">
-        Sign in
-      </a>
-    </div>
-    <div class="navbar-item">
-      <div class="buttons">
-        <a class="button is-warning" @click="referPremium">
-          <strong>Become a supporter!</strong>
+  </div>
+  <div class="navbar-menu">
+    <div class="navbar-end">
+      <a class="navbar-item" @click="referAmazon">Buy the original</a>
+      <div class="navbar-item">
+        <a v-if="value.id" class="button" @click="logOut">
+          Sign out, {{ value.name.split(' ')[0] }}?
         </a>
+        <a v-else-if="!value.hideLogin" class="button" @click="logIn">
+          Sign in
+        </a>
+      </div>
+      <div class="navbar-item" v-if="!isSupporter">
+        <div class="buttons">
+          <a class="button is-warning" @click="referPremium">
+            <strong>Become a supporter!</strong>
+          </a>
+        </div>
       </div>
     </div>
   </div>
