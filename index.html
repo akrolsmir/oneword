@@ -414,6 +414,13 @@
           this.$refs.navbar.logIn();
           return;
         }
+        // Sanitize room name
+        this.room.name = this.room.name
+            .trim()
+            .toLowerCase()
+            .replace(/\s/g, "-") // whitespace
+            .replace(/[^\p{L}-]/gu, ''); // not (dash or letter in any language)
+
         const room = await getRoom(this.room);
         if (room) {
           this.room = room;
