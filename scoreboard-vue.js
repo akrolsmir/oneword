@@ -24,6 +24,8 @@ Vue.component('scoreboard', {
   props: {
     score: Number,
     roundsInGame: [Number, String],
+    supporter: Boolean,
+    name: String
   },
   methods: {
     continuePlaying() {
@@ -42,14 +44,16 @@ Vue.component('scoreboard', {
     <h2>Final score: {{ score }} correct / {{ roundsInGame }} rounds </h2>
     ({{ MESSAGES[score] }})<br>
     <br>
-
-    If you enjoyed One Word, consider becoming a supporter!<br>
-    You can earn nice perks like private rooms, while helping cover our server costs.<br>
-    <br>
-
-    <a target="_blank" rel="noopener noreferrer" href="./supporter.html" class="button is-link">Become a supporter!</a><br>
-    <br>
-    
+    <template v-if="supporter">
+      Hope you had fun, {{ name }}! This is all made possible by supporters like you 😍<br>
+    </template>
+    <template v-else>
+      If you enjoyed One Word, consider becoming a supporter!<br>
+      You can earn nice perks like private rooms, while helping cover our server costs.<br>
+      <br>
+      <a target="_blank" rel="noopener noreferrer" href="./supporter.html" class="button is-link">Become a supporter!</a><br>
+      <br>
+    </template>
     <a @click="continuePlaying()">(Not done playing? Alright, click here to continue.)</a>
   </div>
 `,
