@@ -25,6 +25,7 @@ Vue.component('scoreboard', {
     score: Number,
     roundsInGame: [Number, String],
     supporter: Boolean,
+    name: String
   },
   methods: {
     continuePlaying() {
@@ -44,7 +45,7 @@ Vue.component('scoreboard', {
     ({{ MESSAGES[score] }})<br>
     <br>
     <template v-if="supporter">
-      I hope you had fun! This is all made possible by supporters like you. 😍<br>
+      Hope you had fun, {{ name }}! This is all made possible by supporters like you 😍<br>
     </template>
     <template v-else>
       If you enjoyed One Word, consider becoming a supporter!<br>

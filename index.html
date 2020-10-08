@@ -195,8 +195,8 @@
         </div>
         <h2 class="newline">{{ dedupe(room.currentRound.clues) }}</h2>
         <br>
-        <scoreboard v-if="isEnd(room)" :score="score(room)" :rounds-in-game="room.roundsInGame" :supporter="$refs.navbar.isSupporter"
-          @continue-game="newRound(false)"></scoreboard>
+        <scoreboard v-if="isEnd(room)" :score="score(room)" :rounds-in-game="room.roundsInGame" :name="user.name && user.name.split(' ')[0]"
+          :supporter="$refs.navbar.isSupporter" @continue-game="newRound(false)"></scoreboard>
         <button v-else class="button" @click="newRound(false)">Next Round</button>
       </div>
 
