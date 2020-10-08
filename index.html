@@ -295,7 +295,7 @@
             </div>
           </div>
         </div>
-        <div class="panel-block">
+        <div class="panel-block" v-if="room.categories['custom'] || room.customWords">
           <textarea class="textarea is-small has-fixed-size" placeholder="Input your own word list"
           v-model="room.customWords" :disabled="!room.categories.custom"></textarea>
         </div>
