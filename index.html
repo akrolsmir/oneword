@@ -76,13 +76,13 @@
       This is the online version of <a target="_blank" rel="noopener noreferrer" href="https://amzn.to/2xV5lUm">Just One</a>, a co-op word game for 3+ players.<br>
       In each of the 13 rounds, come up with a one-word hint for the guesser...<br>
       But beware: duplicate hints are discarded!<br>
-      <template v-if="user.id || user.guest">
+      <form v-if="user.id || user.guest" @submit.prevent="enterRoom" method="POST">
         <label class="label">Player</label>
         <input class="input" type="text" v-model="player.name" placeholder="Ringo">
         <label class="label">Room</label>
-        <input class="input" type="text" v-model="room.name" placeholder="apple" @keyup.enter="enterRoom"><br><br>
-        <button class="button" @click="enterRoom">Enter Room</button>
-      </template>
+        <input class="input" type="text" v-model="room.name" placeholder="apple" required><br><br>
+        <input class="button" type="submit" value="Enter Room">
+      </form>
       <template v-else>
         <br>
         <button class="button is-large is-success" @click="$refs.navbar.logIn()">Sign in to get started</button><br>
