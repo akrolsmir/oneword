@@ -383,6 +383,9 @@
         this.room.name = roomName;
         await this.enterRoom();
       }
+      window.onunload = async () => {
+        this.player.name && await this.kickPlayer(this.player.name);
+      };
     },
     watch: {
       'room.currentRound.state'(state) {
