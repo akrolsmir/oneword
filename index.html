@@ -68,7 +68,7 @@
   <link rel="icon" href="https://twemoji.maxcdn.com/v/13.0.1/72x72/1f42c.png">
 </head>
 
-<body class="has-navbar-fixed-top">
+<body class="has-navbar-fixed-top" style="max-width: 95vw">
   <div id="vue">
     <navbar ref="navbar" v-model="user"></navbar>
     <!-- Home page -->
@@ -104,7 +104,7 @@
     <div v-cloak v-else class="container mx-4">
       <!-- Room header -->
       <article class="message">
-        <div class="message-header">
+        <div class="message-header" style="flex-wrap: wrap">
           <h1>{{ room.name }}</h1>
           <h2 class="capitalize">Round {{ room.history.length + 1 }} ({{ room.currentRound.category }})</h2>
         </div>
@@ -206,7 +206,7 @@
       <!-- Mod tools -->
       <nav class="panel" v-if="room.players[0] == player.name">
         <p class="panel-heading">Mod Tools</p>
-        <div class="panel-block" style="background: #ffd70066;">
+        <div class="panel-block" style="background: #ffd70066; flex-wrap: wrap; overflow: auto">
           <h3 style="padding-right: 20px;">Supporter Tools</h3>
           <div class="field is-horizontal has-addons">
             <div class="control">
@@ -260,7 +260,7 @@
           </div>
         </div>
         <div class="panel-block">
-          <div class="field is-grouped is-horizontal">
+          <div class="field is-horizontal">
             <label for="clue-timer" class="mr-2">Clue Timer:</label>
             <div class="field-body mr-4">
               <div class="control">
@@ -269,7 +269,7 @@
               </div>
             </div>
             <label for="guess-timer" class="mr-2">Guess Timer:</label>
-            <div class="field-body mr-6">
+            <div class="field-body mr-4">
               <div class="control">
                 <input class="input is-small"  id="guess-timer" type="number" min="1" max="999" placeholder="e.g. 30"
                   v-model.number="room.timers.GUESSING" :disabled="room.timers.running">
@@ -283,14 +283,14 @@
           </div>
         </div>
         <div class="panel-block">
-          <div class="field is-grouped is-horizontal">
+          <div class="field is-horizontal">
             <template v-for="category in ['nouns', 'verbs', 'adjectives', 'compounds', 'custom']">
               <label class="capitalize">{{ category }}
-                <input type="checkbox" v-model="room.categories[category]">
+                <input type="checkbox" class="control" v-model="room.categories[category]">
               </label>
             </template>
             <div class="control">
-              <button class="button is-small" @click="setCategories()">Save</button>
+              <button class="button is-small mt-2" @click="setCategories()">Save Catagories</button>
             </div>
           </div>
         </div>
@@ -303,14 +303,16 @@
       <!-- History -->
       <h2>History</h2>
       <template v-for="(round, i) in room.history.slice().reverse()">
-        <div class="level is-mobile">
-          <div class="level-left">
-            <span class="icon level-item" :class="correct(round) ? 'has-text-success' : 'has-text-danger'">
+        <div class="level">
+        <div class="level-left">
+          <span class="level-item">
+            <span class="icon" :class="correct(round) ? 'has-text-success' : 'has-text-danger'">
               {{ correct(round) ? '✔' : '✖' }}
             </span>
-            <h3 class="level-item">{{ room.history.length - i }}. {{ round.word }} ({{ round.category }})</h3>
-            <p class="level-item">
-              {{ round.guesser }} guessed "<b :class="correct(round) ? 'has-text-success' : 'has-text-danger'">{{ round.guess }}</b>"</p>
+            <h3>{{ room.history.length - i }}. {{ round.word }} ({{ round.category }})</h3>
+          </span>
+          <p class="level-item">
+            {{ round.guesser }} guessed "<b :class="correct(round) ? 'has-text-success' : 'has-text-danger'">{{ round.guess }}</b>"</p>
           </div>
         </div>
         <p class="newline">{{ dedupe(round.clues) }}</p>
