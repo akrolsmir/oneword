@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+
+<head>
+  <title>One Word Admin</title>
+  <link
+    href="https://fonts.googleapis.com/css?family=Fjalla+One|Merienda+One|Righteous|Sriracha&display=swap"
+    rel="stylesheet"
+  />
+  <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
+  <link
+    rel="stylesheet"
+    href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/buefy@0.9.3/dist/buefy.min.css"
+  />
+  <style>
+    html {
+      margin: 0;
+      height: 100%;
+      background-color: #f0e68c55;
+      position: relative;
+      overflow: auto;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: 'Merienda One', cursive;
+    }
+
+    h1 {
+      font-size: 40px;
+    }
+
+    h2 {
+      margin-top: 16px;
+      font-size: 24px;
+    }
+
+    body {
+      margin: 48px auto;
+      width: 1200px;
+    }
+
+    [v-cloak] {
+      display: none;
+    }
+  </style>
+
+  <meta name="description" content="Abandon hope all ye who enter here" />
+
+  <!-- Ant favicon courtesy of Twemoji -->
+  <link rel="icon" href="https://twemoji.maxcdn.com/v/13.0.1/72x72/1f41f.png" />
+</head>
+
+<body class="has-navbar-fixed-top">
+  <div id="vue">
+    <navbar ref="navbar" v-model="user"></navbar>
+
+    <h2>{{ users.length > 0 ? "Users" : "Loading users..." }}</h2>
+    <template>
+      <b-table :data="users" :paginated="true" :per-page="15">
+        <b-table-column field="id" label="ID" v-slot="props">
+          {{ props.row.id}}
+        </b-table-column>
+        <b-table-column field="name" label="Name" v-slot="props" searchable>
+          {{ props.row.name}}
+        </b-table-column>
+        <b-table-column field="email" label="Email" v-slot="props" searchable>
+          {{ props.row.email}}
+        </b-table-column>
+        <b-table-column
+          field="createTime"
+          label="Created"
+          v-slot="props"
+          sortable
+        >
+          {{ new Date(props.row.createTime).toLocaleDateString() }}
+        </b-table-column>
+        <b-table-column
+          field="supporter"
+          label="Supporter"
+          v-slot="props"
+          sortable
+        >
+          <span class="tag is-success" v-if="props.row.supporter">
+            {{ props.row.supporter }}
+          </span>
+        </b-table-column>
+      </b-table>
+    </template>
+  </div>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.2/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/buefy@0.9.3/dist/buefy.min.js"></script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-firestore.js"></script>
+
+<!-- My code -->
+<script type="module" src="../firebase-network.js"></script>
+<script type="module" src="../navbar-vue.js"></script>
+
+<script type="module">
+  import {
+    setRoom,
+    updateRoom,
+    getRoom,
+    listRooms,
+    listenRoom,
+    unlistenRoom,
+    listenForLogin,
+  } from '../firebase-network.js';
+
+  const vueApp = new Vue({
+    el: '#vue',
+    data: {
+      user: {},
+      player: {}, // Just because listenForLogin() expects vueApp.player.name
+      users: [],
+    },
+    async mounted() {
+      this.users = await listUsers();
+    },
+  });
+  listenForLogin(vueApp);
+
+  async function listUsers() {
+    const db = firebase.firestore();
+    const response = await db.collection('users').get();
+    return response.docs.map((doc) => doc.data());
+  }
+</script>
