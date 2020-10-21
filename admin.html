@@ -89,9 +89,16 @@
           v-slot="props"
           sortable
         >
-          <span class="tag is-success" v-if="props.row.supporter">
-            {{ props.row.supporter }}
-          </span>
+          <div class="field has-addons">
+            <input class="input is-small" v-model="props.row.supporter" />
+            <button
+              class="button is-small"
+              :class="{'is-success': props.row.supporter}"
+              @click="updateUser(props.row)"
+            >
+              Update
+            </button>
+          </div>
         </b-table-column>
       </b-table>
       <button class="button" @click="fetchUsers">Refresh users</button>
@@ -136,6 +143,11 @@
         } catch {
           alert('Error fetching users. Do you have admin permissions?');
         }
+      },
+      async updateUser(user) {
+        const db = firebase.firestore();
+        await db.collection('users').doc(user.id).update(user);
+        alert('Successfully updated: ' + JSON.stringify(user, null, 2));
       },
     },
     async mounted() {
