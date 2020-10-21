@@ -63,7 +63,6 @@
 <body class="has-navbar-fixed-top">
   <div id="vue">
     <navbar ref="navbar" v-model="user"></navbar>
-
     <h2>{{ users.length > 0 ? "Users" : "Loading users..." }}</h2>
     <template>
       <b-table :data="users" :paginated="true" :per-page="15">
@@ -95,6 +94,7 @@
           </span>
         </b-table-column>
       </b-table>
+      <button class="button" @click="fetchUsers">Refresh users</button>
     </template>
   </div>
 </body>
@@ -125,12 +125,21 @@
   const vueApp = new Vue({
     el: '#vue',
     data: {
-      user: {},
+      user: {}, // Check if logged in user has admin permissions
       player: {}, // Just because listenForLogin() expects vueApp.player.name
       users: [],
     },
+    methods: {
+      async fetchUsers() {
+        try {
+          this.users = await listUsers();
+        } catch {
+          alert('Error fetching users. Do you have admin permissions?');
+        }
+      },
+    },
     async mounted() {
-      this.users = await listUsers();
+      this.fetchUsers();
     },
   });
   listenForLogin(vueApp);
