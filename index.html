@@ -45,7 +45,7 @@
     }
 
     .newline {
-      white-space: pre;
+      white-space: pre-wrap;
     }
 
     .capitalize {
@@ -305,13 +305,13 @@
       <template v-for="(round, i) in room.history.slice().reverse()">
         <div class="level">
         <div class="level-left">
-          <span class="level-item">
+          <span class="level-item" style="justify-content: flex-start;">
             <span class="icon" :class="correct(round) ? 'has-text-success' : 'has-text-danger'">
               {{ correct(round) ? '✔' : '✖' }}
             </span>
             <h3>{{ room.history.length - i }}. {{ round.word }} ({{ round.category }})</h3>
           </span>
-          <p class="level-item">
+          <p class="level-item" style="justify-content: flex-start;">
             {{ round.guesser }} guessed "<b :class="correct(round) ? 'has-text-success' : 'has-text-danger'">{{ round.guess }}</b>"</p>
           </div>
         </div>
