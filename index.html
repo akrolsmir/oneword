@@ -8,6 +8,7 @@
   <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
   <link rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     html {
       margin: 0;
@@ -44,7 +45,7 @@
     }
 
     .newline {
-      white-space: pre;
+      white-space: pre-wrap;
     }
 
     .capitalize {
@@ -67,11 +68,11 @@
   <link rel="icon" href="https://twemoji.maxcdn.com/v/13.0.1/72x72/1f42c.png">
 </head>
 
-<body class="has-navbar-fixed-top">
+<body class="has-navbar-fixed-top" style="max-width: 95vw">
   <div id="vue">
     <navbar ref="navbar" v-model="user"></navbar>
     <!-- Home page -->
-    <div v-if="!room.players">
+    <div v-if="!room.players" class="container mx-4">
       <h1>Welcome!</h1>
       This is the online version of <a target="_blank" rel="noopener noreferrer" href="https://amzn.to/2xV5lUm">Just One</a>, a co-op word game for 3+ players.<br>
       In each of the 13 rounds, come up with a one-word hint for the guesser...<br>
@@ -100,10 +101,10 @@
       </template>
     </div>
     <!-- In game -->
-    <div v-cloak v-else>
+    <div v-cloak v-else class="container mx-4">
       <!-- Room header -->
       <article class="message">
-        <div class="message-header">
+        <div class="message-header" style="flex-wrap: wrap">
           <h1>{{ room.name }}</h1>
           <h2 class="capitalize">Round {{ room.history.length + 1 }} ({{ room.currentRound.category }})</h2>
         </div>
@@ -205,7 +206,7 @@
       <!-- Mod tools -->
       <nav class="panel" v-if="room.players[0] == player.name">
         <p class="panel-heading">Mod Tools</p>
-        <div class="panel-block" style="background: #ffd70066;">
+        <div class="panel-block" style="background: #ffd70066; flex-wrap: wrap; overflow: auto">
           <h3 style="padding-right: 20px;">Supporter Tools</h3>
           <div class="field is-horizontal has-addons">
             <div class="control">
@@ -233,7 +234,7 @@
         <div class="panel-block">
           <div class="field is-horizontal">
             <div class="field-body">
-              <div class="field has-addons">
+              <div class="field has-addons" style="margin-right: 20px">
                 <span class="control">
                   <button class="button is-small" @click="nextStage">Next Stage</button>
                 </span>
@@ -244,7 +245,7 @@
                   <button class="button is-small" @click="resetRoom">Reset Room</button>
                 </span>
               </div>
-              <div class="field has-addons" style="padding-left: 20px">
+              <div class="field has-addons">
                 <span class="control">
                   <button class="button is-small" @click="kickPlayer(player.kick)">Kick</button>
                 </span>
@@ -260,38 +261,36 @@
         </div>
         <div class="panel-block">
           <div class="field is-horizontal">
-            <label for="clue-timer" style="margin-right: 12px">Clue Timer:</label>
-            <div class="field-body">
-              
-                <div class="control">
-                  <input class="input is-small" id="clue-timer" type="number" min="1" max="999" placeholder="e.g. 30"
-                      v-model.number="room.timers.CLUEING" :disabled="room.timers.running">
-                </div>
-              
+            <label for="clue-timer" class="mr-2">Clue Timer:</label>
+            <div class="field-body mr-4">
+              <div class="control">
+                <input class="input is-small" id="clue-timer" type="number" min="1" max="999" placeholder="e.g. 30"
+                    v-model.number="room.timers.CLUEING" :disabled="room.timers.running">
+              </div>
             </div>
-            <label for="guess-timer" style="margin-right: 12px">Guess Timer:</label>
+            <label for="guess-timer" class="mr-2">Guess Timer:</label>
+            <div class="field-body mr-4">
+              <div class="control">
+                <input class="input is-small"  id="guess-timer" type="number" min="1" max="999" placeholder="e.g. 30"
+                  v-model.number="room.timers.GUESSING" :disabled="room.timers.running">
+              </div>
+            </div>
             <div class="field-body">
-              <div class="field is-grouped">
-                <div class="control">
-                  <input class="input is-small"  id="guess-timer" type="number" min="1" max="999" placeholder="e.g. 30"
-                    v-model.number="room.timers.GUESSING" :disabled="room.timers.running">
-                </div>
-                <div class="control">
-                  <button class="button is-small" @click="toggleTimers">{{ room.timers.running ? 'Stop' : 'Start' }} Timers</button>
-                </div>
+              <div class="control">
+                <button class="button is-small" @click="toggleTimers">{{ room.timers.running ? 'Stop' : 'Start' }} Timers</button>
               </div>
             </div>
           </div>
         </div>
         <div class="panel-block">
-          <div class="field is-grouped is-horizontal">
+          <div class="field is-horizontal">
             <template v-for="category in ['nouns', 'verbs', 'adjectives', 'compounds', 'custom']">
               <label class="capitalize">{{ category }}
-                <input type="checkbox" v-model="room.categories[category]">
+                <input type="checkbox" class="control" v-model="room.categories[category]">
               </label>
             </template>
             <div class="control">
-              <button class="button is-small" @click="setCategories()">Update Categories</button>
+              <button class="button is-small mt-2" @click="setCategories()">Save Catagories</button>
             </div>
           </div>
         </div>
@@ -305,13 +304,15 @@
       <h2>History</h2>
       <template v-for="(round, i) in room.history.slice().reverse()">
         <div class="level">
-          <div class="level-left">
-            <span class="icon level-item" :class="correct(round) ? 'has-text-success' : 'has-text-danger'">
+        <div class="level-left">
+          <span class="level-item" style="justify-content: flex-start;">
+            <span class="icon" :class="correct(round) ? 'has-text-success' : 'has-text-danger'">
               {{ correct(round) ? '✔' : '✖' }}
             </span>
-            <h3 class="level-item">{{ room.history.length - i }}. {{ round.word }} ({{ round.category }})</h3>
-            <p class="level-item">
-              {{ round.guesser }} guessed "<b :class="correct(round) ? 'has-text-success' : 'has-text-danger'">{{ round.guess }}</b>"</p>
+            <h3>{{ room.history.length - i }}. {{ round.word }} ({{ round.category }})</h3>
+          </span>
+          <p class="level-item" style="justify-content: flex-start;">
+            {{ round.guesser }} guessed "<b :class="correct(round) ? 'has-text-success' : 'has-text-danger'">{{ round.guess }}</b>"</p>
           </div>
         </div>
         <p class="newline">{{ dedupe(round.clues) }}</p>

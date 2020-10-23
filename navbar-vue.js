@@ -49,6 +49,9 @@ Vue.component('navbar', {
       },
     },
   },
+  data: () => ({
+    burgerOpen: false,
+  }),
   methods: {
     logIn() {
       firebase.analytics().logEvent('login');
@@ -85,26 +88,29 @@ Vue.component('navbar', {
   },
   template: `
 <nav class="navbar has-shadow is-fixed-top"
-  style="font-weight: 500; height: 52px;">
+  style="font-weight: 500">
   <div class="navbar-brand">
     <a class="navbar-item" href="./">
-    <h3 style="font-size: 24px; margin: 8px; margin-left: 32px; margin-right: 32px; display: flex;">
-      <div style="margin-left: 8px; color: #4a4a4a">One Word</div>
-    </h3>
+      <h3 style="font-size: 24px; color:  #4a4a4a">One Word</h3>
+    </a>
+    <a role="button" class="navbar-burger burger" :class= "{'is-active':burgerOpen}" aria-label="menu"
+        data-target="navbuttons" @click="burgerOpen = !burgerOpen;">
+      <!-- burger/x icon: -->
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
     </a>
   </div>
-  <div class="navbar-menu">
+  <div id="navbuttons" class="navbar-menu" :class = "{'is-active': burgerOpen}">
     <div class="navbar-end">
       <a class="navbar-item" @click="referAmazon">Buy the original</a>
-      <div class="navbar-item">
-        <a v-if="value.id" class="button" @click="logOut">
-          Sign out, {{ value.name.split(' ')[0] }}?
-        </a>
-        <a v-else-if="!value.hideLogin" class="button" @click="logIn">
-          Sign in
-        </a>
-      </div>
-      <div class="navbar-item" v-if="!isSupporter">
+      <a v-if="value.id" class="navbar-item" @click="logOut">
+        Sign out, {{ value.name.split(' ')[0] }}?
+      </a>
+      <a v-else-if="!value.hideLogin" class="navbar-item" @click="logIn">
+        Sign in
+      </a>
+      <div v-if="!isSupporter" class="navbar-item">
         <div class="buttons">
           <a class="button is-warning" @click="referPremium">
             <strong>Become a supporter!</strong>
