@@ -215,11 +215,6 @@
               </button>
             </div>
             <div class="control">
-              <button class="button is-small" @click="showAvatar" :disabled='!$refs.navbar.isSupporter'>
-                Show avatar
-              </button>
-            </div>
-            <div class="control">
               <button class="button is-small" @click="setRounds" :disabled='!$refs.navbar.isSupporter'>
                 {{ room.roundsInGame }} rounds
               </button>
@@ -451,10 +446,7 @@
           timers: { 'CLUEING': '', 'GUESSING': '', 'DONE': '', running: false },
           categories: { 'nouns': true, 'verbs': false, 'adjectives': false, 'compounds': false, 'custom': false },
           customWords: '',
-          playerData: {}, // for gravatars & borders
-        }
-        if (this.$refs.navbar.value.email) {
-          this.room.playerData[this.player.name] = { email: this.$refs.navbar.value.email };
+          playerData: { [this.player.name]: { email: this.user.email || "", supporter: this.user.supporter || "" } },
         }
         await setRoom(this.room);
       },
@@ -462,31 +454,20 @@
       async joinRoom() {
         listenRoom(this);
 
-        let updates = {}
-
-        //migration
-        if (this.room.namesToEmails) {
-          if (!this.room.playerData) {
-            this.room.playerData = {}
-          }
-          for (const name in this.room.namesToEmails) {
-            //everyone in namesToEmails has to be a sponsor
-            this.room.playerData[name] = { email: this.room.namesToEmails[name], sponsor: 'BASE' };
-          }
-          delete this.room.namesToEmails;
-          updates['namesToEmails'] = null;
+        // migration
+        if (!this.room.playerData) {
+          this.room.playerData = {}
         }
 
-        if (this.$refs.navbar.value.email) {
-          this.room.playerData[this.player.name] = this.room.playerData[this.player.name] || {};
-          this.room.playerData[this.player.name].email = this.$refs.navbar.value.email;
-          updates['playerData'] = this.room.playerData;
-        }
-        if (!this.room.players.includes(this.player.name)) {
+        const { email = "", supporter = "" } = this.user;
+        this.room.playerData[this.player.name] = { email, supporter }
+        
+        if (this.room.players.includes(this.player.name)) {
+          await updateRoom(this.room, { playerData: this.room.playerData })
+        } else {
           this.room.players.push(this.player.name);
-          updates['players'] = this.room.players;
+          await updateRoom(this.room, { playerData: this.room.playerData, players: this.room.players });
         }
-        await updateRoom(this.room, updates);
       },
       goHome() {
         unlistenRoom();
@@ -567,11 +548,6 @@
       async togglePublic() {
         this.room.public = !this.room.public;
         await updateRoom(this.room, { 'public': this.room.public });
-      },
-      async showAvatar() {
-        const {id, name, guest, createTime, lastUpdateTime, ...emailAndSponsor} = this.$refs.navbar.value;
-        this.room.playerData[this.player.name] = emailAndSponsor;
-        await updateRoom(this.room, { 'playerData': this.room.playerData });
       },
       async setRounds() {
         if (this.room.roundsInGame != 13) {
