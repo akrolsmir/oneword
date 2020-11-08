@@ -477,7 +477,8 @@
         if (this.room.players.includes(name)) {
           const index = this.room.players.indexOf(name);
           this.room.players.splice(index, 1);
-          await updateRoom(this.room, { 'players': this.room.players });
+          delete this.room.playerData[name]
+          await updateRoom(this.room, { players: this.room.players, playerData: this.room.playerData });
         }
       },
       async makeMod(name) {

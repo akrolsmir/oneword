@@ -74,8 +74,8 @@ Vue.component('navbar', {
     async logOut() {
       firebase.analytics().logEvent('logout');
       await firebase.auth().signOut();
-      // Reset user id to indicate logged out.
-      this.value.id = '';
+      // Reset user info
+      Object.assign(this.value, { id: "", email: "", supporter: "" })
     },
     referAmazon() {
       firebase.analytics().logEvent('view_amazon', {
