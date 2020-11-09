@@ -154,13 +154,17 @@
         await db.collection('users').doc(user.id).update(user);
         alert('Successfully updated: ' + JSON.stringify(user, null, 2));
       },
-      // Exports all users to a CSV, for bulk import into Mailchimp.
+      // Exports all users to a CSV, for bulk import into Mailjet.
       exportUsers() {
         const csv = this.users
-          .map((u) =>
-            [u.email, splitName(u.name), u.createdDate, u.supporter || ''].join(
-              ', ',
-            ),
+          .map(
+            (u) =>
+              [
+                u.email,
+                ...splitName(u.name),
+                u.createdDate,
+                u.supporter || '',
+              ].join('\t'), // Tab-separated to escape commas
           )
           .join('\n');
         writeToFile('users.csv', csv);
@@ -195,13 +199,13 @@
   }
 
   function splitName(name) {
-    // Austin Chen => "Austin, Chen"
-    // Hillary => "Hillary, "
-    // Barack Hussein Obama => "Barack, Hussein Obama"
+    // Austin Chen => Austin, Chen
+    // Hillary => Hillary, Hillary
+    // Barack Hussein Obama => Barack, Hussein Obama
     const index = name.indexOf(' ');
     if (index >= 0) {
-      return `${name.substring(0, index)}, ${name.substring(index + 1)}`;
+      return [name.substring(0, index), name.substring(index + 1)];
     }
-    return `${name}, `;
+    return [name, name];
   }
 </script>
