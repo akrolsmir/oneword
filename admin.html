@@ -81,7 +81,7 @@
           v-slot="props"
           sortable
         >
-          {{ new Date(props.row.createTime).toLocaleDateString() }}
+          {{ props.row.createdDate }}
         </b-table-column>
         <b-table-column
           field="supporter"
@@ -102,6 +102,7 @@
         </b-table-column>
       </b-table>
       <button class="button" @click="fetchUsers">Refresh users</button>
+      <button class="button" @click="exportUsers">Export users to CSV</button>
     </template>
   </div>
 </body>
@@ -140,14 +141,29 @@
       async fetchUsers() {
         try {
           this.users = await listUsers();
-        } catch {
+          for (const user of this.users) {
+            user.createdDate = new Date(user.createTime).toLocaleDateString();
+          }
+        } catch (e) {
           alert('Error fetching users. Do you have admin permissions?');
+          console.error(e);
         }
       },
       async updateUser(user) {
         const db = firebase.firestore();
         await db.collection('users').doc(user.id).update(user);
         alert('Successfully updated: ' + JSON.stringify(user, null, 2));
+      },
+      // Exports all users to a CSV, for bulk import into Mailchimp.
+      exportUsers() {
+        const csv = this.users
+          .map((u) =>
+            [u.email, splitName(u.name), u.createdDate, u.supporter || ''].join(
+              ', ',
+            ),
+          )
+          .join('\n');
+        writeToFile('users.csv', csv);
       },
     },
     async mounted() {
@@ -160,5 +176,32 @@
     const db = firebase.firestore();
     const response = await db.collection('users').get();
     return response.docs.map((doc) => doc.data());
+  }
+
+  function writeToFile(filename, contents) {
+    const link = document.createElement('a');
+    const data = new Blob([contents], { type: 'text/plain' });
+
+    link.setAttribute('download', filename);
+    link.href = window.URL.createObjectURL(data);
+    document.body.appendChild(link);
+
+    // Wait for the link to be added to the document
+    window.requestAnimationFrame(() => {
+      const event = new MouseEvent('click');
+      link.dispatchEvent(event);
+      document.body.removeChild(link);
+    });
+  }
+
+  function splitName(name) {
+    // Austin Chen => "Austin, Chen"
+    // Hillary => "Hillary, "
+    // Barack Hussein Obama => "Barack, Hussein Obama"
+    const index = name.indexOf(' ');
+    if (index >= 0) {
+      return `${name.substring(0, index)}, ${name.substring(index + 1)}`;
+    }
+    return `${name}, `;
   }
 </script>
