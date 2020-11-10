@@ -94,6 +94,7 @@ export function listenForLogin(vueApp) {
           lastUpdateTime: Date.now(),
         };
         await db.collection('users').doc(fetchedUser.id).set(fetchedUser);
+        await sendWelcomeEmail(fetchedUser);
       } else {
         // Just update the email and name provided by Firebase Auth.
         fetchedUser.name = user.displayName;
@@ -108,4 +109,45 @@ export function listenForLogin(vueApp) {
 export function runUrl(runId) {
   const parsedUrl = new URL(window.location.href);
   return `${parsedUrl.origin}/draft-viewer?run=${runId}`;
+}
+
+/**
+ * `email` should be formatted like: {
+    from: 'Austin - 20 Chars <akrolsmir@gmail.com>'
+    to: 'someone@gmail.com',
+    bcc: 'abc.sinclair@gmail.com'
+    replyTo: 'another@gmail.com',
+    message: {
+      subject: ...,
+      text: ...,
+      html: ...,
+    }
+  }
+*/
+export async function sendMail(email) {
+  // Send with https://firebase.google.com/products/extensions/firestore-send-email
+  await db.collection('mail').add(email);
+}
+
+async function sendWelcomeEmail(user) {
+  const firstName = user.name.split(' ')[0]
+  await sendMail({
+    from: 'Austin Chen <austin@oneword.games>',
+    replyTo: 'Austin Chen <austin@oneword.games>',
+    to: user.email,
+    message: {
+      subject: 'Welcome to One Word!',
+      text: `Heyo ${firstName},
+
+Welcome to One Word! Have a great time cluing and colliding with your comrades~
+I'm Austin, and https://oneword.games was my COVID side-project that suddenly got popular.
+
+If you've got a minute, I'd love to hear from you!
+(Like, how did you find out about us? Any issues, or feedback? I read and respond to every email.)
+
+But most of all: thanks for playing!
+Austin
+`
+    }
+  })
 }
