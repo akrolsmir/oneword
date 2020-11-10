@@ -419,6 +419,13 @@
             .replace(/[^\p{L}-]/gu, ''); // not (dash or letter in any language)
 
         const room = await getRoom(this.room);
+
+        // If the player's name collides with another user's, prepend adjectives until its unique
+        while (room.players.includes(this.player.name) && 
+            (this.user.guest || this.user.email != room.playerData[this.player.name].email)) {
+          this.player.name = capitalize(randomWord('adjectives')) + ' ' + this.player.name
+        }
+
         if (room) {
           this.room = room;
           return await this.joinRoom();
@@ -673,5 +680,9 @@
   function nextCategory(categories) {
     const enabled = Object.keys(categories).filter(c => categories[c]);
     return enabled[Math.floor(Math.random() * enabled.length)];
+  }
+
+  function capitalize(str) {
+    return str ? str[0].toLocaleUpperCase() + str.substring(1) : '';
   }
 </script>
