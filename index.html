@@ -208,7 +208,7 @@
       <br><br>
 
       <!-- Mod tools -->
-      <nav class="panel mt-6" v-if="room.players[0] == player.name">
+      <nav class="panel mt-6" v-if="room.players[0] == player.name || user.supporter == 'ADMIN'">
         <p class="panel-heading">Mod Tools</p>
         <div class="panel-block" style="background: #ffd70066; flex-wrap: wrap; overflow: auto">
           <h3 style="padding-right: 20px;">Supporter Tools</h3>
