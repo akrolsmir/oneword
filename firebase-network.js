@@ -63,7 +63,7 @@ export function listenRoom(vueApp) {
     .collection(COLLECTION)
     .doc(vueApp.room.name)
     .onSnapshot(function (doc) {
-      console.log('Current data: ', doc.data());
+      // console.log('Current data: ', doc.data());
       vueApp.room = doc.data();
     });
 }
