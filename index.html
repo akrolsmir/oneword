@@ -114,22 +114,22 @@
             <b>{{ player.name }}</b>,
             you are
             {{ room.currentRound.guesser == player.name ? 'now guessing' : `clueing ${room.currentRound.guesser}` }}.
-            <button class="button is-small" @click="kickPlayer(player.name)">Leave</button>
+            <button class="button is-small" style="vertical-align: baseline" @click="kickPlayer(player.name)">Leave</button>
           </template>
           <template v-else>
             <button class="button" @click="goHome">Another Room</button>
             <button class="button" @click="joinRoom">Rejoin Game</button>
           </template>
-          <br><br>
-          Players:
-          <template v-for="(player, i) in room.players">
+          <div class="mb-2 mt-5">Players:</div>
+          <div class="tags">
             <avatar
+              v-for="(player, i) in room.players"
               :name="player" 
-              :email="room.namesToEmails && room.namesToEmails[player]"
+              :user="room.playerData && room.playerData[player]"
               :index="i"
               :submitted="!!room.currentRound.clues[player] || room.currentRound.guesser == player">
-            </avatar><span v-if="i + 1 < room.players.length">, </span>              
-          </template>
+            </avatar>
+          </div>
         </div>
       </article>
       <timer :length='timerLength' :on-finish='nextStage' v-if="timerLength > 0" :key="room.currentRound.state"></timer>
@@ -213,11 +213,6 @@
             <div class="control">
               <button class="button is-small is-outlined is-inverted" @click="togglePublic" :disabled='!$refs.navbar.isSupporter'>
                 {{ room.public ? 'Public' : 'Private' }} room
-              </button>
-            </div>
-            <div class="control">
-              <button class="button is-small" @click="showAvatar" :disabled='!$refs.navbar.isSupporter'>
-                Show avatar
               </button>
             </div>
             <div class="control">
@@ -452,7 +447,7 @@
           timers: { 'CLUEING': '', 'GUESSING': '', 'DONE': '', running: false },
           categories: { 'nouns': true, 'verbs': false, 'adjectives': false, 'compounds': false, 'custom': false },
           customWords: '',
-          namesToEmails: {}, // For rendering gravatars
+          playerData: { [this.player.name]: { email: this.user.email || "", supporter: this.user.supporter || "" } },
         }
         await setRoom(this.room);
       },
@@ -460,9 +455,19 @@
       async joinRoom() {
         listenRoom(this);
 
-        if (!this.room.players.includes(this.player.name)) {
+        // migration
+        if (!this.room.playerData) {
+          this.room.playerData = {}
+        }
+
+        const { email = "", supporter = "" } = this.user;
+        this.room.playerData[this.player.name] = { email, supporter }
+        
+        if (this.room.players.includes(this.player.name)) {
+          await updateRoom(this.room, { playerData: this.room.playerData })
+        } else {
           this.room.players.push(this.player.name);
-          await updateRoom(this.room, { 'players': this.room.players });
+          await updateRoom(this.room, { playerData: this.room.playerData, players: this.room.players });
         }
       },
       goHome() {
@@ -544,15 +549,6 @@
       async togglePublic() {
         this.room.public = !this.room.public;
         await updateRoom(this.room, { 'public': this.room.public });
-      },
-      async showAvatar() {
-        if (!this.room.namesToEmails) {
-          // TODO: Maybe remove null check after soaking a while?
-          this.room.namesToEmails = {};
-        }
-        const email = this.$refs.navbar.value.email;
-        this.room.namesToEmails[this.player.name] = email;
-        await updateRoom(this.room, { namesToEmails: this.room.namesToEmails });
       },
       async setRounds() {
         if (this.room.roundsInGame != 13) {

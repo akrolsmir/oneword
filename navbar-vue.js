@@ -1,7 +1,7 @@
 Vue.component('avatar', {
   props: {
     name: String,
-    email: String,
+    user: Object, // email and sponsor status
     submitted: Boolean,
     index: Number,
   },
@@ -11,30 +11,44 @@ Vue.component('avatar', {
     };
   },
   computed: {
-    modStyle() {
-      return {
-        border: this.email ? '2px solid gold' : '',
-      };
-    },
-    supporterMargin() {
-      const style = { margin: '4px' };
-      if (this.email) {
-        style['margin-left'] = 0;
+    attr() {
+      if (!this.user) {
+        return { title: 'guest' };
       }
-      return style;
+      if (this.user.supporter == 'BASE') {
+        return {
+          title: 'supporter',
+          style: 'box-shadow: 0 0 0 2px gold',
+        };
+      }
+      if (this.user.supporter == 'SPONSOR') {
+        return {
+          title: 'sponsor',
+          style: 'box-shadow: 0 0 0 2px #b181e4',
+        };
+      }
+      if (this.user.supporter == 'ADMIN') {
+        return {
+          title: 'developer',
+          style: {
+            outline: "1px dashed #33ff00",
+            boxShadow: "0 0 0 2px #0a0a0a"
+          },
+        };
+      }
+      return { title: 'member' };
     },
   },
   template: `
-<div class="card" style="display: inline-block;" :style="modStyle">
+<div class="tag is-white" :class="{ 'is-primary is-light' : submitted }" v-bind="attr">
   <img
-    style="margin-bottom: -6px;"
-    v-if="email"
-    :src="'https://www.gravatar.com/avatar/' + md5(email) + '?size=24'"
+    v-if="user && user.email && user.supporter"
+    style="border-radius: 4px; margin-left: -9px"
+    class="mr-1"
+    :src="'https://www.gravatar.com/avatar/' + md5(user.email) + '?size=48'"
     height="24"
     width="24">
-  <span :class="{ 'has-text-primary has-text-weight-bold': submitted }" :style="supporterMargin">
-    {{ name }}
-  </span>
+  {{ name }}
 </div>
   `,
 });
@@ -60,8 +74,8 @@ Vue.component('navbar', {
     async logOut() {
       firebase.analytics().logEvent('logout');
       await firebase.auth().signOut();
-      // Reset user id to indicate logged out.
-      this.value.id = '';
+      // Reset user info
+      Object.assign(this.value, { id: "", email: "", supporter: "" })
     },
     referAmazon() {
       firebase.analytics().logEvent('view_amazon', {
@@ -78,13 +92,8 @@ Vue.component('navbar', {
   },
   computed: {
     isSupporter() {
-      return (
-        this.value.supporter == 'BASE' || this.value.supporter == 'SPONSOR'
-      );
-    },
-    isSponsor() {
-      return this.value.supporter == 'SPONSOR';
-    },
+      return ['BASE', 'SPONSOR', 'ADMIN'].includes(this.value.supporter);
+    }
   },
   template: `
 <nav class="navbar has-shadow is-fixed-top"
