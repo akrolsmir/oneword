@@ -1,14 +1,16 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
+<meta charset="utf-8" />
 
 <head>
   <title>One Word</title>
-  <link href="https://fonts.googleapis.com/css?family=Fjalla+One|Merienda+One|Righteous|Sriracha&display=swap"
-    rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css?family=Fjalla+One|Merienda+One|Righteous|Sriracha&display=swap"
+    rel="stylesheet"
+  />
   <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
   <link rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     html {
       margin: 0;
@@ -18,7 +20,9 @@
       overflow: auto;
     }
 
-    h1, h2, h3 {
+    h1,
+    h2,
+    h3 {
       font-family: 'Merienda One', cursive;
     }
 
@@ -56,7 +60,7 @@
     .panel {
       background-color: white;
     }
-    
+
     .tag {
       font-size: 0.875rem !important; /* Bulma's normal tag (0.75 rem) is too small and medium tag (1 rem) is too big */
     }
@@ -66,10 +70,10 @@
     }
   </style>
 
-  <meta name="description" content="You get to pick One Word. Make it count!">
+  <meta name="description" content="You get to pick One Word. Make it count!" />
 
   <!-- Dolphin favicon courtesy of Twemoji -->
-  <link rel="icon" href="https://twemoji.maxcdn.com/v/13.0.1/72x72/1f42c.png">
+  <link rel="icon" href="https://twemoji.maxcdn.com/v/13.0.1/72x72/1f42c.png" />
 </head>
 
 <body class="has-navbar-fixed-top">
@@ -78,29 +82,30 @@
     <!-- Home page -->
     <div v-if="!room.players" class="container mx-4">
       <h1>Welcome!</h1>
-      This is the online version of <a target="_blank" rel="noopener noreferrer" href="https://amzn.to/2xV5lUm">Just One</a>, a co-op word game for 3+ players.<br>
-      In each of the 13 rounds, come up with a one-word hint for the guesser...<br>
-      But beware: duplicate hints are discarded!<br>
+      This is the online version of
+      <a target="_blank" rel="noopener noreferrer" href="https://amzn.to/2xV5lUm">Just One</a>, a co-op word game for 3+
+      players.<br />
+      In each of the 13 rounds, come up with a one-word hint for the guesser...<br />
+      But beware: duplicate hints are discarded!<br />
       <form v-if="user.id || user.guest" @submit.prevent="enterRoom" method="POST">
         <label class="label">Player</label>
-        <input class="input" type="text" v-model="player.name" placeholder="Ringo">
+        <input class="input" type="text" v-model="player.name" placeholder="Ringo" />
         <label class="label">Room</label>
-        <input class="input" type="text" v-model="room.name" placeholder="apple" required><br><br>
-        <input class="button" type="submit" value="Enter Room">
+        <input class="input" type="text" v-model="room.name" placeholder="apple" required /><br /><br />
+        <input class="button" type="submit" value="Enter Room" />
       </form>
       <template v-else>
-        <br>
-        <button class="button is-large is-success" @click="$refs.navbar.logIn()">Sign in to get started</button><br>
+        <br />
+        <button class="button is-large is-success" @click="$refs.navbar.logIn()">Sign in to get started</button><br />
         <a @click='$set(user, "guest", true)' class="is-size-7">Guest account</a>
       </template>
-      
-      <br><br>
+
+      <br /><br />
       <h2>Open Rooms</h2>
       <template v-for="openRoom in allRooms">
         <p>
-          <a @click="room.name = openRoom.name; enterRoom()"><b>{{ openRoom.name }}</b></a>,
-          with {{ openRoom.players.join(', ') }}
-          ({{ moment(openRoom.lastUpdateTime).fromNow() }})
+          <a @click="room.name = openRoom.name; enterRoom()"><b>{{ openRoom.name }}</b></a
+          >, with {{ openRoom.players.join(', ') }} ({{ moment(openRoom.lastUpdateTime).fromNow() }})
         </p>
       </template>
     </div>
@@ -114,10 +119,11 @@
         </div>
         <div class="message-body">
           <template v-if="room.players.includes(player.name)">
-            <b>{{ player.name }}</b>,
-            you are
-            {{ room.currentRound.guesser == player.name ? 'now guessing' : `clueing ${room.currentRound.guesser}` }}.
-            <button class="button is-small" style="vertical-align: baseline" @click="kickPlayer(player.name)">Leave</button>
+            <b>{{ player.name }}</b>, you are {{ room.currentRound.guesser == player.name ? 'now guessing' : `clueing
+            ${room.currentRound.guesser}` }}.
+            <button class="button is-small" style="vertical-align: baseline" @click="kickPlayer(player.name)">
+              Leave
+            </button>
           </template>
           <template v-else>
             <button class="button" @click="goHome">Another Room</button>
@@ -127,15 +133,16 @@
           <div class="tags">
             <avatar
               v-for="(player, i) in room.players"
-              :name="player" 
+              :name="player"
               :user="room.playerData && room.playerData[player]"
               :index="i"
-              :submitted="!!room.currentRound.clues[player] || room.currentRound.guesser == player">
+              :submitted="!!room.currentRound.clues[player] || room.currentRound.guesser == player"
+            >
             </avatar>
           </div>
         </div>
       </article>
-      <timer :length='timerLength' :on-finish='nextStage' v-if="timerLength > 0" :key="room.currentRound.state"></timer>
+      <timer :length="timerLength" :on-finish="nextStage" v-if="timerLength > 0" :key="room.currentRound.state"></timer>
 
       <!-- Input area (clueing) -->
       <div v-if="room.currentRound.state == 'CLUEING'">
@@ -147,20 +154,27 @@
         </div>
         <div v-else>
           <div class="box">
-            <h2>The word is "{{ room.currentRound.word }}"</h2><br>
+            <h2>The word is "{{ room.currentRound.word }}"</h2>
+            <br />
             <label class="label">Your Clue</label>
             <div class="field has-addons">
               <div class="control is-expanded">
-                <input class="input" type="text" v-model="player.clue" @keyup.enter="submitClue"
-                  :class="{'is-primary': room.currentRound.clues[player.name]}" :disabled="!room.players.includes(player.name)">
+                <input
+                  class="input"
+                  type="text"
+                  v-model="player.clue"
+                  @keyup.enter="submitClue"
+                  :class="{'is-primary': room.currentRound.clues[player.name]}"
+                  :disabled="!room.players.includes(player.name)"
+                />
               </div>
               <div class="control">
-                <button class="button" @click="submitClue" :disabled="!room.players.includes(player.name)">Submit</button>
+                <button class="button" @click="submitClue" :disabled="!room.players.includes(player.name)">
+                  Submit
+                </button>
               </div>
             </div>
-            <div class="notification is-danger" v-show="player.clue.includes(' ')">
-              Is that really just one word?
-            </div>
+            <div class="notification is-danger" v-show="player.clue.includes(' ')">Is that really just one word?</div>
           </div>
         </div>
       </div>
@@ -174,7 +188,7 @@
             <label class="label">Your Guess</label>
             <div class="field has-addons">
               <div class="control is-expanded">
-                <input class="input" type="text" v-model="player.guess" @keyup.enter="submitGuess">
+                <input class="input" type="text" v-model="player.guess" @keyup.enter="submitGuess" />
               </div>
               <div class="control">
                 <button class="button" @click="submitGuess">Submit</button>
@@ -195,36 +209,48 @@
           <h2 class="has-text-success">Correct! The word was "{{ room.currentRound.word }}". Good job!</h2>
         </div>
         <div v-else>
-          <h2 class="has-text-danger">Aww, {{ room.currentRound.guesser }} guessed "{{ room.currentRound.guess }}",
-            but it was "{{ room.currentRound.word }}"...</h2>
+          <h2 class="has-text-danger">
+            Aww, {{ room.currentRound.guesser }} guessed "{{ room.currentRound.guess }}", but it was "{{
+            room.currentRound.word }}"...
+          </h2>
         </div>
         <h2 class="newline">{{ dedupe(room.currentRound.clues) }}</h2>
-        <br>
-        <scoreboard v-if="isEnd(room)" :score="score(room)" :rounds-in-game="room.roundsInGame" :name="user.name && user.name.split(' ')[0]"
-          :supporter="$refs.navbar.isSupporter" @continue-game="newRound(false)"></scoreboard>
+        <br />
+        <scoreboard
+          v-if="isEnd(room)"
+          :score="score(room)"
+          :rounds-in-game="room.roundsInGame"
+          :name="user.name && user.name.split(' ')[0]"
+          :supporter="$refs.navbar.isSupporter"
+          @continue-game="newRound(false)"
+        ></scoreboard>
         <button v-else class="button" @click="newRound(false)">Next Round</button>
       </div>
 
-      <br><br>
+      <br /><br />
 
       <!-- Mod tools -->
       <nav class="panel mt-6" v-if="room.players[0] == player.name || user.supporter == 'ADMIN'">
         <p class="panel-heading">Mod Tools</p>
         <div class="panel-block" style="background: #ffd70066; flex-wrap: wrap; overflow: auto">
-          <h3 style="padding-right: 20px;">Supporter Tools</h3>
+          <h3 style="padding-right: 20px">Supporter Tools</h3>
           <div class="field is-horizontal has-addons">
             <div class="control">
-              <button class="button is-small is-outlined is-inverted" @click="togglePublic" :disabled='!$refs.navbar.isSupporter'>
+              <button
+                class="button is-small is-outlined is-inverted"
+                @click="togglePublic"
+                :disabled="!$refs.navbar.isSupporter"
+              >
                 {{ room.public ? 'Public' : 'Private' }} room
               </button>
             </div>
             <div class="control">
-              <button class="button is-small" @click="setRounds" :disabled='!$refs.navbar.isSupporter'>
+              <button class="button is-small" @click="setRounds" :disabled="!$refs.navbar.isSupporter">
                 {{ room.roundsInGame }} rounds
               </button>
             </div>
             <div class="control">
-              <button class="button is-small" @click="shareRoom" :disabled='!$refs.navbar.isSupporter'>
+              <button class="button is-small" @click="shareRoom" :disabled="!$refs.navbar.isSupporter">
                 Share room link
               </button>
             </div>
@@ -252,7 +278,7 @@
                   <button class="button is-small" @click="makeMod(player.kick)">Transfer Mod</button>
                 </span>
                 <span class="control">
-                  <input class="input is-small" type="text" v-model="player.kick" placeholder="Player Name">
+                  <input class="input is-small" type="text" v-model="player.kick" placeholder="Player Name" />
                 </span>
               </div>
             </div>
@@ -263,20 +289,38 @@
             <label for="clue-timer" class="mr-2">Clue Timer:</label>
             <div class="field-body mr-4">
               <div class="control">
-                <input class="input is-small" id="clue-timer" type="number" min="1" max="999" placeholder="e.g. 30"
-                    v-model.number="room.timers.CLUEING" :disabled="room.timers.running">
+                <input
+                  class="input is-small"
+                  id="clue-timer"
+                  type="number"
+                  min="1"
+                  max="999"
+                  placeholder="e.g. 30"
+                  v-model.number="room.timers.CLUEING"
+                  :disabled="room.timers.running"
+                />
               </div>
             </div>
             <label for="guess-timer" class="mr-2">Guess Timer:</label>
             <div class="field-body mr-4">
               <div class="control">
-                <input class="input is-small"  id="guess-timer" type="number" min="1" max="999" placeholder="e.g. 30"
-                  v-model.number="room.timers.GUESSING" :disabled="room.timers.running">
+                <input
+                  class="input is-small"
+                  id="guess-timer"
+                  type="number"
+                  min="1"
+                  max="999"
+                  placeholder="e.g. 30"
+                  v-model.number="room.timers.GUESSING"
+                  :disabled="room.timers.running"
+                />
               </div>
             </div>
             <div class="field-body">
               <div class="control">
-                <button class="button is-small" @click="toggleTimers">{{ room.timers.running ? 'Stop' : 'Start' }} Timers</button>
+                <button class="button is-small" @click="toggleTimers">
+                  {{ room.timers.running ? 'Stop' : 'Start' }} Timers
+                </button>
               </div>
             </div>
           </div>
@@ -284,8 +328,9 @@
         <div class="panel-block">
           <div class="field is-horizontal">
             <template v-for="category in ['nouns', 'verbs', 'adjectives', 'compounds', 'custom']">
-              <label class="capitalize">{{ category }}
-                <input type="checkbox" class="control" v-model="room.categories[category]">
+              <label class="capitalize"
+                >{{ category }}
+                <input type="checkbox" class="control" v-model="room.categories[category]" />
               </label>
             </template>
             <div class="control">
@@ -294,8 +339,12 @@
           </div>
         </div>
         <div class="panel-block" v-if="room.categories['custom'] || room.customWords">
-          <textarea class="textarea is-small has-fixed-size" placeholder="Input your own word list"
-          v-model="room.customWords" :disabled="!room.categories.custom"></textarea>
+          <textarea
+            class="textarea is-small has-fixed-size"
+            placeholder="Input your own word list"
+            v-model="room.customWords"
+            :disabled="!room.categories.custom"
+          ></textarea>
         </div>
       </nav>
 
@@ -303,19 +352,22 @@
       <h2>History</h2>
       <template v-for="(round, i) in room.history.slice().reverse()">
         <div class="level">
-        <div class="level-left">
-          <span class="level-item" style="justify-content: flex-start;">
-            <span class="icon" :class="correct(round) ? 'has-text-success' : 'has-text-danger'">
-              {{ correct(round) ? '✔' : '✖' }}
+          <div class="level-left">
+            <span class="level-item" style="justify-content: flex-start">
+              <span class="icon" :class="correct(round) ? 'has-text-success' : 'has-text-danger'">
+                {{ correct(round) ? '✔' : '✖' }}
+              </span>
+              <h3>{{ room.history.length - i }}. {{ round.word }} ({{ round.category }})</h3>
             </span>
-            <h3>{{ room.history.length - i }}. {{ round.word }} ({{ round.category }})</h3>
-          </span>
-          <p class="level-item" style="justify-content: flex-start;">
-            {{ round.guesser }} guessed "<b :class="correct(round) ? 'has-text-success' : 'has-text-danger'">{{ round.guess }}</b>"</p>
+            <p class="level-item" style="justify-content: flex-start">
+              {{ round.guesser }} guessed "<b :class="correct(round) ? 'has-text-success' : 'has-text-danger'"
+                >{{ round.guess }}</b
+              >"
+            </p>
           </div>
         </div>
         <p class="newline">{{ dedupe(round.clues) }}</p>
-        <br>
+        <br />
       </template>
     </div>
   </div>
@@ -337,7 +389,15 @@
 <script type="module" src="./scoreboard-vue.js"></script>
 <script type="module">
   import { nouns, compounds, verbs, adjectives } from './many-words.js';
-  import { setRoom, updateRoom, getRoom, listRooms, listenRoom, unlistenRoom, listenForLogin } from './firebase-network.js';
+  import {
+    setRoom,
+    updateRoom,
+    getRoom,
+    listRooms,
+    listenRoom,
+    unlistenRoom,
+    listenForLogin,
+  } from './firebase-network.js';
   /**
    Room: {
      name: apple,
@@ -390,8 +450,7 @@
         // Clean up past inputs when the round moves forward.
         if (state == 'GUESSING') {
           this.player.clue = '';
-        }
-        else if (state == 'DONE') {
+        } else if (state == 'DONE') {
           this.player.guess = '';
         }
       },
@@ -402,7 +461,7 @@
           return this.room.timers[this.room.currentRound.state];
         }
         return 0;
-      }
+      },
     },
     methods: {
       md5,
@@ -416,19 +475,21 @@
         }
         // Sanitize room name
         this.room.name = this.room.name
-            .trim()
-            .toLowerCase()
-            .replace(/\s/g, "-") // whitespace
-            .replace(/[^\p{L}-]/gu, ''); // not (dash or letter in any language)
+          .trim()
+          .toLowerCase()
+          .replace(/\s/g, '-') // whitespace
+          .replace(/[^\p{L}-]/gu, ''); // not (dash or letter in any language)
 
         const room = await getRoom(this.room);
 
         if (room) {
           // If the player's name collides with another user's,
           // prepend adjectives until it is unique
-          while (room.players.includes(this.player.name) && 
-              (this.user.guest || this.user.email != room.playerData[this.player.name].email)) {
-            this.player.name = capitalize(randomWord('adjectives')) + ' ' + this.player.name
+          while (
+            room.players.includes(this.player.name) &&
+            (this.user.guest || this.user.email != room.playerData[this.player.name].email)
+          ) {
+            this.player.name = capitalize(randomWord('adjectives')) + ' ' + this.player.name;
           }
 
           this.room = room;
@@ -455,11 +516,22 @@
           public: true,
           roundsInGame: 13,
           lastUpdateTime: Date.now(),
-          timers: { 'CLUEING': '', 'GUESSING': '', 'DONE': '', running: false },
-          categories: { 'nouns': true, 'verbs': false, 'adjectives': false, 'compounds': false, 'custom': false },
+          timers: { CLUEING: '', GUESSING: '', DONE: '', running: false },
+          categories: {
+            nouns: true,
+            verbs: false,
+            adjectives: false,
+            compounds: false,
+            custom: false,
+          },
           customWords: '',
-          playerData: { [this.player.name]: { email: this.user.email || "", supporter: this.user.supporter || "" } },
-        }
+          playerData: {
+            [this.player.name]: {
+              email: this.user.email || '',
+              supporter: this.user.supporter || '',
+            },
+          },
+        };
         await setRoom(this.room);
       },
       // Only call if room already exists.
@@ -468,17 +540,20 @@
 
         // migration
         if (!this.room.playerData) {
-          this.room.playerData = {}
+          this.room.playerData = {};
         }
 
-        const { email = "", supporter = "" } = this.user;
-        this.room.playerData[this.player.name] = { email, supporter }
-        
+        const { email = '', supporter = '' } = this.user;
+        this.room.playerData[this.player.name] = { email, supporter };
+
         if (this.room.players.includes(this.player.name)) {
-          await updateRoom(this.room, { playerData: this.room.playerData })
+          await updateRoom(this.room, { playerData: this.room.playerData });
         } else {
           this.room.players.push(this.player.name);
-          await updateRoom(this.room, { playerData: this.room.playerData, players: this.room.players });
+          await updateRoom(this.room, {
+            playerData: this.room.playerData,
+            players: this.room.players,
+          });
         }
       },
       goHome() {
@@ -489,7 +564,7 @@
         if (this.room.players.includes(name)) {
           const index = this.room.players.indexOf(name);
           this.room.players.splice(index, 1);
-          await updateRoom(this.room, { 'players': this.room.players });
+          await updateRoom(this.room, { players: this.room.players });
         }
       },
       async makeMod(name) {
@@ -497,7 +572,7 @@
           const index = this.room.players.indexOf(name);
           this.room.players[index] = this.player.name;
           this.room.players[0] = name;
-          await updateRoom(this.room, { 'players': this.room.players });
+          await updateRoom(this.room, { players: this.room.players });
         }
       },
       async submitClue() {
@@ -507,17 +582,20 @@
         await updateRoom(this.room, update);
 
         // If all clues are in, move to guessing
-        const doneCluing = this.room.players.every(p =>
-          this.room.currentRound.clues[p] || p == this.room.currentRound.guesser);
+        const doneCluing = this.room.players.every(
+          (p) => this.room.currentRound.clues[p] || p == this.room.currentRound.guesser
+        );
         if (doneCluing) {
           await updateRoom(this.room, { 'currentRound.state': 'GUESSING' });
         }
       },
       async nextStage() {
         if (this.room.currentRound.state == 'CLUEING') {
-          return await updateRoom(this.room, { 'currentRound.state': 'GUESSING' });
+          return await updateRoom(this.room, {
+            'currentRound.state': 'GUESSING',
+          });
         } else if (this.room.currentRound.state == 'GUESSING') {
-          return await updateRoom(this.room, {'currentRound.state': 'DONE'});
+          return await updateRoom(this.room, { 'currentRound.state': 'DONE' });
         } else {
           return await this.newRound();
         }
@@ -525,7 +603,7 @@
       async submitGuess() {
         const update = {
           'currentRound.guess': this.player.guess.toLowerCase().trim(),
-          'currentRound.state': 'DONE'
+          'currentRound.state': 'DONE',
         };
         await updateRoom(this.room, update);
       },
@@ -534,7 +612,8 @@
         const category = nextCategory(this.room.categories);
         this.room.currentRound = {
           state: 'CLUEING',
-          guesser: sameGuesser ? this.room.currentRound.guesser
+          guesser: sameGuesser
+            ? this.room.currentRound.guesser
             : nextGuesser(this.room.currentRound.guesser, this.room.players),
           guess: '',
           word: nextWord(this.room.history, category, this.room.customWords),
@@ -548,18 +627,18 @@
       },
       async toggleTimers() {
         this.room.timers.running = !this.room.timers.running;
-        await updateRoom(this.room, { 'timers': this.room.timers });
+        await updateRoom(this.room, { timers: this.room.timers });
       },
       async setCategories() {
         const update = {
-          'categories': this.room.categories,
-          'customWords': this.room.customWords,
-        }
+          categories: this.room.categories,
+          customWords: this.room.customWords,
+        };
         await updateRoom(this.room, update);
       },
       async togglePublic() {
         this.room.public = !this.room.public;
-        await updateRoom(this.room, { 'public': this.room.public });
+        await updateRoom(this.room, { public: this.room.public });
       },
       async setRounds() {
         if (this.room.roundsInGame != 13) {
@@ -567,38 +646,40 @@
         } else {
           this.room.roundsInGame = 'Unlimited';
         }
-        await updateRoom(this.room, { 'roundsInGame': this.room.roundsInGame });
+        await updateRoom(this.room, { roundsInGame: this.room.roundsInGame });
       },
       async shareRoom() {
-        const link = document.createElement("input");
+        const link = document.createElement('input');
         link.value = `http://oneword.games/?room=${this.room.name}`;
         link.setAttribute('readonly', 'true');
         link.setAttribute('onclick', 'this.select()');
         link.setAttribute('size', '45');
         swal({
-          title: "Share this link:",
-          icon: "success",
-          content: link
+          title: 'Share this link:',
+          icon: 'success',
+          content: link,
         });
       },
       correct,
       isEnd,
       score,
-    }
+    },
   });
 
   listenForLogin(vueApp);
 
   // Returns whether a round's guess is correct.
   function correct(round) {
-    return round.guess === round.word 
-      || (["nouns", "compounds"].includes(round.category) && round.guess === round.word + "s");
+    return (
+      round.guess === round.word ||
+      (['nouns', 'compounds'].includes(round.category) && round.guess === round.word + 's')
+    );
   }
   function totalRounds(room) {
-    return room.roundsInGame == "Unlimited" ? 1024 : room.roundsInGame;
+    return room.roundsInGame == 'Unlimited' ? 1024 : room.roundsInGame;
   }
   function isEnd(room) {
-    return (room.history.length + 1) % totalRounds(room) == 0
+    return (room.history.length + 1) % totalRounds(room) == 0;
   }
   function score(room) {
     return [...room.history, room.currentRound].slice(-totalRounds(room)).filter(correct).length;
@@ -617,7 +698,7 @@
 
   // Return whether the candidate is a dupe of any of the existing clues.
   function anyDupes(clues, candidate) {
-    return clues.some(c => dupes(c, candidate));
+    return clues.some((c) => dupes(c, candidate));
   }
 
   function dedupe(clues, showCollisions = true) {
@@ -647,7 +728,7 @@
       .map(([clue, cluers]) => cluers.join(' & ') + (showCollisions ? ` - ${clue}` : ''));
     let result = showCollisions ? '' : '(Uh, good luck.)';
     if (deduped.length > 0) {
-      result = `${deduped.join('\n')}`
+      result = `${deduped.join('\n')}`;
     }
     if (conflicts.length > 0) {
       result += `\n\nCollisions:\n${conflicts.join('\n')}`;
@@ -660,29 +741,29 @@
     return players[nextIndex];
   }
 
-  function randomWord(category='nouns', customWords='') {
+  function randomWord(category = 'nouns', customWords = '') {
     const custom = customWords.split(/\s/);
     const categories = { nouns, compounds, verbs, adjectives, custom };
     const words = categories[category];
     return words[Math.floor(Math.random() * words.length)];
   }
 
-  function nextWord(history, category='nouns', customWords='') {
+  function nextWord(history, category = 'nouns', customWords = '') {
     let word;
     let loops = 0;
     do {
       loops++;
       if (loops > 10000) {
-        return "You're out of custom words..."
+        return "You're out of custom words...";
       }
       // TODO: consider generating a stable next word using seeded RNG.
       word = randomWord(category, customWords);
-    } while (history.map(round => round.word).includes(word));
+    } while (history.map((round) => round.word).includes(word));
     return word;
   }
 
   function nextCategory(categories) {
-    const enabled = Object.keys(categories).filter(c => categories[c]);
+    const enabled = Object.keys(categories).filter((c) => categories[c]);
     return enabled[Math.floor(Math.random() * enabled.length)];
   }
 

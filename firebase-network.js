@@ -130,7 +130,7 @@ export async function sendMail(email) {
 }
 
 async function sendWelcomeEmail(user) {
-  const firstName = user.name.split(' ')[0]
+  const firstName = user.name.split(' ')[0];
   await sendMail({
     from: 'Austin Chen <austin@oneword.games>',
     replyTo: 'Austin Chen <austin@oneword.games>',
@@ -147,7 +147,7 @@ If you've got a minute, I'd love to hear from you!
 
 But most of all: thanks for playing!
 Austin
-`
-    }
-  })
+`,
+    },
+  });
 }
