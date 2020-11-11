@@ -423,13 +423,14 @@
 
         const room = await getRoom(this.room);
 
-        // If the player's name collides with another user's, prepend adjectives until its unique
-        while (room.players.includes(this.player.name) && 
-            (this.user.guest || this.user.email != room.playerData[this.player.name].email)) {
-          this.player.name = capitalize(randomWord('adjectives')) + ' ' + this.player.name
-        }
-
         if (room) {
+          // If the player's name collides with another user's,
+          // prepend adjectives until it is unique
+          while (room.players.includes(this.player.name) && 
+              (this.user.guest || this.user.email != room.playerData[this.player.name].email)) {
+            this.player.name = capitalize(randomWord('adjectives')) + ' ' + this.player.name
+          }
+
           this.room = room;
           return await this.joinRoom();
         } else {
