@@ -4,15 +4,22 @@ Vue.component('avatar', {
     user: Object, // email and sponsor status
     submitted: Boolean,
     index: Number,
+    guessing: Boolean,
+    mod: Boolean,
   },
   data() {
     return {
       md5,
     };
   },
+  methods: {
+    kick() {
+      this.$emit('kick');
+    }
+  },
   computed: {
     attr() {
-      if (!this.user) {
+      if (!this.user || this.user.guest) {
         return { title: 'guest' };
       }
       if (this.user.supporter == 'BASE') {
@@ -40,15 +47,30 @@ Vue.component('avatar', {
     },
   },
   template: `
-<div class="tag is-white" :class="{ 'is-primary is-light' : submitted }" v-bind="attr">
-  <img
-    v-if="user && user.email && user.supporter"
-    style="border-radius: 4px; margin-left: -9px"
-    class="mr-1"
-    :src="'https://www.gravatar.com/avatar/' + md5(user.email) + '?size=48'"
-    height="24"
-    width="24">
-  {{ name }}
+<div class="control">
+  <div class="tags has-addons">
+    <div 
+      class="tag is-white" 
+      :class="{ 'is-primary is-light': submitted && !guessing, 'is-info': guessing, 'has-text-weight-semibold': submitted }"
+      v-bind="attr" 
+      style="z-index: 1"
+    >
+      <img
+        v-if="user && user.email && user.supporter"
+        style="border-radius: 4px; margin-left: -9px"
+        class="mr-1"
+        :src="'https://www.gravatar.com/avatar/' + md5(user.email) + '?size=48'"
+        height="24"
+        width="24">
+      {{ name }}
+    </div>
+    <template v-if="index == 0">
+      <div class="tag is-dark">
+        Mod
+      </div>
+    </template>
+    <a v-else-if="mod" class="tag is-delete is-danger is-light" :title="'kick ' + name" @click="kick()"></a>
+  </div>
 </div>
   `,
 });
@@ -102,7 +124,7 @@ Vue.component('navbar', {
     <a class="navbar-item" href="./">
       <h3 style="font-size: 24px; color:  #4a4a4a">One Word</h3>
     </a>
-    <a role="button" class="navbar-burger burger" :class= "{'is-active':burgerOpen}" aria-label="menu"
+    <a role="button" class="navbar-burger burger" :class= "{'is-active': burgerOpen}" aria-label="menu"
         data-target="navbuttons" @click="burgerOpen = !burgerOpen;">
       <!-- burger/x icon: -->
       <span aria-hidden="true"></span>
@@ -120,12 +142,11 @@ Vue.component('navbar', {
         Sign in
       </a>
       <div v-if="!isSupporter" class="navbar-item">
-        <div class="buttons">
-          <a class="button is-warning" @click="referPremium">
-            <strong>Become a supporter!</strong>
-          </a>
-        </div>
+        <a class="button is-warning" @click="referPremium">
+          <strong>Become a supporter!</strong>
+        </a>
       </div>
+      <a v-else class="navbar-item" @click="referPremium">Supporter page</a>
     </div>
   </div>
 </nav>
