@@ -8,14 +8,8 @@
     rel="stylesheet"
   />
   <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
-  <link
-    rel="stylesheet"
-    href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css"
-  />
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css"
-  />
+  <link rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css" />
   <style>
     html {
       margin: 0;
@@ -60,9 +54,7 @@
       <article class="message">
         <div class="message-header">
           <h1>{{ room.name }}</h1>
-          <h2 class="capitalize">
-            Round ???
-          </h2>
+          <h2 class="capitalize">Round ???</h2>
         </div>
         <div class="message-body">
           Players: {{ room.players.join(', ') }} <br />
@@ -73,9 +65,7 @@
       <!-- Word -->
       <h3>Word</h3>
       <div v-if="room.currentRound.word">
-        <h2 class="title has-text-centered is-size-1">
-          {{ prefix.toUpperCase() }}...?
-        </h2>
+        <h2 class="title has-text-centered is-size-1">{{ prefix.toUpperCase() }}...?</h2>
       </div>
       <div v-else-if="player.name == room.currentRound.wordmaster">
         <input class="input" v-model="player.word" @keyup.enter="chooseWord" />
@@ -106,10 +96,7 @@
                 Contacted {{clue.contact}}!
                 <!-- Need to debug this... -->
                 <timer :length="10" :on-finish="onContact(cluer, clue)"></timer>
-                <button
-                  v-if="player.name == room.currentRound.wordmaster"
-                  @click="onContact(cluer, clue)()"
-                >
+                <button v-if="player.name == room.currentRound.wordmaster" @click="onContact(cluer, clue)()">
                   Resolve
                 </button>
               </template>
@@ -117,9 +104,7 @@
                 {{ clue.word }}
                 <button @click="withdrawClue">Withdraw</button>
               </template>
-              <template
-                v-else-if="player.name !== room.currentRound.wordmaster"
-              >
+              <template v-else-if="player.name !== room.currentRound.wordmaster">
                 <Submit
                   placeholder="Word"
                   button-text="Contact!"
@@ -321,9 +306,9 @@
         return async () => {
           // Show everyone the "Contact message"
           const matched = clue.word === clue.contactedWord;
-          const message = `${matched ? '' : 'NO '} CONTACT!\n${cluer}: ${
-            clue.word
-          }\n${clue.contact}: ${clue.contactedWord}`;
+          const message = `${matched ? '' : 'NO '} CONTACT!\n${cluer}: ${clue.word}\n${clue.contact}: ${
+            clue.contactedWord
+          }`;
           swal(message);
 
           if (this.player.name !== this.room.currentRound.wordmaster) {
@@ -352,9 +337,7 @@
         }
 
         this.room.currentRound.banned.push(toBan);
-        for (const [cluer, clue] of Object.entries(
-          this.room.currentRound.clues,
-        )) {
+        for (const [cluer, clue] of Object.entries(this.room.currentRound.clues)) {
           if (clue.word === toBan) {
             // Remove the clue entirely
             delete this.room.currentRound.clues[cluer];
@@ -395,10 +378,7 @@
         );
       },
       prefix() {
-        return this.room.currentRound.word.slice(
-          0,
-          this.room.currentRound.revealed,
-        );
+        return this.room.currentRound.word.slice(0, this.room.currentRound.revealed);
       },
     },
   });
