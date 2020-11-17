@@ -118,7 +118,7 @@
           <h2 class="capitalize">Round {{ room.history.length + 1 }}</h2>
           <!-- Navigation -->
           <span class="buttons are-small">
-            <button class="button is-dark is-inverted is-outlined" @click="shareRoom">Link</button>
+            <button class="button is-dark is-inverted is-outlined" @click="shareRoom">Share</button>
             <button
               v-if="room.players.includes(player.name)"
               class="button is-dark is-inverted is-outlined"
@@ -155,13 +155,13 @@
                 </span>
               </div>
               <template v-else>
-                <span class="mx-1">{{ room.public ? 'Public' : 'Private' }}</span>
-                <span class="mx-1">{{ room.roundsInGame == 'Unlimited' ? '&infin;' : room.roundsInGame}} rounds</span>
+                <span class="mx-2">{{ room.public ? 'Public' : 'Private' }} Room</span>
+                <span class="mx-2">{{ room.roundsInGame == 'Unlimited' ? '&infin;' : room.roundsInGame}} rounds</span>
               </template>
             </span>
 
             <!-- Timers -->
-            <span class="mx-1 my-1 is-flex is-align-items-center">
+            <span class="ml-1 mr-2 my-1 is-flex is-align-items-center">
               <template v-if="isMod">
                 <label for="clue-timer" class="is-size-7 mx-1 is-flex-grow-1">Clue:</label>
                 <input
@@ -188,13 +188,13 @@
                   :disabled="room.timers.running"
                 />
                 <button class="button is-small mx-1 is-flex-grow-1" @click="toggleTimers">
-                  {{ room.timers.running ? 'Stop' : 'Start' }}
+                  {{ room.timers.running ? 'Stop' : 'Start' }} Timers
                 </button>
               </template>
               <template v-else>
                 <template v-if="room.timers.running">
-                  <span v-if="room.timers.CLUEING" class="mx-1">Clue: {{ room.timers.CLUEING }}s</span>
-                  <span v-if="room.timers.GUESSING" class="mx-1">Guess: {{ room.timers.GUESSING }}s</span>
+                  <span v-if="room.timers.CLUEING" class="mx-2">Clue: {{ room.timers.CLUEING }}s</span>
+                  <span v-if="room.timers.GUESSING" class="mx-2">Guess: {{ room.timers.GUESSING }}s</span>
                 </template>
                 <span v-else class="mx-1">No timers</span>
               </template>
@@ -209,10 +209,11 @@
                 </label>
               </div>
             </span>
-            <span class="mx-2" v-else>
+            <span class="mx-3" v-else>
               <template v-for="(category, i) in this.CATEGORY_ORDER.filter(c => room.categories[c])">
-                <b v-if="room.currentRound.category == category" class="comma">{{ category }}</b>
-                <span v-else class="comma">{{ category }}</span>
+                <span class="comma" :class="{'has-text-weight-bold': room.currentRound.category == category}">
+                  {{ category }}</span
+                >
               </template>
             </span>
           </div>
@@ -253,7 +254,7 @@
           </div>
           <!-- Other Mod Tools -->
           <div v-if="isMod">
-            <div class="label">Room Controls:</div>
+            <div class="label">Room Controls</div>
             <div class="field has-addons is-inline-flex mb-0">
               <span class="control">
                 <button class="button is-small" @click="nextStage">Next Stage</button>
@@ -449,8 +450,8 @@
       wordsSaved: false,
     },
     created() {
+      // global constant
       this.CATEGORY_ORDER = ['nouns', 'verbs', 'adjectives', 'compounds', 'custom'];
-      Object.freeze(this.CATEGORY_ORDER);
     },
     async mounted() {
       this.allRooms = await listRooms();
