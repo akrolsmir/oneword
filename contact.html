@@ -129,7 +129,7 @@
                 placeholder="Word"
                 button-text="Ban!"
                 :on-submit="banWord"
-                :invalid="(word) => room.currentRound.banned.includes(word) || !word.startsWith(prefix)"
+                :invalid="(word) => word == room.currentRound.word || room.currentRound.banned.includes(word) || !word.startsWith(prefix)"
               />
             </div>
             <ul v-for="word in room.currentRound.banned">
@@ -356,6 +356,7 @@
         });
       },
       async chooseWord() {
+        this.player.word = this.player.word.toLowerCase();
         await updateRoom(this.room, {
           'currentRound.word': this.player.word,
         });
