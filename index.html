@@ -9,7 +9,7 @@
   />
   <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
   <link rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     html {
@@ -57,8 +57,8 @@
       text-transform: capitalize;
     }
 
-    .panel {
-      background-color: white;
+    .comma:not(:last-child):after {
+      content: ', ';
     }
 
     .tag {
@@ -111,37 +111,172 @@
     </div>
     <!-- In game -->
     <div v-cloak v-else class="container mx-4">
-      <!-- Room header -->
-      <article class="message">
-        <div class="message-header" style="flex-wrap: wrap">
+      <div class="message">
+        <!-- Room header -->
+        <div class="message-header is-flex-wrap-wrap">
           <h1>{{ room.name }}</h1>
-          <h2 class="capitalize">Round {{ room.history.length + 1 }} ({{ room.currentRound.category }})</h2>
-        </div>
-        <div class="message-body">
-          <template v-if="room.players.includes(player.name)">
-            <b>{{ player.name }}</b>, you are {{ room.currentRound.guesser == player.name ? 'now guessing' : `clueing
-            ${room.currentRound.guesser}` }}.
-            <button class="button is-small" style="vertical-align: baseline" @click="kickPlayer(player.name)">
-              Leave
+          <h2 class="capitalize">Round {{ room.history.length + 1 }}</h2>
+          <!-- Navigation -->
+          <span class="buttons are-small">
+            <button class="button is-dark is-inverted is-outlined" @click="shareRoom">Share</button>
+            <button
+              v-if="room.players.includes(player.name)"
+              class="button is-dark is-inverted is-outlined"
+              @click="kickPlayer(player.name)"
+            >
+              Watch
             </button>
-          </template>
-          <template v-else>
-            <button class="button" @click="goHome">Another Room</button>
-            <button class="button" @click="joinRoom">Rejoin Game</button>
-          </template>
-          <div class="mb-2 mt-5">Players:</div>
-          <div class="tags">
+            <button v-else class="button is-dark is-inverted is-outlined" @click="joinRoom">Rejoin</button>
+            <button class="button is-danger is-inverted is-outlined" @click="kickPlayer(player.name); goHome();">
+              Exit
+            </button>
+          </span>
+        </div>
+        <div>
+          <div class="is-flex is-flex-wrap-wrap is-align-items-center">
+            <!-- Supporter Settings -->
+            <span
+              title="Supporter settings"
+              class="py-1 pl-1 pr-4"
+              style="background: #ffef99; clip-path: polygon(0 0, 0 100%, 93% 100%, 100% 0)"
+            >
+              <div class="mx-1" v-if="isMod">
+                <span class="select is-small">
+                  <select v-model="room.public" :disabled="!user.supporter" @change="setRoomType()">
+                    <option v-bind:value="true">Public</option>
+                    <option v-bind:value="false">Private</option>
+                  </select>
+                </span>
+                <span class="select is-small">
+                  <select v-model="room.roundsInGame" :disabled="!user.supporter" @change="setRounds()">
+                    <option v-bind:value="13">13 rounds</option>
+                    <option v-bind:value="'Unlimited'">&infin; rounds</option>
+                  </select>
+                </span>
+              </div>
+              <template v-else>
+                <span class="mx-2">{{ room.public ? 'Public' : 'Private' }} Room</span>
+                <span class="mx-2">{{ room.roundsInGame == 'Unlimited' ? '&infin;' : room.roundsInGame}} rounds</span>
+              </template>
+            </span>
+
+            <!-- Timers -->
+            <span class="ml-1 mr-2 my-1 is-flex is-align-items-center">
+              <template v-if="isMod">
+                <label for="clue-timer" class="is-size-7 mx-1 is-flex-grow-1">Clue:</label>
+                <input
+                  class="input is-small"
+                  style="flex: 1 2 48px"
+                  id="clue-timer"
+                  type="number"
+                  min="1"
+                  max="99"
+                  placeholder="&infin;"
+                  v-model.number="room.timers.CLUEING"
+                  :disabled="room.timers.running"
+                />
+                <label for="guess-timer" class="is-size-7 mx-1 is-flex-grow-1">Guess:</label>
+                <input
+                  class="input is-small"
+                  style="flex: 1 2 48px"
+                  id="guess-timer"
+                  type="number"
+                  min="1"
+                  max="99"
+                  placeholder="&infin;"
+                  v-model.number="room.timers.GUESSING"
+                  :disabled="room.timers.running"
+                />
+                <button class="button is-small mx-1 is-flex-grow-1" @click="toggleTimers">
+                  {{ room.timers.running ? 'Stop' : 'Start' }} Timers
+                </button>
+              </template>
+              <template v-else>
+                <template v-if="room.timers.running">
+                  <span v-if="room.timers.CLUEING" class="mx-2">Clue: {{ room.timers.CLUEING }}s</span>
+                  <span v-if="room.timers.GUESSING" class="mx-2">Guess: {{ room.timers.GUESSING }}s</span>
+                </template>
+                <span v-else class="mx-1">No timers</span>
+              </template>
+            </span>
+
+            <!-- Categories -->
+            <span v-if="isMod" class="field is-grouped is-grouped-multiline mx-3 my-1">
+              <div class="control" v-for="category in this.CATEGORY_ORDER">
+                <label class="capitalize checkbox">
+                  <input type="checkbox" v-model="room.categories[category]" @change="setCategories()" />
+                  {{ category }}
+                </label>
+              </div>
+            </span>
+            <span class="mx-3" v-else>
+              <template v-for="(category, i) in this.CATEGORY_ORDER.filter(c => room.categories[c])">
+                <span class="comma" :class="{'has-text-weight-bold': room.currentRound.category == category}">
+                  {{ category }}</span
+                >
+              </template>
+            </span>
+          </div>
+          <!-- Custom word editor (mod only) -->
+          <div v-if="isMod && room.categories['custom']" class="is-flex is-justify-content-center">
+            <div class="field mb-2" style="width: 500px; max-width: 90%">
+              <div class="control">
+                <textarea
+                  class="textarea is-small mb-2"
+                  :class="{'is-primary': wordsSaved}"
+                  placeholder="Input your own word list"
+                  v-model="room.customWords"
+                  @input="wordsSaved = false"
+                ></textarea>
+              </div>
+              <div class="control">
+                <button v-if="wordsSaved" class="button is-small" disabled>Saved</button>
+                <button v-else class="button is-small" @click="wordsSaved = true; setWords();">Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="message-body" style="border-width: 0">
+          <!-- Players -->
+          <div class="field is-grouped is-grouped-multiline">
+            <span class="mb-2 mr-2">Players:</span>
             <avatar
               v-for="(player, i) in room.players"
               :name="player"
               :user="room.playerData && room.playerData[player]"
               :index="i"
               :submitted="!!room.currentRound.clues[player] || room.currentRound.guesser == player"
-            >
-            </avatar>
+              :guessing="room.currentRound.guesser == player"
+              :mod="isMod"
+              @kick="kickPlayer(player)"
+            ></avatar>
+          </div>
+          <!-- Other Mod Tools -->
+          <div v-if="isMod">
+            <div class="label">Room Controls</div>
+            <div class="field has-addons is-inline-flex mb-0">
+              <span class="control">
+                <button class="button is-small" @click="nextStage">Next Stage</button>
+              </span>
+              <span class="control">
+                <button class="button is-small" @click="newRound(true)">Skip Word</button>
+              </span>
+              <span class="control">
+                <button class="button is-small" @click="resetRoom">Reset Room</button>
+              </span>
+            </div>
+            <div class="field has-addons is-inline-flex">
+              <span class="control">
+                <button class="button is-small" @click="makeMod(newMod)">Transfer Mod</button>
+              </span>
+              <span class="control">
+                <input class="input is-small" type="text" v-model="newMod" placeholder="Player Name" />
+              </span>
+            </div>
           </div>
         </div>
-      </article>
+      </div>
       <timer :length="timerLength" :on-finish="nextStage" v-if="timerLength > 0" :key="room.currentRound.state"></timer>
 
       <!-- Input area (clueing) -->
@@ -150,13 +285,15 @@
           <h2>Waiting for 3 players...</h2>
         </div>
         <div v-else-if="room.currentRound.guesser == player.name">
-          <h2>Waiting for clues...</h2>
+          <h2>It's your turn to guess! Waiting for clues...</h2>
         </div>
         <div v-else>
           <div class="box">
-            <h2>The word is "{{ room.currentRound.word }}"</h2>
+            <h2>
+              The {{ wordForWord(room.currentRound.category) }} is <b class="is-size-3">{{ room.currentRound.word }}</b>
+            </h2>
             <br />
-            <label class="label">Your Clue</label>
+            <label class="label">Your clue for {{ room.currentRound.guesser }}</label>
             <div class="field has-addons">
               <div class="control is-expanded">
                 <input
@@ -183,7 +320,7 @@
       <div v-if="room.currentRound.state == 'GUESSING'">
         <div v-if="room.currentRound.guesser == player.name">
           <div class="box">
-            <h2>Your clues are:</h2>
+            <h2>Your clues for the {{ wordForWord(room.currentRound.category) }} are:</h2>
             <h2 class="newline">{{ dedupe(room.currentRound.clues, false) }}</h2>
             <label class="label">Your Guess</label>
             <div class="field has-addons">
@@ -197,7 +334,7 @@
           </div>
         </div>
         <div v-else>
-          <h2>The clues were:</h2>
+          <h2>The clues for <b>{{ room.currentRound.word }}</b> were:</h2>
           <h2 class="newline">{{ dedupe(room.currentRound.clues) }}</h2>
           <h2>Waiting for {{ room.currentRound.guesser }} to guess...</h2>
         </div>
@@ -221,133 +358,12 @@
           :score="score(room)"
           :rounds-in-game="room.roundsInGame"
           :name="user.name && user.name.split(' ')[0]"
-          :supporter="$refs.navbar.isSupporter"
+          :supporter="!!user.supporter"
           @continue-game="newRound(false)"
         ></scoreboard>
         <button v-else class="button" @click="newRound(false)">Next Round</button>
       </div>
-
       <br /><br />
-
-      <!-- Mod tools -->
-      <nav class="panel mt-6" v-if="room.players[0] == player.name || user.supporter == 'ADMIN'">
-        <p class="panel-heading">Mod Tools</p>
-        <div class="panel-block" style="background: #ffd70066; flex-wrap: wrap; overflow: auto">
-          <h3 style="padding-right: 20px">Supporter Tools</h3>
-          <div class="field is-horizontal has-addons">
-            <div class="control">
-              <button
-                class="button is-small is-outlined is-inverted"
-                @click="togglePublic"
-                :disabled="!$refs.navbar.isSupporter"
-              >
-                {{ room.public ? 'Public' : 'Private' }} room
-              </button>
-            </div>
-            <div class="control">
-              <button class="button is-small" @click="setRounds" :disabled="!$refs.navbar.isSupporter">
-                {{ room.roundsInGame }} rounds
-              </button>
-            </div>
-            <div class="control">
-              <button class="button is-small" @click="shareRoom" :disabled="!$refs.navbar.isSupporter">
-                Share room link
-              </button>
-            </div>
-          </div>
-        </div>
-        <div class="panel-block">
-          <div class="field is-horizontal">
-            <div class="field-body">
-              <div class="field has-addons" style="margin-right: 20px">
-                <span class="control">
-                  <button class="button is-small" @click="nextStage">Next Stage</button>
-                </span>
-                <span class="control">
-                  <button class="button is-small" @click="newRound(true)">Skip Word</button>
-                </span>
-                <span class="control">
-                  <button class="button is-small" @click="resetRoom">Reset Room</button>
-                </span>
-              </div>
-              <div class="field has-addons">
-                <span class="control">
-                  <button class="button is-small" @click="kickPlayer(player.kick)">Kick</button>
-                </span>
-                <span class="control">
-                  <button class="button is-small" @click="makeMod(player.kick)">Transfer Mod</button>
-                </span>
-                <span class="control">
-                  <input class="input is-small" type="text" v-model="player.kick" placeholder="Player Name" />
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="panel-block">
-          <div class="field is-horizontal">
-            <label for="clue-timer" class="mr-2">Clue Timer:</label>
-            <div class="field-body mr-4">
-              <div class="control">
-                <input
-                  class="input is-small"
-                  id="clue-timer"
-                  type="number"
-                  min="1"
-                  max="999"
-                  placeholder="e.g. 30"
-                  v-model.number="room.timers.CLUEING"
-                  :disabled="room.timers.running"
-                />
-              </div>
-            </div>
-            <label for="guess-timer" class="mr-2">Guess Timer:</label>
-            <div class="field-body mr-4">
-              <div class="control">
-                <input
-                  class="input is-small"
-                  id="guess-timer"
-                  type="number"
-                  min="1"
-                  max="999"
-                  placeholder="e.g. 30"
-                  v-model.number="room.timers.GUESSING"
-                  :disabled="room.timers.running"
-                />
-              </div>
-            </div>
-            <div class="field-body">
-              <div class="control">
-                <button class="button is-small" @click="toggleTimers">
-                  {{ room.timers.running ? 'Stop' : 'Start' }} Timers
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="panel-block">
-          <div class="field is-horizontal">
-            <template v-for="category in ['nouns', 'verbs', 'adjectives', 'compounds', 'custom']">
-              <label class="capitalize"
-                >{{ category }}
-                <input type="checkbox" class="control" v-model="room.categories[category]" />
-              </label>
-            </template>
-            <div class="control">
-              <button class="button is-small mt-2" @click="setCategories()">Save Catagories</button>
-            </div>
-          </div>
-        </div>
-        <div class="panel-block" v-if="room.categories['custom'] || room.customWords">
-          <textarea
-            class="textarea is-small has-fixed-size"
-            placeholder="Input your own word list"
-            v-model="room.customWords"
-            :disabled="!room.categories.custom"
-          ></textarea>
-        </div>
-      </nav>
-
       <!-- History -->
       <h2>History</h2>
       <template v-for="(round, i) in room.history.slice().reverse()">
@@ -398,6 +414,7 @@
     unlistenRoom,
     listenForLogin,
   } from './firebase-network.js';
+
   /**
    Room: {
      name: apple,
@@ -428,8 +445,13 @@
         name: '',
         clue: '',
         guess: '',
-        kick: '',
       },
+      newMod: '',
+      wordsSaved: false,
+    },
+    created() {
+      // global constant
+      this.CATEGORY_ORDER = ['nouns', 'verbs', 'adjectives', 'compounds', 'custom'];
     },
     async mounted() {
       this.allRooms = await listRooms();
@@ -461,6 +483,14 @@
           return this.room.timers[this.room.currentRound.state];
         }
         return 0;
+      },
+      isMod() {
+        if (this.user.supporter == 'ADMIN') {
+          return true;
+        }
+        if (this.room && this.room.players) {
+          return this.player.name == this.room.players[0];
+        }
       },
     },
     methods: {
@@ -556,7 +586,7 @@
           });
         }
       },
-      goHome() {
+      async goHome() {
         unlistenRoom();
         this.room = { name: '' };
       },
@@ -568,12 +598,23 @@
         }
       },
       async makeMod(name) {
-        if (this.room.players.includes(name)) {
-          const index = this.room.players.indexOf(name);
-          this.room.players[index] = this.player.name;
-          this.room.players[0] = name;
+        const index = this.room.players.indexOf(name);
+        if (index >= 0) {
+          // swap players[0] and players[index]
+          [this.room.players[0], this.room.players[index]] = [this.room.players[index], this.room.players[0]];
           await updateRoom(this.room, { players: this.room.players });
         }
+      },
+      wordForWord(category) {
+        return (
+          {
+            nouns: 'word',
+            verbs: 'verb',
+            adjectives: 'adjective',
+            compounds: 'compound',
+            custom: 'word',
+          }[category] || 'word'
+        );
       },
       async submitClue() {
         this.player.clue = this.player.clue.toLowerCase().trim();
@@ -591,9 +632,7 @@
       },
       async nextStage() {
         if (this.room.currentRound.state == 'CLUEING') {
-          return await updateRoom(this.room, {
-            'currentRound.state': 'GUESSING',
-          });
+          return await updateRoom(this.room, { 'currentRound.state': 'GUESSING' });
         } else if (this.room.currentRound.state == 'GUESSING') {
           return await updateRoom(this.room, { 'currentRound.state': 'DONE' });
         } else {
@@ -630,22 +669,15 @@
         await updateRoom(this.room, { timers: this.room.timers });
       },
       async setCategories() {
-        const update = {
-          categories: this.room.categories,
-          customWords: this.room.customWords,
-        };
-        await updateRoom(this.room, update);
+        await updateRoom(this.room, { categories: this.room.categories });
       },
-      async togglePublic() {
-        this.room.public = !this.room.public;
+      async setWords() {
+        await updateRoom(this.room, { customWords: this.room.customWords });
+      },
+      async setRoomType() {
         await updateRoom(this.room, { public: this.room.public });
       },
       async setRounds() {
-        if (this.room.roundsInGame != 13) {
-          this.room.roundsInGame = 13;
-        } else {
-          this.room.roundsInGame = 'Unlimited';
-        }
         await updateRoom(this.room, { roundsInGame: this.room.roundsInGame });
       },
       async shareRoom() {
