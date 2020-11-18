@@ -362,9 +362,12 @@
         });
       },
       async nextRound() {
+        const wordmaster = this.room.players[
+          (this.room.players.indexOf(this.room.currentRound.wordmaster) + 1) % this.room.players.length
+        ];
         const newRound = {
           revealed: 1,
-          wordmaster: this.player.name,
+          wordmaster,
           word: '',
           banned: [],
           clues: {},
