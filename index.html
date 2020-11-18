@@ -241,7 +241,7 @@
           <!-- Players -->
           <div class="field is-grouped is-grouped-multiline">
             <span class="mb-2 mr-2">Players:</span>
-            <avatar
+            <nametag
               v-for="(player, i) in room.players"
               :name="player"
               :user="room.playerData && room.playerData[player]"
@@ -250,7 +250,7 @@
               :guessing="room.currentRound.guesser == player"
               :mod="isMod"
               @kick="kickPlayer(player)"
-            ></avatar>
+            ></nametag>
           </div>
           <!-- Other Mod Tools -->
           <div v-if="isMod">
@@ -400,6 +400,7 @@
 
 <!-- My code -->
 <script type="module" src="firebase-network.js"></script>
+<script type="module" src="./nametag-vue.js"></script>
 <script type="module" src="./navbar-vue.js"></script>
 <script type="module" src="./timer-vue.js"></script>
 <script type="module" src="./scoreboard-vue.js"></script>
