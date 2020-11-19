@@ -65,8 +65,8 @@ Vue.component('nametag', {
         {{ name }}
       </div>
       <template v-if="index == 0">
-        <div class="tag is-dark">
-          Mod
+        <div class="tag is-dark" @click="$emit('toggle-mod-ui')">
+          {{ mod ? 'Hide mod tools' : 'Mod' }}
         </div>
       </template>
       <a v-else-if="mod" class="tag is-delete is-danger is-light" :title="'Kick ' + name" @click="kick()"></a>

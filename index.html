@@ -250,6 +250,7 @@
               :guessing="room.currentRound.guesser == player"
               :mod="isMod"
               @kick="kickPlayer(player)"
+              @toggle-mod-ui="showModUi = !showModUi"
             ></nametag>
           </div>
           <!-- Other Mod Tools -->
@@ -460,6 +461,7 @@
         guess: '',
       },
       newMod: '',
+      showModUi: true,
       wordsSaved: false,
     },
     created() {
@@ -502,7 +504,7 @@
           return true;
         }
         if (this.room && this.room.players) {
-          return this.player.name == this.room.players[0];
+          return this.player.name == this.room.players[0] && this.showModUi;
         }
       },
     },
