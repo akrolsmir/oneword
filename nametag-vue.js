@@ -1,52 +1,52 @@
 Vue.component('nametag', {
-    props: {
-      name: String,
-      user: Object, // email and sponsor status
-      submitted: Boolean,
-      index: Number,
-      guessing: Boolean,
-      mod: Boolean,
+  props: {
+    name: String,
+    user: Object, // email and sponsor status
+    submitted: Boolean,
+    index: Number,
+    guessing: Boolean,
+    mod: Boolean,
+  },
+  data() {
+    return {
+      md5,
+    };
+  },
+  methods: {
+    kick() {
+      this.$emit('kick');
     },
-    data() {
-      return {
-        md5,
-      };
-    },
-    methods: {
-      kick() {
-        this.$emit('kick');
+  },
+  computed: {
+    attr() {
+      if (!this.user || this.user.guest) {
+        return { title: 'guest' };
       }
+      if (this.user.supporter == 'BASE') {
+        return {
+          title: 'supporter',
+          style: 'box-shadow: 0 0 0 2px gold',
+        };
+      }
+      if (this.user.supporter == 'SPONSOR') {
+        return {
+          title: 'sponsor',
+          style: 'box-shadow: 0 0 0 2px #b181e4',
+        };
+      }
+      if (this.user.supporter == 'ADMIN') {
+        return {
+          title: 'developer',
+          style: {
+            outline: '1px dashed #33ff00',
+            boxShadow: '0 0 0 2px #0a0a0a',
+          },
+        };
+      }
+      return { title: 'member' };
     },
-    computed: {
-      attr() {
-        if (!this.user || this.user.guest) {
-          return { title: 'guest' };
-        }
-        if (this.user.supporter == 'BASE') {
-          return {
-            title: 'supporter',
-            style: 'box-shadow: 0 0 0 2px gold',
-          };
-        }
-        if (this.user.supporter == 'SPONSOR') {
-          return {
-            title: 'sponsor',
-            style: 'box-shadow: 0 0 0 2px #b181e4',
-          };
-        }
-        if (this.user.supporter == 'ADMIN') {
-          return {
-            title: 'developer',
-            style: {
-              outline: "1px dashed #33ff00",
-              boxShadow: "0 0 0 2px #0a0a0a"
-            },
-          };
-        }
-        return { title: 'member' };
-      },
-    },
-    template: `
+  },
+  template: `
   <div class="control">
     <div class="tags has-addons">
       <div 
@@ -73,4 +73,4 @@ Vue.component('nametag', {
     </div>
   </div>
     `,
-  });
+});
