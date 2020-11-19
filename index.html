@@ -284,15 +284,19 @@
         <div v-if="room.players.length < 3">
           <h2>Waiting for 3 players...</h2>
           <br />
-          Invite your friends via this link:<br />
-          <div class="field mt-1">
-            <div class="control">
+          Invite your friends to play!<br />
+          <div class="field has-addons mt-1">
+            <div class="control is-expanded">
               <input
                 class="input is-info"
                 type="text"
                 :value="'https://oneword.games/?room=' + room.name"
-                placeholder="Info input"
+                @focus="$event.target.select()"
+                ref="shareLink"
               />
+            </div>
+            <div class="control">
+              <a class="button is-info" @click="copyLinkToClipboard">Copy</a>
             </div>
           </div>
         </div>
@@ -703,6 +707,14 @@
           title: 'Share this link:',
           icon: 'success',
           content: link,
+        });
+      },
+      copyLinkToClipboard() {
+        this.$refs.shareLink.select();
+        document.execCommand('copy');
+        swal({
+          text: 'Copied invite link to clipboard!',
+          icon: 'success',
         });
       },
       correct,
