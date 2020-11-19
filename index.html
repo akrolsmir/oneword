@@ -501,7 +501,7 @@
       },
       isMod() {
         if (this.user.supporter == 'ADMIN') {
-          return true;
+          return this.showModUi;
         }
         if (this.room && this.room.players) {
           return this.player.name == this.room.players[0] && this.showModUi;
