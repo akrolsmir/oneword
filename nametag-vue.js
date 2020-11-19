@@ -20,30 +20,30 @@ Vue.component('nametag', {
   computed: {
     attr() {
       if (!this.user || this.user.guest) {
-        return { title: 'guest' };
+        return { title: 'Guest' };
       }
       if (this.user.supporter == 'BASE') {
         return {
-          title: 'supporter',
+          title: 'Supporter',
           style: 'box-shadow: 0 0 0 2px gold',
         };
       }
       if (this.user.supporter == 'SPONSOR') {
         return {
-          title: 'sponsor',
+          title: 'Sponsor',
           style: 'box-shadow: 0 0 0 2px #b181e4',
         };
       }
       if (this.user.supporter == 'ADMIN') {
         return {
-          title: 'developer',
+          title: 'Developer',
           style: {
             outline: '1px dashed #33ff00',
             boxShadow: '0 0 0 2px #0a0a0a',
           },
         };
       }
-      return { title: 'member' };
+      return { title: 'Member' };
     },
   },
   template: `
@@ -69,7 +69,7 @@ Vue.component('nametag', {
           Mod
         </div>
       </template>
-      <a v-else-if="mod" class="tag is-delete is-danger is-light" :title="'kick ' + name" @click="kick()"></a>
+      <a v-else-if="mod" class="tag is-delete is-danger is-light" :title="'Kick ' + name" @click="kick()"></a>
     </div>
   </div>
     `,
