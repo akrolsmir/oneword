@@ -20,7 +20,7 @@ Vue.component('navbar', {
       firebase.analytics().logEvent('logout');
       await firebase.auth().signOut();
       // Reset user info
-      Object.assign(this.value, { id: "", email: "", supporter: "" })
+      Object.assign(this.value, { id: '', email: '', supporter: '' });
     },
     referAmazon() {
       firebase.analytics().logEvent('view_amazon', {
@@ -38,7 +38,7 @@ Vue.component('navbar', {
   computed: {
     isSupporter() {
       return ['BASE', 'SPONSOR', 'ADMIN'].includes(this.value.supporter);
-    }
+    },
   },
   template: `
 <nav class="navbar has-shadow is-fixed-top"
@@ -57,7 +57,7 @@ Vue.component('navbar', {
   </div>
   <div id="navbuttons" class="navbar-menu" :class = "{'is-active': burgerOpen}">
     <div class="navbar-end">
-      <a class="navbar-item" @click="referAmazon">Buy the original</a>
+      <a class="navbar-item" @click="referAmazon">Buy the board game</a>
       <a v-if="value.id" class="navbar-item" @click="logOut">
         Sign out, {{ value.name.split(' ')[0] }}?
       </a>
