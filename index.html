@@ -283,6 +283,18 @@
       <div v-if="room.currentRound.state == 'CLUEING'">
         <div v-if="room.players.length < 3">
           <h2>Waiting for 3 players...</h2>
+          <br />
+          Invite your friends via this link:<br />
+          <div class="field mt-1">
+            <div class="control">
+              <input
+                class="input is-info"
+                type="text"
+                :value="'https://oneword.games/?room=' + room.name"
+                placeholder="Info input"
+              />
+            </div>
+          </div>
         </div>
         <div v-else-if="room.currentRound.guesser == player.name">
           <h2>It's your turn to guess! Waiting for clues...</h2>
