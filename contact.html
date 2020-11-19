@@ -249,7 +249,7 @@
       async resetRoom() {
         this.room = {
           name: this.room.name,
-          players: [],
+          players: [this.player.name],
           currentRound: {
             revealed: 1,
             wordmaster: this.player.name,
