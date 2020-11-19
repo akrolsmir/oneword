@@ -2,8 +2,7 @@
 <meta charset="utf-8" />
 
 <head>
-  <title>Thanks for your support! | Legends of Runeterra</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>Thanks for your support!</title>
   <link
     href="https://fonts.googleapis.com/css?family=Fjalla+One|Merienda+One|Righteous|Sriracha&display=swap"
     rel="stylesheet"
@@ -32,33 +31,111 @@
       width: 600px;
       margin: 0 auto;
     }
+
+    /* Pure CSS loader animation, inspired by https://loading.io/css/ */
+    .loaderz {
+      /* display: inline-block; */
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin: 20px auto;
+      background: linear-gradient(-60deg, #a1c3db, #2b90e5);
+      border-radius: 50%;
+    }
+    div.left,
+    div.mid,
+    div.right {
+      display: inline-block;
+      position: absolute;
+      width: 16px;
+      background: #fff;
+      animation: loaderz 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+    }
+    div.mid {
+      animation: mid 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+    }
+    .loaderz div.left {
+      left: 28px;
+      animation-delay: -0.24s;
+    }
+    .loaderz div.mid {
+      left: 52px;
+      animation-delay: -0.12s;
+    }
+    .loaderz div.right {
+      left: 76px;
+      animation-delay: 0;
+    }
+    @keyframes loaderz {
+      0% {
+        top: 44px;
+        height: 48px;
+      }
+      50%,
+      100% {
+        top: 56px;
+        height: 24px;
+      }
+    }
+
+    @keyframes mid {
+      0% {
+        top: 20px;
+        height: 72px;
+      }
+      50%,
+      100% {
+        top: 32px;
+        height: 48px;
+      }
+    }
+
+    /* Fade in the final message */
+    .fade-enter-active {
+      transition: opacity 0.5s;
+    }
+    .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+      opacity: 0;
+    }
   </style>
 
   <meta name="description" content="Thanks for supporting One Word!" />
 
-  <link rel="apple-touch-icon" sizes="180x180" href="images/logo/favicon/apple-touch-icon.png" />
-  <link rel="icon" type="image/png" sizes="32x32" href="images/logo/favicon/favicon-32x32.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="images/logo/favicon/favicon-16x16.png" />
-  <link rel="manifest" href="images/logo/favicon/site.webmanifest" />
+  <!-- Dolphin favicon courtesy of Twemoji -->
+  <link rel="icon" href="https://twemoji.maxcdn.com/v/13.0.1/72x72/1f42c.png" />
 </head>
 
 <body class="has-navbar-fixed-top">
   <div id="thanks">
-    <navbar></navbar>
+    <navbar ref="navbar" v-model="user"></navbar>
     <section class="hero is-primary is-bold">
       <div class="hero-body">
         <div class="container">
-          <h1 class="title">THANK YOU!</h1>
+          <h1 class="title">Thanks for your support!</h1>
           <div class="subtitle">Seriously, you're the literal best.</div>
         </div>
       </div>
     </section>
     <article class="message">
       <div class="message-body">
-        I super-appreciate your support. Mega-appreciate. Hyper-appreciate?<br />
-        If you got any custom rewards, I'll be emailing you soon to follow up.<br />
-        Again, from the bottom of my heart,<br />
-        <img src="images/shen-gg.png" />
+        <transition name="fade">
+          <div v-cloak v-if="finished" key="1">
+            Your supporter benefits have just been granted!<br />
+            It means the world to us, that you enjoyed One Word this much.<br />
+            Again, from the bottom of my heart:<br />
+            <img src="images/shen-gg.png" />
+          </div>
+          <div v-else key="2">
+            Now granting your benefits...
+            <div class="loaderz">
+              <div class="left"></div>
+              <div class="mid"></div>
+              <div class="right"></div>
+            </div>
+            (If this takes more than a minute, something broke. Sadface.<br />
+            Ping austin@oneword.games and I'll get you sorted out.)
+          </div>
+        </transition>
       </div>
     </article>
   </div>
@@ -67,11 +144,36 @@
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-firestore.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bulma-extensions@6.2.7/dist/js/bulma-extensions.min.js"></script>
 
 <!-- My code -->
-<script type="module" src="header-vue.js"></script>
+<script type="module" src="navbar-vue.js"></script>
 <script type="module" src="firebase-network.js"></script>
 <script type="module">
-  const vueApp = new Vue({ el: '#thanks' });
+  import { listenForLogin, updateUser, sendSupporterEmail } from './firebase-network.js';
+
+  const vueApp = new Vue({
+    el: '#thanks',
+    data: {
+      user: {},
+      player: {}, // Just because listenForLogin() expects vueApp.player.name
+      finished: false,
+    },
+    watch: {
+      async 'user.id'() {
+        // We just registered the firebase login.
+        if (!this.user.supporter) {
+          // Could pass supporter tier through URL param, but assume BASE for now.
+          await updateUser(this.user.id, { supporter: 'BASE' });
+          await sendSupporterEmail(this.user);
+
+          // Load for 4 more seconds to provide illusion of work.
+          setTimeout(() => (this.finished = true), 4000);
+        }
+      },
+    },
+  });
+  listenForLogin(vueApp);
 </script>

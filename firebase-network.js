@@ -80,6 +80,11 @@ export async function getUser(userId) {
   return doc.data();
 }
 
+export async function updateUser(userId, user) {
+  const db = firebase.firestore();
+  await db.collection('users').doc(userId).update(user);
+}
+
 export function listenForLogin(vueApp) {
   firebase.auth().onAuthStateChanged(async function (user) {
     if (user) {
@@ -146,6 +151,27 @@ If you've got a minute, I'd love to hear from you!
 (Like, how did you find out about us? Any issues, or feedback? I read and respond to every email.)
 
 But most of all: thanks for playing!
+Austin
+`,
+    },
+  });
+}
+
+export async function sendSupporterEmail(user) {
+  const firstName = user.name.split(' ')[0];
+  await sendMail({
+    from: 'Austin Chen <austin@oneword.games>',
+    replyTo: 'Austin Chen <austin@oneword.games>',
+    to: user.email,
+    bcc: 'Austin Chen <austin@oneword.games>',
+    message: {
+      subject: 'Thanks for supporting One Word!',
+      text: `Hi ${firstName},
+
+Just wanted to thank you for becoming a supporter ☺. We're so glad you love our game!
+Your benefits are now active; let me know if you have any issues (or any time you'd like to cancel).
+
+Also, just curious: what led you to support us in the first place?
 Austin
 `,
     },
