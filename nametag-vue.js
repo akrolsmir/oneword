@@ -57,11 +57,11 @@ Vue.component('nametag', {
       >
         <img
           v-if="user && user.email && user.supporter"
-          style="border-radius: 4px; margin-left: -9px"
+          style="border-top-left-radius: 4px; border-bottom-left-radius: 4px; margin-left: -10.5px"
           class="mr-1"
           :src="'https://www.gravatar.com/avatar/' + md5(user.email) + '?size=48'"
-          height="24"
-          width="24">
+          height="28"
+          width="28">
         {{ name }}
       </div>
       <template v-if="index == 0">
