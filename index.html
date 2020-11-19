@@ -365,7 +365,7 @@
       </div>
       <br /><br />
       <!-- History -->
-      <h2>History</h2>
+      <h2 v-if="room.history.length > 0">History</h2>
       <template v-for="(round, i) in room.history.slice().reverse()">
         <div class="level">
           <div class="level-left">
