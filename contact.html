@@ -77,7 +77,7 @@
       <!-- Word -->
       <h3>Word</h3>
       <div v-if="room.currentRound.word">
-        <h2 class="title has-text-centered is-size-1">{{ prefix.toUpperCase() }}...?</h2>
+        <h2 class="title has-text-centered is-size-1">{{ prefix }}...?</h2>
       </div>
       <div v-else-if="player.name == room.currentRound.wordmaster">
         <input class="input" v-model="player.word" @keyup.enter="chooseWord" />
