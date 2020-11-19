@@ -106,7 +106,7 @@
               <h3>{{ cluer }}'s clue: {{ clue.hint }}</h3>
               <template v-if="clue.contact">
                 Contacted {{clue.contact}}!
-                <timer :length="10" :on-finish="onContact(cluer, clue)"></timer>
+                <timer :length="3" :on-finish="onContact(cluer, clue)"></timer>
                 <button v-if="player.name == room.currentRound.wordmaster" @click="onContact(cluer, clue)()">
                   Resolve
                 </button>
