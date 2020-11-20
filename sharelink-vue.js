@@ -13,7 +13,7 @@ Vue.component('sharelink', {
       this.$refs.input.blur();
       if (!this.isCopied) {
         this.isCopied = true;
-        setTimeout(() => { this.isCopied = false }, 1500)
+        setTimeout(() => { this.isCopied = false }, 3000)
       }
     },
   },
@@ -23,7 +23,7 @@ Vue.component('sharelink', {
     <input
       class="input"
       :class="isCopied ? 'is-success' : 'is-info'"
-      style="transition: all 0.1s ease"
+      style="transition: all 0.5s ease"
       type="text"
       :value=link
       @focus="$event.target.select();"
