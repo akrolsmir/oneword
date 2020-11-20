@@ -283,23 +283,8 @@
       <div v-if="room.currentRound.state == 'CLUEING'">
         <div v-if="room.players.length < 3">
           <h2>Waiting for 3 players...</h2>
-          <br />
-          Invite your friends to play!<br />
-          <div class="field has-addons mt-1">
-            <div class="control is-expanded">
-              <input
-                class="input is-info"
-                type="text"
-                :value="'https://oneword.games/?room=' + room.name"
-                @focus="$event.target.select()"
-                ref="shareLink"
-                readonly
-              />
-            </div>
-            <div class="control">
-              <a class="button is-info" @click="copyLinkToClipboard">Copy</a>
-            </div>
-          </div>
+          <p class="mt-5 mb-2">Invite your friends to play!</p>
+          <sharelink :link="'https://oneword.games/?room=' + room.name"></sharelink>
         </div>
         <div v-else-if="room.currentRound.guesser == player.name">
           <h2>It's your turn to guess! Waiting for clues...</h2>
@@ -421,6 +406,7 @@
 <script type="module" src="components/navbar.js"></script>
 <script type="module" src="components/timer.js"></script>
 <script type="module" src="components/scoreboard.js"></script>
+<script type="module" src="./sharelink-vue.js"></script>
 <script type="module">
   import { nouns, compounds, verbs, adjectives } from './many-words.js';
   import {
@@ -708,14 +694,6 @@
           title: 'Share this link:',
           icon: 'success',
           content: link,
-        });
-      },
-      copyLinkToClipboard() {
-        this.$refs.shareLink.select();
-        document.execCommand('copy');
-        swal({
-          text: 'Copied invite link to clipboard!',
-          icon: 'success',
         });
       },
       correct,
