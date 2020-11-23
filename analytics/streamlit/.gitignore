@@ -1,1 +1,3 @@
 firestore-account-key.json
+# ide specific files
+.idea
