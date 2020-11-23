@@ -142,13 +142,13 @@
             >
               <div class="mx-1" v-if="isMod">
                 <span class="select is-small">
-                  <select v-model="room.public" :disabled="!user.supporter" @change="saveRoom('public')">
+                  <select v-model="room.public" @change="upsell('public')">
                     <option v-bind:value="true">Public</option>
                     <option v-bind:value="false">Private</option>
                   </select>
                 </span>
                 <span class="select is-small">
-                  <select v-model="room.roundsInGame" :disabled="!user.supporter" @change="saveRoom('roundsInGame')">
+                  <select v-model="room.roundsInGame" @change="upsell('roundsInGame')">
                     <option v-bind:value="13">13 rounds</option>
                     <option v-bind:value="'Unlimited'">&infin; rounds</option>
                   </select>
@@ -674,6 +674,29 @@
       // Sync any number of properties of this.room to firebase
       async saveRoom(...props) {
         await updateRoom(this.room, Object.fromEntries(props.map((prop) => [prop, this.room[prop]])));
+      },
+      async upsell(...props) {
+        if (this.user.supporter) {
+          await this.saveRoom(...props);
+        } else {
+          const result = await swal({
+            title: 'Want private rooms?',
+            text: 'Earn perks like private rooms, custom avatars, and more by becoming a supporter 😍',
+            buttons: {
+              cancel: 'Not now',
+              support: 'Okay!',
+            },
+          });
+          if (result === 'support') {
+            firebase.analytics().logEvent('view_promotion', {
+              source: 'modtools',
+            });
+            window.open('./supporter.html', '_blank');
+          }
+          // Reset UI to non-supporter defaults
+          this.room.public = true;
+          this.room.roundsInGame = 13;
+        }
       },
       async shareRoom() {
         const link = document.createElement('input');
