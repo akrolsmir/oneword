@@ -21,7 +21,9 @@
 
     h1,
     h2,
-    h3 {
+    h3,
+    .header,
+    .title {
       font-family: 'Merienda One', cursive;
     }
 
@@ -64,21 +66,21 @@
     <br /><br />
     <div v-if="room && room.currentRound">
       <!-- Room header -->
-      <article class="message">
+      <div class="message">
         <div class="message-header">
-          <h1>{{ room.name }}</h1>
-          <h2>Round ???</h2>
+          <span class="header">Room: {{ room.name }}</span>
+          <span class="header">Round ???</span>
         </div>
         <div class="message-body">
           Players: {{ room.players.join(', ') }} <br />
           Wordmaster: {{ room.currentRound.wordmaster }}
         </div>
-      </article>
+      </div>
 
       <!-- Word -->
-      <h3>Word</h3>
+      <h1>Word</h1>
       <div v-if="room.currentRound.word">
-        <h2 class="title has-text-centered is-size-1">{{ prefix }}...?</h2>
+        <div class="title has-text-centered is-1">{{ prefix }}...?</div>
       </div>
       <div v-else-if="player.name == room.currentRound.wordmaster">
         <input class="input" v-model="player.word" @keyup.enter="chooseWord" />
@@ -89,10 +91,10 @@
       <div class="columns">
         <!-- Clues -->
         <div class="column">
-          <h3>Clues</h3>
+          <h1>Clues</h1>
           <div v-if="!clueGiven">
             <div class="card">
-              <h3>Add a clue!</h3>
+              <h2>Add a clue!</h2>
               <input class="input" v-model="player.hint" placeholder="Hint" />
               <Submit
                 placeholder="Word"
@@ -104,7 +106,10 @@
           </div>
           <template v-for="(clue, cluer) in room.currentRound.clues">
             <div class="card">
-              <h3>{{ cluer }}'s clue: {{ clue.hint }}</h3>
+              <div>
+                <h2 class="is-inline mr-1">{{ cluer }}'s clue:</h2>
+                {{ clue.hint }}
+              </div>
               <template v-if="clue.contact">
                 Contacted {{clue.contact}}!
                 <timer :length="3" :on-finish="onContact(cluer, clue)"></timer>
@@ -112,10 +117,11 @@
                   Resolve
                 </button>
               </template>
-              <template v-else-if="cluer === player.name">
-                {{ clue.word }}
-                <button class="button" @click="withdrawClue">Withdraw</button>
-              </template>
+              <div v-else-if="cluer === player.name">
+                <h2 class="is-inline mr-1">word:</h2>
+                <span>{{ clue.word }}</span>
+                <button class="button is-small" @click="withdrawClue">Withdraw</button>
+              </div>
               <template v-else-if="player.name !== room.currentRound.wordmaster">
                 <Submit
                   placeholder="Word"
@@ -130,7 +136,7 @@
 
         <!-- Banned -->
         <div class="column">
-          <h3>Banned</h3>
+          <h1>Banned</h1>
           <div class="card">
             <div v-if="player.name == room.currentRound.wordmaster">
               <Submit
@@ -180,7 +186,7 @@
   } from './firebase-network.js';
 
   /**
-    Room: {
+    room: {
       name: 'apple',
       players: ['alice', 'bob', 'carol'],
       currentRound: {
