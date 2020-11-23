@@ -139,11 +139,14 @@ category_df = rounds_df.set_index(category).groupby(category).agg(
 st.write(category_df)
 
 st.subheader("By Word")
+min_rounds_played = st.slider("Minimum Rounds Played", min_value=1, max_value=100)
+min_success_rate_word = st.slider("Minimum Success Rate (Word)", min_value=0.0, max_value=1.0, step=0.01)
 word_df = rounds_df.set_index(word).groupby(word).agg(
     rounds_played=(success, "count"),
     success_rate=(success, "mean"),
-
 )
+word_df = word_df[word_df["rounds_played"] >= min_rounds_played]
+word_df = word_df[word_df["success_rate"] >= min_success_rate_word]
 st.write(word_df)
 
 clues = []
@@ -151,6 +154,8 @@ for r in rounds:
     clues += round_to_clue_list(r)
 
 st.subheader("By Clue")
+min_times_clued = st.slider("Minimum Times Clued", min_value=1, max_value=100)
+min_success_rate_clue = st.slider("Minimum Success Rate (Clue)", min_value=0.0, max_value=1.0, step=0.01)
 clue = "clue"
 clues_df = pd.DataFrame(clues, columns=[clue, category, word, guess, success])
 st.write(clues_df)
@@ -161,6 +166,8 @@ clues_df_agg = clues_df.set_index(clue).groupby(clue).agg(
     most_common_guess=(guess, lambda x: x.value_counts().index[0]),
     most_common_category=(category, lambda x: x.value_counts().index[0])
 )
+clues_df_agg = clues_df_agg[clues_df_agg["times_clued"] >= min_times_clued]
+clues_df_agg = clues_df_agg[clues_df_agg["success_rate"] >= min_success_rate_clue]
 st.write(clues_df_agg)
 
 # Questions to answer:
