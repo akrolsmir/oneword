@@ -52,6 +52,13 @@
       <button class="button" @click="resetRoom">Reset room</button>
       <button class="button" @click="enterRoom">Enter room</button>
       <button class="button" @click="nextRound">Next round</button>
+      <button
+        v-if="room && room.currentRound && (player.name == room.currentRound.wordmaster)"
+        class="button"
+        @click="nextLetter"
+      >
+        Next Letter
+      </button>
     </div>
     <br /><br />
     <div v-if="room && room.currentRound">
@@ -321,18 +328,14 @@
 
           if (matched) {
             this.room.currentRound.banned.push(clue.word);
-            this.room.currentRound.revealed++;
-            delete this.room.currentRound.clues;
-            this.room.currentRound.clues = {};
+            await this.nextLetter();
           } else {
             // Ban both words and reset
             this.room.currentRound.banned.push(clue.word);
             this.room.currentRound.banned.push(clue.contactedWord);
             delete this.room.currentRound.clues[cluer];
+            await updateRoom(this.room, { currentRound: this.room.currentRound });
           }
-          await updateRoom(this.room, {
-            currentRound: this.room.currentRound,
-          });
         };
       },
       async banWord(toBan) {
