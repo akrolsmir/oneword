@@ -1,19 +1,19 @@
 const MESSAGES = {
-  0: "You do understand this is supposed to be a COOPERATIVE game, right?",
+  0: 'You do understand this is supposed to be a COOPERATIVE game, right?',
   1: "At least you can't do much worse next time!",
-  2: "Uh... Were you even trying?",
+  2: 'Uh... Were you even trying?',
   3: "Here's a tip: try not colliding so much.",
   4: "Well, it's not the worst result I've ever seen...",
   5: "Alright, now that you've warmed up, are you ready to play for real?",
-  6: "Respectable attempt. Want to try again?",
+  6: 'Respectable attempt. Want to try again?',
   7: "Okay... At least it's a lucky number?",
   8: "Not bad! Now we're getting somewhere.",
-  9: "Pretty good job -- but can you make it to double digits?",
-  10: "Huh, color me impressed. Was it a fluke?",
-  11: "You really dialed it to the next level. Try a harder category next time!",
-  12: "You all must be cheating somehow, I just know it...",
+  9: 'Pretty good job -- but can you make it to double digits?',
+  10: 'Huh, color me impressed. Was it a fluke?',
+  11: 'You really dialed it to the next level. Try a harder category next time!',
+  12: 'You all must be cheating somehow, I just know it...',
   13: "Wow, that's hall of fame material right there. I am in awe.",
-}
+};
 
 Vue.component('scoreboard', {
   data() {
@@ -25,12 +25,12 @@ Vue.component('scoreboard', {
     score: Number,
     roundsInGame: [Number, String],
     supporter: Boolean,
-    name: String
+    name: String,
   },
   methods: {
     continuePlaying() {
       this.$emit('continue-game');
-    }
+    },
   },
   mounted() {
     startFireworks(this.score);
@@ -66,25 +66,22 @@ function startFireworks(correct) {
   // play with them
   var c = document.querySelector('#fireworks'),
     ctx = c.getContext('2d'),
-    width = c.width = 600,
-    height = c.height = 200,
-
+    width = (c.width = 600),
+    height = (c.height = 200),
     n_stars = 20 + correct * 10, //num of stars
     stars = [], //array to store generated stars
-    twinkleFactor = .4, //how much stars 'twinkle'
+    twinkleFactor = 0.4, //how much stars 'twinkle'
     maxStarRadius = 3,
-
-    fw1, fw2, //firework objects
+    fw1,
+    fw2, //firework objects
     minStrength = 1.5, //lowest firework power
     maxStrength = 7, //highest firework power
     minTrails = 7, //min particles
     maxTrails = 30, //max particles
     particleRadius = 2,
     trailLength = 15, //particle trail length
-    delay = .5, // number of LIFEs between explosions
-
+    delay = 0.5, // number of LIFEs between explosions
     LIFE = 150, //life time of firework
-
     g = 5e-2, //strength of gravity
     D = 1e-3; //strength of drag (air resistance)
 
@@ -106,20 +103,20 @@ function startFireworks(correct) {
 
       // add point to path but if full, remove a point first
       if (this.path.length >= trailLength) this.path.shift();
-      this.path.push([this.x, this.y])
+      this.path.push([this.x, this.y]);
 
       // update speed n position n stuff
       this.vy += this.ay;
       this.vx += this.ax;
       this.x += this.vx;
       this.y += this.vy;
-    }
+    };
 
     this.draw = function () {
-      var opacity = ~~(this.life * 100 / LIFE) / 100;
+      var opacity = ~~((this.life * 100) / LIFE) / 100;
 
-      // tail      
-      ctx.fillStyle = 'rgba(' + this.colour + (opacity * 0.4) + ')';
+      // tail
+      ctx.fillStyle = 'rgba(' + this.colour + opacity * 0.4 + ')';
       if (this.life > LIFE * 0.95) ctx.fillStyle = '#fff';
       ctx.lineWidth = 1;
       ctx.beginPath();
@@ -137,26 +134,24 @@ function startFireworks(correct) {
       ctx.arc(~~this.x, ~~this.y, this.r, 0, Math.PI * 2);
       ctx.fill();
       ctx.closePath();
-    }
-  }
+    };
+  };
 
   // Firework class
   var Firework = function () {
     this.x = width * (Math.random() * 0.8 + 0.1); // from 0.1-0.9 widths
     this.y = height * (Math.random() * 0.8 + 0.1); // from 0.1-0.9 heights
     this.strength = Math.random() * (maxStrength - minStrength) + minStrength;
-    this.colour = ~~(Math.random() * 255) + ',' +
-      ~~(Math.random() * 255) + ',' +
-      ~~(Math.random() * 255) + ',';
+    this.colour = ~~(Math.random() * 255) + ',' + ~~(Math.random() * 255) + ',' + ~~(Math.random() * 255) + ',';
     this.life = 0;
     this.particles = (function (x, y, strength, colour) {
       var p = [];
 
       var n = ~~(Math.random() * (maxTrails - minTrails)) + minTrails;
       var ay = g;
-      for (var i = n; i--;) {
+      for (var i = n; i--; ) {
         var ax = D;
-        var angle = i * Math.PI * 2 / n;
+        var angle = (i * Math.PI * 2) / n;
         if (angle < Math.PI) ax *= -1;
         var vx = strength * Math.sin(angle);
         var vy = strength * Math.cos(angle);
@@ -169,12 +164,12 @@ function startFireworks(correct) {
     this.update = function () {
       this.life++;
       if (this.life < 0) return; //allows life to be delayed
-      for (var i = this.particles.length; i--;) {
+      for (var i = this.particles.length; i--; ) {
         this.particles[i].update();
         this.particles[i].draw();
         //wasn't bothered to make an extra draw function for firework class
       }
-    }
+    };
   };
 
   var Star = function () {
@@ -182,39 +177,39 @@ function startFireworks(correct) {
     this.y = Math.random() * height;
     this.r = Math.random() * maxStarRadius;
     this.b = ~~(Math.random() * 100) / 100;
-  }
+  };
 
   Star.prototype.draw = function () {
-    this.b += twinkleFactor * (Math.random() - .5);
+    this.b += twinkleFactor * (Math.random() - 0.5);
     ctx.fillStyle = 'rgba(255,255,255,' + this.b + ')';
     ctx.beginPath();
     ctx.arc(~~this.x, ~~this.y, this.r, 0, Math.PI * 2);
     ctx.fill();
     ctx.closePath();
-  }
+  };
 
   function createStars() {
-    for (var i = n_stars; i--;) stars.push(new Star);
+    for (var i = n_stars; i--; ) stars.push(new Star());
   }
 
   function main() {
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, width, height);
 
-    for (var i = n_stars; i--;) stars[i].draw();
+    for (var i = n_stars; i--; ) stars[i].draw();
 
     fw1.update();
     fw2.update();
 
-    if (fw1.life == LIFE * delay) fw2 = new Firework;
-    if (fw2.life == LIFE * delay) fw1 = new Firework;
+    if (fw1.life == LIFE * delay) fw2 = new Firework();
+    if (fw2.life == LIFE * delay) fw1 = new Firework();
 
     window.requestAnimationFrame(main);
   }
 
   function init() {
-    fw1 = new Firework;
-    fw2 = new Firework;
+    fw1 = new Firework();
+    fw2 = new Firework();
     fw2.life = -LIFE * delay;
     createStars();
     main();
