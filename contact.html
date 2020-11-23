@@ -337,11 +337,8 @@
             this.room.currentRound.banned.push(clue.word);
             await this.nextLetter();
           } else {
-            // Ban both words and reset
-            this.room.currentRound.banned.push(clue.word);
-            this.room.currentRound.banned.push(clue.contactedWord);
-            delete this.room.currentRound.clues[cluer];
-            await updateRoom(this.room, { currentRound: this.room.currentRound });
+            // Ban both words
+            await Promise.all(this.banWord(clue.word), this.banWord(clue.contactedWord));
           }
         };
       },
