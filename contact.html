@@ -115,8 +115,8 @@
                   <h2 class="is-inline mr-1">{{ cluer }}'s clue:</h2>
                   {{ clue.hint }}
                 </div>
-                <template v-if="clue.contact">
-                  Contacted {{clue.contact}}!
+                <template v-if="clue.guesser">
+                  Contacted {{clue.guesser}}!
                   <timer :length="4" @finish="onContact(cluer, clue)"></timer>
                   <button v-if="player.name == room.currentRound.wordmaster" @click="onContact(cluer, clue)">
                     Resolve
@@ -131,7 +131,7 @@
                   <Submit
                     placeholder="Word"
                     button-text="Contact!"
-                    @submitted="(word) => contact(cluer, word)"
+                    @submitted="(word) => guess(cluer, word)"
                     :invalid="(word) => room.currentRound.banned.includes(word) || !word.startsWith(prefix)"
                   />
                 </template>
@@ -205,8 +205,8 @@
           bob: {
             hint: 'square',
             word: 'corner',
-            contact: 'carol',
-            contactedWord: 'corner',
+            guesser: 'carol',
+            guess: 'corner',
           },
           carol: ...
         }
@@ -293,8 +293,8 @@
             [`currentRound.clues.${this.player.name}`]: {
               word,
               hint: this.player.hint,
-              contact: '',
-              contactedWord: '',
+              guesser: '',
+              guess: '',
             },
           };
           await updateRoom(this.room, update);
@@ -316,31 +316,29 @@
           await updateRoom(this.room, { currentRound: this.room.currentRound });
         }
       },
-      async contact(cluer, word) {
+      async guess(cluer, word) {
         const update = {
-          [`currentRound.clues.${cluer}.contact`]: this.player.name,
-          [`currentRound.clues.${cluer}.contactedWord`]: word,
+          [`currentRound.clues.${cluer}.guesser`]: this.player.name,
+          [`currentRound.clues.${cluer}.guess`]: word,
         };
         await updateRoom(this.room, update);
       },
       async onContact(cluer, clue) {
         // Show everyone the "Contact message"
-        const matched = clue.word === clue.contactedWord;
-        const message = `${matched ? '' : 'NO '} CONTACT!\n${cluer}: ${clue.word}\n${clue.contact}: ${
-            clue.contactedWord
-          }`;
-          swal(message);
+        const matched = clue.word === clue.guess;
+        const message = `${matched ? '' : 'NO '} CONTACT!\n${cluer}: ${clue.word}\n${clue.guesser}: ${clue.guess}`;
+        swal(message);
 
-          if (this.player.name !== this.room.currentRound.wordmaster) {
-            return;
-          }
+        if (this.player.name !== this.room.currentRound.wordmaster) {
+          return;
+        }
 
-          if (matched) {
-            this.room.currentRound.banned.push(clue.word);
+        if (matched) {
+          this.room.currentRound.banned.push(clue.word);
           await this.nextLetter();
         } else {
           // Ban both words
-          await Promise.all([this.banWord(clue.word), this.banWord(clue.contactedWord)]);
+          await Promise.all([this.banWord(clue.word), this.banWord(clue.guess)]);
         }
       },
       async banWord(toBan) {
@@ -353,10 +351,10 @@
           if (clue.word === toBan) {
             // Remove the clue entirely
             delete this.room.currentRound.clues[cluer];
-          } else if (clue.contactedWord === toBan) {
+          } else if (clue.guess === toBan) {
             // Remove the contacted information, but NOT the original clue.
-            clue.contact = '';
-            clue.contactedWord = '';
+            clue.guesser = '';
+            clue.guess = '';
           }
         }
         await updateRoom(this.room, { currentRound: this.room.currentRound });
