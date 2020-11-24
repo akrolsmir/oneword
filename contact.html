@@ -77,81 +77,87 @@
         </div>
       </div>
 
-      <!-- Word -->
-      <h1>Word</h1>
-      <div v-if="room.currentRound.word">
-        <div class="title has-text-centered is-1">{{ prefix }}...?</div>
-      </div>
-      <div v-else-if="player.name == room.currentRound.wordmaster">
-        <input class="input" v-model="player.word" @keyup.enter="chooseWord" />
-        <button class="button" @click="chooseWord">Choose!</button>
-      </div>
-      <br /><br />
+      <template v-if="room.players.length < 3">
+        <label class="header is-block mb-1">Invite your friends!</label>
+        <sharelink :link="'https://oneword.games/contact?room=' + room.name"></sharelink>
+      </template>
+      <template v-else>
+        <!-- Word -->
+        <h1>Word</h1>
+        <div v-if="room.currentRound.word">
+          <div class="title has-text-centered is-1">{{ prefix }}...?</div>
+        </div>
+        <div v-else-if="player.name == room.currentRound.wordmaster">
+          <input class="input" v-model="player.word" @keyup.enter="chooseWord" />
+          <button class="button" @click="chooseWord">Choose!</button>
+        </div>
+        <br /><br />
 
-      <div class="columns">
-        <!-- Clues -->
-        <div class="column">
-          <h1>Clues</h1>
-          <div v-if="!clueGiven">
-            <div class="card">
-              <h2>Add a clue!</h2>
-              <input class="input" v-model="player.hint" placeholder="Hint" />
-              <Submit
-                placeholder="Word"
-                button-text="Create"
-                :on-submit="createClue"
-                :invalid="(word) => room.currentRound.banned.includes(word) || !word.startsWith(prefix)"
-              />
-            </div>
-          </div>
-          <template v-for="(clue, cluer) in room.currentRound.clues">
-            <div class="card">
-              <div>
-                <h2 class="is-inline mr-1">{{ cluer }}'s clue:</h2>
-                {{ clue.hint }}
-              </div>
-              <template v-if="clue.contact">
-                Contacted {{clue.contact}}!
-                <timer :length="4" :on-finish="onContact(cluer, clue)"></timer>
-                <button v-if="player.name == room.currentRound.wordmaster" @click="onContact(cluer, clue)()">
-                  Resolve
-                </button>
-              </template>
-              <div v-else-if="cluer === player.name">
-                <h2 class="is-inline mr-1">word:</h2>
-                <span>{{ clue.word }}</span>
-                <button class="button is-small" @click="withdrawClue">Withdraw</button>
-              </div>
-              <template v-else-if="player.name !== room.currentRound.wordmaster">
+        <div class="columns">
+          <!-- Clues -->
+          <div class="column">
+            <h1>Clues</h1>
+            <div v-if="!clueGiven">
+              <div class="card">
+                <h2>Add a clue!</h2>
+                <input class="input" v-model="player.hint" placeholder="Hint" />
                 <Submit
                   placeholder="Word"
-                  button-text="Contact!"
-                  :on-submit="contact(cluer)"
+                  button-text="Create"
+                  :on-submit="createClue"
                   :invalid="(word) => room.currentRound.banned.includes(word) || !word.startsWith(prefix)"
                 />
-              </template>
+              </div>
             </div>
-          </template>
-        </div>
+            <template v-for="(clue, cluer) in room.currentRound.clues">
+              <div class="card">
+                <div>
+                  <h2 class="is-inline mr-1">{{ cluer }}'s clue:</h2>
+                  {{ clue.hint }}
+                </div>
+                <template v-if="clue.contact">
+                  Contacted {{clue.contact}}!
+                  <timer :length="4" :on-finish="onContact(cluer, clue)"></timer>
+                  <button v-if="player.name == room.currentRound.wordmaster" @click="onContact(cluer, clue)()">
+                    Resolve
+                  </button>
+                </template>
+                <div v-else-if="cluer === player.name">
+                  <h2 class="is-inline mr-1">word:</h2>
+                  <span>{{ clue.word }}</span>
+                  <button class="button is-small" @click="withdrawClue">Withdraw</button>
+                </div>
+                <template v-else-if="player.name !== room.currentRound.wordmaster">
+                  <Submit
+                    placeholder="Word"
+                    button-text="Contact!"
+                    :on-submit="contact(cluer)"
+                    :invalid="(word) => room.currentRound.banned.includes(word) || !word.startsWith(prefix)"
+                  />
+                </template>
+              </div>
+            </template>
+          </div>
 
-        <!-- Banned -->
-        <div class="column">
-          <h1>Banned</h1>
-          <div class="card">
-            <div v-if="player.name == room.currentRound.wordmaster" class="mb-1">
-              <Submit
-                placeholder="Word"
-                button-text="Ban!"
-                :on-submit="banWord"
-                :invalid="(word) => word == room.currentRound.word || room.currentRound.banned.includes(word) || !word.startsWith(prefix)"
-              />
+          <!-- Banned -->
+          <div class="column">
+            <h1>Banned</h1>
+            <div class="card">
+              <div v-if="player.name == room.currentRound.wordmaster" class="mb-1">
+                <Submit
+                  placeholder="Word"
+                  button-text="Ban!"
+                  :on-submit="banWord"
+                  :invalid="(word) => word == room.currentRound.word || room.currentRound.banned.includes(word) || !word.startsWith(prefix)"
+                />
+              </div>
+              <ul style="max-height: 300px; overflow-y: auto">
+                <li v-for="word in room.currentRound.banned.slice().reverse()">{{ word }}</li>
+              </ul>
             </div>
-            <ul style="max-height: 300px; overflow-y: auto">
-              <li v-for="word in room.currentRound.banned.slice().reverse()">{{ word }}</li>
-            </ul>
           </div>
         </div>
-      </div>
+      </template>
     </div>
   </div>
 </body>
@@ -173,6 +179,7 @@
 <script type="module" src="components/navbar.js"></script>
 <script type="module" src="components/timer.js"></script>
 <script type="module" src="components/scoreboard.js"></script>
+<script type="module" src="components/sharelink.js"></script>
 <script type="module" src="components/submit.js"></script>
 <script type="module">
   import {
