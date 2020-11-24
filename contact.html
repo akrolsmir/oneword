@@ -9,7 +9,7 @@
   />
   <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
   <link rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css" />
   <style>
     html {
       margin: 0;
@@ -138,7 +138,7 @@
         <div class="column">
           <h1>Banned</h1>
           <div class="card">
-            <div v-if="player.name == room.currentRound.wordmaster">
+            <div v-if="player.name == room.currentRound.wordmaster" class="mb-1">
               <Submit
                 placeholder="Word"
                 button-text="Ban!"
@@ -146,8 +146,8 @@
                 :invalid="(word) => word == room.currentRound.word || room.currentRound.banned.includes(word) || !word.startsWith(prefix)"
               />
             </div>
-            <ul v-for="word in room.currentRound.banned">
-              <li>{{ word }}</li>
+            <ul style="max-height: 300px; overflow-y: auto">
+              <li v-for="word in room.currentRound.banned.slice().reverse()">{{ word }}</li>
             </ul>
           </div>
         </div>
