@@ -51,7 +51,7 @@
       Player Name
       <input class="input" v-model="player.name" /> <br />
       Room Name
-      <input class="input" v-model="room.name" /> <br />
+      <input class="input" v-model="room.name" @keyup.enter="enterRoom" /> <br />
       <button class="button" @click="resetRoom">Reset room</button>
       <button class="button" @click="enterRoom">Enter room</button>
       <button class="button" @click="nextRound">Next round</button>
