@@ -79,6 +79,17 @@
 <body class="has-navbar-fixed-top">
   <div id="vue">
     <navbar ref="navbar" v-model="user"></navbar>
+    <!-- Notification -->
+    <div class="modal" :class="{'is-active': alertIsShowing}">
+      <div class="modal-background" @click="alertIsShowing=false"></div>
+      <div class="modal-content">
+        <div class="notification">
+          <label class="is-block mb-2">Invite your friends to play!</label>
+          <sharelink :link="'https://oneword.games/?room=' + room.name"></sharelink>
+          <button class="delete" aria-label="close" @click="alertIsShowing=false"></button>
+        </div>
+      </div>
+    </div>
     <!-- Home page -->
     <div v-if="!room.players" class="container mx-4">
       <h1>Welcome!</h1>
@@ -118,7 +129,7 @@
           <h2 class="capitalize">Round {{ room.history.length + 1 }}</h2>
           <!-- Navigation -->
           <span class="buttons are-small">
-            <button class="button is-dark is-inverted is-outlined" @click="shareRoom">Share</button>
+            <button class="button is-dark is-inverted is-outlined" @click="alertIsShowing=true">Invite</button>
             <button
               v-if="room.players.includes(player.name)"
               class="button is-dark is-inverted is-outlined"
@@ -394,7 +405,6 @@
 </body>
 <script src="https://cdn.jsdelivr.net/npm/vue@2.6.2/dist/vue.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert@2.1.2/dist/sweetalert.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/blueimp-md5@2.13.0/js/md5.min.js"></script>
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-app.js"></script>
@@ -452,6 +462,7 @@
         clue: '',
         guess: '',
       },
+      alertIsShowing: false,
       newMod: '',
       wordsSaved: false,
     },
@@ -697,18 +708,6 @@
           this.room.public = true;
           this.room.roundsInGame = 13;
         }
-      },
-      async shareRoom() {
-        const link = document.createElement('input');
-        link.value = `http://oneword.games/?room=${this.room.name}`;
-        link.setAttribute('readonly', 'true');
-        link.setAttribute('onclick', 'this.select()');
-        link.setAttribute('size', '45');
-        swal({
-          title: 'Share this link:',
-          icon: 'success',
-          content: link,
-        });
       },
       correct,
       isEnd,
