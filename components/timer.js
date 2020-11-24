@@ -8,7 +8,6 @@ Vue.component('timer', {
   },
   props: {
     length: [Number, String],
-    onFinish: Function,
   },
   created() {
     this.startMs = performance.now();
@@ -20,7 +19,7 @@ Vue.component('timer', {
       if (this.secondsElapsed >= this.length + 0.25 /* 0.25s padding*/) {
         // We're done! Run onFinish if the timer's still visible.
         if (!this.destroyed) {
-          await this.onFinish();
+          this.$emit('finish');
         }
         this.startMs = timestamp;
       } else {

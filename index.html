@@ -279,7 +279,7 @@
           </div>
         </div>
       </div>
-      <timer :length="timerLength" :on-finish="nextStage" v-if="timerLength > 0" :key="room.currentRound.state"></timer>
+      <timer :length="timerLength" @finish="nextStage" v-if="timerLength > 0" :key="room.currentRound.state"></timer>
 
       <!-- Input area (clueing) -->
       <div v-if="room.currentRound.state == 'CLUEING'">

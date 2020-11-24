@@ -104,7 +104,7 @@
                 <Submit
                   placeholder="Word"
                   button-text="Create"
-                  :on-submit="createClue"
+                  @submitted="createClue"
                   :invalid="(word) => room.currentRound.banned.includes(word) || !word.startsWith(prefix)"
                 />
               </div>
@@ -117,8 +117,8 @@
                 </div>
                 <template v-if="clue.contact">
                   Contacted {{clue.contact}}!
-                  <timer :length="4" :on-finish="onContact(cluer, clue)"></timer>
-                  <button v-if="player.name == room.currentRound.wordmaster" @click="onContact(cluer, clue)()">
+                  <timer :length="4" @finish="onContact(cluer, clue)"></timer>
+                  <button v-if="player.name == room.currentRound.wordmaster" @click="onContact(cluer, clue)">
                     Resolve
                   </button>
                 </template>
@@ -131,7 +131,7 @@
                   <Submit
                     placeholder="Word"
                     button-text="Contact!"
-                    :on-submit="contact(cluer)"
+                    @submitted="(word) => contact(cluer, word)"
                     :invalid="(word) => room.currentRound.banned.includes(word) || !word.startsWith(prefix)"
                   />
                 </template>
@@ -147,7 +147,7 @@
                 <Submit
                   placeholder="Word"
                   button-text="Ban!"
-                  :on-submit="banWord"
+                  @submitted="banWord"
                   :invalid="(word) => word == room.currentRound.word || room.currentRound.banned.includes(word) || !word.startsWith(prefix)"
                 />
               </div>
@@ -316,22 +316,17 @@
           await updateRoom(this.room, { currentRound: this.room.currentRound });
         }
       },
-      // Wrapper, since Submit onEnter expects a function.
-      contact(cluer) {
-        return async (word) => {
-          const update = {
-            [`currentRound.clues.${cluer}.contact`]: this.player.name,
-            [`currentRound.clues.${cluer}.contactedWord`]: word,
-          };
-          await updateRoom(this.room, update);
+      async contact(cluer, word) {
+        const update = {
+          [`currentRound.clues.${cluer}.contact`]: this.player.name,
+          [`currentRound.clues.${cluer}.contactedWord`]: word,
         };
+        await updateRoom(this.room, update);
       },
-      // Wrapper, since timer onFinish expects a function.
-      onContact(cluer, clue) {
-        return async () => {
-          // Show everyone the "Contact message"
-          const matched = clue.word === clue.contactedWord;
-          const message = `${matched ? '' : 'NO '} CONTACT!\n${cluer}: ${clue.word}\n${clue.contact}: ${
+      async onContact(cluer, clue) {
+        // Show everyone the "Contact message"
+        const matched = clue.word === clue.contactedWord;
+        const message = `${matched ? '' : 'NO '} CONTACT!\n${cluer}: ${clue.word}\n${clue.contact}: ${
             clue.contactedWord
           }`;
           swal(message);
@@ -342,12 +337,11 @@
 
           if (matched) {
             this.room.currentRound.banned.push(clue.word);
-            await this.nextLetter();
-          } else {
-            // Ban both words
-            await Promise.all(this.banWord(clue.word), this.banWord(clue.contactedWord));
-          }
-        };
+          await this.nextLetter();
+        } else {
+          // Ban both words
+          await Promise.all([this.banWord(clue.word), this.banWord(clue.contactedWord)]);
+        }
       },
       async banWord(toBan) {
         if (this.room.currentRound.banned.includes(toBan)) {
