@@ -31,6 +31,12 @@ Vue.component('scoreboard', {
     continuePlaying() {
       this.$emit('continue-game');
     },
+    referPremium() {
+      firebase.analytics().logEvent('view_promotion', {
+        source: 'game_end',
+      });
+      window.open('./supporter.html', '_blank');
+    },
   },
   mounted() {
     startFireworks(this.score);
@@ -51,7 +57,7 @@ Vue.component('scoreboard', {
       If you enjoyed One Word, consider becoming a supporter!<br>
       You can earn nice perks like private rooms, while helping cover our server costs.<br>
       <br>
-      <a target="_blank" rel="noopener noreferrer" href="./supporter.html" class="button is-link">Become a supporter!</a><br>
+      <a @click="referPremium" class="button is-link">Become a supporter!</a><br>
       <br>
     </template>
     <a @click="continuePlaying()">(Not done playing? Alright, click here to continue.)</a>
