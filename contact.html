@@ -329,13 +329,13 @@
         const message = `${matched ? '' : 'NO '} CONTACT!\n${cluer}: ${clue.word}\n${clue.guesser}: ${clue.guess}`;
         swal(message);
 
-        if (this.player.name !== this.room.currentRound.wordmaster) {
-          return;
-        }
 
         if (matched) {
-          this.room.currentRound.banned.push(clue.word);
-          await this.nextLetter();
+          // Go to the next letter, but don't go to the one after
+          if (!this.room.currentRound.banned.includes(clue.word)) {
+            this.room.currentRound.banned.push(clue.word);
+            await this.nextLetter();
+          }
         } else {
           // Ban both words
           await Promise.all([this.banWord(clue.word), this.banWord(clue.guess)]);
