@@ -29,7 +29,7 @@
 
     body {
       margin: 48px auto;
-      width: 600px;
+      width: 900px;
       max-width: 95vw;
     }
 
@@ -58,7 +58,7 @@
       <button
         v-if="room && room.currentRound && (player.name == room.currentRound.wordmaster)"
         class="button"
-        @click="nextLetter"
+        @click="room.currentRound.history.push({ event: 'nextLetter'}); nextLetter()"
       >
         Next Letter
       </button>
@@ -95,7 +95,7 @@
 
         <div class="columns">
           <!-- Clues -->
-          <div class="column">
+          <div class="column is-half">
             <h1>Clues</h1>
             <div v-if="!clueGiven">
               <div class="card">
@@ -139,21 +139,19 @@
             </template>
           </div>
 
-          <!-- Banned -->
-          <div class="column">
-            <h1>Banned</h1>
+          <!-- History -->
+          <div class="column is-half">
+            <h1>History</h1>
             <div class="card">
               <div v-if="player.name == room.currentRound.wordmaster" class="mb-1">
                 <Submit
                   placeholder="Word"
                   button-text="Ban!"
-                  @submitted="banWord"
+                  @submitted="(word) => banWord(word, true)"
                   :invalid="(word) => word == room.currentRound.word || room.currentRound.banned.includes(word) || !word.startsWith(prefix)"
                 />
               </div>
-              <ul style="max-height: 300px; overflow-y: auto">
-                <li v-for="word in room.currentRound.banned.slice().reverse()">{{ word }}</li>
-              </ul>
+              <history :round="room.currentRound"></history>
             </div>
           </div>
         </div>
@@ -176,6 +174,7 @@
   window.COLLECTION = 'contact';
 </script>
 <script type="module" src="./firebase-network.js"></script>
+<script type="module" src="components/contact-history.js"></script>
 <script type="module" src="components/navbar.js"></script>
 <script type="module" src="components/timer.js"></script>
 <script type="module" src="components/scoreboard.js"></script>
@@ -209,11 +208,23 @@
             guess: 'corner',
           },
           carol: ...
-        }
+        },
+        history: [
+          {
+            event: 'ban', // or 'miss' or 'contact'
+            word: 'cloak',
+            clues: { bob: {...}, carol: {...}} // clues thwarted by the banned, or just the clue contacted/missed
+          },
+          {
+            event: 'skipLetter'
+          },
+          // TODO: events for people entering, leaving, or winning 
+          ...
+        ]
       }
-      history: [{round1}, ...]
+      previousRounds: [{round1}, ...]
     }
-    */
+  */
   const vueApp = new Vue({
     el: '#vue',
     data: {
@@ -221,7 +232,7 @@
       allRooms: [],
       room: {
         name: 'default-room',
-        history: [],
+        previousRounds: [],
       },
       player: {
         name: '',
@@ -270,8 +281,9 @@
             word: '',
             banned: [],
             clues: {},
+            history: [],
           },
-          history: [],
+          previousRounds: [],
         };
         await setRoom(this.room);
       },
@@ -334,21 +346,27 @@
           // Go to the next letter, but don't go to the one after
           if (!this.room.currentRound.banned.includes(clue.word)) {
             this.room.currentRound.banned.push(clue.word);
+            this.room.currentRound.history.push({ event: 'contact', clues: { [cluer]: clue } });
             await this.nextLetter();
           }
         } else {
+          if (!this.room.currentRound.banned.includes(clue.word)) {
+            this.room.currentRound.history.push({ event: 'miss', clues: { [cluer]: clue } });
+          }
           // Ban both words
           await Promise.all([this.banWord(clue.word), this.banWord(clue.guess)]);
         }
       },
-      async banWord(toBan) {
+      async banWord(toBan, log = false) {
         if (this.room.currentRound.banned.includes(toBan)) {
           return; // Word is already banned.
         }
 
         this.room.currentRound.banned.push(toBan);
+        let thwartedClues = {};
         for (const [cluer, clue] of Object.entries(this.room.currentRound.clues)) {
           if (clue.word === toBan) {
+            thwartedClues[cluer] = clue;
             // Remove the clue entirely
             delete this.room.currentRound.clues[cluer];
           } else if (clue.guess === toBan) {
@@ -356,6 +374,9 @@
             clue.guesser = '';
             clue.guess = '';
           }
+        }
+        if (log) {
+          this.room.currentRound.history.push({ event: 'ban', word: toBan, clues: thwartedClues });
         }
         await updateRoom(this.room, { currentRound: this.room.currentRound });
       },
@@ -375,10 +396,11 @@
           word: '',
           banned: [],
           clues: {},
+          history: [],
         };
         await updateRoom(this.room, {
           currentRound: newRound,
-          history: [...this.room.history, this.room.currentRound],
+          previousRounds: [...this.room.previousRounds, this.room.currentRound],
         });
       },
     },
