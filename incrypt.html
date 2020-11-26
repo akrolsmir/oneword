@@ -74,28 +74,30 @@
   Room: {
     name: apple,
     redTeam: {
-      // By convention, red team goes first
+      // Red team goes first on intercepts (TODO alternate?)
       // TODO name: 'Ugliest Carriages'
-      players: ['alice', 'bob'],
+      players: ['alice', 'bob'], // First player is team lead aka mod
       words: ['student', 'bible', 'catholic', 'eraser'],
       intercepted: 0
       dropped: 1
     }
     blueTeam: ...
     currentRound: {
-      team: 'redTeam'
-      state: 'clueing' // or 'intercepting' or 'guessing' or 'done'
-      spy: 'alice',
-      key: [4, 1, 2],
-      encode: ['gone', 'lazy', 'book']
-      intercept: {
-        carol: [2, 3, 1],
-        bill: [2, 4, 1],
+      state: 'encoding' // or 'redIntercept'/'blueIntercept'/'decoding'/'done'
+      redTeam: {
+        spy: 'alice',
+        key: [4, 1, 2],
+        encode: ['gone', 'lazy', 'book'],
+        intercept: {
+          // TODO: Spy breaks ties? or mod? or first submitted? or random?
+          alice: [2, 3, 1],
+          bob: [2, 4, 1],
+        },
+        decode: {
+          bob: [3, 1, 2],
+        }
       },
-      decode: {
-        alice: [4, 1, 2],
-        bob: [3, 1, 2],
-      }
+      blueTeam: {...}
     }
     history: [{round1}, ...]
   }
