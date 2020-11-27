@@ -45,8 +45,9 @@
   <link rel="icon" href="https://twemoji.maxcdn.com/v/13.0.1/72x72/1f42c.png" />
 </head>
 
-<body>
+<body class="has-navbar-fixed-top">
   <div id="vue">
+    <navbar ref="navbar" v-model="user"></navbar>
     <div style="max-width: 400px">
       Player Name
       <input class="input" v-model="player.name" /> <br />
