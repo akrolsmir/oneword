@@ -135,62 +135,75 @@
         intercept: [],
         decode: [],
       },
-      room: {
-        name: 'apple',
-        redTeam: {
-          // Red team goes first on intercepts (TODO alternate?)
-          // TODO name: 'Ugliest Carriages'
-          players: ['alice', 'bob'], // First player is team lead aka mod
-          words: ['student', 'bible', 'catholic', 'eraser'],
-          intercepted: 0,
-          dropped: 1,
-        },
-        blueTeam: {
-          players: ['carol', 'david'], // First player is team lead aka mod
-          words: ['four', 'google', 'vane', 'sand'],
-          intercepted: 0,
-          dropped: 1,
-        },
-        currentRound: {
-          state: 'encoding', // or 'redIntercept'/'blueIntercept'/'decoding'/'done'
-          redTeam: {
-            spy: 'alice',
-            key: [4, 1, 2],
-            encode: ['gone', 'lazy', 'book'],
-            intercept: {
-              // TODO: Spy breaks ties? or mod? or first submitted? or random?
-              alice: [2, 3, 1],
-              bob: [2, 4, 1],
-            },
-            decode: {
-              bob: [3, 1, 2],
-            },
-          },
-          blueTeam: {
-            spy: 'carol',
-            key: [1, 2, 4],
-            encode: ['quad', 'lots', 'dry'],
-            intercept: {
-              carol: [1, 3, 2],
-              david: [1, 4, 2],
-            },
-            decode: {
-              david: [1, 2, 4],
-            },
-          },
-        },
-        history: [],
-      },
+      room: exampleRoom(),
+    },
+    async created() {
+      // For now, always start by overwriting with the example room
+      await setRoom(this.room);
     },
     methods: {
-      joinTeam(team) {
+      async joinTeam(team) {
         this.room[team].players.push(this.player.name);
         // Also remove from existing team
         unpush(this.room[other(team)].players, this.player.name);
         // TODO: push changes to Firestore
+        await this.saveRoom('redTeam.players', 'blueTeam.players');
+      },
+      // Sync any number of properties of this.room to firebase
+      async saveRoom(...props) {
+        await updateRoom(this.room, Object.fromEntries(props.map((prop) => [prop, getIn(this.room, prop)])));
       },
     },
   });
+
+  function exampleRoom() {
+    return {
+      name: 'apple',
+      redTeam: {
+        // Red team goes first on intercepts (TODO alternate?)
+        // TODO name: 'Ugliest Carriages'
+        players: ['alice', 'bob'], // First player is team lead aka mod
+        words: ['student', 'bible', 'catholic', 'eraser'],
+        intercepted: 0,
+        dropped: 1,
+      },
+      blueTeam: {
+        players: ['carol', 'david'], // First player is team lead aka mod
+        words: ['four', 'google', 'vane', 'sand'],
+        intercepted: 0,
+        dropped: 1,
+      },
+      currentRound: {
+        state: 'encoding', // or 'redIntercept'/'blueIntercept'/'decoding'/'done'
+        redTeam: {
+          spy: 'alice',
+          key: [4, 1, 2],
+          encode: ['gone', 'lazy', 'book'],
+          intercept: {
+            // TODO: Spy breaks ties? or mod? or first submitted? or random?
+            alice: [2, 3, 1],
+            bob: [2, 4, 1],
+          },
+          decode: {
+            bob: [3, 1, 2],
+          },
+        },
+        blueTeam: {
+          spy: 'carol',
+          key: [1, 2, 4],
+          encode: ['quad', 'lots', 'dry'],
+          intercept: {
+            carol: [1, 3, 2],
+            david: [1, 4, 2],
+          },
+          decode: {
+            david: [1, 2, 4],
+          },
+        },
+      },
+      history: [],
+    };
+  }
 
   function unpush(array, value) {
     const index = array.indexOf(value);
@@ -201,5 +214,14 @@
 
   function other(team) {
     return team === 'redTeam' ? 'blueTeam' : 'redTeam';
+  }
+
+  // Extracts a node from an object tree by its path, like "redTeam.players"
+  function getIn(object, path) {
+    let node = object;
+    for (const part of path.split('.')) {
+      node = node[part];
+    }
+    return node;
   }
 </script>
