@@ -48,21 +48,37 @@
 <body class="has-navbar-fixed-top">
   <div id="vue">
     <navbar ref="navbar" v-model="user"></navbar>
+    <!-- Notifications -->
+    <div class="modal" :class="{'is-active': !!alertState}">
+      <div class="modal-background" @click="alertState=''"></div>
+      <div class="modal-content">
+        <div class="notification">
+          <template v-if="alertState=='share'">
+            <label class="is-block mb-2">Invite your friends to play!</label>
+            <sharelink :link="'https://oneword.games/?room=' + room.name"></sharelink>
+          </template>
+          <button class="delete" aria-label="close" @click="alertState=''"></button>
+        </div>
+      </div>
+    </div>
     <div style="max-width: 400px">
       Player Name
       <input class="input" v-model="player.name" /> <br />
       Room Name
-      <input class="input" v-model="room.name" @keyup.enter="enterRoom" /> <br />
-      <button class="button" @click="resetRoom">Reset room</button>
-      <button class="button" @click="enterRoom">Enter room</button>
-      <button class="button" @click="nextRound">Next round</button>
-      <button
-        v-if="room && room.currentRound && (player.name == room.currentRound.wordmaster)"
-        class="button"
-        @click="room.currentRound.history.push({ event: 'nextLetter'}); nextLetter()"
-      >
-        Next Letter
-      </button>
+      <input class="input" v-model="room.name" @keyup.enter="enterRoom" />
+      <div class="buttons mt-4">
+        <button class="button" @click="resetRoom">Reset room</button>
+        <button class="button" @click="enterRoom">Enter room</button>
+        <button class="button" @click="nextRound">Next round</button>
+        <button
+          v-if="room && room.currentRound && (player.name == room.currentRound.wordmaster)"
+          class="button"
+          @click="room.currentRound.history.push({ event: 'nextLetter'}); nextLetter()"
+        >
+          Next Letter
+        </button>
+        <button class="button" @click="alertState='share'">Invite Friends</button>
+      </div>
     </div>
     <br /><br />
     <div v-if="room && room.currentRound">
@@ -242,6 +258,7 @@
         word: '',
         toBan: '',
       },
+      alertState: '', // or 'share', 'win', 'update' etc.
     },
     async mounted() {
       // Detect url params like ?room=party&player=austin
