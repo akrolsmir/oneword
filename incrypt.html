@@ -56,19 +56,19 @@
   <div id="vue">
     <h2>Your name <input class="input" v-model="player.name" /></h2>
     <h2>Room: {{ room.name }}</h2>
-    <h3>
-      Red team: {{ room.redTeam.players.join(', ') }}
-      <a v-if="!room.redTeam.players.includes(player.name)" @click="joinTeam('redTeam')">(join)</a>
-    </h3>
-    <h3>
-      Blue team: {{ room.blueTeam.players.join(', ') }}
-      <a v-if="!room.blueTeam.players.includes(player.name)" @click="joinTeam('blueTeam')">(join)</a>
-    </h3>
+    <template v-for="team in ['redTeam', 'blueTeam']">
+      <h3>
+        {{ room[team].name }} team: {{ room[team].players.join(', ') }}
+        <a v-if="!room[team].players.includes(player.name)" @click="joinTeam(team)">(join)</a>
+      </h3>
+      Interceptions: {{ room[team].intercepted }}<br />
+      Dropped messages: {{ room[team].dropped }}<br />
+    </template>
     <br /><br />
     <!-- In game -->
     <div v-cloak v-if="room.currentRound.state === 'ENCODING'" class="box">
       <h2>{{ myTeam.name }} words</h2>
-      {{ myTeam.words.join(' / ') }}
+      <h3>{{ myTeam.words.join(' / ') }}</h3>
       <br /><br />
       <div v-if="player.name === myTeamRound.spy">
         <h3>You are the {{ myTeam.name }} spy! Encode for your team: {{ myTeamRound.key.join(' - ') }}</h3>
@@ -89,15 +89,15 @@
         <h3>The blue spy encoded: "{{ room.currentRound.blueTeam.encode.join(' - ') }}". Try intercepting it:</h3>
         <br />
         <!-- Section: Vote for the code -->
-        <template v-for="encoded in room.currentRound.blueTeam.encode">
+        <template v-for="(encoded, e) in room.currentRound.blueTeam.encode">
           <div class="select">
-            <select>
-              <option v-for="(word, i) in room.blueTeam.words">Word {{ i + 1 }}</option>
+            <select v-model="player.intercept[e]">
+              <option v-for="(word, i) in room.blueTeam.words" :value="i + 1">Word {{ i + 1 }}</option>
             </select>
           </div>
           -
         </template>
-        <button class="button">Submit</button>
+        <button class="button" @click="submitIntercept()">Submit</button>
         <br /><br />
         <!-- Section: See all past clues -->
         <div v-for="(word, i) in room.blueTeam.words">
@@ -110,7 +110,32 @@
         </div>
       </div>
     </div>
-    <!-- TODO: Both teams try to decode the key -->
+    <!-- Both teams try to decode the key -->
+    <div v-if="room.currentRound.state === 'DECODING'">
+      <div v-if="player.name === myTeamRound.spy">Waiting for your teammantes to decode your message...</div>
+      <div v-else class="box">
+        <h3>Decode what {{ myTeamRound.spy }} meant by "{{ myTeamRound.encode.join(' - ') }}":</h3>
+        <!-- (TODO: deduplicate or component-ize with above) -->
+        <!-- Section: Vote for the code -->
+        <template v-for="(encoded, e) in myTeamRound.encode">
+          <div class="select">
+            <select v-model="player.decode[e]">
+              <option v-for="(word, i) in myTeam.words" :value="i + 1">Word {{ i + 1 }}</option>
+            </select>
+          </div>
+          -
+        </template>
+        <button class="button" @click="submitDecode(myTeamId)">Submit</button>
+        <br /><br />
+        <!-- Section: See your words-->
+        <h2>{{ myTeam.name }} words</h2>
+        <h3>{{ myTeam.words.join(' / ') }}</h3>
+      </div>
+    </div>
+    <!-- Results for both teams! -->
+    <div v-if="room.currentRound.state === 'DONE'">
+      <!-- TODO -->
+    </div>
   </div>
 </body>
 
@@ -156,6 +181,8 @@
         spy: 'alice',
         key: [4, 1, 2],
         encode: ['gone', 'lazy', 'book'],
+        // intercept and decode start like keys [3, 2, 4].
+        // But extension would be individualized voting:
         intercept: {
           // TODO: Spy breaks ties? or mod? or first submitted? or random?
           alice: [2, 3, 1],
@@ -203,8 +230,47 @@
           this.room.currentRound.state = 'RED_INTERCEPT';
           await this.saveRoom('currentRound.state');
 
-          // TODO temp filling in
+          // Temp filling in, TODO remove
           this.room.history.push(this.room.currentRound);
+        }
+      },
+      async submitIntercept() {
+        // TODO red intercept should lead to blue intercept; blue => decoding
+        // TODO interception should obviate decoding
+        if (this.myTeamId == 'redTeam') {
+          // Save the result
+          this.myTeamRound.intercept = this.player.intercept;
+          await this.saveRoom('currentRound.redTeam.intercept');
+
+          if (keysEqual(this.myTeamRound.intercept, this.theirTeamRound.key)) {
+            // TODO: watch out for race conditions where two intercepts
+            // are submitted simultaneously...
+            // Like if the "Submit" button is double-clicked...
+            this.myTeam.intercepted += 1;
+            await this.saveRoom(`${this.myTeamId}.intercepted`);
+          }
+
+          // Move on to decoding
+          this.room.currentRound.state = 'DECODING';
+          await this.saveRoom('currentRound.state');
+        }
+      },
+      async submitDecode() {
+        this.myTeamRound.decode = this.player.decode;
+        await this.saveRoom(`currentRound.${this.myTeamId}.decode`);
+
+        // If both teams have finished decoding, the round is over!
+        if (this.theirTeamRound.decode.length === this.myTeamRound.decode.length) {
+          // Score the teams
+          for (const team of ['redTeam', 'blueTeam']) {
+            if (!keysEqual(this.room.currentRound[team].decode, this.room.currentRound[team].key)) {
+              this.room[team].dropped += 1;
+              await this.saveRoom(`${team}.intercepted`);
+            }
+          }
+
+          this.room.currentRound.state = 'DONE';
+          await this.saveRoom('currentRound.state');
         }
       },
       // Sync any number of properties of this.room to firebase
@@ -231,13 +297,13 @@
       myTeam() {
         return this.room[this.myTeamId];
       },
-      thierTeam() {
+      theirTeam() {
         return this.room[this.theirTeamId];
       },
       myTeamRound() {
         return this.room.currentRound[this.myTeamId];
       },
-      thierTeamRound() {
+      theirTeamRound() {
         return this.room.currentRound[this.theirTeamId];
       },
     },
@@ -253,14 +319,14 @@
         players: ['alice', 'bob'], // First player is team lead aka mod
         words: ['student', 'bible', 'catholic', 'eraser'],
         intercepted: 0,
-        dropped: 1,
+        dropped: 0,
       },
       blueTeam: {
         name: 'Blue',
         players: ['carol', 'david'], // First player is team lead aka mod
         words: ['four', 'google', 'vane', 'sand'],
         intercepted: 0,
-        dropped: 1,
+        dropped: 0,
       },
       currentRound: {
         state: 'ENCODING', // or 'RED_INTERCEPT'/'BLUE_INTERCEPT'/'DECODING'/'DONE'
@@ -268,26 +334,15 @@
           spy: 'alice',
           key: [4, 1, 2],
           encode: ['gone', 'lazy', 'book'],
-          intercept: {
-            // TODO: Spy breaks ties? or mod? or first submitted? or random?
-            alice: [2, 3, 1],
-            bob: [2, 4, 1],
-          },
-          decode: {
-            bob: [3, 1, 2],
-          },
+          intercept: [],
+          decode: [],
         },
         blueTeam: {
           spy: 'carol',
           key: [1, 2, 4],
           encode: ['quad', 'lots', 'dry'],
-          intercept: {
-            carol: [1, 3, 2],
-            david: [1, 4, 2],
-          },
-          decode: {
-            david: [1, 2, 4],
-          },
+          intercept: [],
+          decode: [],
         },
       },
       history: [],
@@ -312,5 +367,18 @@
       node = node[part];
     }
     return node;
+  }
+
+  // Keys are just arrays of ints
+  function keysEqual(key1, key2) {
+    if (key1.length !== key2.length) {
+      return false;
+    }
+    for (let i = 0; i < key1.length; i++) {
+      if (key1[i] !== key2[i]) {
+        return false;
+      }
+    }
+    return true;
   }
 </script>
