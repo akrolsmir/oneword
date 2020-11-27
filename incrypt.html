@@ -67,27 +67,19 @@
     <br /><br />
     <!-- In game -->
     <div v-cloak v-if="room.currentRound.state === 'ENCODING'" class="box">
-      <div v-if="isRed">
-        <!-- TODO: Hm, gotta be some way to deduplicate code -->
-        <h2>Red words</h2>
-        {{ room.redTeam.words.join(' / ') }}
-        <br /><br />
-        <div v-if="player.name === room.currentRound.redTeam.spy">
-          <h3>You are the Red spy! Encode for your team: {{ room.currentRound.redTeam.key.join(' - ') }}</h3>
-          <div v-for="(digit, i) in room.currentRound.redTeam.key">
-            {{ digit }} - {{ room.redTeam.words[digit - 1] }}
-            <input class="input" v-model="player.encode[i]" />
-          </div>
-          <button class="button" @click="submitEncode('redTeam')">Encode</button>
+      <h2>{{ myTeam.name }} words</h2>
+      {{ myTeam.words.join(' / ') }}
+      <br /><br />
+      <div v-if="player.name === myTeamRound.spy">
+        <h3>You are the {{ myTeam.name }} spy! Encode for your team: {{ myTeamRound.key.join(' - ') }}</h3>
+        <div v-for="(digit, i) in myTeamRound.key">
+          {{ digit }} - {{ myTeam.words[digit - 1] }}
+          <input class="input" v-model="player.encode[i]" />
         </div>
-        <div v-else>
-          <h3>Waiting for {{ room.currentRound.redTeam.spy }} to encode the key...</h3>
-        </div>
+        <button class="button" @click="submitEncode()">Encode</button>
       </div>
       <div v-else>
-        <!-- TODO: or just copy it all for Blue -->
-        <h2>Blue words</h2>
-        {{ room.blueTeam.words.join(' / ') }}
+        <h3>Waiting for {{ myTeamRound.spy }} to encode the key...</h3>
       </div>
     </div>
     <!-- Red team's turn to guess Blue team's code -->
@@ -118,6 +110,7 @@
         </div>
       </div>
     </div>
+    <!-- TODO: Both teams try to decode the key -->
   </div>
 </body>
 
@@ -201,12 +194,12 @@
         unpush(this.room[other(team)].players, this.player.name);
         await this.saveRoom('redTeam.players', 'blueTeam.players');
       },
-      async submitEncode(team) {
-        this.room.currentRound[team].encode = this.player.encode;
-        await this.saveRoom(`currentRound.${team}.encode`);
+      async submitEncode() {
+        this.myTeamRound.encode = this.player.encode;
+        await this.saveRoom(`currentRound.${this.myTeamId}.encode`);
 
         // If both spies have finished encoding, move on to the next stage
-        if (this.room.currentRound[other(team)].encode.length === this.room.currentRound[team].encode.length) {
+        if (this.theirTeamRound.encode.length === this.myTeamRound.encode.length) {
           this.room.currentRound.state = 'RED_INTERCEPT';
           await this.saveRoom('currentRound.state');
 
@@ -223,6 +216,30 @@
       isRed() {
         return this.room.redTeam.players.includes(this.player.name);
       },
+      // Pros of room.redTeam separate from room.currentRound.redTeam:
+      // - Easier history (?)
+      // Cons:
+      // - Uglier syntax
+      // So maybe can refactor
+
+      myTeamId() {
+        return this.isRed ? 'redTeam' : 'blueTeam';
+      },
+      theirTeamId() {
+        return this.isRed ? 'blueTeam' : 'redTeam';
+      },
+      myTeam() {
+        return this.room[this.myTeamId];
+      },
+      thierTeam() {
+        return this.room[this.theirTeamId];
+      },
+      myTeamRound() {
+        return this.room.currentRound[this.myTeamId];
+      },
+      thierTeamRound() {
+        return this.room.currentRound[this.theirTeamId];
+      },
     },
   });
 
@@ -232,12 +249,14 @@
       redTeam: {
         // Red team goes first on intercepts (TODO alternate?)
         // TODO name: 'Ugliest Carriages'
+        name: 'Red',
         players: ['alice', 'bob'], // First player is team lead aka mod
         words: ['student', 'bible', 'catholic', 'eraser'],
         intercepted: 0,
         dropped: 1,
       },
       blueTeam: {
+        name: 'Blue',
         players: ['carol', 'david'], // First player is team lead aka mod
         words: ['four', 'google', 'vane', 'sand'],
         intercepted: 0,
