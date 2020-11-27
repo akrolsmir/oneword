@@ -71,7 +71,7 @@
         <button class="button" @click="enterRoom">Enter room</button>
         <button class="button" @click="nextRound">Next round</button>
         <button
-          v-if="room && room.currentRound && (player.name == room.currentRound.wordmaster)"
+          v-if="player.name === room?.currentRound?.wordmaster"
           class="button"
           @click="room.currentRound.history.push({ event: 'nextLetter'}); nextLetter()"
         >
@@ -81,7 +81,7 @@
       </div>
     </div>
     <br /><br />
-    <div v-if="room && room.currentRound">
+    <div v-if="room?.currentRound">
       <!-- Room header -->
       <div class="message">
         <div class="message-header">
