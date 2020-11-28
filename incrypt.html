@@ -66,6 +66,15 @@
       {{ room[team].dropped }} dropped messages (2 to lose) <br />
     </template>
     <br /><br />
+    <!-- Show the current state of the game -->
+    <div v-if="room.currentRound.state !== 'NOT_STARTED'">
+      Round {{ room.history.length + 1 }}:
+      <span :class="{'has-text-weight-bold': room.currentRound.state === 'ENCODING'}">Incrypt</span> -
+      <span :class="{'has-text-weight-bold': room.currentRound.state === 'RED_INTERCEPT'}">Intercept Blue</span> -
+      <span :class="{'has-text-weight-bold': room.currentRound.state === 'BLUE_INTERCEPT'}">Intercept Red</span> -
+      <span :class="{'has-text-weight-bold': room.currentRound.state === 'DECODING'}">Decrypt</span> -
+      <span :class="{'has-text-weight-bold': room.currentRound.state === 'DONE'}">Debrief</span>
+    </div>
     <!-- Pre-game: Waiting for players -->
     <div v-if="room.currentRound.state === 'NOT_STARTED'" class="box">
       <div v-if="room.redTeam.players.length < 2 ">
