@@ -5,7 +5,10 @@ Vue.component('history', {
   computed: {
     prettyHistory() {
       let lettersRevealed = 1;
-      let ph = [{ word: `${this.round.wordmaster} chose a word starting with ${this.round.word.charAt(0)}` }];
+      let ph = [];
+      if (this.round.word) {
+        ph.push({ word: `${this.round.wordmaster} chose a word starting with ${this.round.word.charAt(0)}` });
+      }
       for (const data of this.round.history) {
         if (data.event == 'ban') {
           const numClues = Object.keys(data.clues).length;
