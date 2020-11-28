@@ -162,9 +162,17 @@
       </div>
     </div>
     <!-- Part 4: Both teams try to decode the key -->
-    <div v-if="room.currentRound.state === 'DECODING'">
-      <div v-if="player.name === myTeamRound.spy">Waiting for your teammantes to decode your message...</div>
-      <div v-else class="box">
+    <div v-if="room.currentRound.state === 'DECODING'" class="box">
+      <div v-if="keysEqual(theirTeamRound.intercept, myTeamRound.key)">
+        <h3>
+          Oh no! {{ theirTeam.name }} team intercepted {{ myTeamRound.spy }}'s message of
+          <span>"{{ myTeamRound.encode.join(' - ') }}"</span> to be "{{ myTeamRound.key.join(' - ') }}""
+        </h3>
+      </div>
+      <div v-else-if="player.name === myTeamRound.spy">
+        <h3>Waiting for your teammantes to decode your message...</h3>
+      </div>
+      <div v-else>
         <h3>Decode what {{ myTeamRound.spy }} meant by "{{ myTeamRound.encode.join(' - ') }}":</h3>
         <br />
         <!-- (TODO: deduplicate or component-ize with above) -->
@@ -244,7 +252,7 @@
         key: [4, 1, 2], // sometimes referred to as "message"
         encode: ['gone', 'lazy', 'book'],
         // intercept and decode start like keys [3, 2, 4].
-        // But extension would be individualized voting:
+        // But TODO extension would be individualized voting:
         intercept: {
           // TODO: Spy breaks ties? or mod? or first submitted? or random?
           alice: [2, 3, 1],
@@ -348,9 +356,6 @@
         if (this.theirTeamRound.encode.length === this.myTeamRound.encode.length) {
           this.room.currentRound.state = 'RED_INTERCEPT';
           await this.saveRoom('currentRound.state');
-
-          // Temp filling in, TODO remove
-          this.room.history.push(this.room.currentRound);
         }
       },
       async submitIntercept() {
@@ -359,17 +364,28 @@
         await this.saveRoom(`currentRound.${this.myTeamId}.intercept`);
 
         if (keysEqual(this.myTeamRound.intercept, this.theirTeamRound.key)) {
+          // Add to our intercept score, and auto-mark their message correct
           // TODO: watch out for race conditions where two intercepts
           // are submitted simultaneously...
           // Like if the "Submit" button is double-clicked...
           this.myTeam.intercepted += 1;
-          await this.saveRoom(`${this.myTeamId}.intercepted`);
+          this.theirTeamRound.decode = this.theirTeamRound.key;
+          await this.saveRoom(`${this.myTeamId}.intercepted`, `currentRound.${other(this.myTeamId)}.decode`);
         }
 
         // TODO successful interception should obviate decoding
         // TODO do not intercept in round one
-        // RED_INTERCEPT leads to BLUE_INTERCEPT; BLUE => DECODING
-        this.room.currentRound.state = this.room.currentRound.state === 'RED_INTERCEPT' ? 'BLUE_INTERCEPT' : 'DECODING';
+        if (this.room.currentRound.state === 'RED_INTERCEPT') {
+          this.room.currentRound.state = 'BLUE_INTERCEPT';
+        } else if (
+          this.myTeamRound.decode.length === this.KEY_LENGTH &&
+          this.theirTeamRound.decode.length === this.KEY_LENGTH
+        ) {
+          // Both intercepts successful, skip directly to DONE
+          this.room.currentRound.state = 'DONE';
+        } else {
+          this.room.currentRound.state = 'DECODING';
+        }
         await this.saveRoom('currentRound.state');
       },
       async submitDecode() {
@@ -484,6 +500,8 @@
   }
 
   // Keys are just arrays of ints
+  // TODO wait, does the dropdown return a string? how does this work at all???
+  // Maybe could use == instead of ===, cuz "3" == 3
   function keysEqual(key1, key2) {
     if (key1.length !== key2.length) {
       return false;
