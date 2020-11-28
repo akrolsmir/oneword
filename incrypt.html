@@ -62,14 +62,17 @@
     <h2>Room: {{ room.name }}. Your name: <input class="input" v-model="player.name" /></h2>
     <br />
     <!-- Team rosters -->
-    <template v-for="team in ['redTeam', 'blueTeam']">
-      <h3>
-        {{ room[team].name }} team: {{ room[team].players.join(', ') }}
-        <a v-if="!room[team].players.includes(player.name)" @click="joinTeam(team)">(join)</a>
-      </h3>
-      {{ room[team].intercepted }} interceptions (2 to win) <br />
-      {{ room[team].dropped }} dropped messages (2 to lose) <br />
-    </template>
+    <div class="columns">
+      <div class="column" v-for="team in ['redTeam', 'blueTeam']">
+        <h3>
+          {{ room[team].name }} team: {{ room[team].players.join(', ') }}
+          <a v-if="!room[team].players.includes(player.name)" @click="joinTeam(team)">(join)</a>
+        </h3>
+        {{ room[team].intercepted }} interceptions (2 to win) <br />
+        {{ room[team].dropped }} dropped messages (2 to lose) <br />
+      </div>
+    </div>
+
     <br /><br />
     <!-- Show the current words -->
     <div class="columns is-2">
@@ -82,7 +85,7 @@
     </div>
 
     <!-- Show the current state of the game -->
-    <div v-if="room.currentRound.state !== 'NOT_STARTED'">
+    <div v-if="room.currentRound.state !== 'NOT_STARTED'" class="mb-2">
       Round {{ room.history.length + 1 }}:
       <span :class="{'has-text-weight-bold': room.currentRound.state === 'ENCODING'}">Incrypt</span> -
       <span :class="{'has-text-weight-bold': room.currentRound.state === 'RED_INTERCEPT'}">Intercept Blue</span> -
@@ -115,6 +118,7 @@
           {{ digit }} - {{ myTeam.words[digit - 1] }}
           <input class="input" v-model="player.encode[i]" />
         </div>
+        <br />
         <button class="button" @click="submitEncode()">Encode</button>
       </div>
       <div v-else>
@@ -142,12 +146,14 @@
         <button class="button" @click="submitIntercept()">Submit</button>
         <br /><br />
         <!-- Section: See all past clues -->
-        <div v-for="(word, i) in room[smugglers].words">
-          Word {{ i + 1 }}
-          <div v-for="(round, r) in room.history">
-            <div v-if="round[smugglers].key.includes(i + 1 )">
-              --- Round {{ r }}: {{ round[smugglers].encode[round[smugglers].key.indexOf(i + 1)] }}
-            </div>
+        <div class="columns">
+          <div class="column" v-for="(word, i) in room[smugglers].words">
+            <b>Word {{ i + 1 }}</b>
+            <ul>
+              <li v-for="(round, r) in room.history" v-if="round[smugglers].key.includes(i + 1 )">
+                {{ round[smugglers].encode[round[smugglers].key.indexOf(i + 1)] }} (r{{ r + 1 }})
+              </li>
+            </ul>
           </div>
         </div>
       </div>
@@ -160,6 +166,7 @@
       <div v-if="player.name === myTeamRound.spy">Waiting for your teammantes to decode your message...</div>
       <div v-else class="box">
         <h3>Decode what {{ myTeamRound.spy }} meant by "{{ myTeamRound.encode.join(' - ') }}":</h3>
+        <br />
         <!-- (TODO: deduplicate or component-ize with above) -->
         <!-- Section: Vote for the code -->
         <template v-for="(encoded, e) in myTeamRound.encode">
@@ -171,10 +178,6 @@
           -
         </template>
         <button class="button" @click="submitDecode(myTeamId)">Submit</button>
-        <br /><br />
-        <!-- Section: See your words-->
-        <h2>{{ myTeam.name }} words</h2>
-        <h3>{{ myTeam.words.join(' / ') }}</h3>
       </div>
     </div>
     <!-- Results for both teams! -->
