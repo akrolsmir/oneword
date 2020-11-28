@@ -439,46 +439,6 @@
     },
   });
 
-  function exampleRoom() {
-    return {
-      name: 'apple',
-      redTeam: {
-        // Red team goes first on intercepts (TODO alternate?)
-        // TODO name: 'Ugliest Carriages'
-        name: 'Red',
-        players: ['alice', 'bob'], // First player is team lead aka mod
-        words: ['student', 'bible', 'catholic', 'eraser'],
-        intercepted: 0,
-        dropped: 0,
-      },
-      blueTeam: {
-        name: 'Blue',
-        players: ['carol', 'david'], // First player is team lead aka mod
-        words: ['four', 'google', 'vane', 'sand'],
-        intercepted: 0,
-        dropped: 0,
-      },
-      currentRound: {
-        state: 'ENCODING', // or 'RED_INTERCEPT'/'BLUE_INTERCEPT'/'DECODING'/'DONE'
-        redTeam: {
-          spy: 'alice',
-          key: [4, 1, 2],
-          encode: ['gone', 'lazy', 'book'],
-          intercept: [],
-          decode: [],
-        },
-        blueTeam: {
-          spy: 'carol',
-          key: [1, 2, 4],
-          encode: ['quad', 'lots', 'dry'],
-          intercept: [],
-          decode: [],
-        },
-      },
-      history: [],
-    };
-  }
-
   function unpush(array, value) {
     const index = array.indexOf(value);
     if (index !== -1) {
