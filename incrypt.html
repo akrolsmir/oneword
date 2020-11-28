@@ -133,8 +133,22 @@
       </div>
     </div>
     <!-- Results for both teams! -->
-    <div v-if="room.currentRound.state === 'DONE'">
-      <!-- TODO -->
+    <div v-if="room.currentRound.state === 'DONE'" class="box">
+      <template v-for="team in ['redTeam', 'blueTeam']">
+        <h3>{{ room[team].name }} team's message was "{{ room.currentRound[team].key.join(' - ') }}"</h3>
+        <div v-if="keysEqual(room.currentRound[other(team)].intercept, room.currentRound[team].key)">
+          {{ room[other(team)].name }} team intercepted {{ room[team].name }} team's message 😮
+        </div>
+        <div v-else-if="keysEqual(room.currentRound[team].decode, room.currentRound[team].key)">
+          {{ room[team].name }} team succesfully decoded their message. Nice job!
+        </div>
+        <div v-else>
+          {{ room[team].name }} team thought it was "{{ room.currentRound[team].decode.join(' - ') }}". Sorry, {{
+          room.currentRound[team].spy }}!
+        </div>
+        <br />
+      </template>
+      <button class="button" @click="newRound">Next round</button>
     </div>
   </div>
 </body>
@@ -179,7 +193,7 @@
       state: 'ENCODING', // or 'RED_INTERCEPT'/'BLUE_INTERCEPT'/'DECODING'/'DONE'
       redTeam: {
         spy: 'alice',
-        key: [4, 1, 2],
+        key: [4, 1, 2], // sometimes referred to as "message"
         encode: ['gone', 'lazy', 'book'],
         // intercept and decode start like keys [3, 2, 4].
         // But extension would be individualized voting:
@@ -211,6 +225,8 @@
       room: exampleRoom(),
     },
     async created() {
+      this.KEY_LENGTH = 3;
+      this.WORDS_SHOWN = 4;
       // For now, always start by overwriting with the example room
       await setRoom(this.room);
     },
@@ -273,10 +289,37 @@
           await this.saveRoom('currentRound.state');
         }
       },
+      async newRound() {
+        this.room.history.push(this.room.currentRound);
+        this.room.currentRound = {
+          state: 'ENCODING',
+          redTeam: {
+            spy: nextSpy(this.room.currentRound.redTeam.spy, this.room.redTeam.players),
+            key: randomKey(this.KEY_LENGTH, this.WORDS_SHOWN),
+            encode: [],
+            intercept: [],
+            decode: [],
+          },
+          blueTeam: {
+            spy: nextSpy(this.room.currentRound.blueTeam.spy, this.room.blueTeam.players),
+            key: randomKey(this.KEY_LENGTH, this.WORDS_SHOWN),
+            encode: [],
+            intercept: [],
+            decode: [],
+          },
+        };
+        // TODO when we're tracking separate rooms
+        // this.room.lastUpdateTime = Date.now();
+
+        // Overwrite existing room;
+        await setRoom(this.room);
+      },
       // Sync any number of properties of this.room to firebase
       async saveRoom(...props) {
         await updateRoom(this.room, Object.fromEntries(props.map((prop) => [prop, getIn(this.room, prop)])));
       },
+      other,
+      keysEqual,
     },
     computed: {
       isRed() {
@@ -380,5 +423,30 @@
       }
     }
     return true;
+  }
+
+  // Key elements will be unique e.g. randomKey(3, 4) => [2, 1, 4]
+  function randomKey(length, max) {
+    function shuffleArray(array) {
+      // From https://stackoverflow.com/a/12646864/1222351
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    if (length > max) {
+      throw "Can't have a longer key than # of words shown!";
+    }
+
+    // Generate a list from [1...max], then shuffle, then slice.
+    const sequential = [...Array(max).keys()].map((i) => i + 1);
+    return shuffleArray(sequential).slice(0, length);
+  }
+
+  function nextSpy(lastSpy, players) {
+    const nextIndex = (players.indexOf(lastSpy) + 1 + players.length) % players.length;
+    return players[nextIndex];
   }
 </script>
