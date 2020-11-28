@@ -101,8 +101,12 @@
       <template v-else>
         <!-- Word -->
         <h1>Word</h1>
-        <div v-if="room.currentRound.word">
-          <div class="title has-text-centered is-1">{{ prefix }}...?</div>
+        <div v-if="room.currentRound.word" class="title has-text-centered is-1">
+          <template v-if="player.name == room.currentRound.wordmaster">
+            <span class="has-text-danger">{{ prefix }}</span>{{
+            room.currentRound.word.substr(room.currentRound.revealed) }}
+          </template>
+          <template v-else>{{ prefix }}...?</template>
         </div>
         <div v-else-if="player.name == room.currentRound.wordmaster">
           <input class="input" v-model="player.word" @keyup.enter="chooseWord" />
