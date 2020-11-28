@@ -54,6 +54,7 @@
 <body class="has-navbar-fixed-top">
   <h1>Welcome to Incrypt</h1>
   <div id="vue">
+    <button class="button is-small is-danger" @click="resetRoom">Reset game</button>
     <h2>Your name <input class="input" v-model="player.name" /></h2>
     <h2>Room: {{ room.name }}</h2>
     <template v-for="team in ['redTeam', 'blueTeam']">
@@ -66,6 +67,22 @@
     </template>
     <br /><br />
     <!-- In game -->
+    <div v-if="room.currentRound.state === 'NOT_STARTED'" class="box">
+      <div v-if="room.redTeam.players.length < 2 ">
+        {{ room.redTeam.name }} team needs {{ 2 - room.redTeam.players.length }} more, before we can start!
+      </div>
+      <div v-else-if="room.blueTeam.players.length < 2 ">
+        {{ room.blueTeam.name }} team needs {{ 2 - room.blueTeam.players.length }} more, before we can start!
+      </div>
+      <div v-else>
+        Awesome! There are {{ room.redTeam.players.length }} players on {{ room.redTeam.name }} and {{
+        room.blueTeam.players.length }} players on {{ room.blueTeam.name }}.
+        <br /><br />
+        Ready to start?
+        <br />
+        <button class="button" @click="newRound(/*saveCurrentRound=*/false)">Start game!</button>
+      </div>
+    </div>
     <div v-cloak v-if="room.currentRound.state === 'ENCODING'" class="box">
       <h2>{{ myTeam.name }} words</h2>
       <h3>{{ myTeam.words.join(' / ') }}</h3>
@@ -190,7 +207,7 @@
     },
     blueTeam: ...
     currentRound: {
-      state: 'ENCODING', // or 'RED_INTERCEPT'/'BLUE_INTERCEPT'/'DECODING'/'DONE'
+      state: 'ENCODING', // or 'NOT_STARTED'/'RED_INTERCEPT'/'BLUE_INTERCEPT'/'DECODING'/'DONE'
       redTeam: {
         spy: 'alice',
         key: [4, 1, 2], // sometimes referred to as "message"
@@ -231,6 +248,33 @@
       await setRoom(this.room);
     },
     methods: {
+      async resetRoom() {
+        this.room = {
+          name: this.room.name,
+          redTeam: {
+            name: 'Red',
+            players: [],
+            words: randomWords(4),
+            intercepted: 0,
+            dropped: 0,
+          },
+          blueTeam: {
+            name: 'Blue',
+            players: [],
+            words: randomWords(4),
+            intercepted: 0,
+            dropped: 0,
+          },
+          currentRound: {
+            // Some dummy variables so Vue is happy.
+            state: 'NOT_STARTED',
+            redTeam: {},
+            blueTeam: {},
+          },
+          history: [],
+        };
+        await setRoom(this.room);
+      },
       async joinTeam(team) {
         this.room[team].players.push(this.player.name);
         // Also remove from existing team
@@ -289,8 +333,10 @@
           await this.saveRoom('currentRound.state');
         }
       },
-      async newRound() {
-        this.room.history.push(this.room.currentRound);
+      async newRound(saveCurrentRound = true) {
+        if (saveCurrentRound) {
+          this.room.history.push(this.room.currentRound);
+        }
         this.room.currentRound = {
           state: 'ENCODING',
           redTeam: {
@@ -425,17 +471,24 @@
     return true;
   }
 
+  function shuffleArray(array) {
+    // From https://stackoverflow.com/a/12646864/1222351
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
+  // Unique list of random words e.g. randomWords(4) => ['at', 'lol', 'cat', 'yo']
+  function randomWords(length) {
+    const nounsCopy = nouns.slice();
+    // Assumes nouns has no duplicates.
+    return shuffleArray(nounsCopy).slice(0, length);
+  }
+
   // Key elements will be unique e.g. randomKey(3, 4) => [2, 1, 4]
   function randomKey(length, max) {
-    function shuffleArray(array) {
-      // From https://stackoverflow.com/a/12646864/1222351
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
-    }
-
     if (length > max) {
       throw "Can't have a longer key than # of words shown!";
     }
