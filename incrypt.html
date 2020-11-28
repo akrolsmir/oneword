@@ -55,8 +55,8 @@
   <h1>Welcome to Incrypt</h1>
   <div id="vue">
     <button class="button is-small is-danger" @click="resetRoom">Reset game</button>
-    <h2>Your name <input class="input" v-model="player.name" /></h2>
-    <h2>Room: {{ room.name }}</h2>
+    <h2>Room: {{ room.name }}. Your name: <input class="input" v-model="player.name" /></h2>
+    <br />
     <template v-for="team in ['redTeam', 'blueTeam']">
       <h3>
         {{ room[team].name }} team: {{ room[team].players.join(', ') }}
@@ -244,8 +244,32 @@
     async created() {
       this.KEY_LENGTH = 3;
       this.WORDS_SHOWN = 4;
-      // For now, always start by overwriting with the example room
-      await setRoom(this.room);
+      // For now, always start by listening to the 'apple' example room
+      listenRoom(this);
+    },
+    async mounted() {
+      const parsedUrl = new URL(window.location.href);
+      const roomName = parsedUrl.searchParams.get('room');
+      const playerName = parsedUrl.searchParams.get('player');
+      if (playerName) {
+        this.player.name = playerName;
+      }
+      if (roomName) {
+        this.room.name = roomName;
+      }
+    },
+    watch: {
+      'room.currentRound.state'(state) {
+        this.$emit('reset-timer');
+        // Clean up past inputs when the round moves forward.
+        if (state === 'RED_INTERCEPT' || state === 'BLUE_INTERCEPT') {
+          this.player.encode = [];
+        } else if (state === 'DECODING') {
+          this.player.intercept = '';
+        } else if (state === 'DONE') {
+          this.player.decode = [];
+        }
+      },
     },
     methods: {
       async resetRoom() {
