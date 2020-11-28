@@ -42,6 +42,10 @@
       max-width: 95vw;
     }
 
+    .column {
+      padding: 0.25rem;
+    }
+
     [v-cloak] {
       display: none;
     }
@@ -57,6 +61,7 @@
     <button class="button is-small is-danger" @click="resetRoom">Reset game</button>
     <h2>Room: {{ room.name }}. Your name: <input class="input" v-model="player.name" /></h2>
     <br />
+    <!-- Team rosters -->
     <template v-for="team in ['redTeam', 'blueTeam']">
       <h3>
         {{ room[team].name }} team: {{ room[team].players.join(', ') }}
@@ -66,6 +71,16 @@
       {{ room[team].dropped }} dropped messages (2 to lose) <br />
     </template>
     <br /><br />
+    <!-- Show the current words -->
+    <div class="columns is-2">
+      <div class="column" v-for="(word, i) in myTeam.words">
+        <div class="notification" :class="isRed ? 'is-danger' : 'is-info'">
+          <small>Word {{ i + 1 }}</small>
+          <h2>{{ word }}</h2>
+        </div>
+      </div>
+    </div>
+
     <!-- Show the current state of the game -->
     <div v-if="room.currentRound.state !== 'NOT_STARTED'">
       Round {{ room.history.length + 1 }}:
@@ -94,9 +109,6 @@
     </div>
     <!-- Part 1: Spies are encoding their messages -->
     <div v-cloak v-if="room.currentRound.state === 'ENCODING'" class="box">
-      <h2>{{ myTeam.name }} words</h2>
-      <h3>{{ myTeam.words.join(' / ') }}</h3>
-      <br /><br />
       <div v-if="player.name === myTeamRound.spy">
         <h3>You are the {{ myTeam.name }} spy! Encode for your team: {{ myTeamRound.key.join(' - ') }}</h3>
         <div v-for="(digit, i) in myTeamRound.key">
