@@ -205,7 +205,7 @@
           {{ room[other(team)].name }} team intercepted {{ room[team].name }} team's message 😮
         </div>
         <div v-else-if="keysEqual(room.currentRound[team].decode, room.currentRound[team].key)">
-          {{ room[team].name }} team succesfully decoded their message 🎉
+          {{ room[team].name }} team succesfully decoded their message!
         </div>
         <div v-else>
           {{ room[team].name }} team thought it was "{{ room.currentRound[team].decode.join(' - ') }}" 🤦‍♀️
@@ -215,7 +215,7 @@
       <button class="button" @click="newRound">Next round</button>
     </div>
 
-    <div class="notification">
+    <div class="notification" v-if="player.name === 'Austin'">
       <h2>Mod tools</h2>
       <br />
       <div class="columns">
@@ -224,6 +224,26 @@
         </div>
         <div class="column"><input class="input is-small" v-model="room.timerLength" /> second timer</div>
       </div>
+    </div>
+
+    <!-- History. TODO: Maybe columnize, maybe componentize -->
+    <div>
+      <h2>History</h2>
+      <template v-for="(round, r) of room.history.slice().reverse()">
+        <h3>Round {{ room.history.length - r }}</h3>
+        <template v-for="team in ['redTeam', 'blueTeam']">
+          <b>{{ room[team].name }} team's message was "{{ round[team].key.join(' - ') }}"</b><br />
+          {{ round[team].spy }} incrypted it as "{{ round[team].encode.join(' - ') }}"
+          <div v-if="keysEqual(round[other(team)].intercept, round[team].key)">
+            {{ room[other(team)].name }} team intercepted {{ room[team].name }} team's message 😮
+          </div>
+          <div v-else-if="keysEqual(round[team].decode, round[team].key)">
+            {{ room[team].name }} team succesfully decoded their message!
+          </div>
+          <div v-else>{{ room[team].name }} team thought it was "{{ round[team].decode.join(' - ') }}" 🤦‍♀️</div>
+          <br />
+        </template>
+      </template>
     </div>
   </div>
 </body>
