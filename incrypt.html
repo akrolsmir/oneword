@@ -42,7 +42,12 @@
       max-width: 95vw;
     }
 
-    .column {
+    /* Narrow the gap between words */
+    .words {
+      margin: -0.25rem;
+    }
+
+    .words > .column {
       padding: 0.25rem;
     }
 
@@ -76,7 +81,7 @@
 
     <div v-if="room.state !== 'NOT_STARTED'" class="mb-2">
       <!-- Show the current words -->
-      <div v-if="isPlaying" class="columns is-2">
+      <div v-if="isPlaying" class="columns words">
         <div class="column" v-for="(word, i) in myTeam.words">
           <div class="notification" :class="isRed ? 'is-danger' : 'is-info'">
             <small>Word {{ i + 1 }}</small>
@@ -173,7 +178,7 @@
         </h3>
       </div>
       <div v-else-if="player.name === myTeamRound.spy">
-        <h3>Waiting for your teammantes to decode your message...</h3>
+        <h3>Waiting for your teammates to decode your message...</h3>
       </div>
       <div v-else>
         <h3>Decode what {{ myTeamRound.spy }} meant by "{{ myTeamRound.encode.join(' - ') }}":</h3>
@@ -286,7 +291,7 @@
     data: {
       nouns,
       player: {
-        name: 'alice',
+        name: '',
         // Local values, before they get uploaded
         encode: [],
         intercept: [],
@@ -352,7 +357,7 @@
             blueTeam: {},
           },
           history: [],
-          timerLength: 60,
+          timerLength: 80,
         };
         await setRoom(this.room);
       },
