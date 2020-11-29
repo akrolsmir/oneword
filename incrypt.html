@@ -75,7 +75,7 @@
 
     <br /><br />
 
-    <div v-if="room.currentRound.state !== 'NOT_STARTED'" class="mb-2">
+    <div v-if="room.state !== 'NOT_STARTED'" class="mb-2">
       <!-- Show the current words -->
       <div v-if="isPlaying" class="columns is-2">
         <div class="column" v-for="(word, i) in myTeam.words">
@@ -88,14 +88,14 @@
 
       <!-- Show the current state of the game -->
       Round {{ room.history.length + 1 }}:
-      <span :class="{'has-text-weight-bold': room.currentRound.state === 'ENCODING'}">Incrypt</span> -
-      <span :class="{'has-text-weight-bold': room.currentRound.state === 'RED_INTERCEPT'}">Intercept Blue</span> -
-      <span :class="{'has-text-weight-bold': room.currentRound.state === 'BLUE_INTERCEPT'}">Intercept Red</span> -
-      <span :class="{'has-text-weight-bold': room.currentRound.state === 'DECODING'}">Decrypt</span> -
-      <span :class="{'has-text-weight-bold': room.currentRound.state === 'DONE'}">Debrief</span>
+      <span :class="{'has-text-weight-bold': room.state === 'ENCODING'}">Incrypt</span> -
+      <span :class="{'has-text-weight-bold': room.state === 'RED_INTERCEPT'}">Intercept Blue</span> -
+      <span :class="{'has-text-weight-bold': room.state === 'BLUE_INTERCEPT'}">Intercept Red</span> -
+      <span :class="{'has-text-weight-bold': room.state === 'DECODING'}">Decrypt</span> -
+      <span :class="{'has-text-weight-bold': room.state === 'DONE'}">Debrief</span>
     </div>
     <!-- Pre-game: Waiting for players -->
-    <div v-if="room.currentRound.state === 'NOT_STARTED'" class="box">
+    <div v-if="room.state === 'NOT_STARTED'" class="box">
       <div v-if="room.redTeam.players.length < 2 ">
         {{ room.redTeam.name }} team needs {{ 2 - room.redTeam.players.length }} more, before we can start!
       </div>
@@ -112,7 +112,7 @@
       </div>
     </div>
     <!-- Part 1: Spies are encoding their messages -->
-    <div v-cloak v-if="room.currentRound.state === 'ENCODING'" class="box">
+    <div v-cloak v-if="room.state === 'ENCODING'" class="box">
       <div v-if="player.name === myTeamRound.spy">
         <h3>You are the {{ myTeam.name }} spy! Encode for your team: {{ myTeamRound.key.join(' - ') }}</h3>
         <div v-for="(digit, i) in myTeamRound.key">
@@ -127,7 +127,7 @@
       </div>
     </div>
     <!-- Parts 2 and 3: Each team gets a chance to intercept -->
-    <div v-if="['RED_INTERCEPT', 'BLUE_INTERCEPT'].includes(room.currentRound.state)" class="box">
+    <div v-if="['RED_INTERCEPT', 'BLUE_INTERCEPT'].includes(room.state)" class="box">
       <div v-if="myTeamId === other(smugglers)">
         <!-- Section: Show the smugglers' code -->
         <h3>
@@ -163,7 +163,7 @@
       </div>
     </div>
     <!-- Part 4: Both teams try to decode the key -->
-    <div v-if="room.currentRound.state === 'DECODING'" class="box">
+    <div v-if="room.state === 'DECODING'" class="box">
       <div v-if="keysEqual(otherTeamRound.intercept, myTeamRound.key)">
         <h3>
           Oh no! {{ otherTeam.name }} team intercepted {{ myTeamRound.spy }}'s message of
@@ -190,7 +190,7 @@
       </div>
     </div>
     <!-- Results for both teams! -->
-    <div v-if="room.currentRound.state === 'DONE'" class="box">
+    <div v-if="room.state === 'DONE'" class="box">
       <template v-for="team in ['redTeam', 'blueTeam']">
         <h3>{{ room[team].name }} team's message was "{{ room.currentRound[team].key.join(' - ') }}"</h3>
         {{ room.currentRound[team].spy }} incrypted it as "{{ room.currentRound[team].encode.join(' - ') }}"
@@ -237,6 +237,7 @@
   /**
   Room: {
     name: 'apple',
+    state: 'ENCODING', // or 'NOT_STARTED'/'RED_INTERCEPT'/'BLUE_INTERCEPT'/'DECODING'/'DONE'
     redTeam: {
       // Red team goes first on intercepts (TODO alternate?)
       // TODO name: 'Ugliest Carriages'
@@ -247,7 +248,6 @@
     },
     blueTeam: ...
     currentRound: {
-      state: 'ENCODING', // or 'NOT_STARTED'/'RED_INTERCEPT'/'BLUE_INTERCEPT'/'DECODING'/'DONE'
       redTeam: {
         spy: 'alice',
         key: [4, 1, 2], // sometimes referred to as "message"
@@ -303,7 +303,7 @@
       }
     },
     watch: {
-      'room.currentRound.state'(state) {
+      'room.state'(state) {
         this.$emit('reset-timer');
         // Clean up past inputs when the round moves forward.
         if (state === 'RED_INTERCEPT' || state === 'BLUE_INTERCEPT') {
@@ -319,6 +319,7 @@
       async resetRoom() {
         this.room = {
           name: this.room.name,
+          state: 'NOT_STARTED',
           redTeam: {
             name: 'Red',
             players: [],
@@ -335,7 +336,6 @@
           },
           currentRound: {
             // Some dummy variables so Vue is happy.
-            state: 'NOT_STARTED',
             redTeam: {},
             blueTeam: {},
           },
@@ -355,8 +355,8 @@
 
         // Once both spies are done, move to intercepting (or straight to decoding in round 1)
         if (this.otherTeamRound.encode.length === this.myTeamRound.encode.length) {
-          this.room.currentRound.state = this.room.history.length > 0 ? 'RED_INTERCEPT' : 'DECODING';
-          await this.saveRoom('currentRound.state');
+          this.room.state = this.room.history.length > 0 ? 'RED_INTERCEPT' : 'DECODING';
+          await this.saveRoom('state');
         }
       },
       async submitIntercept() {
@@ -376,18 +376,18 @@
 
         // TODO successful interception should obviate decoding
         // TODO do not intercept in round one
-        if (this.room.currentRound.state === 'RED_INTERCEPT') {
-          this.room.currentRound.state = 'BLUE_INTERCEPT';
+        if (this.room.state === 'RED_INTERCEPT') {
+          this.room.state = 'BLUE_INTERCEPT';
         } else if (
           this.myTeamRound.decode.length === this.KEY_LENGTH &&
           this.otherTeamRound.decode.length === this.KEY_LENGTH
         ) {
           // Both intercepts successful, skip directly to DONE
-          this.room.currentRound.state = 'DONE';
+          this.room.state = 'DONE';
         } else {
-          this.room.currentRound.state = 'DECODING';
+          this.room.state = 'DECODING';
         }
-        await this.saveRoom('currentRound.state');
+        await this.saveRoom('state');
       },
       async submitDecode() {
         this.myTeamRound.decode = this.player.decode;
@@ -403,16 +403,16 @@
             }
           }
 
-          this.room.currentRound.state = 'DONE';
-          await this.saveRoom('currentRound.state');
+          this.room.state = 'DONE';
+          await this.saveRoom('state');
         }
       },
       async newRound(saveCurrentRound = true) {
         if (saveCurrentRound) {
           this.room.history.push(this.room.currentRound);
         }
+        this.room.state = 'ENCODING';
         this.room.currentRound = {
-          state: 'ENCODING',
           redTeam: {
             spy: nextSpy(this.room.currentRound.redTeam.spy, this.room.redTeam.players),
             key: randomKey(this.KEY_LENGTH, this.WORDS_SHOWN),
@@ -465,7 +465,7 @@
       },
       smugglers() {
         // AKA interceptees
-        const state = this.room.currentRound.state;
+        const state = this.room.state;
         if (state === 'RED_INTERCEPT') {
           return 'blueTeam';
         }
