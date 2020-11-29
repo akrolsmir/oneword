@@ -121,13 +121,18 @@
     <!-- Part 1: Spies are encoding their messages -->
     <div v-cloak v-if="room.state === 'ENCODING'" class="box">
       <div v-if="player.name === myTeamRound.spy">
-        <h3>You are the {{ myTeam.name }} spy! Encode for your team: {{ myTeamRound.key.join(' - ') }}</h3>
-        <div v-for="(digit, i) in myTeamRound.key">
-          {{ digit }} - {{ myTeam.words[digit - 1] }}
-          <input class="input" v-model="player.encode[i]" />
-        </div>
+        <h3>You are the {{ myTeam.name }} spy! Encode for your team: "{{ myTeamRound.key.join(' - ') }}"</h3>
         <br />
-        <button class="button" @click="submitEncode()">Encode</button>
+        <div class="columns">
+          <div class="column" v-for="(digit, i) in myTeamRound.key">
+            <h3>{{ digit }} - {{ myTeam.words[digit - 1] }}</h3>
+            <input class="input" v-model="player.encode[i]" />
+          </div>
+          <div class="column">
+            <br />
+            <button class="button" @click="submitEncode()">Encode</button>
+          </div>
+        </div>
       </div>
       <div v-else>
         <h3>Waiting for {{ myTeamRound.spy }} to encode the key...</h3>
@@ -143,16 +148,21 @@
         </h3>
         <br />
         <!-- Section: Vote for the code -->
-        <template v-for="(encoded, e) in room.currentRound[smugglers].encode">
-          <div class="select">
-            <select v-model="player.intercept[e]">
-              <option v-for="(word, i) in room[smugglers].words" :value="i + 1">Word {{ i + 1 }}</option>
-            </select>
+        <div class="columns">
+          <div class="column" v-for="(encoded, e) in room.currentRound[smugglers].encode">
+            <h3>"{{ encoded }}"</h3>
+            <div class="select">
+              <select v-model="player.intercept[e]">
+                <option v-for="(word, i) in room[smugglers].words" :value="i + 1">Word {{ i + 1 }}</option>
+              </select>
+            </div>
           </div>
-          -
-        </template>
-        <button class="button" @click="submitIntercept()">Submit</button>
-        <br /><br />
+          <div class="column">
+            <br />
+            <button class="button" @click="submitIntercept()">Submit</button>
+          </div>
+        </div>
+        <br />
         <!-- Section: See all past clues -->
         <div class="columns">
           <div class="column" v-for="(word, i) in room[smugglers].words">
@@ -185,19 +195,26 @@
         <br />
         <!-- (TODO: deduplicate or component-ize with above) -->
         <!-- Section: Vote for the code -->
-        <template v-for="(encoded, e) in myTeamRound.encode">
-          <div class="select">
-            <select v-model="player.decode[e]">
-              <option v-for="(word, i) in myTeam.words" :value="i + 1">Word {{ i + 1 }}</option>
-            </select>
+        <div class="columns">
+          <div class="column" v-for="(encoded, e) in myTeamRound.encode">
+            <h3>"{{ encoded }}"</h3>
+            <div class="select">
+              <select v-model="player.decode[e]">
+                <option v-for="(word, i) in myTeam.words" :value="i + 1">{{i + 1 }} - {{ word }}</option>
+              </select>
+            </div>
           </div>
-          -
-        </template>
-        <button class="button" @click="submitDecode(myTeamId)">Submit</button>
+          <div class="column">
+            <br />
+            <button class="button" @click="submitDecode(myTeamId)">Submit</button>
+          </div>
+        </div>
       </div>
     </div>
     <!-- Results for both teams! -->
     <div v-if="room.state === 'DONE'" class="box">
+      <h2>Round {{ room.history.length + 1 }} debrief</h2>
+      <br />
       <template v-for="team in ['redTeam', 'blueTeam']">
         <h3>{{ room[team].name }} team's message was "{{ room.currentRound[team].key.join(' - ') }}"</h3>
         {{ room.currentRound[team].spy }} incrypted it as "{{ room.currentRound[team].encode.join(' - ') }}"
@@ -215,6 +232,7 @@
       <button class="button" @click="newRound">Next round</button>
     </div>
 
+    <!-- Mod tools -->
     <div class="notification" v-if="player.name === 'Austin'">
       <h2>Mod tools</h2>
       <br />
@@ -319,13 +337,21 @@
       },
       room: {
         // See below in created()
-        name: 'apple',
+        name: 'banana',
       },
     },
     async created() {
       this.KEY_LENGTH = 3;
       this.WORDS_SHOWN = 4;
-      // For now, always start by listening to the 'apple' example room
+
+      // For now, always start by listening to the 'banana' example room
+      const room = await getRoom(this.room);
+      if (room) {
+        this.room = room;
+      } else {
+        // Create a new room
+        await this.resetRoom();
+      }
       listenRoom(this);
     },
     async mounted() {
