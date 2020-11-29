@@ -193,15 +193,15 @@
     <div v-if="room.currentRound.state === 'DONE'" class="box">
       <template v-for="team in ['redTeam', 'blueTeam']">
         <h3>{{ room[team].name }} team's message was "{{ room.currentRound[team].key.join(' - ') }}"</h3>
+        {{ room.currentRound[team].spy }} incrypted it as "{{ room.currentRound[team].encode.join(' - ') }}"
         <div v-if="keysEqual(room.currentRound[other(team)].intercept, room.currentRound[team].key)">
           {{ room[other(team)].name }} team intercepted {{ room[team].name }} team's message 😮
         </div>
         <div v-else-if="keysEqual(room.currentRound[team].decode, room.currentRound[team].key)">
-          {{ room[team].name }} team succesfully decoded their message. Nice job!
+          {{ room[team].name }} team succesfully decoded their message 🎉
         </div>
         <div v-else>
-          {{ room[team].name }} team thought it was "{{ room.currentRound[team].decode.join(' - ') }}". Sorry, {{
-          room.currentRound[team].spy }}!
+          {{ room[team].name }} team thought it was "{{ room.currentRound[team].decode.join(' - ') }}" 🤦‍♀️
         </div>
         <br />
       </template>
@@ -353,9 +353,9 @@
         this.myTeamRound.encode = this.player.encode;
         await this.saveRoom(`currentRound.${this.myTeamId}.encode`);
 
-        // If both spies have finished encoding, move on to the next stage
+        // Once both spies are done, move to intercepting (or straight to decoding in round 1)
         if (this.theirTeamRound.encode.length === this.myTeamRound.encode.length) {
-          this.room.currentRound.state = 'RED_INTERCEPT';
+          this.room.currentRound.state = this.room.history.length > 0 ? 'RED_INTERCEPT' : 'DECODING';
           await this.saveRoom('currentRound.state');
         }
       },
