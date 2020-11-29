@@ -164,9 +164,9 @@
     </div>
     <!-- Part 4: Both teams try to decode the key -->
     <div v-if="room.currentRound.state === 'DECODING'" class="box">
-      <div v-if="keysEqual(theirTeamRound.intercept, myTeamRound.key)">
+      <div v-if="keysEqual(otherTeamRound.intercept, myTeamRound.key)">
         <h3>
-          Oh no! {{ theirTeam.name }} team intercepted {{ myTeamRound.spy }}'s message of
+          Oh no! {{ otherTeam.name }} team intercepted {{ myTeamRound.spy }}'s message of
           <span>"{{ myTeamRound.encode.join(' - ') }}"</span> to be "{{ myTeamRound.key.join(' - ') }}""
         </h3>
       </div>
@@ -354,7 +354,7 @@
         await this.saveRoom(`currentRound.${this.myTeamId}.encode`);
 
         // Once both spies are done, move to intercepting (or straight to decoding in round 1)
-        if (this.theirTeamRound.encode.length === this.myTeamRound.encode.length) {
+        if (this.otherTeamRound.encode.length === this.myTeamRound.encode.length) {
           this.room.currentRound.state = this.room.history.length > 0 ? 'RED_INTERCEPT' : 'DECODING';
           await this.saveRoom('currentRound.state');
         }
@@ -364,13 +364,13 @@
         this.myTeamRound.intercept = this.player.intercept;
         await this.saveRoom(`currentRound.${this.myTeamId}.intercept`);
 
-        if (keysEqual(this.myTeamRound.intercept, this.theirTeamRound.key)) {
+        if (keysEqual(this.myTeamRound.intercept, this.otherTeamRound.key)) {
           // Add to our intercept score, and auto-mark their message correct
           // TODO: watch out for race conditions where two intercepts
           // are submitted simultaneously...
           // Like if the "Submit" button is double-clicked...
           this.myTeam.intercepted += 1;
-          this.theirTeamRound.decode = this.theirTeamRound.key;
+          this.otherTeamRound.decode = this.otherTeamRound.key;
           await this.saveRoom(`${this.myTeamId}.intercepted`, `currentRound.${other(this.myTeamId)}.decode`);
         }
 
@@ -380,7 +380,7 @@
           this.room.currentRound.state = 'BLUE_INTERCEPT';
         } else if (
           this.myTeamRound.decode.length === this.KEY_LENGTH &&
-          this.theirTeamRound.decode.length === this.KEY_LENGTH
+          this.otherTeamRound.decode.length === this.KEY_LENGTH
         ) {
           // Both intercepts successful, skip directly to DONE
           this.room.currentRound.state = 'DONE';
@@ -394,7 +394,7 @@
         await this.saveRoom(`currentRound.${this.myTeamId}.decode`);
 
         // If both teams have finished decoding, the round is over!
-        if (this.theirTeamRound.decode.length === this.myTeamRound.decode.length) {
+        if (this.otherTeamRound.decode.length === this.myTeamRound.decode.length) {
           // Score the teams
           for (const team of ['redTeam', 'blueTeam']) {
             if (!keysEqual(this.room.currentRound[team].decode, this.room.currentRound[team].key)) {
@@ -460,7 +460,7 @@
       myTeam() {
         return this.room[this.myTeamId];
       },
-      theirTeam() {
+      otherTeam() {
         return this.room[other(this.myTeamId)];
       },
       smugglers() {
@@ -477,7 +477,7 @@
       myTeamRound() {
         return this.room.currentRound[this.myTeamId];
       },
-      theirTeamRound() {
+      otherTeamRound() {
         return this.room.currentRound[other(this.myTeamId)];
       },
     },
