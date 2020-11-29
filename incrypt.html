@@ -74,18 +74,19 @@
     </div>
 
     <br /><br />
-    <!-- Show the current words -->
-    <div class="columns is-2">
-      <div class="column" v-for="(word, i) in myTeam.words">
-        <div class="notification" :class="isRed ? 'is-danger' : 'is-info'">
-          <small>Word {{ i + 1 }}</small>
-          <h2>{{ word }}</h2>
+
+    <div v-if="room.currentRound.state !== 'NOT_STARTED'" class="mb-2">
+      <!-- Show the current words -->
+      <div v-if="isPlaying" class="columns is-2">
+        <div class="column" v-for="(word, i) in myTeam.words">
+          <div class="notification" :class="isRed ? 'is-danger' : 'is-info'">
+            <small>Word {{ i + 1 }}</small>
+            <h2>{{ word }}</h2>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Show the current state of the game -->
-    <div v-if="room.currentRound.state !== 'NOT_STARTED'" class="mb-2">
+      <!-- Show the current state of the game -->
       Round {{ room.history.length + 1 }}:
       <span :class="{'has-text-weight-bold': room.currentRound.state === 'ENCODING'}">Incrypt</span> -
       <span :class="{'has-text-weight-bold': room.currentRound.state === 'RED_INTERCEPT'}">Intercept Blue</span> -
@@ -443,6 +444,9 @@
     computed: {
       isRed() {
         return this.room.redTeam.players.includes(this.player.name);
+      },
+      isPlaying() {
+        return this.isRed || this.room.blueTeam.players.includes(this.player.name);
       },
       // Pros of room.redTeam separate from room.currentRound.redTeam:
       // - Easier history (?)
