@@ -203,12 +203,12 @@
       </div>
     </div>
     <!-- Results for both teams! -->
-    <!-- TODO NEXT: Separate for RED_DONE, and copy to history. -->
     <div v-if="room.state === 'DONE'" class="box">
       <h2>Round {{ room.history.length + 1 }} debrief</h2>
       <br />
       <template v-for="team in ['redTeam', 'blueTeam']">
-        <h3>{{ room[team].name }} team's message was "{{ room.currentRound[team].key.join(' - ') }}"</h3>
+        <b>{{ room[team].name }} team's message was "{{ room.currentRound[team].key.join(' - ') }}"</b>
+        <br />
         {{ room.currentRound[team].spy }} incrypted it as "{{ room.currentRound[team].encode.join(' - ') }}"
         <div v-if="keysEqual(room.currentRound[other(team)].intercept, room.currentRound[team].key)">
           👻 {{ room[other(team)].name }} team intercepted the message!
@@ -244,19 +244,34 @@
     <div>
       <h2>History</h2>
       <template v-for="(round, r) of room.history.slice().reverse()">
-        <h3>Round {{ room.history.length - r }}</h3>
-        <template v-for="team in ['redTeam', 'blueTeam']">
-          <b>{{ room[team].name }} team's message was "{{ round[team].key.join(' - ') }}"</b><br />
-          {{ round[team].spy }} incrypted it as "{{ round[team].encode.join(' - ') }}"
-          <div v-if="keysEqual(round[other(team)].intercept, round[team].key)">
-            {{ room[other(team)].name }} team intercepted {{ room[team].name }} team's message 😮
+        <div class="columns">
+          <div class="column" v-for="team in ['redTeam', 'blueTeam']">
+            <h3>Round {{ room.history.length - r }}: {{ room[team].name }} team</h3>
+            <table class="table is-fullwidth is-striped">
+              <tbody>
+                <thead>
+                  <th>{{ round[team].spy }}'s Incryption</th>
+                  <!-- TODO: maybe emojize more -->
+                  <th>{{ team === 'redTeam' ? '🔵' : '🔴' }}</th>
+                  <th>{{ team === 'redTeam' ? '🔴' : '🔵' }}</th>
+                  <th>✔️</th>
+                </thead>
+                <tr v-for="(encoded, e) in round[team].encode">
+                  <td>{{ encoded }}</td>
+                  <td>{{ round[other(team)].intercept[e] }}</td>
+                  <td>{{ round[team].decode[e] }}</td>
+                  <td>{{ round[team].key[e] }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <div v-if="keysEqual(round[other(team)].intercept, round[team].key)">
+              👻 {{ room[other(team)].name }} team intercepted the message!
+            </div>
+            <div v-if="!keysEqual(round[team].decode, round[team].key)">
+              🤦‍♀️ {{ room[team].name }} team thought it was "{{ round[team].decode.join(' - ') }}"...
+            </div>
           </div>
-          <div v-else-if="keysEqual(round[team].decode, round[team].key)">
-            {{ room[team].name }} team succesfully decoded their message!
-          </div>
-          <div v-else>{{ room[team].name }} team thought it was "{{ round[team].decode.join(' - ') }}" 🤦‍♀️</div>
-          <br />
-        </template>
+        </div>
       </template>
     </div>
   </div>
