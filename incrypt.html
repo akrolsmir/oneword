@@ -210,12 +210,12 @@
         <b>{{ room[team].name }} team's message was "{{ room.currentRound[team].key.join(' - ') }}"</b>
         <br />
         {{ room.currentRound[team].spy }} incrypted it as "{{ room.currentRound[team].encode.join(' - ') }}"
-        <div v-if="keysEqual(room.currentRound[other(team)].intercept, room.currentRound[team].key)">
+        <div v-if="keysEqual(room.currentRound[team].intercept, room.currentRound[team].key)">
           👻 {{ room[other(team)].name }} team intercepted the message!
         </div>
         <div v-else>
           {{ room[other(team)].name }} team tried to intercept with
-          <span>"{{ room.currentRound[other(team)].intercept.join(' - ') }}"</span>
+          <span>"{{ room.currentRound[team].intercept.join(' - ') }}"</span>
         </div>
         <div v-if="keysEqual(room.currentRound[team].decode, room.currentRound[team].key)">
           {{ room[team].name }} team succesfully decoded their message~
@@ -258,13 +258,13 @@
                 </thead>
                 <tr v-for="(encoded, e) in round[team].encode">
                   <td>{{ encoded }}</td>
-                  <td>{{ round[other(team)].intercept[e] }}</td>
+                  <td>{{ round[team].intercept[e] }}</td>
                   <td>{{ round[team].decode[e] }}</td>
                   <td>{{ round[team].key[e] }}</td>
                 </tr>
               </tbody>
             </table>
-            <div v-if="keysEqual(round[other(team)].intercept, round[team].key)">
+            <div v-if="keysEqual(round[team].intercept, round[team].key)">
               👻 {{ room[other(team)].name }} team intercepted the message!
             </div>
             <div v-if="!keysEqual(round[team].decode, round[team].key)">
@@ -439,8 +439,8 @@
         }
       },
       async submitIntercept() {
-        this.myTeamRound.intercept = this.player.intercept;
-        await this.saveRoom(`currentRound.${this.myTeamId}.intercept`);
+        this.otherTeamRound.intercept = this.player.intercept;
+        await this.saveRoom(`currentRound.${other(this.myTeamId)}.intercept`);
         await this.checkIfDecrypted();
       },
       async submitDecode() {
@@ -458,7 +458,7 @@
         const team = this.room.state === 'RED_DECRYPT' ? 'redTeam' : 'blueTeam';
         if (
           this.room.currentRound[team].decode.length != this.KEY_LENGTH ||
-          this.room.currentRound[other(team)].intercept.length != this.KEY_LENGTH
+          this.room.currentRound[team].intercept.length != this.KEY_LENGTH
         ) {
           return;
         }
@@ -469,7 +469,7 @@
 
         // TODO: watch out for race conditions with double-intercept click
         // Check if intercepted
-        if (keysEqual(this.room.currentRound[other(team)].intercept, this.room.currentRound[team].key)) {
+        if (keysEqual(this.room.currentRound[team].intercept, this.room.currentRound[team].key)) {
           this.room[other(team)].intercepted += 1;
           toUpdate.push(`${other(team)}.intercepted`);
         }
