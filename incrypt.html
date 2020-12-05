@@ -94,12 +94,12 @@
       Round {{ room.history.length + 1 }}:
       <span :class="{'has-text-weight-bold': room.state === 'ENCODING'}">Incrypt</span> -
       <template v-if="room.history.length === 0">
-        <span :class="{'has-text-weight-bold': room.state === 'BOTH_DECRYPT'}">Decrypt</span> -
+        <span :class="{'has-text-weight-bold': room.state === 'BOTH_DECODE'}">Decrypt</span> -
       </template>
       <template v-else>
-        <span :class="{'has-text-weight-bold': room.state === 'RED_DECRYPT'}">Decrypt Red</span> -
+        <span :class="{'has-text-weight-bold': room.state === 'RED_DECODE'}">Decrypt Red</span> -
         <!-- <span :class="{'has-text-weight-bold': room.state === 'RED_DONE'}">Debrief</span> - -->
-        <span :class="{'has-text-weight-bold': room.state === 'BLUE_DECRYPT'}">Decrypt Blue</span> -
+        <span :class="{'has-text-weight-bold': room.state === 'BLUE_DECODE'}">Decrypt Blue</span> -
       </template>
       <span :class="{'has-text-weight-bold': room.state === 'DONE'}">Debrief</span>
 
@@ -166,9 +166,9 @@
         </div>
       </div>
     </div>
-    <div v-if="['RED_DECRYPT', 'BLUE_DECRYPT', 'BOTH_DECRYPT'].includes(room.state)" class="box">
+    <div v-if="['RED_DECODE', 'BLUE_DECODE', 'BOTH_DECODE'].includes(room.state)" class="box">
       <!-- Parts 2 and 4: Other team tries to intercept -->
-      <div v-if="room.state != 'BOTH_DECRYPT' && myTeamId === other(smugglers)">
+      <div v-if="room.state != 'BOTH_DECODE' && myTeamId === other(smugglers)">
         <!-- Section: Show the smugglers' code -->
         <h3>
           The {{ otherTeam.name }} spy incrypted: "{{ otherTeam.round.encode.join(' - ') }}". Try intercepting it:
@@ -342,7 +342,7 @@
   /**
   Room: {
     name: 'apple',
-    state: 'ENCODING', // or 'NOT_STARTED'/'RED_DECRYPT'/'BLUE_DECRYPT'/'BOTH_DECRYPT/'DONE'
+    state: 'ENCODING', // or 'NOT_STARTED'/'RED_DECODE'/'BLUE_DECODE'/'BOTH_DECODE/'DONE'
     redTeam: {
       // Red team goes first on intercepts (TODO alternate?)
       // TODO name: 'Ugliest Carriages'
@@ -467,7 +467,7 @@
 
         // Once both spies are done, move to intercepting (or straight to decoding in round 1)
         if (this.otherTeam.round.encode.length === this.myTeam.round.encode.length) {
-          this.room.state = this.room.history.length > 0 ? 'RED_DECRYPT' : 'BOTH_DECRYPT';
+          this.room.state = this.room.history.length > 0 ? 'RED_DECODE' : 'BOTH_DECODE';
           await this.saveRoom('state');
         }
       },
@@ -482,13 +482,13 @@
         await this.checkIfDecrypted();
       },
       async checkIfDecrypted() {
-        if (!['RED_DECRYPT', 'BLUE_DECRYPT', 'BOTH_DECRYPT'].includes(this.room.state)) {
+        if (!['RED_DECODE', 'BLUE_DECODE', 'BOTH_DECODE'].includes(this.room.state)) {
           console.error('intercept or decode called from invalid round!');
           return;
         }
 
         const team = this.smugglers;
-        if (this.room.state === 'BOTH_DECRYPT') {
+        if (this.room.state === 'BOTH_DECODE') {
           if (!finished('decode', this.myTeam.round) || !finished('decode', this.otherTeam.round)) {
             // Only move forward when both teams are finished decoding
             return;
@@ -499,9 +499,9 @@
         }
         // Figure out what the next stage should be
         const nextState = {
-          RED_DECRYPT: 'BLUE_DECRYPT',
-          BLUE_DECRYPT: 'DONE',
-          BOTH_DECRYPT: 'DONE',
+          RED_DECODE: 'BLUE_DECODE',
+          BLUE_DECODE: 'DONE',
+          BOTH_DECODE: 'DONE',
           // TODO RED_DONE?
         };
         this.room.state = nextState[this.room.state];
@@ -580,9 +580,9 @@
       smugglers() {
         // AKA interceptees
         const map = {
-          RED_DECRYPT: 'redTeam',
-          BLUE_DECRYPT: 'blueTeam',
-          BOTH_DECRYPT: this.myTeamId,
+          RED_DECODE: 'redTeam',
+          BLUE_DECODE: 'blueTeam',
+          BOTH_DECODE: this.myTeamId,
         };
         return map[this.room.state];
       },
