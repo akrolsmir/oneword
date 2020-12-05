@@ -418,8 +418,8 @@
     watch: {
       'room.state'(state) {
         this.$emit('reset-timer');
-        // Clean up past inputs when the round moves forward.
-        if (['RED_INTERCEPT', 'BLUE_INTERCEPT', 'DONE'].includes(state)) {
+        // Clean up past inputs on each new round.
+        if (state === 'DONE') {
           this.player.encode = [];
           this.player.intercept = [];
           this.player.decode = [];
