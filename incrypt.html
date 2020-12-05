@@ -168,8 +168,8 @@
           <div class="column" v-for="(word, i) in room[smugglers].words">
             <b>Word {{ i + 1 }}</b>
             <ul>
-              <li v-for="(round, r) in room.history" v-if="round[smugglers].key.includes(i + 1 )">
-                {{ round[smugglers].encode[round[smugglers].key.indexOf(i + 1)] }} (r{{ r + 1 }})
+              <li v-for="(entry, e) in room.history" v-if="entry[smugglers].round.key.includes(i + 1)">
+                {{ entry[smugglers].round.encode[entry[smugglers].round.key.indexOf(i + 1)] }} (r{{ e + 1 }})
               </li>
             </ul>
           </div>
