@@ -93,9 +93,14 @@
       <!-- Show the current state of the game -->
       Round {{ room.history.length + 1 }}:
       <span :class="{'has-text-weight-bold': room.state === 'ENCODING'}">Incrypt</span> -
-      <span :class="{'has-text-weight-bold': room.state === 'RED_DECRYPT'}">Decrypt Red</span> -
-      <!-- <span :class="{'has-text-weight-bold': room.state === 'RED_DONE'}">Debrief</span> - -->
-      <span :class="{'has-text-weight-bold': room.state === 'BLUE_DECRYPT'}">Decrypt Blue</span> -
+      <template v-if="room.history.length === 0">
+        <span :class="{'has-text-weight-bold': room.state === 'BOTH_DECRYPT'}">Decrypt</span> -
+      </template>
+      <template v-else>
+        <span :class="{'has-text-weight-bold': room.state === 'RED_DECRYPT'}">Decrypt Red</span> -
+        <!-- <span :class="{'has-text-weight-bold': room.state === 'RED_DONE'}">Debrief</span> - -->
+        <span :class="{'has-text-weight-bold': room.state === 'BLUE_DECRYPT'}">Decrypt Blue</span> -
+      </template>
       <span :class="{'has-text-weight-bold': room.state === 'DONE'}">Debrief</span>
 
       <!-- Show the timer.. -->
@@ -138,7 +143,7 @@
             <button
               class="button"
               @click="submitEncode()"
-              :class="myTeam.round.encode.length == KEY_LENGTH ? 'is-success' : ''"
+              :class="finished('encode', myTeam.round) ? 'is-success' : ''"
             >
               Incrypt
             </button>
@@ -147,9 +152,9 @@
       </div>
       <div v-else>
         <h3>Waiting for {{ myTeam.round.spy }} to incrypt the key...</h3>
-        <br />
         <!-- Section: Show past clues, so teammates can think -->
-        <div class="columns">
+        <div v-if="room.history.length > 0" class="columns">
+          <br />
           <div class="column" v-for="(word, i) in myTeam.words">
             <b>{{ i + 1 }} - {{ word }}</b>
             <ul>
@@ -161,22 +166,21 @@
         </div>
       </div>
     </div>
-    <!-- Parts 2 and 4: Other team tries to intercept -->
-    <div v-if="['RED_DECRYPT', 'BLUE_DECRYPT'].includes(room.state)" class="box">
-      <div v-if="myTeamId === other(smugglers)">
+    <div v-if="['RED_DECRYPT', 'BLUE_DECRYPT', 'BOTH_DECRYPT'].includes(room.state)" class="box">
+      <!-- Parts 2 and 4: Other team tries to intercept -->
+      <div v-if="room.state != 'BOTH_DECRYPT' && myTeamId === other(smugglers)">
         <!-- Section: Show the smugglers' code -->
         <h3>
-          The {{ room[smugglers].name }} spy incrypted: "{{ room[smugglers].round.encode.join(' - ') }}". Try
-          intercepting it:
+          The {{ otherTeam.name }} spy incrypted: "{{ otherTeam.round.encode.join(' - ') }}". Try intercepting it:
         </h3>
         <br />
         <!-- Section: Vote for the code -->
         <div class="columns">
-          <div class="column" v-for="(encoded, e) in room[smugglers].round.encode">
+          <div class="column" v-for="(encoded, e) in otherTeam.round.encode">
             <h3>"{{ encoded }}"</h3>
             <div class="select">
               <select v-model="player.intercept[e]">
-                <option v-for="(word, i) in room[smugglers].words" :value="i + 1">Word {{ i + 1 }}</option>
+                <option v-for="(word, i) in otherTeam.words" :value="i + 1">Word {{ i + 1 }}</option>
               </select>
             </div>
           </div>
@@ -185,7 +189,7 @@
             <button
               class="button"
               @click="submitIntercept()"
-              :class="otherTeam.round.intercept.length == KEY_LENGTH ? 'is-success' : ''"
+              :class="finished('intercept', otherTeam.round) ? 'is-success' : ''"
             >
               Intercept
             </button>
@@ -194,18 +198,19 @@
         <br />
         <!-- Section: See all past clues -->
         <div class="columns">
-          <div class="column" v-for="(word, i) in room[smugglers].words">
+          <div class="column" v-for="(word, i) in otherTeam.words">
             <b>Word {{ i + 1 }}</b>
             <ul>
-              <li v-for="(entry, e) in room.history" v-if="entry[smugglers].round.key.includes(i + 1)">
-                {{ entry[smugglers].round.encode[entry[smugglers].round.key.indexOf(i + 1)] }}
+              <li v-for="(entry, e) in room.history" v-if="entry[other(myTeamId)].round.key.includes(i + 1)">
+                {{ entry[other(myTeamId)].round.encode[entry[other(myTeamId)].round.key.indexOf(i + 1)] }}
               </li>
             </ul>
           </div>
         </div>
       </div>
-      <!-- Parts 2 and 4: Meanwhile, the team tries to decrypt the key -->
+      <!-- Parts 2 and 4: Meanwhile, the smugglers tries to decrypt the key -->
       <div v-else>
+        <!-- TODO refactor: Switch if case -->
         <div v-if="player.name === myTeam.round.spy">
           <h3>Waiting for your teammates to decrypt your message...</h3>
         </div>
@@ -228,7 +233,7 @@
               <button
                 class="button"
                 @click="submitDecode(myTeamId)"
-                :class="myTeam.round.decode.length == KEY_LENGTH ? 'is-success' : ''"
+                :class="finished('decode', myTeam.round) ? 'is-success' : ''"
               >
                 Decrypt
               </button>
@@ -248,7 +253,7 @@
         <div v-if="keysEqual(room[team].round.intercept, room[team].round.key)">
           👻 {{ room[other(team)].name }} team intercepted the message!
         </div>
-        <div v-else>
+        <div v-else-if="room[team].round.intercept.length > 0">
           {{ room[other(team)].name }} team tried to intercept with
           <span>"{{ room[team].round.intercept.join(' - ') }}"</span>
         </div>
@@ -337,7 +342,7 @@
   /**
   Room: {
     name: 'apple',
-    state: 'ENCODING', // or 'NOT_STARTED'/'RED_DECRYPT'/'BLUE_DECRYPT'/'DECODING'/'DONE'
+    state: 'ENCODING', // or 'NOT_STARTED'/'RED_DECRYPT'/'BLUE_DECRYPT'/'BOTH_DECRYPT/'DONE'
     redTeam: {
       // Red team goes first on intercepts (TODO alternate?)
       // TODO name: 'Ugliest Carriages'
@@ -412,7 +417,7 @@
       'room.state'(state) {
         this.$emit('reset-timer');
         // Clean up past inputs when the round moves forward.
-        if (['RED_INTERCEPT', 'BLUE_INTERCEPT', 'DECODING', 'DONE'].includes(state)) {
+        if (['RED_INTERCEPT', 'BLUE_INTERCEPT', 'DONE'].includes(state)) {
           this.player.encode = [];
           this.player.intercept = [];
           this.player.decode = [];
@@ -462,9 +467,7 @@
 
         // Once both spies are done, move to intercepting (or straight to decoding in round 1)
         if (this.otherTeam.round.encode.length === this.myTeam.round.encode.length) {
-          // TODO: Figure out simultaneous round 1 decoding
-          this.room.state = 'RED_DECRYPT';
-          // this.room.state = this.room.history.length > 0 ? 'RED_DECRYPT' : 'DECODING';
+          this.room.state = this.room.history.length > 0 ? 'RED_DECRYPT' : 'BOTH_DECRYPT';
           await this.saveRoom('state');
         }
       },
@@ -479,22 +482,29 @@
         await this.checkIfDecrypted();
       },
       async checkIfDecrypted() {
-        if (!['RED_DECRYPT', 'BLUE_DECRYPT'].includes(this.room.state)) {
+        if (!['RED_DECRYPT', 'BLUE_DECRYPT', 'BOTH_DECRYPT'].includes(this.room.state)) {
           console.error('intercept or decode called from invalid round!');
           return;
         }
 
-        // Only move forward when we're done decoding and intercepting
-        const team = this.room.state === 'RED_DECRYPT' ? 'redTeam' : 'blueTeam';
-        if (
-          this.room[team].round.decode.length != this.KEY_LENGTH ||
-          this.room[team].round.intercept.length != this.KEY_LENGTH
-        ) {
+        const team = this.smugglers;
+        if (this.room.state === 'BOTH_DECRYPT') {
+          if (!finished('decode', this.myTeam.round) || !finished('decode', this.otherTeam.round)) {
+            // Only move forward when both teams are finished decoding
+            return;
+          }
+        } else if (!finished('decode', this.room[team].round) || !finished('intercept', this.room[team].round)) {
+          // Only move forward when decoding and intercepting are both finished
           return;
         }
         // Figure out what the next stage should be
-        // TODO add RED_DONE
-        this.room.state = this.room.state === 'RED_DECRYPT' ? 'BLUE_DECRYPT' : 'DONE';
+        const nextState = {
+          RED_DECRYPT: 'BLUE_DECRYPT',
+          BLUE_DECRYPT: 'DONE',
+          BOTH_DECRYPT: 'DONE',
+          // TODO RED_DONE?
+        };
+        this.room.state = nextState[this.room.state];
         const toUpdate = ['state'];
 
         // TODO: watch out for race conditions with double-intercept click
@@ -549,6 +559,7 @@
       },
       other,
       keysEqual,
+      finished,
     },
     computed: {
       isRed() {
@@ -568,14 +579,12 @@
       },
       smugglers() {
         // AKA interceptees
-        const state = this.room.state;
-        if (state === 'RED_DECRYPT') {
-          return 'redTeam';
-        }
-        if (state === 'BLUE_DECRYPT') {
-          return 'blueTeam';
-        }
-        return 'notIntercepting';
+        const map = {
+          RED_DECRYPT: 'redTeam',
+          BLUE_DECRYPT: 'blueTeam',
+          BOTH_DECRYPT: this.myTeamId,
+        };
+        return map[this.room.state];
       },
     },
   });
@@ -645,5 +654,10 @@
   function nextSpy(lastSpy, players) {
     const nextIndex = (players.indexOf(lastSpy) + 1 + players.length) % players.length;
     return players[nextIndex];
+  }
+
+  // keyType = 'encode', 'intercept', 'decode'
+  function finished(keyType, round) {
+    return round[keyType].length === vueApp.KEY_LENGTH;
   }
 </script>
