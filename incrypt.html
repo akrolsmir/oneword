@@ -121,7 +121,7 @@
     <!-- Part 1: Spies are encoding their messages -->
     <div v-cloak v-if="room.state === 'ENCODING'" class="box">
       <div v-if="player.name === myTeam.round.spy">
-        <h3>You are the {{ myTeam.name }} spy! Encode for your team: "{{ myTeam.round.key.join(' - ') }}"</h3>
+        <h3>You are the {{ myTeam.name }} spy! Incrypt for your team: "{{ myTeam.round.key.join(' - ') }}"</h3>
         <br />
         <div class="columns">
           <div class="column" v-for="(digit, i) in myTeam.round.key">
@@ -130,12 +130,18 @@
           </div>
           <div class="column">
             <br />
-            <button class="button" @click="submitEncode()">Encode</button>
+            <button
+              class="button"
+              @click="submitEncode()"
+              :class="myTeam.round.encode.length == KEY_LENGTH ? 'is-success' : ''"
+            >
+              Incrypt
+            </button>
           </div>
         </div>
       </div>
       <div v-else>
-        <h3>Waiting for {{ myTeam.round.spy }} to encode the key...</h3>
+        <h3>Waiting for {{ myTeam.round.spy }} to incrypt the key...</h3>
       </div>
     </div>
     <!-- Parts 2 and 4: Other team tries to intercept -->
@@ -143,8 +149,8 @@
       <div v-if="myTeamId === other(smugglers)">
         <!-- Section: Show the smugglers' code -->
         <h3>
-          The {{ room[smugglers].name }} spy encoded: "{{ room[smugglers].round.encode.join(' - ') }}". Try intercepting
-          it:
+          The {{ room[smugglers].name }} spy incrypted: "{{ room[smugglers].round.encode.join(' - ') }}". Try
+          intercepting it:
         </h3>
         <br />
         <!-- Section: Vote for the code -->
@@ -159,7 +165,13 @@
           </div>
           <div class="column">
             <br />
-            <button class="button" @click="submitIntercept()">Submit</button>
+            <button
+              class="button"
+              @click="submitIntercept()"
+              :class="otherTeam.round.intercept.length == KEY_LENGTH ? 'is-success' : ''"
+            >
+              Intercept
+            </button>
           </div>
         </div>
         <br />
@@ -178,10 +190,10 @@
       <!-- Parts 2 and 4: Meanwhile, the team tries to decrypt the key -->
       <div v-else>
         <div v-if="player.name === myTeam.round.spy">
-          <h3>Waiting for your teammates to decode your message...</h3>
+          <h3>Waiting for your teammates to decrypt your message...</h3>
         </div>
         <div v-else>
-          <h3>Decode what {{ myTeam.round.spy }} meant by "{{ myTeam.round.encode.join(' - ') }}":</h3>
+          <h3>Decrypt what {{ myTeam.round.spy }} meant by "{{ myTeam.round.encode.join(' - ') }}":</h3>
           <br />
           <!-- (TODO: deduplicate or component-ize with above) -->
           <!-- Section: Vote for the code -->
@@ -196,7 +208,13 @@
             </div>
             <div class="column">
               <br />
-              <button class="button" @click="submitDecode(myTeamId)">Submit</button>
+              <button
+                class="button"
+                @click="submitDecode(myTeamId)"
+                :class="myTeam.round.decode.length == KEY_LENGTH ? 'is-success' : ''"
+              >
+                Decrypt
+              </button>
             </div>
           </div>
         </div>
@@ -248,7 +266,7 @@
             <table class="table is-fullwidth is-striped">
               <tbody>
                 <thead>
-                  <th>{{ past[team].round.spy }}'s Incryption</th>
+                  <th>{{ past[team].round.spy }}</th>
                   <!-- TODO: maybe emojize more -->
                   <th>{{ team === 'redTeam' ? '🔵' : '🔴' }}</th>
                   <th>{{ team === 'redTeam' ? '🔴' : '🔵' }}</th>
