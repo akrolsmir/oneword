@@ -153,8 +153,7 @@
       <div v-else>
         <h3>Waiting for {{ myTeam.round.spy }} to incrypt the key...</h3>
         <!-- Section: Show past clues, so teammates can think -->
-        <div v-if="room.history.length > 0" class="columns">
-          <br />
+        <div v-if="room.history.length > 0" class="columns mt-2">
           <div class="column" v-for="(word, i) in myTeam.words">
             <b>{{ i + 1 }} - {{ word }}</b>
             <ul>
@@ -168,7 +167,7 @@
     </div>
     <div v-if="['RED_DECODE', 'BLUE_DECODE', 'BOTH_DECODE'].includes(room.state)" class="box">
       <!-- Parts 2 and 4: Other team tries to intercept -->
-      <div v-if="room.state != 'BOTH_DECODE' && myTeamId === other(smugglers)">
+      <div v-if="myTeamId !== smugglers">
         <!-- Section: Show the smugglers' code -->
         <h3>
           The {{ otherTeam.name }} spy incrypted: "{{ otherTeam.round.encode.join(' - ') }}". Try intercepting it:
@@ -210,7 +209,6 @@
       </div>
       <!-- Parts 2 and 4: Meanwhile, the smugglers tries to decrypt the key -->
       <div v-else>
-        <!-- TODO refactor: Switch if case -->
         <div v-if="player.name === myTeam.round.spy">
           <h3>Waiting for your teammates to decrypt your message...</h3>
         </div>
@@ -279,7 +277,7 @@
     </div>
 
     <!-- History -->
-    <div>
+    <div v-if="room.history.length > 0">
       <h2>History</h2>
       <template v-for="(past, p) of room.history.slice().reverse()">
         <div class="columns">
@@ -636,6 +634,7 @@
   // Unique list of random words e.g. randomWords(4) => ['at', 'lol', 'cat', 'yo']
   function randomWords(length) {
     const nounsCopy = nouns.slice();
+    // TODO: maybe cap words at length 8?
     // Assumes nouns has no duplicates.
     return shuffleArray(nounsCopy).slice(0, length);
   }
