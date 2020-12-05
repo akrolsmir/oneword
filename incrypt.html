@@ -108,7 +108,7 @@
       <span v-if="room.state === 'DONE'"><b>✔️ Debrief</b></span>
       <span v-else>Debrief</span>
 
-      <!-- Show the timer.. -->
+      <!-- Show the timer. -->
       <timer
         :length="room.timerLength"
         :on-finish="nextState"
@@ -365,7 +365,7 @@
     state: 'ENCODING', // or 'NOT_STARTED'/'RED_DECODE'/'BLUE_DECODE'/'BOTH_DECODE/'DONE'
     redTeam: {
       // Red team goes first on intercepts (TODO alternate?)
-      // TODO name: 'Ugliest Carriages'
+      // TODO name: 'Ugliest Carriages', emoji: '🤦‍♀️', color: '#FF4422'
       players: ['alice', 'bob'], // First player is team lead aka mod
       words: ['student', 'bible', 'catholic', 'eraser'],
       intercepted: 0,
@@ -472,7 +472,6 @@
         await setRoom(this.room);
       },
       async nextState() {
-        console.log('NEXT STATE');
         // Figure out what the next state should be, then go there.
         const next = {
           ENCODING: this.room.history.length > 0 ? 'RED_DECODE' : 'BOTH_DECODE',
