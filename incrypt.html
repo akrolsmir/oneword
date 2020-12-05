@@ -72,8 +72,9 @@
           {{ room[team].name }} team: {{ room[team].players.join(', ') }}
           <a v-if="!room[team].players.includes(player.name)" @click="joinTeam(team)">(join)</a>
         </h3>
-        👻 {{ room[team].intercepted }} interceptions (2 to win) <br />
-        🤦‍♀️ {{ room[team].dropped }} dropped messages (2 to lose) <br />
+        👻 {{ intercepted(other(team), room.history) }} interceptions (2 to win) <br />
+        🤦‍♀️ {{ dropped(team, room.history) }} dropped messages (2 to lose)
+        <br />
       </div>
     </div>
 
@@ -108,7 +109,12 @@
       <span v-else>Debrief</span>
 
       <!-- Show the timer.. -->
-      <!-- <timer :length="room.timerLength" :on-finish="nextStage" v-if="room.timerLength > 0" :key="room.state"></timer> -->
+      <timer
+        :length="room.timerLength"
+        :on-finish="nextState"
+        v-if="room.timerLength > 0 && room.state !== 'DONE'"
+        :key="room.state"
+      ></timer>
     </div>
     <!-- Pre-game: Waiting for players -->
     <div v-if="room.state === 'NOT_STARTED'" class="box">
@@ -285,7 +291,10 @@
         <div class="column">
           <button class="button is-small is-danger" @click="resetRoom">Reset game</button>
         </div>
-        <div class="column"><input class="input is-small" v-model="room.timerLength" /> second timer</div>
+        <div class="column">
+          <button class="button is-small" @click="nextState">Next stage</button>
+        </div>
+        <div class="column"><input class="input is-small" v-model.number="room.timerLength" /> second timer</div>
       </div>
     </div>
 
@@ -458,13 +467,23 @@
             round: {},
           },
           history: [],
-          timerLength: 80,
+          timerLength: 10,
         };
         await setRoom(this.room);
       },
-      async nextStage() {
-        // For now, just alert the players to go to the next stage
-        // alert('Pencils down, time is up!');
+      async nextState() {
+        console.log('NEXT STATE');
+        // Figure out what the next state should be, then go there.
+        const next = {
+          ENCODING: this.room.history.length > 0 ? 'RED_DECODE' : 'BOTH_DECODE',
+          RED_DECODE: 'BLUE_DECODE',
+          // TODO RED_DONE?
+          BLUE_DECODE: 'DONE',
+          BOTH_DECODE: 'DONE',
+          DONE: 'ENCODING',
+        };
+        this.room.state = next[this.room.state];
+        await this.saveRoom('state');
       },
       async joinTeam(team) {
         this.room[team].players.push(this.player.name);
@@ -478,8 +497,7 @@
 
         // Once both spies are done, move to intercepting (or straight to decoding in round 1)
         if (this.otherTeam.round.encode.length === this.myTeam.round.encode.length) {
-          this.room.state = this.room.history.length > 0 ? 'RED_DECODE' : 'BOTH_DECODE';
-          await this.saveRoom('state');
+          await this.nextState();
         }
       },
       async submitIntercept() {
@@ -508,29 +526,7 @@
           // Only move forward when decoding and intercepting are both finished
           return;
         }
-        // Figure out what the next stage should be
-        const nextState = {
-          RED_DECODE: 'BLUE_DECODE',
-          BLUE_DECODE: 'DONE',
-          BOTH_DECODE: 'DONE',
-          // TODO RED_DONE?
-        };
-        this.room.state = nextState[this.room.state];
-        const toUpdate = ['state'];
-
-        // TODO: watch out for race conditions with double-intercept click
-        // Check if intercepted
-        if (keysEqual(this.room[team].round.intercept, this.room[team].round.key)) {
-          this.room[other(team)].intercepted += 1;
-          toUpdate.push(`${other(team)}.intercepted`);
-        }
-
-        // Check if message dropped
-        if (!keysEqual(this.room[team].round.decode, this.room[team].round.key)) {
-          this.room[team].dropped += 1;
-          toUpdate.push(`${team}.dropped`);
-        }
-        await this.saveRoom(...toUpdate);
+        await this.nextState();
       },
       async newRound(saveCurrentRound = true) {
         if (saveCurrentRound) {
@@ -571,6 +567,8 @@
       other,
       keysEqual,
       finished,
+      intercepted,
+      dropped,
     },
     computed: {
       isRed() {
@@ -671,5 +669,19 @@
   // keyType = 'encode', 'intercept', 'decode'
   function finished(keyType, round) {
     return round[keyType].length === vueApp.KEY_LENGTH;
+  }
+
+  // Returns how many of <team>'s messages have been intercepted
+  function intercepted(team, history) {
+    return history
+      .map((entry) => keysEqual(entry[team].round.intercept, entry[team].round.key))
+      .reduce((a, b) => a + b, 0);
+  }
+
+  // Returns how many of <team>'s messages have not been correctly decoded
+  function dropped(team, history) {
+    return history
+      .map((entry) => !keysEqual(entry[team].round.decode, entry[team].round.key))
+      .reduce((a, b) => a + b, 0);
   }
 </script>
