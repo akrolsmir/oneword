@@ -92,16 +92,20 @@
 
       <!-- Show the current state of the game -->
       Round {{ room.history.length + 1 }}:
-      <span :class="{'has-text-weight-bold': room.state === 'ENCODING'}">Incrypt</span> -
+      <span v-if="room.state === 'ENCODING'"><b>🔏 Incrypt</b></span>
+      <span v-else>Incrypt</span> -
       <template v-if="room.history.length === 0">
-        <span :class="{'has-text-weight-bold': room.state === 'BOTH_DECODE'}">Decrypt</span> -
+        <span v-if="room.state === 'BOTH_DECODE'"><b>🔴🔵 Decrypt</b></span>
+        <span v-else>Decrypt</span> -
       </template>
       <template v-else>
-        <span :class="{'has-text-weight-bold': room.state === 'RED_DECODE'}">Decrypt Red</span> -
-        <!-- <span :class="{'has-text-weight-bold': room.state === 'RED_DONE'}">Debrief</span> - -->
-        <span :class="{'has-text-weight-bold': room.state === 'BLUE_DECODE'}">Decrypt Blue</span> -
+        <span v-if="room.state === 'RED_DECODE'"><b>🔴 Decrypt Red</b></span>
+        <span v-else>Decrypt Red</span> -
+        <span v-if="room.state === 'BLUE_DECODE'"><b>🔵 Decrypt Blue</b></span>
+        <span v-else>Decrypt Blue</span> -
       </template>
-      <span :class="{'has-text-weight-bold': room.state === 'DONE'}">Debrief</span>
+      <span v-if="room.state === 'DONE'"><b>✔️ Debrief</b></span>
+      <span v-else>Debrief</span>
 
       <!-- Show the timer.. -->
       <!-- <timer :length="room.timerLength" :on-finish="nextStage" v-if="room.timerLength > 0" :key="room.state"></timer> -->
@@ -286,7 +290,7 @@
             <table class="table is-fullwidth is-striped">
               <tbody>
                 <thead>
-                  <th>{{ past[team].round.spy }}</th>
+                  <th>🔏 {{ past[team].round.spy }}</th>
                   <!-- TODO: maybe emojize more -->
                   <th>{{ team === 'redTeam' ? '🔵' : '🔴' }}</th>
                   <th>{{ team === 'redTeam' ? '🔴' : '🔵' }}</th>
