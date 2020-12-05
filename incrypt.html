@@ -637,10 +637,10 @@
 
   // Unique list of random words e.g. randomWords(4) => ['at', 'lol', 'cat', 'yo']
   function randomWords(length) {
-    const nounsCopy = nouns.slice();
-    // TODO: maybe cap words at length 8?
+    // For now, take out nouns longer than 8 letters; ~758 of 825 nouns left
+    const filteredNouns = nouns.filter((word) => word.length <= 8);
     // Assumes nouns has no duplicates.
-    return shuffleArray(nounsCopy).slice(0, length);
+    return shuffleArray(filteredNouns).slice(0, length);
   }
 
   // Key elements will be unique e.g. randomKey(3, 4) => [2, 1, 4]
