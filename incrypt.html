@@ -241,24 +241,28 @@
     <!-- History -->
     <div>
       <h2>History</h2>
-      <template v-for="(past, p) of room.history.slice().reverse()">
-        <div class="columns">
-          <div class="column" v-for="team in ['redTeam', 'blueTeam']">
+      <div class="columns">
+        <div class="column" v-for="team in ['redTeam', 'blueTeam']">
+          <template v-for="(past, p) of room.history.slice().reverse()">
             <h3>Round {{ room.history.length - p }}: {{ room[team].name }} team</h3>
+            <!-- Try swapped version -->
             <table class="table is-fullwidth is-striped">
               <tbody>
                 <thead>
-                  <th>{{ past[team].round.spy }}'s Incryption</th>
-                  <!-- TODO: maybe emojize more -->
-                  <th>{{ team === 'redTeam' ? '🔵' : '🔴' }}</th>
-                  <th>{{ team === 'redTeam' ? '🔴' : '🔵' }}</th>
-                  <th>✔️</th>
+                  <th></th>
+                  <th v-for="encoded in past[team].round.encode">{{ encoded }}</th>
                 </thead>
-                <tr v-for="(encoded, e) in past[team].round.encode">
-                  <td>{{ encoded }}</td>
-                  <td>{{ past[team].round.intercept[e] }}</td>
-                  <td>{{ past[team].round.decode[e] }}</td>
-                  <td>{{ past[team].round.key[e] }}</td>
+                <tr>
+                  <th>{{ team === 'redTeam' ? '🔵' : '🔴' }}</th>
+                  <td v-for="(_, e) in past[team].round.encode">{{ past[team].round.intercept[e] }}</td>
+                </tr>
+                <tr>
+                  <th>{{ team === 'redTeam' ? '🔴' : '🔵' }}</th>
+                  <td v-for="(_, e) in past[team].round.encode">{{ past[team].round.decode[e] }}</td>
+                </tr>
+                <tr>
+                  <th>✔️</th>
+                  <td v-for="(_, e) in past[team].round.encode">{{ past[team].round.key[e] }}</td>
                 </tr>
               </tbody>
             </table>
@@ -268,9 +272,9 @@
             <div v-if="!keysEqual(past[team].round.decode, past[team].round.key)">
               🤦‍♀️ {{ room[team].name }} team thought it was "{{ past[team].round.decode.join(' - ') }}"...
             </div>
-          </div>
+          </template>
         </div>
-      </template>
+      </div>
     </div>
   </div>
 </body>
