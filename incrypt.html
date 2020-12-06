@@ -130,7 +130,7 @@
         <br /><br />
         Ready to start?
         <br />
-        <button class="button" @click="newRound(/*saveCurrentRound=*/false)">Start game!</button>
+        <button class="button" @click="newRound">Start game!</button>
       </div>
     </div>
     <!-- Part 1: Spies are encoding their messages -->
@@ -473,6 +473,7 @@
       },
       async nextState() {
         // Figure out what the next state should be, then go there.
+        const toUpdate = ['state'];
         const next = {
           ENCODING: this.room.history.length > 0 ? 'RED_DECODE' : 'BOTH_DECODE',
           RED_DECODE: 'BLUE_DECODE',
@@ -482,7 +483,19 @@
           DONE: 'ENCODING',
         };
         this.room.state = next[this.room.state];
-        await this.saveRoom('state');
+        if (this.room.state === 'DONE') {
+          // Add current round to history on DONE, to update victory conditions
+          this.room.history.push({
+            redTeam: {
+              round: this.room.redTeam.round,
+            },
+            blueTeam: {
+              round: this.room.blueTeam.round,
+            },
+          });
+          toUpdate.push('history');
+        }
+        await this.saveRoom(...toUpdate);
       },
       async joinTeam(team) {
         this.room[team].players.push(this.player.name);
@@ -527,17 +540,7 @@
         }
         await this.nextState();
       },
-      async newRound(saveCurrentRound = true) {
-        if (saveCurrentRound) {
-          this.room.history.push({
-            redTeam: {
-              round: this.room.redTeam.round,
-            },
-            blueTeam: {
-              round: this.room.blueTeam.round,
-            },
-          });
-        }
+      async newRound() {
         this.room.state = 'ENCODING';
         this.room.redTeam.round = {
           spy: nextSpy(this.room.redTeam.round.spy, this.room.redTeam.players),
