@@ -118,7 +118,7 @@ const vueApp = new Vue({
           round: {},
         },
         history: [],
-        timerLength: 10,
+        timerLength: 100,
       };
       await setRoom(this.room);
     },
@@ -284,8 +284,6 @@ function getIn(object, path) {
 }
 
 // Keys are just arrays of ints
-// TODO wait, does the dropdown return a string? how does this work at all???
-// Maybe could use == instead of ===, cuz "3" == 3
 function keysEqual(key1, key2) {
   if (key1.length !== key2.length) {
     return false;
