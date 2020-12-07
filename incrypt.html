@@ -280,7 +280,25 @@
         <div v-else>🤦‍♀️ {{ room[team].name }} team thought it was "{{ room[team].round.decode.join(' - ') }}"...</div>
         <br />
       </template>
-      <button class="button" @click="newRound">Next round</button>
+      <!-- Game over -->
+      <div v-if="gameOver">
+        <h2>Game Over</h2>
+        <template v-for="team in ['redTeam', 'blueTeam']">
+          <b>{{ room[team].name }} team has {{ points(team) }} points.</b><br />
+          + {{ intercepted(other(team), room.history) }} 👻 interceptions<br />
+          − {{ dropped(team, room.history) }} 🤦‍♀️ dropped messages<br />
+          <br />
+        </template>
+        <div v-if="points('redTeam') === points('blueTeam')">
+          <h2>It's a tie!</h2>
+          The tiebreaker is which team can guess more of the other team's words.
+        </div>
+        <div v-else>
+          <h2>{{ points('redTeam') > points('blueTeam') ? room.redTeam.name : room.blueTeam.name }} team wins!</h2>
+          Congratulations! GG and well played~
+        </div>
+      </div>
+      <button v-else class="button" @click="newRound">Next round</button>
     </div>
 
     <!-- Mod tools -->
@@ -571,6 +589,9 @@
       finished,
       intercepted,
       dropped,
+      points(team) {
+        return intercepted(other(team), this.room.history) - dropped(team, this.room.history);
+      },
     },
     computed: {
       isRed() {
@@ -596,6 +617,15 @@
           BOTH_DECODE: this.myTeamId,
         };
         return map[this.room.state];
+      },
+      gameOver() {
+        return (
+          // TODO: could extract 2 to a constant
+          intercepted('redTeam', this.room.history) >= 2 ||
+          dropped('redTeam', this.room.history) >= 2 ||
+          intercepted('blueTeam', this.room.history) >= 2 ||
+          dropped('blueTeam', this.room.history) >= 2
+        );
       },
     },
   });
