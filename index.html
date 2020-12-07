@@ -41,10 +41,6 @@
       max-width: 95vw;
     }
 
-    .spacy {
-      white-space: pre-wrap;
-    }
-
     .label {
       margin-top: 20px;
     }
@@ -98,19 +94,7 @@
       players.<br />
       In each of the 13 rounds, come up with a one-word hint for the guesser...<br />
       But beware: duplicate hints are discarded!<br />
-      <form v-if="user.id || user.guest" @submit.prevent="enterRoom" method="POST">
-        <label class="label">Player</label>
-        <input class="input" type="text" v-model="player.name" placeholder="Ringo" />
-        <label class="label">Room</label>
-        <input class="input" type="text" v-model="room.name" placeholder="apple" required /><br /><br />
-        <input class="button" type="submit" value="Enter Room" />
-      </form>
-      <template v-else>
-        <br />
-        <button class="button is-large is-success" @click="$refs.navbar.logIn()">Sign in to get started</button><br />
-        <a @click='$set(user, "guest", true)' class="is-size-7">Play without an account</a>
-      </template>
-
+      <roomselect :on-enter="enterRoom" :user="user" :player="player" :room="room" :navbar="$refs.navbar"></roomselect>
       <br /><br />
       <h2>Open Rooms</h2>
       <template v-for="openRoom in allRooms">
@@ -417,6 +401,7 @@
 <script type="module" src="components/timer.js"></script>
 <script type="module" src="components/scoreboard.js"></script>
 <script type="module" src="components/sharelink.js"></script>
+<script type="module" src="components/roomselect.js"></script>
 <script type="module">
   import { nouns, compounds, verbs, adjectives } from './many-words.js';
   import {
