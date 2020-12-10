@@ -382,7 +382,11 @@
         <div class="level">
           <div class="level-left">
             <span class="level-item" style="justify-content: flex-start">
-              <span class="icon" :class="correct(round) ? 'has-text-success' : 'has-text-danger'">
+              <span
+                class="icon"
+                :class="correct(round) ? 'has-text-success' : 'has-text-danger'"
+                :aria-label="correct(round) ? 'correct' : 'incorrect'"
+              >
                 {{ correct(round) ? '✔' : '✖' }}
               </span>
               <h3>{{ room.history.length - i }}. {{ round.word }} ({{ round.category }})</h3>
