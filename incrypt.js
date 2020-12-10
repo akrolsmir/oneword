@@ -19,8 +19,6 @@ Room: {
     // TODO name: 'Ugliest Carriages', emoji: '🤦‍♀️', color: '#FF4422'
     players: ['alice', 'bob'], // First player is team lead aka mod
     words: ['student', 'bible', 'catholic', 'eraser'],
-    intercepted: 0,
-    dropped: 1,
     round: {
       spy: 'alice',
       key: [4, 1, 2], // sometimes referred to as "message"
@@ -53,6 +51,7 @@ const vueApp = new Vue({
       encode: [],
       intercept: [],
       decode: [],
+      timerLength: 100,
     },
     room: {
       // See below in created()
@@ -212,6 +211,10 @@ const vueApp = new Vue({
 
       // Overwrite existing room;
       await setRoom(this.room);
+    },
+    async updateTimer() {
+      this.room.timerLength = this.player.timerLength;
+      this.saveRoom('timerLength');
     },
     // Sync any number of properties of this.room to firebase
     async saveRoom(...props) {

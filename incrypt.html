@@ -313,7 +313,11 @@
           <div class="column">
             <button class="button is-small" @click="nextState">Next stage</button>
           </div>
-          <div class="column"><input class="input is-small" v-model.number="room.timerLength" /> second timer</div>
+          <div class="column">
+            <input class="input is-small" style="flex: 1 2 48px" v-model.number="player.timerLength" />
+
+            <button class="button is-small" @click="updateTimer">Set Timer</button>
+          </div>
         </div>
       </div>
 
