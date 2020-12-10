@@ -94,12 +94,19 @@
       players.<br />
       In each of the 13 rounds, come up with a one-word hint for the guesser...<br />
       But beware: duplicate hints are discarded!<br />
-      <roomselect :on-enter="enterRoom" :user="user" :player="player" :room="room" :navbar="$refs.navbar"></roomselect>
+      <roomselect
+        ref="roomselect"
+        :reset-room="resetRoom"
+        :user="user"
+        :player="player"
+        :room="room"
+        :navbar="$refs.navbar"
+      ></roomselect>
       <br /><br />
       <h2>Open Rooms</h2>
       <template v-for="openRoom in allRooms">
         <p>
-          <a @click="room.name = openRoom.name; enterRoom()"><b>{{ openRoom.name }}</b></a
+          <a @click="room.name = openRoom.name; $refs.roomselect.enterRoom()"><b>{{ openRoom.name }}</b></a
           >, with {{ openRoom.players.join(', ') }} ({{ moment(openRoom.lastUpdateTime).fromNow() }})
         </p>
       </template>
@@ -121,7 +128,9 @@
             >
               Watch
             </button>
-            <button v-else class="button is-dark is-inverted is-outlined" @click="joinRoom">Rejoin</button>
+            <button v-else class="button is-dark is-inverted is-outlined" @click="$refs.roomselect.joinRoom">
+              Rejoin
+            </button>
             <button class="button is-danger is-inverted is-outlined" @click="kickPlayer(player.name); goHome();">
               Exit
             </button>
@@ -455,6 +464,7 @@
     },
     async mounted() {
       this.allRooms = await listRooms();
+      // TODO: also copy into roomselect?
       const parsedUrl = new URL(window.location.href);
       const roomName = parsedUrl.searchParams.get('room');
       const playerName = parsedUrl.searchParams.get('player');
@@ -463,7 +473,7 @@
       }
       if (roomName) {
         this.room.name = roomName;
-        await this.enterRoom();
+        await this.$refs.roomselect.enterRoom();
       }
     },
     watch: {
@@ -498,38 +508,6 @@
       moment,
       listRooms,
       dedupe,
-      async enterRoom() {
-        if (!this.player.name) {
-          this.$refs.navbar.logIn();
-          return;
-        }
-        // Sanitize room name
-        this.room.name = this.room.name
-          .trim()
-          .toLowerCase()
-          .replace(/\s/g, '-') // whitespace
-          .replace(/[^\p{L}-]/gu, ''); // not (dash or letter in any language)
-
-        const room = await getRoom(this.room);
-
-        if (room) {
-          // If the player's name collides with another user's,
-          // prepend adjectives until it is unique
-          while (
-            room.players.includes(this.player.name) &&
-            (this.user.guest || this.user.email != room.playerData[this.player.name].email)
-          ) {
-            this.player.name = capitalize(randomWord('adjectives')) + ' ' + this.player.name;
-          }
-
-          this.room = room;
-          return await this.joinRoom();
-        } else {
-          // Create a new room
-          listenRoom(this);
-          return await this.resetRoom();
-        }
-      },
       async resetRoom() {
         this.room = {
           name: this.room.name,
@@ -563,25 +541,6 @@
           },
         };
         await setRoom(this.room);
-      },
-      // Only call if room already exists.
-      async joinRoom() {
-        listenRoom(this);
-
-        // migration
-        if (!this.room.playerData) {
-          this.room.playerData = {};
-        }
-
-        const { email = '', supporter = '' } = this.user;
-        this.room.playerData[this.player.name] = { email, supporter };
-
-        if (this.room.players.includes(this.player.name)) {
-          await this.saveRoom('playerData');
-        } else {
-          this.room.players.push(this.player.name);
-          await this.saveRoom('playerData', 'players');
-        }
       },
       goHome() {
         unlistenRoom();
@@ -797,9 +756,5 @@
   function nextCategory(categories) {
     const enabled = Object.keys(categories).filter((c) => categories[c]);
     return enabled[Math.floor(Math.random() * enabled.length)];
-  }
-
-  function capitalize(str) {
-    return str ? str[0].toLocaleUpperCase() + str.substring(1) : '';
   }
 </script>

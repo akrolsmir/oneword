@@ -48,30 +48,21 @@ const vueApp = new Vue({
   data: {
     nouns,
     player: {
-      name: '',
+      name: '', // TODO: should this go into
       // Local values, before they get uploaded
       encode: [],
       intercept: [],
       decode: [],
     },
     room: {
-      // See below in created()
-      name: 'banana',
+      name: '',
     },
+    user: {},
   },
   async created() {
+    // Define game constants here
     this.KEY_LENGTH = 3;
     this.WORDS_SHOWN = 4;
-
-    // For now, always start by listening to the 'banana' example room
-    const room = await getRoom(this.room);
-    if (room) {
-      this.room = room;
-    } else {
-      // Create a new room
-      await this.resetRoom();
-    }
-    listenRoom(this);
   },
   async mounted() {
     const parsedUrl = new URL(window.location.href);
@@ -96,6 +87,29 @@ const vueApp = new Vue({
     },
   },
   methods: {
+    // Somewhat copied from One Word's index.html. TODO: Dedupe?
+    async enterRoom() {
+      if (!this.player.name) {
+        this.$refs.navbar.logIn();
+        return;
+      }
+      // Sanitize room name
+      this.room.name = this.room.name
+        .trim()
+        .toLowerCase()
+        .replace(/\s/g, '-') // whitespace
+        .replace(/[^\p{L}-]/gu, ''); // not (dash or letter in any language)
+
+      const room = await getRoom(this.room);
+
+      if (room) {
+        this.room = room;
+      } else {
+        // Create a new room
+        await this.resetRoom();
+      }
+      listenRoom(this);
+    },
     async resetRoom() {
       this.room = {
         name: this.room.name,
@@ -215,6 +229,8 @@ const vueApp = new Vue({
     },
     // Sync any number of properties of this.room to firebase
     async saveRoom(...props) {
+      // Note: local update => saveRoom is not the same as updateRoom.
+      // Former is optimistic, latter waits for server roundtrip. Not sure which is better.
       await updateRoom(this.room, Object.fromEntries(props.map((prop) => [prop, getIn(this.room, prop)])));
     },
     other,
