@@ -51,6 +51,10 @@
       padding: 0.25rem;
     }
 
+    .table {
+      background-color: #fff6;
+    }
+
     [v-cloak] {
       display: none;
     }
@@ -93,21 +97,23 @@
         </div>
 
         <!-- Show the current state of the game -->
-        Round {{ room.history.length + 1 }}:
-        <span v-if="room.state === 'ENCODING'"><b>🔏 Incrypt</b></span>
-        <span v-else>Incrypt</span> -
-        <template v-if="room.history.length === 0">
-          <span v-if="room.state === 'BOTH_DECODE'"><b>🔴🔵 Decrypt</b></span>
-          <span v-else>Decrypt</span> -
-        </template>
-        <template v-else>
-          <span v-if="room.state === 'RED_DECODE'"><b>🔴 Decrypt Red</b></span>
-          <span v-else>Decrypt Red</span> -
-          <span v-if="room.state === 'BLUE_DECODE'"><b>🔵 Decrypt Blue</b></span>
-          <span v-else>Decrypt Blue</span> -
-        </template>
-        <span v-if="room.state === 'DONE'"><b>✔️ Debrief</b></span>
-        <span v-else>Debrief</span>
+        <div class="notification has-text-centered">
+          Round {{ room.history.length + 1 }}:
+          <span v-if="room.state === 'ENCODING'"><b>🔏 Incrypt</b></span>
+          <span v-else>Incrypt</span> -
+          <template v-if="room.history.length === 0">
+            <span v-if="room.state === 'BOTH_DECODE'"><b>🔴🔵 Decrypt</b></span>
+            <span v-else>Decrypt</span> -
+          </template>
+          <template v-else>
+            <span v-if="room.state === 'RED_DECODE'"><b>🔴 Decrypt Red</b></span>
+            <span v-else>Decrypt Red</span> -
+            <span v-if="room.state === 'BLUE_DECODE'"><b>🔵 Decrypt Blue</b></span>
+            <span v-else>Decrypt Blue</span> -
+          </template>
+          <span v-if="room.state === 'DONE'"><b>✔️ Debrief</b></span>
+          <span v-else>Debrief</span>
+        </div>
 
         <!-- Show the timer. -->
         <timer
@@ -328,7 +334,7 @@
           <div class="columns">
             <div class="column" v-for="team in ['redTeam', 'blueTeam']">
               <h3>Round {{ room.history.length - p }}: {{ room[team].name }} team</h3>
-              <table class="table is-fullwidth is-striped">
+              <table class="table is-fullwidth">
                 <tbody>
                   <thead>
                     <th>🔏 {{ past[team].round.spy }}</th>
