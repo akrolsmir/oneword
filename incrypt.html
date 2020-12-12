@@ -193,7 +193,7 @@
       </div>
       <div v-if="['RED_DECODE', 'BLUE_DECODE', 'BOTH_DECODE'].includes(room.state)" class="box">
         <!-- Parts 2 and 4: Other team tries to intercept -->
-        <div v-if="myTeamId !== smugglers">
+        <div v-if="myTeamId !== smugglersId">
           <!-- Section: Show the smugglers' code -->
           <h3>
             The {{ otherTeam.name }} spy incrypted: "{{ otherTeam.round.encode.join(' - ') }}". Try intercepting it:
@@ -245,22 +245,20 @@
             <!-- Section: Vote for the code -->
             <div class="columns">
               <div class="column" v-for="(encoded, e) in myTeam.round.encode">
-                <h3>"{{ encoded }}"</h3>
-                <div class="select">
-                  <select v-model="player.decode[e]">
-                    <option v-for="(word, i) in myTeam.words" :value="i + 1">{{i + 1 }} - {{ word }}</option>
-                  </select>
+                <h3 class="has-text-centered">"{{ encoded }}"</h3>
+                <div v-for="(word, w) in myTeam.words">
+                  <button
+                    class="button is-fullwidth"
+                    :class="voters('decodeVotes', e, w + 1).includes(player.name) ? 'is-success' : ''"
+                    @click="vote('decodeVotes', player.name, e, w + 1)"
+                  >
+                    {{ word }}
+                  </button>
+                  <div class="mb-2">
+                    <span v-if="voters('decodeVotes', e, w + 1).length > 0" class="is-size-7">Chosen by </span>
+                    <span class="tag" v-for="voter of voters('decodeVotes', e, w + 1)">{{ voter }}</span>
+                  </div>
                 </div>
-              </div>
-              <div class="column">
-                <br />
-                <button
-                  class="button"
-                  @click="submitDecode(myTeamId)"
-                  :class="finished('decode', myTeam.round) ? 'is-success' : ''"
-                >
-                  Decrypt
-                </button>
               </div>
             </div>
           </div>

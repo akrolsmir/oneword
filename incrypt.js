@@ -55,7 +55,7 @@ const vueApp = new Vue({
     },
     room: {
       // See below in created()
-      name: 'banana',
+      name: 'bananaz',
     },
   },
   async created() {
@@ -178,13 +178,19 @@ const vueApp = new Vue({
         return;
       }
 
-      const team = this.smugglers;
+      const team = this.smugglersId;
       if (this.room.state === 'BOTH_DECODE') {
-        if (!finished('decode', this.myTeam.round) || !finished('decode', this.otherTeam.round)) {
+        if (
+          !finishedVoting(this.myTeam.round.decodeVotes, this.decrypters(this.myTeamId)) ||
+          !finishedVoting(this.otherTeam.round.decodeVotes, this.decrypters(other(this.myTeamId)))
+        ) {
           // Only move forward when both teams are finished decoding
           return;
         }
-      } else if (!finished('decode', this.room[team].round) || !finished('intercept', this.room[team].round)) {
+      } else if (
+        !finishedVoting(this.room[team].round.decodeVotes, this.decrypters(team)) ||
+        !finished('intercept', this.room[team].round)
+      ) {
         // Only move forward when decoding and intercepting are both finished
         return;
       }
@@ -198,6 +204,7 @@ const vueApp = new Vue({
         encode: [],
         intercept: [],
         decode: [],
+        decodeVotes: {},
       };
       this.room.blueTeam.round = {
         spy: nextSpy(this.room.blueTeam.round.spy, this.room.blueTeam.players),
@@ -205,6 +212,7 @@ const vueApp = new Vue({
         encode: [],
         intercept: [],
         decode: [],
+        decodeVotes: {},
       };
       // TODO when we're tracking separate rooms
       // this.room.lastUpdateTime = Date.now();
@@ -220,6 +228,22 @@ const vueApp = new Vue({
     async saveRoom(...props) {
       await updateRoom(this.room, Object.fromEntries(props.map((prop) => [prop, getIn(this.room, prop)])));
     },
+    async vote(voteType /* decodeVotes or interceptVotes */, name, keyIndex, wordIndex) {
+      if (!this.myTeam.round[voteType][name]) {
+        // Need to fill in a dummy value so Firestore is happy
+        this.myTeam.round[voteType][name] = Array(this.KEY_LENGTH).fill(-1);
+      }
+      this.myTeam.round[voteType][name][keyIndex] = wordIndex;
+      await this.saveRoom(`${this.myTeamId}.round.${voteType}.${name}`);
+      await this.checkIfDecrypted();
+    },
+    voters(voteType, keyIndex, wordIndex) {
+      return Object.entries(this.myTeam.round[voteType] || {})
+        .map(([player, vote]) => {
+          return vote[keyIndex] === wordIndex ? player : null;
+        })
+        .filter((player) => player);
+    },
     other,
     keysEqual,
     finished,
@@ -227,6 +251,11 @@ const vueApp = new Vue({
     dropped,
     points(team) {
       return intercepted(other(team), this.room.history) - dropped(team, this.room.history);
+    },
+    decrypters(team) {
+      const decrypters = this.room[team].players.slice();
+      unpush(decrypters, this.room[team].round.spy);
+      return decrypters;
     },
   },
   computed: {
@@ -245,7 +274,7 @@ const vueApp = new Vue({
     otherTeam() {
       return this.room[other(this.myTeamId)];
     },
-    smugglers() {
+    smugglersId() {
       // AKA interceptees
       const map = {
         RED_DECODE: 'redTeam',
@@ -335,6 +364,23 @@ function nextSpy(lastSpy, players) {
 // keyType = 'encode', 'intercept', 'decode'
 function finished(keyType, round) {
   return round[keyType].length === vueApp.KEY_LENGTH;
+}
+
+// votes = { alice: [1, 2, 3], ...}; players = ['alice', ...]
+function finishedVoting(votes, players) {
+  // Not done if any player has not yet voted
+  if (!arrayContentsEqual(players, Object.keys(votes))) {
+    return false;
+  }
+  // Done when every vote is not the default value of -1
+  return Object.values(votes)
+    .flat()
+    .every((v) => v !== -1);
+}
+
+function arrayContentsEqual(a, b) {
+  const bSet = new Set(b);
+  return a.length === b.length && a.every((v) => bSet.has(v));
 }
 
 // Returns how many of <team>'s messages have been intercepted
