@@ -327,7 +327,7 @@
         <h2>History</h2>
         <template v-for="(past, p) of room.history.slice().reverse()">
           <div class="columns">
-            <div class="column" v-for="team in ['redTeam, 'blueTeam']">
+            <div class="column" v-for="team in ['redTeam', 'blueTeam']">
               <h3>Round {{ room.history.length - p }}: {{ room[team].name }} team</h3>
               <table class="table is-fullwidth">
                 <tbody>
