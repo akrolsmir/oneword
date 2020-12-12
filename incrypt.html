@@ -200,28 +200,26 @@
             The {{ otherTeam.name }} spy incrypted: "{{ otherTeam.round.encode.join(' - ') }}". Try intercepting it:
           </h3>
           <br />
-          <!-- Section: Vote for the code -->
+          <!-- Section: Vote for the intercept -->
           <div class="columns">
             <div class="column" v-for="(encoded, e) in otherTeam.round.encode">
-              <h3>"{{ encoded }}"</h3>
-              <div class="select">
-                <select v-model="player.intercept[e]">
-                  <option v-for="(word, i) in otherTeam.words" :value="i + 1">Word {{ i + 1 }}</option>
-                </select>
+              <h3 class="has-text-centered">"{{ encoded }}"</h3>
+              <div v-for="(word, w) in otherTeam.words">
+                <button
+                  class="button is-fullwidth"
+                  :class="voters('interceptVotes', e, w + 1).includes(player.name) ? 'is-success' : ''"
+                  @click="vote('interceptVotes', player.name, e, w + 1)"
+                >
+                  Word {{ w + 1 }}
+                </button>
+                <div class="mb-2">
+                  <span v-if="voters('interceptVotes', e, w + 1).length > 0" class="is-size-7">Chosen by </span>
+                  <span class="tag" v-for="voter of voters('interceptVotes', e, w + 1)">{{ voter }}</span>
+                </div>
               </div>
             </div>
-            <div class="column">
-              <br />
-              <button
-                class="button"
-                @click="submitIntercept()"
-                :class="finished('intercept', otherTeam.round) ? 'is-success' : ''"
-              >
-                Intercept
-              </button>
-            </div>
           </div>
-          <br />
+
           <!-- Section: See all past clues -->
           <div class="columns">
             <div class="column" v-for="(word, i) in otherTeam.words">
@@ -241,24 +239,25 @@
           </div>
           <div v-else>
             <h3>Decrypt what {{ myTeam.round.spy }} meant by "{{ myTeam.round.encode.join(' - ') }}":</h3>
-            <br />
-            <!-- (TODO: deduplicate or component-ize with above) -->
-            <!-- Section: Vote for the code -->
-            <div class="columns">
-              <div class="column" v-for="(encoded, e) in myTeam.round.encode">
-                <h3 class="has-text-centered">"{{ encoded }}"</h3>
-                <div v-for="(word, w) in myTeam.words">
-                  <button
-                    class="button is-fullwidth"
-                    :class="voters('decodeVotes', e, w + 1).includes(player.name) ? 'is-success' : ''"
-                    @click="vote('decodeVotes', player.name, e, w + 1)"
-                  >
-                    {{ word }}
-                  </button>
-                  <div class="mb-2">
-                    <span v-if="voters('decodeVotes', e, w + 1).length > 0" class="is-size-7">Chosen by </span>
-                    <span class="tag" v-for="voter of voters('decodeVotes', e, w + 1)">{{ voter }}</span>
-                  </div>
+          </div>
+          <br />
+          <!-- (TODO: deduplicate or component-ize with above) -->
+          <!-- Section: Vote for the code -->
+          <div class="columns">
+            <div class="column" v-for="(encoded, e) in myTeam.round.encode">
+              <h3 class="has-text-centered">"{{ encoded }}"</h3>
+              <div v-for="(word, w) in myTeam.words">
+                <button
+                  class="button is-fullwidth"
+                  :disabled="player.name === myTeam.round.spy"
+                  :class="voters('decodeVotes', e, w + 1).includes(player.name) ? 'is-success' : ''"
+                  @click="vote('decodeVotes', player.name, e, w + 1)"
+                >
+                  {{ word }}
+                </button>
+                <div class="mb-2">
+                  <span v-if="voters('decodeVotes', e, w + 1).length > 0" class="is-size-7">Chosen by </span>
+                  <span class="tag" v-for="voter of voters('decodeVotes', e, w + 1)">{{ voter }}</span>
                 </div>
               </div>
             </div>
@@ -273,12 +272,8 @@
           <b>{{ room[team].name }} team's message was "{{ room[team].round.key.join(' - ') }}"</b>
           <br />
           {{ room[team].round.spy }} incrypted it as "{{ room[team].round.encode.join(' - ') }}"
-          <div v-if="keysEqual(room[team].round.intercept, room[team].round.key)">
-            👻 {{ room[other(team)].name }} team intercepted the message!
-          </div>
-          <div v-else-if="room[team].round.intercept.length > 0">
-            {{ room[other(team)].name }} team tried to intercept with
-            <span>"{{ room[team].round.intercept.join(' - ') }}"</span>
+          <div v-for="vote, voter in room[team].round.interceptVotes">
+            <div v-if="keysEqual(vote, room[team].round.key)">👻 {{ voter }} intercepted the message!</div>
           </div>
           <div v-for="vote, voter in room[team].round.decodeVotes">
             <div v-if="!keysEqual(vote, room[team].round.key)">
@@ -351,8 +346,8 @@
                   </tr>
                 </tbody>
               </table>
-              <div v-if="keysEqual(past[team].round.intercept, past[team].round.key)">
-                👻 {{ room[other(team)].name }} team intercepted the message!
+              <div v-for="vote, voter in past[team].round.interceptVotes">
+                <div v-if="keysEqual(vote, past[team].round.key)">👻 {{ voter }} intercepted the message!</div>
               </div>
               <div v-for="vote, voter in past[team].round.decodeVotes">
                 <div v-if="!keysEqual(vote, past[team].round.key)">
