@@ -103,8 +103,6 @@ const vueApp = new Vue({
           name: 'Red',
           players: [],
           words: randomWords(4),
-          intercepted: 0,
-          dropped: 0,
           // Current round
           round: {},
         },
@@ -112,8 +110,6 @@ const vueApp = new Vue({
           name: 'Blue',
           players: [],
           words: randomWords(4),
-          intercepted: 0,
-          dropped: 0,
           round: {},
         },
         history: [],
@@ -285,11 +281,13 @@ const vueApp = new Vue({
     },
     gameOver() {
       return (
+        // Game is over when every player on a team has (on average) intercepted
+        // twice, or dropped two messages
         // TODO: could extract 2 to a constant
-        intercepted('redTeam', this.room.history) >= 2 ||
-        dropped('redTeam', this.room.history) >= 2 ||
-        intercepted('blueTeam', this.room.history) >= 2 ||
-        dropped('blueTeam', this.room.history) >= 2
+        intercepted('redTeam', this.room.history) >= 2 * this.room.blueTeam.players.length ||
+        dropped('redTeam', this.room.history) >= 2 * this.room.blueTeam.players.length - 2 ||
+        intercepted('blueTeam', this.room.history) >= 2 * this.room.redTeam.players.length ||
+        dropped('blueTeam', this.room.history) >= 2 * this.room.redTeam.players.length - 2
       );
     },
   },
@@ -392,5 +390,11 @@ function intercepted(team, history) {
 
 // Returns how many of <team>'s messages have not been correctly decoded
 function dropped(team, history) {
-  return history.map((entry) => !keysEqual(entry[team].round.decode, entry[team].round.key)).reduce((a, b) => a + b, 0);
+  const sum = (a, b) => a + b;
+  // Abusing the fact that 0 + false + true = 1
+  return history
+    .flatMap((entry) =>
+      Object.values(entry[team].round.decodeVotes).map((vote) => !keysEqual(vote, entry[team].round.key))
+    )
+    .reduce(sum, 0);
 }

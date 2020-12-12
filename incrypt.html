@@ -77,8 +77,9 @@
             {{ room[team].name }} team: {{ room[team].players.join(', ') }}
             <a v-if="!room[team].players.includes(player.name)" @click="joinTeam(team)">(join)</a>
           </h3>
-          👻 {{ intercepted(other(team), room.history) }} interceptions (2 to win) <br />
-          🤦‍♀️ {{ dropped(team, room.history) }} dropped messages (2 to lose)
+          👻 {{ intercepted(other(team), room.history) }} interceptions ({{ 2 * room[team].players.length }} to win)
+          <br />
+          🤦‍♀️ {{ dropped(team, room.history) }} dropped messages ({{ 2 * room[team].players.length - 2}} to lose)
           <br />
         </div>
       </div>
@@ -279,10 +280,11 @@
             {{ room[other(team)].name }} team tried to intercept with
             <span>"{{ room[team].round.intercept.join(' - ') }}"</span>
           </div>
-          <div v-if="keysEqual(room[team].round.decode, room[team].round.key)">
-            {{ room[team].name }} team succesfully decoded their message~
+          <div v-for="vote, voter in room[team].round.decodeVotes">
+            <div v-if="!keysEqual(vote, room[team].round.key)">
+              🤦‍♀️ {{ voter }} thought it was "{{ vote.join(' - ') }}"...
+            </div>
           </div>
-          <div v-else>🤦‍♀️ {{ room[team].name }} team thought it was "{{ room[team].round.decode.join(' - ') }}"...</div>
           <br />
         </template>
         <!-- Game over -->
@@ -352,8 +354,10 @@
               <div v-if="keysEqual(past[team].round.intercept, past[team].round.key)">
                 👻 {{ room[other(team)].name }} team intercepted the message!
               </div>
-              <div v-if="!keysEqual(past[team].round.decode, past[team].round.key)">
-                🤦‍♀️ {{ room[team].name }} team thought it was "{{ past[team].round.decode.join(' - ') }}"...
+              <div v-for="vote, voter in past[team].round.decodeVotes">
+                <div v-if="!keysEqual(vote, past[team].round.key)">
+                  🤦‍♀️ {{ voter }} thought it was "{{ vote.join(' - ') }}"...
+                </div>
               </div>
             </div>
           </div>
