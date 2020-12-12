@@ -7,6 +7,7 @@ import datetime
 # TODO: Show a nice st.error when key is missing
 db = firestore.Client.from_service_account_json("firestore-account-key.json")
 
+
 global rounds_without_clues
 global rounds_without_guesses
 global total_rounds

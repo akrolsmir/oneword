@@ -167,10 +167,10 @@
   window.COLLECTION = 'contact';
 </script>
 <script type="module" src="./firebase-network.js"></script>
-<script type="module" src="./navbar-vue.js"></script>
-<script type="module" src="./timer-vue.js"></script>
-<script type="module" src="./scoreboard-vue.js"></script>
-<script type="module" src="./submit-vue.js"></script>
+<script type="module" src="components/navbar.js"></script>
+<script type="module" src="components/timer.js"></script>
+<script type="module" src="components/scoreboard.js"></script>
+<script type="module" src="components/submit.js"></script>
 <script type="module">
   import {
     setRoom,
@@ -275,21 +275,36 @@
         }
       },
       async createClue(word) {
-        const update = {
-          [`currentRound.clues.${this.player.name}`]: {
-            word,
-            hint: this.player.hint,
-            contact: '',
-            contactedWord: '',
-          },
-        };
-        await updateRoom(this.room, update);
+        if (word == this.room.currentRound.word) {
+          swal('Victory!', `${this.player.name} correctly guessed the word "${this.room.currentRound.word}"`);
+          await this.nextRound();
+        } else {
+          const update = {
+            [`currentRound.clues.${this.player.name}`]: {
+              word,
+              hint: this.player.hint,
+              contact: '',
+              contactedWord: '',
+            },
+          };
+          await updateRoom(this.room, update);
+        }
       },
       async withdrawClue() {
         delete this.room.currentRound.clues[this.player.name];
         await updateRoom(this.room, {
           'currentRound.clues': this.room.currentRound.clues,
         });
+      },
+      async nextLetter() {
+        this.room.currentRound.revealed++;
+        if (this.room.currentRound.revealed >= this.room.currentRound.word.length) {
+          swal('Victory', `The word is "${this.room.currentRound.word}"`);
+          await this.nextRound();
+        } else {
+          this.room.currentRound.clues = {};
+          await updateRoom(this.room, { currentRound: this.room.currentRound });
+        }
       },
       // Wrapper, since Submit onEnter expects a function.
       contact(cluer) {

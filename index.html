@@ -20,19 +20,20 @@
       overflow: auto;
     }
 
-    h1,
-    h2,
-    h3 {
+    .fancy {
       font-family: 'Merienda One', cursive;
+      margin-top: 16px;
+      font-size: 24px;
     }
 
-    h1 {
+    .fancy.big {
+      margin-top: 0;
       font-size: 40px;
     }
 
-    h2 {
-      margin-top: 16px;
-      font-size: 24px;
+    .fancy.normal {
+      margin-top: 0;
+      font-size: 100%;
     }
 
     body {
@@ -79,10 +80,21 @@
 <body class="has-navbar-fixed-top">
   <div id="vue">
     <navbar ref="navbar" v-model="user"></navbar>
+    <!-- Notification -->
+    <div class="modal" :class="{'is-active': alertIsShowing}">
+      <div class="modal-background" @click="alertIsShowing=false"></div>
+      <div class="modal-content">
+        <div class="notification">
+          <label class="is-block mb-2">Invite your friends to play!</label>
+          <sharelink :link="'https://oneword.games/?room=' + room.name"></sharelink>
+          <button class="delete" aria-label="close" @click="alertIsShowing=false"></button>
+        </div>
+      </div>
+    </div>
     <!-- Home page -->
     <div v-if="!room.players" class="container mx-4">
-      <h1>Welcome!</h1>
-      This is the online version of
+      <div class="fancy big">Welcome!</div>
+      This is an online game based on
       <a target="_blank" rel="noopener noreferrer" href="https://amzn.to/2xV5lUm">Just One</a>, a co-op word game for 3+
       players.<br />
       In each of the 13 rounds, come up with a one-word hint for the guesser...<br />
@@ -97,11 +109,11 @@
       <template v-else>
         <br />
         <button class="button is-large is-success" @click="$refs.navbar.logIn()">Sign in to get started</button><br />
-        <a @click='$set(user, "guest", true)' class="is-size-7">Guest account</a>
+        <a @click='$set(user, "guest", true)' class="is-size-7">Play without an account</a>
       </template>
 
       <br /><br />
-      <h2>Open Rooms</h2>
+      <h1 class="fancy">Open Rooms</h1>
       <template v-for="openRoom in allRooms">
         <p>
           <a @click="room.name = openRoom.name; enterRoom()"><b>{{ openRoom.name }}</b></a
@@ -113,12 +125,12 @@
     <div v-cloak v-else class="container mx-4">
       <div class="message">
         <!-- Room header -->
-        <div class="message-header is-flex-wrap-wrap">
-          <h1>{{ room.name }}</h1>
-          <h2 class="capitalize">Round {{ room.history.length + 1 }}</h2>
+        <div class="message-header has-text-weight-normal is-flex-wrap-wrap">
+          <span class="fancy big">{{ room.name }}</span>
+          <span class="fancy capitalize">Round {{ room.history.length + 1 }}</span>
           <!-- Navigation -->
           <span class="buttons are-small">
-            <button class="button is-dark is-inverted is-outlined" @click="shareRoom">Share</button>
+            <button class="button is-dark is-inverted is-outlined" @click="alertIsShowing=true">Invite</button>
             <button
               v-if="room.players.includes(player.name)"
               class="button is-dark is-inverted is-outlined"
@@ -142,13 +154,13 @@
             >
               <div class="mx-1" v-if="isMod">
                 <span class="select is-small">
-                  <select v-model="room.public" :disabled="!user.supporter" @change="setRoomType()">
+                  <select v-model="room.public" @change="upsell('public')">
                     <option v-bind:value="true">Public</option>
                     <option v-bind:value="false">Private</option>
                   </select>
                 </span>
                 <span class="select is-small">
-                  <select v-model="room.roundsInGame" :disabled="!user.supporter" @change="setRounds()">
+                  <select v-model="room.roundsInGame" @change="upsell('roundsInGame')">
                     <option v-bind:value="13">13 rounds</option>
                     <option v-bind:value="'Unlimited'">&infin; rounds</option>
                   </select>
@@ -204,7 +216,7 @@
             <span v-if="isMod" class="field is-grouped is-grouped-multiline mx-3 my-1">
               <div class="control" v-for="category in this.CATEGORY_ORDER">
                 <label class="capitalize checkbox">
-                  <input type="checkbox" v-model="room.categories[category]" @change="setCategories()" />
+                  <input type="checkbox" v-model="room.categories[category]" @change="saveRoom('categories')" />
                   {{ category }}
                 </label>
               </div>
@@ -231,7 +243,9 @@
               </div>
               <div class="control">
                 <button v-if="wordsSaved" class="button is-small" disabled>Saved</button>
-                <button v-else class="button is-small" @click="wordsSaved = true; setWords();">Save</button>
+                <button v-else class="button is-small" @click="wordsSaved = true; saveRoom('customWords');">
+                  Save
+                </button>
               </div>
             </div>
           </div>
@@ -262,9 +276,6 @@
               <span class="control">
                 <button class="button is-small" @click="newRound(true)">Skip Word</button>
               </span>
-              <span class="control">
-                <button class="button is-small" @click="resetRoom">Reset Room</button>
-              </span>
             </div>
             <div class="field has-addons is-inline-flex">
               <span class="control">
@@ -282,32 +293,18 @@
       <!-- Input area (clueing) -->
       <div v-if="room.currentRound.state == 'CLUEING'">
         <div v-if="room.players.length < 3">
-          <h2>Waiting for 3 players...</h2>
-          <br />
-          Invite your friends to play!<br />
-          <div class="field has-addons mt-1">
-            <div class="control is-expanded">
-              <input
-                class="input is-info"
-                type="text"
-                :value="'https://oneword.games/?room=' + room.name"
-                @focus="$event.target.select()"
-                ref="shareLink"
-              />
-            </div>
-            <div class="control">
-              <a class="button is-info" @click="copyLinkToClipboard">Copy</a>
-            </div>
-          </div>
+          <div class="fancy">Waiting for 3 players...</div>
+          <p class="mt-5 mb-2">Invite your friends to play!</p>
+          <sharelink :link="'https://oneword.games/?room=' + room.name"></sharelink>
         </div>
         <div v-else-if="room.currentRound.guesser == player.name">
-          <h2>It's your turn to guess! Waiting for clues...</h2>
+          <div class="fancy">It's your turn to guess! Waiting for clues...</div>
         </div>
         <div v-else>
           <div class="box">
-            <h2>
+            <div class="fancy">
               The {{ wordForWord(room.currentRound.category) }} is <b class="is-size-3">{{ room.currentRound.word }}</b>
-            </h2>
+            </div>
             <br />
             <label class="label">Your clue for {{ room.currentRound.guesser }}</label>
             <div class="field has-addons">
@@ -336,8 +333,8 @@
       <div v-if="room.currentRound.state == 'GUESSING'">
         <div v-if="room.currentRound.guesser == player.name">
           <div class="box">
-            <h2>Your clues for the {{ wordForWord(room.currentRound.category) }} are:</h2>
-            <h2 class="newline">{{ dedupe(room.currentRound.clues, false) }}</h2>
+            <div class="fancy">Your clues for the {{ wordForWord(room.currentRound.category) }} are:</div>
+            <div class="fancy newline">{{ dedupe(room.currentRound.clues, false) }}</div>
             <label class="label">Your Guess</label>
             <div class="field has-addons">
               <div class="control is-expanded">
@@ -350,24 +347,24 @@
           </div>
         </div>
         <div v-else>
-          <h2>The clues for <b>{{ room.currentRound.word }}</b> were:</h2>
-          <h2 class="newline">{{ dedupe(room.currentRound.clues) }}</h2>
-          <h2>Waiting for {{ room.currentRound.guesser }} to guess...</h2>
+          <div class="fancy">The clues for <strong>{{ room.currentRound.word }}</strong> were:</div>
+          <div class="fancy newline">{{ dedupe(room.currentRound.clues) }}</div>
+          <div class="fancy">Waiting for {{ room.currentRound.guesser }} to guess...</div>
         </div>
       </div>
 
       <!-- Input area (done) -->
       <div v-if="room.currentRound.state == 'DONE'">
         <div v-if="correct(room.currentRound)">
-          <h2 class="has-text-success">Correct! The word was "{{ room.currentRound.word }}". Good job!</h2>
+          <div class="fancy has-text-success">Correct! The word was "{{ room.currentRound.word }}". Good job!</div>
         </div>
         <div v-else>
-          <h2 class="has-text-danger">
+          <div class="fancy has-text-danger">
             Aww, {{ room.currentRound.guesser }} guessed "{{ room.currentRound.guess }}", but it was "{{
             room.currentRound.word }}"...
-          </h2>
+          </div>
         </div>
-        <h2 class="newline">{{ dedupe(room.currentRound.clues) }}</h2>
+        <div class="fancy newline">{{ dedupe(room.currentRound.clues) }}</div>
         <br />
         <scoreboard
           v-if="isEnd(room)"
@@ -381,15 +378,19 @@
       </div>
       <br /><br />
       <!-- History -->
-      <h2 v-if="room.history.length > 0">History</h2>
+      <h1 v-if="room.history.length > 0" class="fancy">History</h1>
       <template v-for="(round, i) in room.history.slice().reverse()">
         <div class="level">
           <div class="level-left">
             <span class="level-item" style="justify-content: flex-start">
-              <span class="icon" :class="correct(round) ? 'has-text-success' : 'has-text-danger'">
+              <span
+                class="icon"
+                :class="correct(round) ? 'has-text-success' : 'has-text-danger'"
+                :aria-label="correct(round) ? 'correct' : 'incorrect'"
+              >
                 {{ correct(round) ? '✔' : '✖' }}
               </span>
-              <h3>{{ room.history.length - i }}. {{ round.word }} ({{ round.category }})</h3>
+              <span class="fancy normal">{{ room.history.length - i }}. {{ round.word }} ({{ round.category }})</span>
             </span>
             <p class="level-item" style="justify-content: flex-start">
               {{ round.guesser }} guessed "<b :class="correct(round) ? 'has-text-success' : 'has-text-danger'"
@@ -416,10 +417,11 @@
 
 <!-- My code -->
 <script type="module" src="firebase-network.js"></script>
-<script type="module" src="./nametag-vue.js"></script>
-<script type="module" src="./navbar-vue.js"></script>
-<script type="module" src="./timer-vue.js"></script>
-<script type="module" src="./scoreboard-vue.js"></script>
+<script type="module" src="components/nametag.js"></script>
+<script type="module" src="components/navbar.js"></script>
+<script type="module" src="components/timer.js"></script>
+<script type="module" src="components/scoreboard.js"></script>
+<script type="module" src="components/sharelink.js"></script>
 <script type="module">
   import { nouns, compounds, verbs, adjectives } from './many-words.js';
   import {
@@ -463,6 +465,7 @@
         clue: '',
         guess: '',
       },
+      alertIsShowing: false,
       newMod: '',
       wordsSaved: false,
     },
@@ -594,16 +597,13 @@
         this.room.playerData[this.player.name] = { email, supporter };
 
         if (this.room.players.includes(this.player.name)) {
-          await updateRoom(this.room, { playerData: this.room.playerData });
+          await this.saveRoom('playerData');
         } else {
           this.room.players.push(this.player.name);
-          await updateRoom(this.room, {
-            playerData: this.room.playerData,
-            players: this.room.players,
-          });
+          await this.saveRoom('playerData', 'players');
         }
       },
-      async goHome() {
+      goHome() {
         unlistenRoom();
         this.room = { name: '' };
       },
@@ -611,7 +611,7 @@
         if (this.room.players.includes(name)) {
           const index = this.room.players.indexOf(name);
           this.room.players.splice(index, 1);
-          await updateRoom(this.room, { players: this.room.players });
+          await this.saveRoom('players');
         }
       },
       async makeMod(name) {
@@ -619,7 +619,7 @@
         if (index >= 0) {
           // swap players[0] and players[index]
           [this.room.players[0], this.room.players[index]] = [this.room.players[index], this.room.players[0]];
-          await updateRoom(this.room, { players: this.room.players });
+          await this.saveRoom('players');
         }
       },
       wordForWord(category) {
@@ -683,39 +683,34 @@
       },
       async toggleTimers() {
         this.room.timers.running = !this.room.timers.running;
-        await updateRoom(this.room, { timers: this.room.timers });
+        await this.saveRoom('timers');
       },
-      async setCategories() {
-        await updateRoom(this.room, { categories: this.room.categories });
+      // Sync any number of properties of this.room to firebase
+      async saveRoom(...props) {
+        await updateRoom(this.room, Object.fromEntries(props.map((prop) => [prop, this.room[prop]])));
       },
-      async setWords() {
-        await updateRoom(this.room, { customWords: this.room.customWords });
-      },
-      async setRoomType() {
-        await updateRoom(this.room, { public: this.room.public });
-      },
-      async setRounds() {
-        await updateRoom(this.room, { roundsInGame: this.room.roundsInGame });
-      },
-      async shareRoom() {
-        const link = document.createElement('input');
-        link.value = `http://oneword.games/?room=${this.room.name}`;
-        link.setAttribute('readonly', 'true');
-        link.setAttribute('onclick', 'this.select()');
-        link.setAttribute('size', '45');
-        swal({
-          title: 'Share this link:',
-          icon: 'success',
-          content: link,
-        });
-      },
-      copyLinkToClipboard() {
-        this.$refs.shareLink.select();
-        document.execCommand('copy');
-        swal({
-          text: 'Copied invite link to clipboard!',
-          icon: 'success',
-        });
+      async upsell(...props) {
+        if (this.user.supporter) {
+          await this.saveRoom(...props);
+        } else {
+          const result = await swal({
+            title: 'Want private rooms?',
+            text: 'Earn perks like private rooms, custom avatars, and more by becoming a supporter 😍',
+            buttons: {
+              cancel: 'Not now',
+              support: 'Okay!',
+            },
+          });
+          if (result === 'support') {
+            firebase.analytics().logEvent('view_promotion', {
+              source: 'modtools',
+            });
+            window.open('./supporter.html', '_blank');
+          }
+          // Reset UI to non-supporter defaults
+          this.room.public = true;
+          this.room.roundsInGame = 13;
+        }
       },
       correct,
       isEnd,
