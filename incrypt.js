@@ -49,8 +49,6 @@ const vueApp = new Vue({
       name: '',
       // Local values & UI controls, before they get uploaded
       encode: [],
-      intercept: [],
-      decode: [],
       timerLength: 100,
     },
     room: {
@@ -89,8 +87,6 @@ const vueApp = new Vue({
       // Clean up past inputs on each new round.
       if (state === 'DONE') {
         this.player.encode = [];
-        this.player.intercept = [];
-        this.player.decode = [];
       }
     },
   },
@@ -169,16 +165,6 @@ const vueApp = new Vue({
         await this.nextState();
       }
     },
-    async submitIntercept() {
-      this.otherTeam.round.intercept = this.player.intercept;
-      await this.saveRoom(`${other(this.myTeamId)}.round.intercept`);
-      await this.checkIfDecrypted();
-    },
-    async submitDecode() {
-      this.myTeam.round.decode = this.player.decode;
-      await this.saveRoom(`${this.myTeamId}.round.decode`);
-      await this.checkIfDecrypted();
-    },
     async checkIfDecrypted() {
       if (!['RED_DECODE', 'BLUE_DECODE', 'BOTH_DECODE'].includes(this.room.state)) {
         console.error('intercept or decode called from invalid round!');
@@ -209,18 +195,14 @@ const vueApp = new Vue({
         spy: nextSpy(this.room.redTeam.round.spy, this.room.redTeam.players),
         key: randomKey(this.KEY_LENGTH, this.WORDS_SHOWN),
         encode: [],
-        intercept: [],
         interceptVotes: {},
-        decode: [],
         decodeVotes: {},
       };
       this.room.blueTeam.round = {
         spy: nextSpy(this.room.blueTeam.round.spy, this.room.blueTeam.players),
         key: randomKey(this.KEY_LENGTH, this.WORDS_SHOWN),
         encode: [],
-        intercept: [],
         interceptVotes: {},
-        decode: [],
         decodeVotes: {},
       };
       // TODO when we're tracking separate rooms
