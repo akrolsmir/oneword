@@ -327,22 +327,26 @@
         <h2>History</h2>
         <template v-for="(past, p) of room.history.slice().reverse()">
           <div class="columns">
-            <div class="column" v-for="team in ['redTeam', 'blueTeam']">
+            <div class="column" v-for="team in ['redTeam, 'blueTeam']">
               <h3>Round {{ room.history.length - p }}: {{ room[team].name }} team</h3>
               <table class="table is-fullwidth">
                 <tbody>
                   <thead>
                     <th>🔏 {{ past[team].round.spy }}</th>
-                    <!-- TODO: maybe emojize more -->
-                    <th>{{ team === 'redTeam' ? '🔵' : '🔴' }}</th>
-                    <th>{{ team === 'redTeam' ? '🔴' : '🔵' }}</th>
-                    <th>✔️</th>
+                    <td v-for="(encoded, e) in past[team].round.encode">{{ encoded }}</td>
                   </thead>
-                  <tr v-for="(encoded, e) in past[team].round.encode">
-                    <td>{{ encoded }}</td>
-                    <td>{{ past[team].round.intercept[e] }}</td>
-                    <td>{{ past[team].round.decode[e] }}</td>
-                    <td>{{ past[team].round.key[e] }}</td>
+
+                  <tr v-for="vote, voter in past[team].round.interceptVotes">
+                    <th>{{ team === 'redTeam' ? '🔵' : '🔴' }} {{ voter }}</th>
+                    <td v-for="v in vote">{{ v }}</td>
+                  </tr>
+                  <tr v-for="vote, voter in past[team].round.decodeVotes">
+                    <th>{{ team === 'redTeam' ? '🔴' : '🔵' }} {{ voter }}</th>
+                    <td v-for="v in vote">{{ v }}</td>
+                  </tr>
+                  <tr>
+                    <th>✔️</th>
+                    <td v-for="k in past[team].round.key">{{ k }}</td>
                   </tr>
                 </tbody>
               </table>

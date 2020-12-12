@@ -47,7 +47,7 @@ const vueApp = new Vue({
     nouns,
     player: {
       name: '',
-      // Local values, before they get uploaded
+      // Local values & UI controls, before they get uploaded
       encode: [],
       intercept: [],
       decode: [],
