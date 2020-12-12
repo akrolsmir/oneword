@@ -128,6 +128,17 @@ const vueApp = new Vue({
         BOTH_DECODE: 'DONE',
         DONE: 'ENCODING',
       };
+      // If the cluer timed out, at least fill in with empty strings
+      if (this.room.state === 'ENCODING') {
+        while (this.room.redTeam.round.encode.length < this.KEY_LENGTH) {
+          this.room.redTeam.round.encode.push('');
+          toUpdate.push('redTeam.round.encode');
+        }
+        while (this.room.blueTeam.round.encode.length < this.KEY_LENGTH) {
+          this.room.blueTeam.round.encode.push('');
+          toUpdate.push('blueTeam.round.encode');
+        }
+      }
       this.room.state = next[this.room.state];
       if (this.room.state === 'DONE') {
         // Add current round to history on DONE, to update victory conditions
@@ -211,7 +222,7 @@ const vueApp = new Vue({
         decodeVotes: {},
       };
       // TODO when we're tracking separate rooms
-      // this.room.lastUpdateTime = Date.now();
+      this.room.lastUpdateTime = Date.now();
 
       // Overwrite existing room;
       await setRoom(this.room);
