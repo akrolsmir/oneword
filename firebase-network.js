@@ -52,7 +52,7 @@ export async function listRooms() {
 
   const rooms = [];
   docs.forEach((doc) => rooms.push(doc.data()));
-  return rooms.filter((room) => room.players.length > 0);
+  return rooms;
 }
 
 let unsubscribe;
