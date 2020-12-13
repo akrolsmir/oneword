@@ -109,6 +109,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/vue@2.6.2/dist/vue.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/buefy@0.9.3/dist/buefy.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-analytics.js"></script>
@@ -162,7 +163,7 @@
               [
                 u.email,
                 ...splitName(u.name),
-                u.createdDate.toISOString(),
+                moment(u.createdDate).format("MM/DD/YYYY"),
                 u.supporter || '',
               ].join('\t'), // Tab-separated to escape commas
           )
