@@ -60,6 +60,7 @@ Vue.component('nametag', {
           style="border-top-left-radius: 4px; border-bottom-left-radius: 4px; margin-left: -10.5px"
           class="mr-1"
           :src="'https://www.gravatar.com/avatar/' + md5(user.email) + '?size=48'"
+          alt=""
           height="28"
           width="28">
         {{ name }}

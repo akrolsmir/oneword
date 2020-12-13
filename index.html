@@ -113,7 +113,7 @@
       </template>
 
       <br /><br />
-      <h1 class="fancy">Open Rooms</h1>
+      <h2 class="fancy">Open Rooms</h2>
       <template v-for="openRoom in allRooms">
         <p>
           <a @click="room.name = openRoom.name; enterRoom()"><b>{{ openRoom.name }}</b></a
@@ -126,7 +126,7 @@
       <div class="message">
         <!-- Room header -->
         <div class="message-header has-text-weight-normal is-flex-wrap-wrap">
-          <span class="fancy big">{{ room.name }}</span>
+          <h1 class="fancy big">{{ room.name }}</h1>
           <span class="fancy capitalize">Round {{ room.history.length + 1 }}</span>
           <!-- Navigation -->
           <span class="buttons are-small">
@@ -293,24 +293,26 @@
       <!-- Input area (clueing) -->
       <div v-if="room.currentRound.state == 'CLUEING'">
         <div v-if="room.players.length < 3">
-          <div class="fancy">Waiting for 3 players...</div>
+          <h2 class="fancy" role="alert">Waiting for 3 players...</h2>
           <p class="mt-5 mb-2">Invite your friends to play!</p>
           <sharelink :link="'https://oneword.games/?room=' + room.name"></sharelink>
         </div>
         <div v-else-if="room.currentRound.guesser == player.name">
-          <div class="fancy">It's your turn to guess! Waiting for clues...</div>
+          <h2 class="fancy" role="alert">It's your turn to guess! Waiting for clues...</h2>
         </div>
         <div v-else>
           <div class="box">
-            <div class="fancy">
-              The {{ wordForWord(room.currentRound.category) }} is <b class="is-size-3">{{ room.currentRound.word }}</b>
-            </div>
+            <h2 class="fancy has-text-centered" role="alert">
+              The {{ wordForWord(room.currentRound.category) }} for {{ room.currentRound.guesser }} is<br />
+              <strong class="is-size-3">{{ room.currentRound.word }}</strong>
+            </h2>
             <br />
-            <label class="label">Your clue for {{ room.currentRound.guesser }}</label>
+            <label class="label" for="hintInput">Your clue</label>
             <div class="field has-addons">
               <div class="control is-expanded">
                 <input
                   class="input"
+                  id="hintInput"
                   type="text"
                   v-model="player.clue"
                   @keyup.enter="submitClue"
@@ -324,7 +326,7 @@
                 </button>
               </div>
             </div>
-            <div class="notification is-danger" v-show="hasSpecialCharacters(player.clue)">
+            <div class="notification is-danger" role="alert" v-if="hasSpecialCharacters(player.clue)">
               Are you sure this is a real word?
             </div>
           </div>
@@ -335,12 +337,12 @@
       <div v-if="room.currentRound.state == 'GUESSING'">
         <div v-if="room.currentRound.guesser == player.name">
           <div class="box">
-            <div class="fancy">Your clues for the {{ wordForWord(room.currentRound.category) }} are:</div>
+            <h2 class="fancy" role="alert">Your clues for the {{ wordForWord(room.currentRound.category) }} are:</h2>
             <div class="fancy newline">{{ dedupe(room.currentRound.clues, false) }}</div>
-            <label class="label">Your Guess</label>
+            <label class="label" for="guess-input">Your Guess</label>
             <div class="field has-addons">
               <div class="control is-expanded">
-                <input class="input" type="text" v-model="player.guess" @keyup.enter="submitGuess" />
+                <input class="input" id="guess-input" type="text" v-model="player.guess" @keyup.enter="submitGuess" />
               </div>
               <div class="control">
                 <button class="button" @click="submitGuess">Submit</button>
@@ -349,22 +351,24 @@
           </div>
         </div>
         <div v-else>
+          <h2 class="fancy" role="alert">Waiting for {{ room.currentRound.guesser }} to guess...</h2>
           <div class="fancy">The clues for <strong>{{ room.currentRound.word }}</strong> were:</div>
           <div class="fancy newline">{{ dedupe(room.currentRound.clues) }}</div>
-          <div class="fancy">Waiting for {{ room.currentRound.guesser }} to guess...</div>
         </div>
       </div>
 
       <!-- Input area (done) -->
       <div v-if="room.currentRound.state == 'DONE'">
         <div v-if="correct(room.currentRound)">
-          <div class="fancy has-text-success">Correct! The word was "{{ room.currentRound.word }}". Good job!</div>
+          <h2 class="fancy has-text-success" role="alert">
+            Correct! The word was "{{ room.currentRound.word }}". Good job!
+          </h2>
         </div>
         <div v-else>
-          <div class="fancy has-text-danger">
+          <h2 class="fancy has-text-danger" role="alert">
             Aww, {{ room.currentRound.guesser }} guessed "{{ room.currentRound.guess }}", but it was "{{
             room.currentRound.word }}"...
-          </div>
+          </h2>
         </div>
         <div class="fancy newline">{{ dedupe(room.currentRound.clues) }}</div>
         <br />
@@ -380,7 +384,7 @@
       </div>
       <br /><br />
       <!-- History -->
-      <h1 v-if="room.history.length > 0" class="fancy">History</h1>
+      <h2 v-if="room.history.length > 0" class="fancy">History</h2>
       <template v-for="(round, i) in room.history.slice().reverse()">
         <div class="level">
           <div class="level-left">
