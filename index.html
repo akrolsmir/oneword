@@ -324,7 +324,9 @@
                 </button>
               </div>
             </div>
-            <div class="notification is-danger" v-show="hasSpecialCharacters(player.clue)">Are you sure this is a real word?</div>
+            <div class="notification is-danger" v-show="hasSpecialCharacters(player.clue)">
+              Are you sure this is a real word?
+            </div>
           </div>
         </div>
       </div>
@@ -634,7 +636,7 @@
         );
       },
       hasSpecialCharacters(word) {
-        return /[\s~`!@#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?()\._]/g.test(word)
+        return /[\s~`!@#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?()\._]/g.test(word);
       },
       async submitClue() {
         this.player.clue = this.player.clue.toLowerCase().trim();
