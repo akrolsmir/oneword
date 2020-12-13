@@ -802,7 +802,7 @@
     const custom = customWords.split(/\s/);
     const categories = { nouns, compounds, verbs, adjectives, custom };
     const words = categories[category];
-    return words[Math.floor(Math.random() * words.length)];
+    return words[Math.floor(Math.random() * words.length)].toLowerCase();
   }
 
   function nextWord(history, category = 'nouns', customWords = '') {
