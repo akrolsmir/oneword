@@ -409,6 +409,7 @@
 <script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert@2.1.2/dist/sweetalert.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/blueimp-md5@2.13.0/js/md5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pluralize@8.0.0/pluralize.js"></script>
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-analytics.js"></script>
@@ -725,10 +726,7 @@
 
   // Returns whether a round's guess is correct.
   function correct(round) {
-    return (
-      round.guess === round.word ||
-      (['nouns', 'compounds'].includes(round.category) && round.guess === round.word + 's')
-    );
+    return (pluralize.singular(round.guess) === round.word || pluralize.plural(round.guess) == round.word);
   }
   function totalRounds(room) {
     return room.roundsInGame == 'Unlimited' ? 1024 : room.roundsInGame;
