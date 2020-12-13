@@ -55,6 +55,10 @@
       background-color: #fff6;
     }
 
+    .label {
+      margin-top: 20px;
+    }
+
     [v-cloak] {
       display: none;
     }
@@ -66,21 +70,50 @@
 
 <body class="has-navbar-fixed-top">
   <div id="vue">
-    <div v-if="false"></div>
+    <navbar ref="navbar" v-model="user"></navbar>
+    <!-- Home page -->
+    <div v-if="!room.redTeam">
+      <h1>Welcome to Incrypt!</h1>
+      Incrypt is a word game for two teams, based on Decrypto.<br />
+      Each spy incrypts three words by writing down three clues...<br />
+      Too complex? Your own team won't get the message 🤦‍♀️<br />
+      Too simple? The other team will intercept it! 👻<br />
+      <!-- Enter user credentials. TODO merge with One Word -->
+      <form v-if="user.id || user.guest" @submit.prevent="enterRoom" method="POST">
+        <label class="label">Player</label>
+        <input class="input" type="text" v-model="player.name" placeholder="Ringo" />
+        <label class="label">Room</label>
+        <input class="input" type="text" v-model="room.name" placeholder="apple" required /><br /><br />
+        <input class="button" type="submit" value="Enter Room" />
+      </form>
+      <template v-else>
+        <br />
+        <button class="button is-large is-success" @click="$refs.navbar.logIn()">Sign in to get started</button><br />
+        <a @click='$set(user, "guest", true)' class="is-size-7">Play without an account</a>
+      </template>
+
+      <br /><br />
+      <h2>Open Rooms</h2>
+      <template v-for="openRoom in allRooms">
+        <p>
+          <a @click="room.name = openRoom.name; enterRoom()"><b>{{ openRoom.name }}</b></a
+          >, with {{ openRoom.redTeam.players.concat(openRoom.blueTeam.players).join(', ') }}
+          <span>({{ moment(openRoom.lastUpdateTime).fromNow() }})</span>
+        </p>
+      </template>
+    </div>
     <div v-else>
-      <h2>Room: {{ room.name }}. Your name: <input class="input" v-model="player.name" /></h2>
-      <br />
       <!-- Team rosters -->
-      <div class="columns">
-        <div class="column" v-for="team in ['redTeam', 'blueTeam']">
-          <h3>
-            {{ room[team].name }} team: {{ room[team].players.join(', ') }}
-            <a v-if="!room[team].players.includes(player.name)" @click="joinTeam(team)">(join)</a>
-          </h3>
-          👻 {{ intercepted(other(team), room.history) }} interceptions ({{ 2 * room[team].players.length }} to win)
-          <br />
-          🤦‍♀️ {{ dropped(team, room.history) }} dropped messages ({{ 2 * room[team].players.length - 2}} to lose)
-          <br />
+      <div v-if="room.state !== 'NOT_STARTED'">
+        <div class="columns">
+          <div class="column" v-for="team in ['redTeam', 'blueTeam']">
+            <h3>{{ room[team].name }} team: {{ room[team].players.join(', ') }}</h3>
+            <!-- Show the current scores on each team -->
+            👻 {{ intercepted(other(team), room.history) }} interceptions ({{ 2 * room[team].players.length }} to win)
+            <br />
+            🤦‍♀️ {{ dropped(team, room.history) }} dropped messages ({{ 2 * room[team].players.length - 2}} to lose)
+            <br />
+          </div>
         </div>
       </div>
 
@@ -125,7 +158,23 @@
         ></timer>
       </div>
       <!-- Pre-game: Waiting for players -->
+      <div v-if="room.state === 'NOT_STARTED'">
+        <h2>Room: {{ room.name }}</h2>
+        Incrypt is a word game for two teams, based on Decrypto.<br />
+        Each spy incrypts three words by writing down three clues...<br />
+        Too complex? Your own team won't get the message 🤦‍♀️<br />
+        Too simple? The other team will intercept it! 👻<br />
+        <br />
+      </div>
       <div v-if="room.state === 'NOT_STARTED'" class="box">
+        <div class="columns">
+          <div class="column" v-for="team in ['redTeam', 'blueTeam']">
+            <h3>
+              {{ room[team].name }} team: {{ room[team].players.join(', ') }}
+              <a v-if="!room[team].players.includes(player.name)" @click="joinTeam(team)">(join)</a>
+            </h3>
+          </div>
+        </div>
         <div v-if="room.redTeam.players.length < 2 ">
           {{ room.redTeam.name }} team needs {{ 2 - room.redTeam.players.length }} more, before we can start!
         </div>
@@ -367,6 +416,7 @@
 </body>
 
 <script src="https://cdn.jsdelivr.net/npm/vue@2.6.2/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-analytics.js"></script>
@@ -377,4 +427,5 @@
 <script>
   window.COLLECTION = 'incrypt';
 </script>
+<script type="module" src="components/navbar.js"></script>
 <script type="module" src="incrypt.js"></script>

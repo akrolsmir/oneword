@@ -23,14 +23,11 @@ Room: {
       spy: 'alice',
       key: [4, 1, 2], // sometimes referred to as "message"
       encode: ['gone', 'lazy', 'book'],
-      // intercept and decode start like keys [3, 2, 4].
-      // But TODO extension would be individualized voting:
-      intercept: {
-        // TODO: Spy breaks ties? or mod? or first submitted? or random?
+      interceptVotes: {
         carol: [2, 3, 1],
         dave: [2, 4, 1],
       },
-      decode: {
+      decodeVotes: {
         bob: [3, 1, 2],
       }
   },
@@ -53,24 +50,15 @@ const vueApp = new Vue({
     },
     room: {
       // See below in created()
-      name: 'bananaz',
+      // name: 'bananaz',
     },
+    user: {},
+    allRooms: [],
   },
   async created() {
     this.KEY_LENGTH = 3;
     this.WORDS_SHOWN = 4;
 
-    // For now, always start by listening to the 'banana' example room
-    const room = await getRoom(this.room);
-    if (room) {
-      this.room = room;
-    } else {
-      // Create a new room
-      await this.resetRoom();
-    }
-    listenRoom(this);
-  },
-  async mounted() {
     const parsedUrl = new URL(window.location.href);
     const roomName = parsedUrl.searchParams.get('room');
     const playerName = parsedUrl.searchParams.get('player');
@@ -80,6 +68,12 @@ const vueApp = new Vue({
     if (roomName) {
       this.room.name = roomName;
     }
+    if (roomName && playerName) {
+      await this.enterRoom();
+    }
+  },
+  async mounted() {
+    this.allRooms = await listRooms();
   },
   watch: {
     'room.state'(state) {
@@ -91,6 +85,29 @@ const vueApp = new Vue({
     },
   },
   methods: {
+    // Somewhat copied from One Word's index.html. TODO: Dedupe?
+    async enterRoom() {
+      if (!this.player.name) {
+        this.$refs.navbar.logIn();
+        return;
+      }
+      // Sanitize room name
+      this.room.name = this.room.name
+        .trim()
+        .toLowerCase()
+        .replace(/\s/g, '-') // whitespace
+        .replace(/[^\p{L}-]/gu, ''); // not (dash or letter in any language)
+
+      const room = await getRoom(this.room);
+
+      if (room) {
+        this.room = room;
+      } else {
+        // Create a new room
+        await this.resetRoom();
+      }
+      listenRoom(this);
+    },
     async resetRoom() {
       this.room = {
         name: this.room.name,
@@ -110,6 +127,8 @@ const vueApp = new Vue({
         },
         history: [],
         timerLength: 100,
+        public: true,
+        lastUpdateTime: Date.now(),
       };
       await setRoom(this.room);
     },
@@ -242,6 +261,7 @@ const vueApp = new Vue({
     finished,
     intercepted,
     dropped,
+    moment,
     points(team) {
       return intercepted(other(team), this.room.history) - dropped(team, this.room.history);
     },
@@ -290,6 +310,8 @@ const vueApp = new Vue({
     },
   },
 });
+
+listenForLogin(vueApp);
 
 function unpush(array, value) {
   const index = array.indexOf(value);
