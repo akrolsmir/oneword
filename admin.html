@@ -81,7 +81,7 @@
           v-slot="props"
           sortable
         >
-          {{ props.row.createdDate }}
+          {{ props.row.createdDate.toLocaleDateString() }}
         </b-table-column>
         <b-table-column
           field="supporter"
@@ -142,7 +142,7 @@
         try {
           this.users = await listUsers();
           for (const user of this.users) {
-            user.createdDate = new Date(user.createTime).toLocaleDateString();
+            user.createdDate = new Date(user.createTime);
           }
         } catch (e) {
           alert('Error fetching users. Do you have admin permissions?');
@@ -162,7 +162,7 @@
               [
                 u.email,
                 ...splitName(u.name),
-                u.createdDate,
+                u.createdDate.toISOString(),
                 u.supporter || '',
               ].join('\t'), // Tab-separated to escape commas
           )
