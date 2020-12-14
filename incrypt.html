@@ -71,10 +71,15 @@
 <body class="has-navbar-fixed-top">
   <div id="vue">
     <navbar ref="navbar" v-model="user"></navbar>
+    <!-- Beta announcement -->
+    <div class="notification is-danger is-light">
+      Incrypt is currently in beta. Got feedback? Email <a href="mailto:austin@oneword.games">austin@oneword.games</a>!
+    </div>
     <!-- Home page -->
     <div v-if="!room.redTeam">
       <h1>Welcome to Incrypt!</h1>
-      Incrypt is a word game for two teams, based on Decrypto.<br />
+      Incrypt is a word game for two teams, based on
+      <a target="_blank" rel="noopener noreferrer" href="https://amzn.to/384qWYi">Decrypto</a>.<br />
       Each spy incrypts three words by writing down three clues...<br />
       Too complex? Your own team won't get the message 🤦‍♀️<br />
       Too simple? The other team will intercept it! 👻<br />
