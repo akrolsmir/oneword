@@ -271,6 +271,9 @@ const vueApp = new Vue({
       unpush(decrypters, this.room[team].round.spy);
       return decrypters;
     },
+    allPlayers(room) {
+      return room.redTeam.players.concat(room.blueTeam.players).join(', ');
+    },
   },
   computed: {
     isRed() {

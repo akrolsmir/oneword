@@ -94,13 +94,17 @@
 
       <br /><br />
       <h2>Open Rooms</h2>
-      <template v-for="openRoom in allRooms">
-        <p>
-          <a @click="room.name = openRoom.name; enterRoom()"><b>{{ openRoom.name }}</b></a
-          >, with {{ openRoom.redTeam.players.concat(openRoom.blueTeam.players).join(', ') }}
-          <span>({{ moment(openRoom.lastUpdateTime).fromNow() }})</span>
-        </p>
-      </template>
+      <p v-for="openRoom in allRooms.filter((room) => allPlayers(room) && room.state === 'NOT_STARTED')">
+        <a @click="room.name = openRoom.name; enterRoom()"><b>{{ openRoom.name }}</b></a
+        >, with {{ allPlayers(openRoom) }}
+        <span>({{ moment(openRoom.lastUpdateTime).fromNow() }})</span>
+      </p>
+      <h2>Now Playing</h2>
+      <p v-for="openRoom in allRooms.filter((room) => allPlayers(room) && room.state !== 'NOT_STARTED')">
+        <a @click="room.name = openRoom.name; enterRoom()"><b>{{ openRoom.name }}</b></a
+        >, with {{ allPlayers(openRoom) }}
+        <span>({{ moment(openRoom.lastUpdateTime).fromNow() }})</span>
+      </p>
     </div>
     <div v-else>
       <!-- Team rosters -->
