@@ -278,6 +278,10 @@ const vueApp = new Vue({
     },
   },
   computed: {
+    isMod() {
+      // For now, the first red team player is always the mod. Also me.
+      return this.room.redTeam.players.indexOf(this.player.name) === 0 || this.player.name === 'Austin';
+    },
     isRed() {
       return this.room.redTeam.players.includes(this.player.name);
     },
