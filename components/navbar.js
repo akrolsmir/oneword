@@ -34,6 +34,12 @@ Vue.component('navbar', {
       });
       window.open('./supporter.html', '_blank');
     },
+    referIncrypt() {
+      firebase.analytics().logEvent('view_promotion', {
+        source: 'navbar',
+      });
+      window.open('./incrypt.html', '_blank');
+    },
   },
   computed: {
     isSupporter() {
@@ -56,6 +62,12 @@ Vue.component('navbar', {
     </a>
   </div>
   <div id="navbuttons" class="navbar-menu" :class = "{'is-active': burgerOpen}">
+    <div class="navbar-start">
+      <a class="navbar-item" @click="referIncrypt">
+        Play Incrypt
+      </a>
+    </div>
+
     <div class="navbar-end">
       <a class="navbar-item" @click="referAmazon">Buy the board game</a>
       <a v-if="value.id" class="navbar-item" @click="logOut">

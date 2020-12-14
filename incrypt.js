@@ -10,6 +10,8 @@ import {
   listenForLogin,
 } from './firebase-network.js';
 
+const NO_VOTE = '?';
+
 /**
 Room: {
   name: 'apple',
@@ -19,20 +21,15 @@ Room: {
     // TODO name: 'Ugliest Carriages', emoji: '🤦‍♀️', color: '#FF4422'
     players: ['alice', 'bob'], // First player is team lead aka mod
     words: ['student', 'bible', 'catholic', 'eraser'],
-    intercepted: 0,
-    dropped: 1,
     round: {
       spy: 'alice',
       key: [4, 1, 2], // sometimes referred to as "message"
       encode: ['gone', 'lazy', 'book'],
-      // intercept and decode start like keys [3, 2, 4].
-      // But TODO extension would be individualized voting:
-      intercept: {
-        // TODO: Spy breaks ties? or mod? or first submitted? or random?
+      interceptVotes: {
         carol: [2, 3, 1],
         dave: [2, 4, 1],
       },
-      decode: {
+      decodeVotes: {
         bob: [3, 1, 2],
       }
   },
@@ -49,31 +46,21 @@ const vueApp = new Vue({
     nouns,
     player: {
       name: '',
-      // Local values, before they get uploaded
+      // Local values & UI controls, before they get uploaded
       encode: [],
-      intercept: [],
-      decode: [],
+      timerLength: 100,
     },
     room: {
       // See below in created()
-      name: 'banana',
+      name: randomWord('adjectives') + '-' + randomWord('nouns'),
     },
+    user: {},
+    allRooms: [],
   },
   async created() {
     this.KEY_LENGTH = 3;
     this.WORDS_SHOWN = 4;
 
-    // For now, always start by listening to the 'banana' example room
-    const room = await getRoom(this.room);
-    if (room) {
-      this.room = room;
-    } else {
-      // Create a new room
-      await this.resetRoom();
-    }
-    listenRoom(this);
-  },
-  async mounted() {
     const parsedUrl = new URL(window.location.href);
     const roomName = parsedUrl.searchParams.get('room');
     const playerName = parsedUrl.searchParams.get('player');
@@ -83,6 +70,12 @@ const vueApp = new Vue({
     if (roomName) {
       this.room.name = roomName;
     }
+    if (roomName && playerName) {
+      await this.enterRoom();
+    }
+  },
+  async mounted() {
+    this.allRooms = await listRooms();
   },
   watch: {
     'room.state'(state) {
@@ -90,12 +83,33 @@ const vueApp = new Vue({
       // Clean up past inputs on each new round.
       if (state === 'DONE') {
         this.player.encode = [];
-        this.player.intercept = [];
-        this.player.decode = [];
       }
     },
   },
   methods: {
+    // Somewhat copied from One Word's index.html. TODO: Dedupe?
+    async enterRoom() {
+      if (!this.player.name) {
+        this.$refs.navbar.logIn();
+        return;
+      }
+      // Sanitize room name
+      this.room.name = this.room.name
+        .trim()
+        .toLowerCase()
+        .replace(/\s/g, '-') // whitespace
+        .replace(/[^\p{L}-]/gu, ''); // not (dash or letter in any language)
+
+      const room = await getRoom(this.room);
+
+      if (room) {
+        this.room = room;
+      } else {
+        // Create a new room
+        await this.resetRoom();
+      }
+      listenRoom(this);
+    },
     async resetRoom() {
       this.room = {
         name: this.room.name,
@@ -104,8 +118,6 @@ const vueApp = new Vue({
           name: 'Red',
           players: [],
           words: randomWords(4),
-          intercepted: 0,
-          dropped: 0,
           // Current round
           round: {},
         },
@@ -113,12 +125,12 @@ const vueApp = new Vue({
           name: 'Blue',
           players: [],
           words: randomWords(4),
-          intercepted: 0,
-          dropped: 0,
           round: {},
         },
         history: [],
         timerLength: 100,
+        public: true,
+        lastUpdateTime: Date.now(),
       };
       await setRoom(this.room);
     },
@@ -133,6 +145,17 @@ const vueApp = new Vue({
         BOTH_DECODE: 'DONE',
         DONE: 'ENCODING',
       };
+      // If the cluer timed out, at least fill in with empty strings
+      if (this.room.state === 'ENCODING') {
+        while (this.room.redTeam.round.encode.length < this.KEY_LENGTH) {
+          this.room.redTeam.round.encode.push('');
+          toUpdate.push('redTeam.round.encode');
+        }
+        while (this.room.blueTeam.round.encode.length < this.KEY_LENGTH) {
+          this.room.blueTeam.round.encode.push('');
+          toUpdate.push('blueTeam.round.encode');
+        }
+      }
       this.room.state = next[this.room.state];
       if (this.room.state === 'DONE') {
         // Add current round to history on DONE, to update victory conditions
@@ -163,29 +186,25 @@ const vueApp = new Vue({
         await this.nextState();
       }
     },
-    async submitIntercept() {
-      this.otherTeam.round.intercept = this.player.intercept;
-      await this.saveRoom(`${other(this.myTeamId)}.round.intercept`);
-      await this.checkIfDecrypted();
-    },
-    async submitDecode() {
-      this.myTeam.round.decode = this.player.decode;
-      await this.saveRoom(`${this.myTeamId}.round.decode`);
-      await this.checkIfDecrypted();
-    },
     async checkIfDecrypted() {
       if (!['RED_DECODE', 'BLUE_DECODE', 'BOTH_DECODE'].includes(this.room.state)) {
         console.error('intercept or decode called from invalid round!');
         return;
       }
 
-      const team = this.smugglers;
+      const team = this.smugglersId;
       if (this.room.state === 'BOTH_DECODE') {
-        if (!finished('decode', this.myTeam.round) || !finished('decode', this.otherTeam.round)) {
+        if (
+          !finishedVoting(this.myTeam.round.decodeVotes, this.decrypters(this.myTeamId)) ||
+          !finishedVoting(this.otherTeam.round.decodeVotes, this.decrypters(other(this.myTeamId)))
+        ) {
           // Only move forward when both teams are finished decoding
           return;
         }
-      } else if (!finished('decode', this.room[team].round) || !finished('intercept', this.room[team].round)) {
+      } else if (
+        !finishedVoting(this.room[team].round.decodeVotes, this.decrypters(team)) ||
+        !finishedVoting(this.room[team].round.interceptVotes, this.room[other(team)].players)
+      ) {
         // Only move forward when decoding and intercepting are both finished
         return;
       }
@@ -197,36 +216,72 @@ const vueApp = new Vue({
         spy: nextSpy(this.room.redTeam.round.spy, this.room.redTeam.players),
         key: randomKey(this.KEY_LENGTH, this.WORDS_SHOWN),
         encode: [],
-        intercept: [],
-        decode: [],
+        interceptVotes: {},
+        decodeVotes: {},
       };
       this.room.blueTeam.round = {
         spy: nextSpy(this.room.blueTeam.round.spy, this.room.blueTeam.players),
         key: randomKey(this.KEY_LENGTH, this.WORDS_SHOWN),
         encode: [],
-        intercept: [],
-        decode: [],
+        interceptVotes: {},
+        decodeVotes: {},
       };
       // TODO when we're tracking separate rooms
-      // this.room.lastUpdateTime = Date.now();
+      this.room.lastUpdateTime = Date.now();
 
       // Overwrite existing room;
       await setRoom(this.room);
     },
+    async updateTimer() {
+      this.room.timerLength = this.player.timerLength;
+      this.saveRoom('timerLength');
+    },
     // Sync any number of properties of this.room to firebase
     async saveRoom(...props) {
       await updateRoom(this.room, Object.fromEntries(props.map((prop) => [prop, getIn(this.room, prop)])));
+    },
+    async vote(voteType /* decodeVotes or interceptVotes */, name, keyIndex, wordIndex) {
+      const team = voteType === 'decodeVotes' ? this.myTeamId : other(this.myTeamId);
+      if (!this.room[team].round[voteType][name]) {
+        // Need to fill in a dummy value so Firestore is happy
+        this.room[team].round[voteType][name] = Array(this.KEY_LENGTH).fill(NO_VOTE);
+      }
+      this.room[team].round[voteType][name][keyIndex] = wordIndex;
+      await this.saveRoom(`${team}.round.${voteType}.${name}`);
+      await this.checkIfDecrypted();
+    },
+    voters(voteType, keyIndex, wordIndex) {
+      const team = voteType === 'decodeVotes' ? this.myTeamId : other(this.myTeamId);
+      return Object.entries(this.room[team].round[voteType] || {})
+        .map(([player, vote]) => {
+          return vote[keyIndex] === wordIndex ? player : null;
+        })
+        .filter((player) => player);
     },
     other,
     keysEqual,
     finished,
     intercepted,
     dropped,
+    moment,
     points(team) {
       return intercepted(other(team), this.room.history) - dropped(team, this.room.history);
     },
+    decrypters(team) {
+      // Exclude the spy, as the are not decoding
+      const decrypters = this.room[team].players.slice();
+      unpush(decrypters, this.room[team].round.spy);
+      return decrypters;
+    },
+    allPlayers(room) {
+      return room.redTeam.players.concat(room.blueTeam.players).join(', ');
+    },
   },
   computed: {
+    isMod() {
+      // For now, the first red team player is always the mod. Also me.
+      return this.room.redTeam.players.indexOf(this.player.name) === 0 || this.player.name === 'Austin';
+    },
     isRed() {
       return this.room.redTeam.players.includes(this.player.name);
     },
@@ -242,7 +297,7 @@ const vueApp = new Vue({
     otherTeam() {
       return this.room[other(this.myTeamId)];
     },
-    smugglers() {
+    smugglersId() {
       // AKA interceptees
       const map = {
         RED_DECODE: 'redTeam',
@@ -253,15 +308,19 @@ const vueApp = new Vue({
     },
     gameOver() {
       return (
+        // Game is over when every player on a team has (on average) intercepted
+        // twice, or dropped two messages
         // TODO: could extract 2 to a constant
-        intercepted('redTeam', this.room.history) >= 2 ||
-        dropped('redTeam', this.room.history) >= 2 ||
-        intercepted('blueTeam', this.room.history) >= 2 ||
-        dropped('blueTeam', this.room.history) >= 2
+        intercepted('redTeam', this.room.history) >= 2 * this.room.blueTeam.players.length ||
+        dropped('redTeam', this.room.history) >= 2 * this.room.blueTeam.players.length - 2 ||
+        intercepted('blueTeam', this.room.history) >= 2 * this.room.redTeam.players.length ||
+        dropped('blueTeam', this.room.history) >= 2 * this.room.redTeam.players.length - 2
       );
     },
   },
 });
+
+listenForLogin(vueApp);
 
 function unpush(array, value) {
   const index = array.indexOf(value);
@@ -305,6 +364,14 @@ function shuffleArray(array) {
   return array;
 }
 
+// Random word for a category, copied from index.html
+function randomWord(category = 'nouns', customWords = '') {
+  const custom = customWords.split(/\s/);
+  const categories = { nouns, compounds, verbs, adjectives, custom };
+  const words = categories[category];
+  return words[Math.floor(Math.random() * words.length)];
+}
+
 // Unique list of random words e.g. randomWords(4) => ['at', 'lol', 'cat', 'yo']
 function randomWords(length) {
   // For now, take out nouns longer than 8 letters; ~758 of 825 nouns left
@@ -334,14 +401,39 @@ function finished(keyType, round) {
   return round[keyType].length === vueApp.KEY_LENGTH;
 }
 
+// votes = { alice: [1, 2, 3], ...}; players = ['alice', ...]
+function finishedVoting(votes, players) {
+  // Not done if any player has not yet voted
+  if (!arrayContentsEqual(players, Object.keys(votes))) {
+    return false;
+  }
+  // Done when every vote is not the default value of NO_VOTE
+  return Object.values(votes)
+    .flat()
+    .every((v) => v !== NO_VOTE);
+}
+
+function arrayContentsEqual(a, b) {
+  const bSet = new Set(b);
+  return a.length === b.length && a.every((v) => bSet.has(v));
+}
+
 // Returns how many of <team>'s messages have been intercepted
 function intercepted(team, history) {
   return history
-    .map((entry) => keysEqual(entry[team].round.intercept, entry[team].round.key))
+    .flatMap((entry) =>
+      Object.values(entry[team].round.interceptVotes).map((vote) => keysEqual(vote, entry[team].round.key))
+    )
     .reduce((a, b) => a + b, 0);
 }
 
 // Returns how many of <team>'s messages have not been correctly decoded
 function dropped(team, history) {
-  return history.map((entry) => !keysEqual(entry[team].round.decode, entry[team].round.key)).reduce((a, b) => a + b, 0);
+  const sum = (a, b) => a + b;
+  // Abusing the fact that 0 + false + true = 1
+  return history
+    .flatMap((entry) =>
+      Object.values(entry[team].round.decodeVotes).map((vote) => !keysEqual(vote, entry[team].round.key))
+    )
+    .reduce(sum, 0);
 }
