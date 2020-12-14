@@ -248,7 +248,8 @@
         <div v-if="myTeamId !== smugglersId">
           <!-- Section: Show the smugglers' code -->
           <h3>
-            The {{ otherTeam.name }} spy incrypted: "{{ otherTeam.round.encode.join(' - ') }}". Try intercepting it:
+            The {{ otherTeam.name }} spy, {{ otherTeam.round.spy }}, incrypted "{{ otherTeam.round.encode.join(' - ')
+            }}". Try intercepting it:
           </h3>
           <br />
           <!-- Section: Vote for the intercept -->
@@ -286,7 +287,7 @@
         <!-- Parts 2 and 4: Meanwhile, the smugglers tries to decrypt the key -->
         <div v-else>
           <div v-if="player.name === myTeam.round.spy">
-            <h3>Waiting for your teammates to decrypt your message...</h3>
+            <h3>Waiting for your teammates to decrypt "{{ myTeam.round.encode.join(' - ') }}"...</h3>
           </div>
           <div v-else>
             <h3>Decrypt what {{ myTeam.round.spy }} meant by "{{ myTeam.round.encode.join(' - ') }}":</h3>
