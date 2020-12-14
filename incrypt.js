@@ -10,6 +10,8 @@ import {
   listenForLogin,
 } from './firebase-network.js';
 
+const NO_VOTE = '?';
+
 /**
 Room: {
   name: 'apple',
@@ -242,7 +244,7 @@ const vueApp = new Vue({
       const team = voteType === 'decodeVotes' ? this.myTeamId : other(this.myTeamId);
       if (!this.room[team].round[voteType][name]) {
         // Need to fill in a dummy value so Firestore is happy
-        this.room[team].round[voteType][name] = Array(this.KEY_LENGTH).fill(-1);
+        this.room[team].round[voteType][name] = Array(this.KEY_LENGTH).fill(NO_VOTE);
       }
       this.room[team].round[voteType][name][keyIndex] = wordIndex;
       await this.saveRoom(`${team}.round.${voteType}.${name}`);
@@ -401,10 +403,10 @@ function finishedVoting(votes, players) {
   if (!arrayContentsEqual(players, Object.keys(votes))) {
     return false;
   }
-  // Done when every vote is not the default value of -1
+  // Done when every vote is not the default value of NO_VOTE
   return Object.values(votes)
     .flat()
-    .every((v) => v !== -1);
+    .every((v) => v !== NO_VOTE);
 }
 
 function arrayContentsEqual(a, b) {
