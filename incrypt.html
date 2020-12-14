@@ -112,6 +112,12 @@
       </p>
     </div>
     <div v-else>
+      <!-- Alert spectators that the game can't be joined. -->
+      <div v-if="!(isPlaying || room.state === 'NOT_STARTED')" class="notification is-danger is-light">
+        Hey {{ player.name }}! This game is currently in progress, but you can spectate as a member of
+        <span>{{ room.blueTeam.name }}</span> team 🙂
+      </div>
+
       <!-- Team rosters -->
       <div v-if="room.state !== 'NOT_STARTED'" class="mb-2">
         <div class="columns">
@@ -128,7 +134,7 @@
 
       <div v-if="room.state !== 'NOT_STARTED'" class="mb-2">
         <!-- Show the current words -->
-        <div v-if="isPlaying" class="columns words">
+        <div class="columns words">
           <div class="column" v-for="(word, i) in myTeam.words">
             <div class="notification" :class="isRed ? 'is-danger' : 'is-info'">
               <small>Word {{ i + 1 }}</small>
@@ -169,7 +175,8 @@
       <!-- Pre-game: Waiting for players -->
       <div v-if="room.state === 'NOT_STARTED'">
         <h2>Room: {{ room.name }}</h2>
-        Incrypt is a word game for two teams, based on Decrypto.<br />
+        Incrypt is a word game for two teams, based on
+        <a target="_blank" rel="noopener noreferrer" href="https://amzn.to/384qWYi">Decrypto</a>.<br />
         Each spy incrypts three words by writing down three clues...<br />
         Too complex? Your own team won't get the message 🤦‍♀️<br />
         Too simple? The other team will intercept it! 👻<br />
@@ -232,13 +239,15 @@
             <b>Rules</b>
             <ul>
               <li>Your incryptions should relate to the <i>meaning</i> of each word</li>
-              <li>NOT its <i>number</i>, <i>rhymes</i>, or <i>homonyms</i></li>
+              <li>NOT its <i>number</i>, or how the word <i>rhymes</i> or <i>sounds</i></li>
               <li>Don't reuse words or past incryptions!</li>
             </ul>
           </div>
         </div>
         <div v-else>
           <h3>Waiting for {{ myTeam.round.spy }} to incrypt the key...</h3>
+          <br />
+          In the meantime, think of what incryptions you might use!
           <!-- Section: Show past clues, so teammates can think -->
           <div v-if="room.history.length > 0" class="columns mt-2">
             <div class="column" v-for="(word, i) in myTeam.words">
@@ -310,7 +319,7 @@
               <div v-for="(word, w) in myTeam.words">
                 <button
                   class="button is-fullwidth"
-                  :disabled="player.name === myTeam.round.spy"
+                  :disabled="!decrypters(myTeamId).includes(player.name)"
                   :class="voters('decodeVotes', e, w + 1).includes(player.name) ? 'is-success' : ''"
                   @click="vote('decodeVotes', player.name, e, w + 1)"
                 >
@@ -330,8 +339,7 @@
         <h2>Round {{ room.history.length + 1 }} debrief</h2>
         <br />
         <template v-for="team in ['redTeam', 'blueTeam']">
-          <b>{{ room[team].name }} team's message was "{{ room[team].round.key.join(' - ') }}"</b>
-          <br />
+          <b>{{ room[team].name }} team's message was "{{ room[team].round.key.join(' - ') }}"</b><br />
           {{ room[team].round.spy }} incrypted it as "{{ room[team].round.encode.join(' - ') }}"
           <div v-for="vote, voter in room[team].round.interceptVotes">
             <div v-if="keysEqual(vote, room[team].round.key)">👻 {{ voter }} intercepted the message!</div>
@@ -341,7 +349,7 @@
               🤦‍♀️ {{ voter }} thought it was "{{ vote.join(' - ') }}"...
             </div>
           </div>
-          <br />
+          <br /><br />
         </template>
         <!-- Game over -->
         <div v-if="gameOver">
