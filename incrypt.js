@@ -50,7 +50,7 @@ const vueApp = new Vue({
     },
     room: {
       // See below in created()
-      // name: 'bananaz',
+      name: randomWord('adjectives') + '-' + randomWord('nouns'),
     },
     user: {},
     allRooms: [],
@@ -356,6 +356,14 @@ function shuffleArray(array) {
     [array[i], array[j]] = [array[j], array[i]];
   }
   return array;
+}
+
+// Random word for a category, copied from index.html
+function randomWord(category = 'nouns', customWords = '') {
+  const custom = customWords.split(/\s/);
+  const categories = { nouns, compounds, verbs, adjectives, custom };
+  const words = categories[category];
+  return words[Math.floor(Math.random() * words.length)];
 }
 
 // Unique list of random words e.g. randomWords(4) => ['at', 'lol', 'cat', 'yo']
