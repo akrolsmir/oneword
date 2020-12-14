@@ -106,7 +106,11 @@ export function listenForLogin(vueApp) {
         fetchedUser.email = user.email;
       }
       vueApp.user = fetchedUser;
-      vueApp.player.name = fetchedUser.name.split(' ')[0];
+      if (!vueApp.player.name) {
+        // Only overwrite player name if none previously provided.
+        // This allows devs to use "?player=Zed" for multi-account testing.
+        vueApp.player.name = fetchedUser.name.split(' ')[0];
+      }
     }
   });
 }
