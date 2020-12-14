@@ -469,7 +469,7 @@
       this.CATEGORY_ORDER = ['nouns', 'verbs', 'adjectives', 'compounds', 'custom'];
     },
     async mounted() {
-      this.allRooms = await listRooms().filter((room) => room.players.length > 0);
+      this.allRooms = (await listRooms()).filter((room) => room.players.length > 0);
       const parsedUrl = new URL(window.location.href);
       const roomName = parsedUrl.searchParams.get('room');
       const playerName = parsedUrl.searchParams.get('player');
