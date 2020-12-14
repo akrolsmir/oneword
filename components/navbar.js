@@ -51,7 +51,7 @@ Vue.component('navbar', {
   style="font-weight: 500">
   <div class="navbar-brand">
     <a class="navbar-item" href="./">
-      <h3 style="font-size: 24px; color:  #4a4a4a">One Word</h3>
+      <span style="font-family: 'Merienda One', cursive; font-size: 24px; color:  #4a4a4a" >One Word</span>
     </a>
     <a role="button" class="navbar-burger burger" :class= "{'is-active': burgerOpen}" aria-label="menu"
         data-target="navbuttons" @click="burgerOpen = !burgerOpen;">

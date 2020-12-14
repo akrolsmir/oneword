@@ -20,19 +20,20 @@
       overflow: auto;
     }
 
-    h1,
-    h2,
-    h3 {
+    .fancy {
       font-family: 'Merienda One', cursive;
+      margin-top: 16px;
+      font-size: 24px;
     }
 
-    h1 {
+    .fancy.big {
+      margin-top: 0;
       font-size: 40px;
     }
 
-    h2 {
-      margin-top: 16px;
-      font-size: 24px;
+    .fancy.normal {
+      margin-top: 0;
+      font-size: 100%;
     }
 
     body {
@@ -97,7 +98,7 @@
         Try our new team-vs-team word game, <a href="incrypt.html">Incrypt</a>!
       </div>
 
-      <h1>Welcome!</h1>
+      <div class="fancy big">Welcome!</div>
       This is an online game based on
       <a target="_blank" rel="noopener noreferrer" href="https://amzn.to/2xV5lUm">Just One</a>, a co-op word game for 3+
       players.<br />
@@ -117,7 +118,7 @@
       </template>
 
       <br /><br />
-      <h2>Open Rooms</h2>
+      <h1 class="fancy">Open Rooms</h1>
       <template v-for="openRoom in allRooms">
         <p>
           <a @click="room.name = openRoom.name; enterRoom()"><b>{{ openRoom.name }}</b></a
@@ -129,9 +130,9 @@
     <div v-cloak v-else class="container mx-4">
       <div class="message">
         <!-- Room header -->
-        <div class="message-header is-flex-wrap-wrap">
-          <h1>{{ room.name }}</h1>
-          <h2 class="capitalize">Round {{ room.history.length + 1 }}</h2>
+        <div class="message-header has-text-weight-normal is-flex-wrap-wrap">
+          <span class="fancy big">{{ room.name }}</span>
+          <span class="fancy capitalize">Round {{ room.history.length + 1 }}</span>
           <!-- Navigation -->
           <span class="buttons are-small">
             <button class="button is-dark is-inverted is-outlined" @click="alertIsShowing=true">Invite</button>
@@ -297,18 +298,18 @@
       <!-- Input area (clueing) -->
       <div v-if="room.currentRound.state == 'CLUEING'">
         <div v-if="room.players.length < 3">
-          <h2>Waiting for 3 players...</h2>
+          <div class="fancy">Waiting for 3 players...</div>
           <p class="mt-5 mb-2">Invite your friends to play!</p>
           <sharelink :link="'https://oneword.games/?room=' + room.name"></sharelink>
         </div>
         <div v-else-if="room.currentRound.guesser == player.name">
-          <h2>It's your turn to guess! Waiting for clues...</h2>
+          <div class="fancy">It's your turn to guess! Waiting for clues...</div>
         </div>
         <div v-else>
           <div class="box">
-            <h2>
+            <div class="fancy">
               The {{ wordForWord(room.currentRound.category) }} is <b class="is-size-3">{{ room.currentRound.word }}</b>
-            </h2>
+            </div>
             <br />
             <label class="label">Your clue for {{ room.currentRound.guesser }}</label>
             <div class="field has-addons">
@@ -328,7 +329,9 @@
                 </button>
               </div>
             </div>
-            <div class="notification is-danger" v-show="player.clue.includes(' ')">Is that really just one word?</div>
+            <div class="notification is-danger" v-show="hasSpecialCharacters(player.clue)">
+              Are you sure this is a real word?
+            </div>
           </div>
         </div>
       </div>
@@ -337,8 +340,8 @@
       <div v-if="room.currentRound.state == 'GUESSING'">
         <div v-if="room.currentRound.guesser == player.name">
           <div class="box">
-            <h2>Your clues for the {{ wordForWord(room.currentRound.category) }} are:</h2>
-            <h2 class="newline">{{ dedupe(room.currentRound.clues, false) }}</h2>
+            <div class="fancy">Your clues for the {{ wordForWord(room.currentRound.category) }} are:</div>
+            <div class="fancy newline">{{ dedupe(room.currentRound.clues, false) }}</div>
             <label class="label">Your Guess</label>
             <div class="field has-addons">
               <div class="control is-expanded">
@@ -351,24 +354,24 @@
           </div>
         </div>
         <div v-else>
-          <h2>The clues for <b>{{ room.currentRound.word }}</b> were:</h2>
-          <h2 class="newline">{{ dedupe(room.currentRound.clues) }}</h2>
-          <h2>Waiting for {{ room.currentRound.guesser }} to guess...</h2>
+          <div class="fancy">The clues for <strong>{{ room.currentRound.word }}</strong> were:</div>
+          <div class="fancy newline">{{ dedupe(room.currentRound.clues) }}</div>
+          <div class="fancy">Waiting for {{ room.currentRound.guesser }} to guess...</div>
         </div>
       </div>
 
       <!-- Input area (done) -->
       <div v-if="room.currentRound.state == 'DONE'">
         <div v-if="correct(room.currentRound)">
-          <h2 class="has-text-success">Correct! The word was "{{ room.currentRound.word }}". Good job!</h2>
+          <div class="fancy has-text-success">Correct! The word was "{{ room.currentRound.word }}". Good job!</div>
         </div>
         <div v-else>
-          <h2 class="has-text-danger">
+          <div class="fancy has-text-danger">
             Aww, {{ room.currentRound.guesser }} guessed "{{ room.currentRound.guess }}", but it was "{{
             room.currentRound.word }}"...
-          </h2>
+          </div>
         </div>
-        <h2 class="newline">{{ dedupe(room.currentRound.clues) }}</h2>
+        <div class="fancy newline">{{ dedupe(room.currentRound.clues) }}</div>
         <br />
         <scoreboard
           v-if="isEnd(room)"
@@ -382,15 +385,19 @@
       </div>
       <br /><br />
       <!-- History -->
-      <h2 v-if="room.history.length > 0">History</h2>
+      <h1 v-if="room.history.length > 0" class="fancy">History</h1>
       <template v-for="(round, i) in room.history.slice().reverse()">
         <div class="level">
           <div class="level-left">
             <span class="level-item" style="justify-content: flex-start">
-              <span class="icon" :class="correct(round) ? 'has-text-success' : 'has-text-danger'">
+              <span
+                class="icon"
+                :class="correct(round) ? 'has-text-success' : 'has-text-danger'"
+                :aria-label="correct(round) ? 'correct' : 'incorrect'"
+              >
                 {{ correct(round) ? '✔' : '✖' }}
               </span>
-              <h3>{{ room.history.length - i }}. {{ round.word }} ({{ round.category }})</h3>
+              <span class="fancy normal">{{ room.history.length - i }}. {{ round.word }} ({{ round.category }})</span>
             </span>
             <p class="level-item" style="justify-content: flex-start">
               {{ round.guesser }} guessed "<b :class="correct(round) ? 'has-text-success' : 'has-text-danger'"
@@ -409,6 +416,7 @@
 <script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert@2.1.2/dist/sweetalert.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/blueimp-md5@2.13.0/js/md5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pluralize@8.0.0/pluralize.js"></script>
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-analytics.js"></script>
@@ -633,6 +641,9 @@
           }[category] || 'word'
         );
       },
+      hasSpecialCharacters(word) {
+        return /[\s~`!@#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?()\._]/g.test(word);
+      },
       async submitClue() {
         this.player.clue = this.player.clue.toLowerCase().trim();
         const update = {};
@@ -722,10 +733,7 @@
 
   // Returns whether a round's guess is correct.
   function correct(round) {
-    return (
-      round.guess === round.word ||
-      (['nouns', 'compounds'].includes(round.category) && round.guess === round.word + 's')
-    );
+    return pluralize.singular(round.guess) === round.word || pluralize.plural(round.guess) == round.word;
   }
   function totalRounds(room) {
     return room.roundsInGame == 'Unlimited' ? 1024 : room.roundsInGame;
@@ -797,7 +805,7 @@
     const custom = customWords.split(/\s/);
     const categories = { nouns, compounds, verbs, adjectives, custom };
     const words = categories[category];
-    return words[Math.floor(Math.random() * words.length)];
+    return words[Math.floor(Math.random() * words.length)].toLowerCase();
   }
 
   function nextWord(history, category = 'nouns', customWords = '') {
