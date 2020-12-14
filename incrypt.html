@@ -104,7 +104,7 @@
     </div>
     <div v-else>
       <!-- Team rosters -->
-      <div v-if="room.state !== 'NOT_STARTED'">
+      <div v-if="room.state !== 'NOT_STARTED'" class="mb-2">
         <div class="columns">
           <div class="column" v-for="team in ['redTeam', 'blueTeam']">
             <h3>{{ room[team].name }} team: {{ room[team].players.join(', ') }}</h3>
@@ -116,8 +116,6 @@
           </div>
         </div>
       </div>
-
-      <br /><br />
 
       <div v-if="room.state !== 'NOT_STARTED'" class="mb-2">
         <!-- Show the current words -->
@@ -176,19 +174,21 @@
           </div>
         </div>
         <div v-if="room.redTeam.players.length < 2 ">
-          {{ room.redTeam.name }} team needs {{ 2 - room.redTeam.players.length }} more, before we can start!
+          {{ room.redTeam.name }} team needs {{ 2 - room.redTeam.players.length }} more, before we can start...
         </div>
         <div v-else-if="room.blueTeam.players.length < 2 ">
-          {{ room.blueTeam.name }} team needs {{ 2 - room.blueTeam.players.length }} more, before we can start!
+          {{ room.blueTeam.name }} team needs {{ 2 - room.blueTeam.players.length }} more, before we can start...
         </div>
         <div v-else>
-          Awesome! There are {{ room.redTeam.players.length }} players on {{ room.redTeam.name }} and {{
-          room.blueTeam.players.length }} players on {{ room.blueTeam.name }}.
-          <br /><br />
-          Ready to start?
+          Awesome! There are {{ room.redTeam.players.length }} players on {{ room.redTeam.name }} team and {{
+          room.blueTeam.players.length }} players on {{ room.blueTeam.name }} team. <br />
+          Ready to start? <br />
           <br />
           <button class="button" @click="newRound">Start game!</button>
+          <br /><br />
         </div>
+        <div class="mb-2">Invite your friends to play!</div>
+        <sharelink :link="'https://oneword.games/incrypt?room=' + room.name"></sharelink>
       </div>
       <!-- Part 1: Spies are encoding their messages -->
       <div v-cloak v-if="room.state === 'ENCODING'" class="box">
@@ -428,4 +428,5 @@
   window.COLLECTION = 'incrypt';
 </script>
 <script type="module" src="components/navbar.js"></script>
+<script type="module" src="components/sharelink.js"></script>
 <script type="module" src="incrypt.js"></script>
