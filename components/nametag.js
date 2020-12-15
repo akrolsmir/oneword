@@ -60,6 +60,7 @@ Vue.component('nametag', {
           style="border-top-left-radius: 4px; border-bottom-left-radius: 4px; margin-left: -10.5px"
           class="mr-1"
           :src="'https://www.gravatar.com/avatar/' + md5(user.email) + '?size=48'"
+          alt=""
           height="28"
           width="28">
         {{ name }}
@@ -69,7 +70,13 @@ Vue.component('nametag', {
           Mod
         </div>
       </template>
-      <a v-else-if="mod" class="tag is-delete is-danger is-light" :title="'Kick ' + name" @click="kick()"></a>
+      <a
+        v-else-if="mod"
+        class="tag is-delete is-danger is-light"
+        role="button"
+        :title="'Kick ' + name"
+        href="#"
+        @click.prevent="kick()"></a>
     </div>
   </div>
     `,
