@@ -70,7 +70,13 @@ Vue.component('nametag', {
           Mod
         </div>
       </template>
-      <a v-else-if="mod" class="tag is-delete is-danger is-light" :title="'Kick ' + name" @click="kick()"></a>
+      <a
+        v-else-if="mod"
+        class="tag is-delete is-danger is-light"
+        role="button"
+        :title="'Kick ' + name"
+        href="#"
+        @click.prevent="kick()"></a>
     </div>
   </div>
     `,
