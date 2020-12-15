@@ -287,7 +287,11 @@
                 <button class="button is-small" @click="makeMod(newMod)">Transfer Mod</button>
               </span>
               <span class="control">
-                <input class="input is-small" type="text" v-model="newMod" placeholder="Player Name" />
+                <span class="select is-small">
+                  <select v-model="newMod">
+                    <option v-for="player in this.room.players.slice(1)">{{ player }}</option>
+                  </select>
+                </span>
               </span>
             </div>
           </div>
