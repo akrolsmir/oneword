@@ -99,12 +99,15 @@
           <p class="modal-card-title">Private room</p>
           <button class="delete" aria-label="close" @click="showPrivateModal=false"></button>
         </header>
-        <section class="modal-card-body">
+        <section v-if="" class="modal-card-body">
           This room is private. To join, ask your teammates for the room name or link.<br /><br />
 
           To make your own private room, become a supporter!<br />
         </section>
         <footer class="modal-card-foot">
+          <button class="button" @click="'TODO: make a showPrivateModal an enum, have an enter box'">
+            Enter room name
+          </button>
           <button class="button is-warning" @click="referSupporter('private_room_modal')">Become a supporter</button>
         </footer>
       </div>
