@@ -118,17 +118,19 @@
       </template>
 
       <br /><br />
-      <h2 class="fancy">Private Rooms</h2>
-      <p v-for="privateRoom in privateRooms">
-        <a @click="console.log('TODO')"><b>{{ "Private room" }} with {{ privateRoom.players[0] }}</b></a>
-        <span v-if="privateRoom.players.length > 1"> and {{ privateRoom.players.length }} others</span>
-        ({{ moment(privateRoom.lastUpdateTime).fromNow() }})
-      </p>
-      <h2 class="fancy">Open Rooms</h2>
-      <p v-for="openRoom in allRooms">
-        <a @click="room.name = openRoom.name; enterRoom()"><b>{{ openRoom.name }}</b></a
-        >, with {{ openRoom.players.join(', ') }} ({{ moment(openRoom.lastUpdateTime).fromNow() }})
-      </p>
+      <div v-cloak>
+        <h2 class="fancy">Private Rooms</h2>
+        <p v-for="privateRoom in privateRooms">
+          <a @click="console.log('TODO')"><b>{{ "Private room" }} with {{ privateRoom.players[0] }}</b></a>
+          <span v-if="privateRoom.players.length > 1"> and {{ privateRoom.players.length }} others</span>
+          ({{ moment(privateRoom.lastUpdateTime).fromNow() }})
+        </p>
+        <h2 class="fancy">Open Rooms</h2>
+        <p v-for="openRoom in allRooms">
+          <a @click="room.name = openRoom.name; enterRoom()"><b>{{ openRoom.name }}</b></a
+          >, with {{ openRoom.players.join(', ') }} ({{ moment(openRoom.lastUpdateTime).fromNow() }})
+        </p>
+      </div>
       <br /><br /><br /><br /><br />
     </div>
     <!-- In game -->
@@ -496,8 +498,7 @@
       this.CATEGORY_ORDER = ['nouns', 'verbs', 'adjectives', 'compounds', 'custom'];
     },
     async mounted() {
-      this.allRooms = (await listRooms(20, true)).filter((room) => room.players.length > 0);
-      this.privateRooms = (await listRooms(5, false)).filter((room) => room.players.length > 0);
+      this.populateHome(); // Begin listing rooms, but don't wait for the result to mount
       const parsedUrl = new URL(window.location.href);
       const roomName = parsedUrl.searchParams.get('room');
       const playerName = parsedUrl.searchParams.get('player');
@@ -541,6 +542,10 @@
       moment,
       listRooms,
       dedupe,
+      async populateHome() {
+        this.privateRooms = (await listRooms(5, false)).filter((room) => room.players.length > 0);
+        this.allRooms = (await listRooms(20, true)).filter((room) => room.players.length > 0);
+      },
       async enterRoom() {
         if (!this.player.name) {
           this.$refs.navbar.logIn();
