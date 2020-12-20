@@ -80,15 +80,33 @@
 <body class="has-navbar-fixed-top">
   <div id="vue">
     <navbar ref="navbar" v-model="user"></navbar>
-    <!-- Notification -->
-    <div class="modal" :class="{'is-active': alertIsShowing}">
-      <div class="modal-background" @click="alertIsShowing=false"></div>
+    <!-- Share Link Notification -->
+    <div class="modal" :class="{'is-active': showShareModal}">
+      <div class="modal-background" @click="showShareModal=false"></div>
       <div class="modal-content">
         <div class="notification">
           <label class="is-block mb-2">Invite your friends to play!</label>
           <sharelink :link="'https://oneword.games/?room=' + room.name"></sharelink>
-          <button class="delete" aria-label="close" @click="alertIsShowing=false"></button>
+          <button class="delete" aria-label="close" @click="showShareModal=false"></button>
         </div>
+      </div>
+    </div>
+    <!-- Private Room Notification -->
+    <div class="modal" :class="{'is-active': showPrivateModal}">
+      <div class="modal-background" @click="showPrivateModal=false"></div>
+      <div class="modal-card">
+        <header class="modal-card-head">
+          <p class="modal-card-title">Private room</p>
+          <button class="delete" aria-label="close" @click="showPrivateModal=false"></button>
+        </header>
+        <section class="modal-card-body">
+          This room is private. To join, ask your teammates for the room name or link.<br /><br />
+
+          To make your own private room, become a supporter!<br />
+        </section>
+        <footer class="modal-card-foot">
+          <button class="button is-warning" @click="referSupporter('private_room_modal')">Become a supporter</button>
+        </footer>
       </div>
     </div>
     <!-- Home page -->
@@ -121,7 +139,7 @@
       <div v-cloak>
         <h2 class="fancy">Private Rooms</h2>
         <p v-for="privateRoom in privateRooms">
-          <a @click="console.log('TODO')"><b>{{ "Private room" }} with {{ privateRoom.players[0] }}</b></a>
+          <a @click="showPrivateModal = true"><b>{{ "Private room" }} with {{ privateRoom.players[0] }}</b></a>
           <span v-if="privateRoom.players.length > 1"> and {{ privateRoom.players.length }} others</span>
           ({{ moment(privateRoom.lastUpdateTime).fromNow() }})
         </p>
@@ -142,7 +160,7 @@
           <span class="fancy capitalize">Round {{ room.history.length + 1 }}</span>
           <!-- Navigation -->
           <span class="buttons are-small">
-            <button class="button is-dark is-inverted is-outlined" @click="alertIsShowing=true">Invite</button>
+            <button class="button is-dark is-inverted is-outlined" @click="showShareModal=true">Invite</button>
             <button
               v-if="room.players.includes(player.name)"
               class="button is-dark is-inverted is-outlined"
@@ -489,7 +507,8 @@
         clue: '',
         guess: '',
       },
-      alertIsShowing: false,
+      showShareModal: false,
+      showPrivateModal: false,
       newMod: '',
       wordsSaved: false,
     },
@@ -733,21 +752,26 @@
             },
           });
           if (result === 'support') {
-            firebase.analytics().logEvent('view_promotion', {
-              source: 'modtools',
-            });
-            window.open('./supporter.html', '_blank');
+            referSupporter('modtools');
           }
           // Reset UI to non-supporter defaults
           this.room.public = true;
           this.room.roundsInGame = 13;
         }
       },
+      referSupporter,
       correct,
       isEnd,
       score,
     },
   });
+
+  function referSupporter(source) {
+    firebase.analytics().logEvent('view_promotion', {
+      source: source,
+    });
+    window.open('./supporter.html', '_blank');
+  }
 
   listenForLogin(vueApp);
 
