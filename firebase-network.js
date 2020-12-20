@@ -40,14 +40,14 @@ export async function getRoom(room) {
   return doc.data();
 }
 
-export async function listRooms() {
+export async function listRooms(limit = 20, publicRoom = true) {
   const db = firebase.firestore();
   const docs = await db
     .collection(COLLECTION)
-    .where('public', '==', true)
+    .where('public', '==', publicRoom)
     .orderBy('lastUpdateTime', 'desc')
     // TODO: limit to last 7 days instead.
-    .limit(20)
+    .limit(limit)
     .get();
 
   const rooms = [];
