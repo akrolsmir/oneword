@@ -66,6 +66,10 @@
       font-size: 0.875rem !important; /* Bulma's normal tag (0.75 rem) is too small and medium tag (1 rem) is too big */
     }
 
+    .halfOpacity {
+      opacity: 0.5;
+    }
+
     [v-cloak] {
       display: none;
     }
@@ -120,10 +124,12 @@
       <br /><br />
       <h2 class="fancy">Open Rooms</h2>
       <template v-for="openRoom in allRooms">
-        <p>
-          <a @click="room.name = openRoom.name; enterRoom()"><b>{{ openRoom.name }}</b></a
-          >, with {{ openRoom.players.join(', ') }} ({{ moment(openRoom.lastUpdateTime).fromNow() }})
-        </p>
+        <div v-bind:class="{ halfOpacity: isMuteOpenRoom(openRoom) }">
+          <p>
+            <a @click="room.name = openRoom.name; enterRoom()"><b>{{ openRoom.name }}</b></a
+            >, with {{ openRoom.players.join(', ') }} ({{ moment(openRoom.lastUpdateTime).fromNow() }})
+          </p>
+        </div>
       </template>
     </div>
     <!-- In game -->
@@ -531,6 +537,17 @@
           return this.player.name == this.room.players[0];
         }
       },
+      // Returns the set of open room names that matches the current `room.name`.
+      filteredRoomNameSet() {
+        const filtered = new Set();
+        const roomNameRe = new RegExp(this.room.name, 'i');
+        for (const openRoom of this.allRooms) {
+          if (openRoom.name.match(roomNameRe)) {
+            filtered.add(openRoom.name);
+          }
+        }
+        return filtered;
+      },
     },
     methods: {
       md5,
@@ -733,6 +750,11 @@
           this.room.public = true;
           this.room.roundsInGame = 13;
         }
+      },
+      // Returns a bool indicating if the provided Room object should be muted due to not matching the
+      // currently entered Room field. Will always return false if no open rooms match the current room name.
+      isMuteOpenRoom: function (openRoom) {
+        return this.filteredRoomNameSet.size != 0 && !this.filteredRoomNameSet.has(openRoom.name);
       },
       correct,
       isEnd,
