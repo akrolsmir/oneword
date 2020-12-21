@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+
+<head>
+  <title>Ruby Shoes</title>
+  <link
+    href="https://fonts.googleapis.com/css?family=Fjalla+One|Merienda+One|Righteous|Sriracha&display=swap"
+    rel="stylesheet"
+  />
+  <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
+  <link rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    html {
+      margin: 0;
+      height: 100%;
+      background-color: #d6c6a2;
+      background-image: linear-gradient(to right, rgb(245, 216, 178), rgb(181, 181, 255));
+      position: relative;
+      overflow: auto;
+    }
+
+    .fancy {
+      font-family: 'Merienda One', cursive;
+      margin-top: 16px;
+      font-size: 24px;
+    }
+
+    .fancy.big {
+      margin-top: 0;
+      font-size: 40px;
+    }
+
+    .fancy.normal {
+      margin-top: 0;
+      font-size: 100%;
+    }
+
+    body {
+      margin: 48px auto;
+      width: 600px;
+      max-width: 95vw;
+    }
+
+    .spacy {
+      white-space: pre-wrap;
+    }
+
+    .label {
+      margin-top: 20px;
+    }
+
+    .newline {
+      white-space: pre-wrap;
+    }
+
+    .capitalize {
+      text-transform: capitalize;
+    }
+
+    .tag {
+      font-size: 0.875rem !important;
+    }
+
+    .history {
+      max-height: 400px;
+      overflow: auto;
+    }
+
+    [v-cloak] {
+      display: none;
+    }
+  </style>
+
+  <meta name="description" content="Choose your friends' adventure" />
+
+  <!-- Magic wand favicon courtesy of Twemoji -->
+  <link rel="icon" href="https://twemoji.maxcdn.com/v/13.0.1/72x72/1fa84.png" />
+</head>
+
+<body class="has-navbar-fixed-top">
+  <div id="vue">
+    <navbar ref="navbar" v-model="user"></navbar>
+    <div class="modal" :class="{'is-active': alertIsShowing}">
+      <div class="modal-background" @click="alertIsShowing=false"></div>
+      <div class="modal-content">
+        <div class="notification">
+          <label class="is-block mb-2">Invite your friends to play!</label>
+          <sharelink :link="'https://oneword.games/?room=' + room.name"></sharelink>
+          <button class="delete" aria-label="close" @click="alertIsShowing=false"></button>
+        </div>
+      </div>
+    </div>
+    <!-- Home page -->
+    <div v-if="!room.players" class="container mx-4">
+      You and your friends find yourself in a text adventure, but you are all controlling the same person. On your turn,
+      choose what the character will do, then your friends will continue the story... But you get to choose your
+      friend's adventure!
+      <form v-if="user.id || user.guest" @submit.prevent="enterRoom" method="POST">
+        <label class="label">Player</label>
+        <input class="input" type="text" v-model="player.name" placeholder="Ringo" />
+        <label class="label">Room</label>
+        <input class="input" type="text" v-model="room.name" placeholder="apple" required /><br /><br />
+        <input class="button" type="submit" value="Enter Room" />
+      </form>
+      <template v-else>
+        <br />
+        <button class="button is-large is-success" @click="$refs.navbar.logIn()">Sign in to get started</button><br />
+        <a @click='$set(user, "guest", true)' class="is-size-7">Play without an account</a>
+      </template>
+
+      <br /><br />
+      <h2 class="fancy">Open Rooms</h2>
+      <template v-for="openRoom in allRooms">
+        <p>
+          <a @click="room.name = openRoom.name; enterRoom()"><b>{{ openRoom.name }}</b></a
+          >, with {{ openRoom.players.join(', ') }} ({{ moment(openRoom.lastUpdateTime).fromNow() }})
+        </p>
+      </template>
+    </div>
+    <!-- In game -->
+    <div v-cloak v-else class="container mx-4">
+      <div class="message">
+        <!-- Room header -->
+        <div class="message-header has-text-weight-normal is-flex-wrap-wrap">
+          <h1 class="fancy">Room: {{ room.name }}</h1>
+
+          <!-- Navigation -->
+          <span class="buttons are-small">
+            <button class="button is-dark is-inverted is-outlined" @click="alertIsShowing=true">Invite</button>
+            <button
+              v-if="room.players.includes(player.name)"
+              class="button is-dark is-inverted is-outlined"
+              @click="kickPlayer(player.name)"
+            >
+              Watch
+            </button>
+            <button v-else class="button is-dark is-inverted is-outlined" @click="joinRoom">Rejoin</button>
+            <button class="button is-danger is-inverted is-outlined" @click="kickPlayer(player.name); goHome();">
+              Exit
+            </button>
+          </span>
+        </div>
+        <div>
+          <div class="is-flex is-flex-wrap-wrap is-align-items-center">
+            <!-- Supporter Settings -->
+            <span
+              title="Supporter settings"
+              class="py-1 pl-1 pr-4"
+              style="background: #ffef99; clip-path: polygon(0 0, 0 100%, 93% 100%, 100% 0)"
+            >
+              <div class="mx-1" v-if="isMod">
+                <span class="select is-small">
+                  <select v-model="room.public" @change="upsell('public')">
+                    <option v-bind:value="true">Public</option>
+                    <option v-bind:value="false">Private</option>
+                  </select>
+                </span>
+              </div>
+              <template v-else>
+                <span class="mx-2">{{ room.public ? 'Public' : 'Private' }} Room</span>
+              </template>
+            </span>
+          </div>
+        </div>
+
+        <div class="message-body" style="border-width: 0">
+          <!-- Players -->
+          <div class="field is-grouped is-grouped-multiline">
+            <span class="mb-2 mr-2">Players:</span>
+            <nametag
+              v-for="(player, i) in room.players"
+              :name="player"
+              :user="room.playerData && room.playerData[player]"
+              :index="i"
+              :submitted="!!room.currentRound.responses[player] || room.currentRound.chooser == player"
+              :guessing="room.currentRound.chooser == player"
+              :mod="isMod"
+              @kick="kickPlayer(player)"
+            ></nametag>
+          </div>
+          <!-- Other Mod Tools -->
+          <div v-if="isMod">
+            <div class="label">Room Controls</div>
+            <div class="field has-addons is-inline-flex mb-0">
+              <span class="control">
+                <button class="button is-small" @click="nextStage">Next Stage</button>
+              </span>
+
+              <span v-if="this.user.supporter == 'ADMIN'" class="control">
+                <button class="button is-small" @click="resetRoom">Reset Room</button>
+              </span>
+            </div>
+            <div class="field has-addons is-inline-flex">
+              <span class="control">
+                <button class="button is-small" @click="makeMod(newMod)">Transfer Mod</button>
+              </span>
+              <span class="control">
+                <span class="select is-small">
+                  <select v-model="newMod">
+                    <option v-for="player in this.room.players.slice(1)">{{ player }}</option>
+                  </select>
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="history">
+        <template v-for="round in room.history">
+          <div :title="round.chooser">&gt; {{ round.prompt }}</div>
+          <p>{{ round.responses[round.choice] }}</p>
+          <br />
+        </template>
+      </div>
+
+      <div v-if="room.players.length < 3">
+        <h2 class="fancy" role="alert">Waiting for 3 players...</h2>
+        <p class="mt-5 mb-2">Invite your friends to play!</p>
+        <sharelink :link="'https://oneword.games/rapidsilver.html?room=' + room.name"></sharelink>
+        <!-- TODO: choose your starting prompt -->
+      </div>
+
+      <div v-else class="card">
+        <h2 aria-live="polite">{{ prettyStatus }}</h2>
+        <!-- Prompt -->
+        <template v-if="room.currentRound.state == 'PROMPT'">
+          <template v-if="isChooser">
+            <div class="field has-addons">
+              <div class="control">
+                <input class="input" v-model="room.currentRound.prompt" />
+              </div>
+              <div class="control">
+                <button class="button" @click="submitPrompt">Submit</button>
+              </div>
+            </div>
+            <!-- TODO suggested actions -->
+          </template>
+        </template>
+        <!-- Response -->
+        <template v-else-if="room.currentRound.state == 'RESPONSE'">
+          <strong class="is-size-3">&gt; {{ room.currentRound.prompt }}</strong>
+          <template v-if="!isChooser">
+            <div class="field has-addons">
+              <div class="control is-expanded">
+                <input
+                  class="input"
+                  id="responseInput"
+                  type="text"
+                  v-model="player.response"
+                  @keyup.enter="submitResponse"
+                  :class="{'is-primary': room.currentRound.responses[player.name]}"
+                  :disabled="!room.players.includes(player.name)"
+                />
+              </div>
+              <div class="control">
+                <button class="button" @click="submitResponse" :disabled="!room.players.includes(player.name)">
+                  Submit
+                </button>
+              </div>
+            </div>
+          </template>
+        </template>
+        <!-- Choosing -->
+        <template v-else-if="room.currentRound.state == 'CHOOSING'">
+          <strong class="is-size-3">&gt; {{ room.currentRound.prompt }}</strong>
+          <div class="content">
+            <ol>
+              <li v-for="(response, player) in room.currentRound.responses">
+                {{ response }} <a v-if="isChooser" href="#" @click.prevent="chooseResponse(player)">Choose</a>
+              </li>
+            </ol>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.2/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert@2.1.2/dist/sweetalert.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/blueimp-md5@2.13.0/js/md5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pluralize@8.0.0/pluralize.js"></script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-firestore.js"></script>
+
+<!-- My code -->
+<script type="module" src="firebase-network.js"></script>
+<script type="module" src="components/nametag.js"></script>
+<script type="module" src="components/navbar.js"></script>
+<script type="module" src="components/timer.js"></script>
+<script type="module" src="components/scoreboard.js"></script>
+<script type="module" src="components/sharelink.js"></script>
+<script>
+  window.COLLECTION = 'silver';
+</script>
+<script type="module">
+  import { nouns, compounds, verbs, adjectives } from './many-words.js';
+  import {
+    setRoom,
+    updateRoom,
+    getRoom,
+    listRooms,
+    listenRoom,
+    unlistenRoom,
+    listenForLogin,
+  } from './firebase-network.js';
+
+  /**
+   Room: {
+     name: apple,
+     players: ['alice', 'bob', 'carol'],
+     currentRound: {
+       state: 'PROMPT' // or 'RESPONSE' or 'CHOOSING'
+       chooser: 'alice',
+       prompt: 'Eat cake'
+       responses: {
+         alice: 'You fall into a hole and die',
+         bob: 'A dragon appears in front of you'
+         carol: 'You start to hear a creepy yet entrancing chant'
+       }
+       choice: 'alice'
+     }
+     history: [{round1}, ...]
+   }
+  */
+  const vueApp = new Vue({
+    el: '#vue',
+    data: {
+      user: {},
+      allRooms: [],
+      room: {
+        name: randomWord('adjectives') + '-' + randomWord('nouns'),
+        history: [],
+      },
+      player: {
+        name: '',
+        response: '',
+        choice: '',
+      },
+      alertIsShowing: false,
+      newMod: '',
+      wordsSaved: false,
+    },
+    async mounted() {
+      this.allRooms = (await listRooms()).filter((room) => room.players.length > 0);
+      const parsedUrl = new URL(window.location.href);
+      const roomName = parsedUrl.searchParams.get('room');
+      const playerName = parsedUrl.searchParams.get('player');
+      if (playerName) {
+        this.player.name = playerName;
+      }
+      if (roomName) {
+        this.room.name = roomName;
+        await this.enterRoom();
+      }
+    },
+    watch: {
+      'room.currentRound.state'(state) {
+        // Clean up past inputs when the round moves forward.
+        if (state == 'GUESSING') {
+          this.player.response = '';
+        }
+      },
+    },
+    computed: {
+      isMod() {
+        if (this.user.supporter == 'ADMIN') {
+          return true;
+        }
+        if (this.room && this.room.players) {
+          return this.player.name == this.room.players[0];
+        }
+      },
+      isChooser() {
+        return this.player.name == this?.room?.currentRound.chooser;
+      },
+      prettyStatus() {
+        if (this.room.currentRound.state == 'PROMPT') {
+          return this.isChooser ? 'What do?' : `Consider what ${this.room.currentRound.chooser} would do`;
+        } else if (this.room.currentRound.state == 'RESPONSE') {
+          return this.isChooser ? 'The future has not yet been written' : 'Write what happens next';
+        } else if (this.room.currentRound.state == 'CHOOSING') {
+          return this.isChooser ? 'Choose a fate' : `${this.room.currentRound.chooser} is deciding the future.`;
+        }
+      },
+    },
+    methods: {
+      md5,
+      moment,
+      listRooms,
+      async enterRoom() {
+        if (!this.player.name) {
+          this.$refs.navbar.logIn();
+          return;
+        }
+        // Sanitize room name
+        this.room.name = this.room.name
+          .trim()
+          .toLowerCase()
+          .replace(/\s/g, '-') // whitespace
+          .replace(/[^\p{L}-]/gu, ''); // not (dash or letter in any language)
+
+        const room = await getRoom(this.room);
+
+        if (room) {
+          // If the player's name collides with another user's,
+          // prepend adjectives until it is unique
+          while (
+            room.players.includes(this.player.name) &&
+            (this.user.guest || this.user.email != room.playerData[this.player.name].email)
+          ) {
+            this.player.name = capitalize(randomWord('adjectives')) + ' ' + this.player.name;
+          }
+
+          this.room = room;
+          return await this.joinRoom();
+        } else {
+          // Create a new room
+          listenRoom(this);
+          return await this.resetRoom();
+        }
+      },
+      async resetRoom() {
+        this.room = {
+          name: this.room.name,
+          players: [this.player.name],
+          currentRound: {
+            state: 'PROMPT',
+            chooser: this.player.name,
+            choice: '',
+            word: randomWord(),
+            responses: {},
+            category: 'nouns',
+          },
+          history: [],
+          public: true,
+          lastUpdateTime: Date.now(),
+          categories: {
+            nouns: true,
+            verbs: false,
+            adjectives: false,
+            compounds: false,
+            custom: false,
+          },
+          customWords: '',
+          playerData: {
+            [this.player.name]: {
+              email: this.user.email || '',
+              supporter: this.user.supporter || '',
+            },
+          },
+        };
+        await setRoom(this.room);
+      },
+      // Only call if room already exists.
+      async joinRoom() {
+        listenRoom(this);
+
+        // migration
+        if (!this.room.playerData) {
+          this.room.playerData = {};
+        }
+
+        const { email = '', supporter = '' } = this.user;
+        this.room.playerData[this.player.name] = { email, supporter };
+
+        if (this.room.players.includes(this.player.name)) {
+          await this.saveRoom('playerData');
+        } else {
+          this.room.players.push(this.player.name);
+          await this.saveRoom('playerData', 'players');
+        }
+      },
+      goHome() {
+        unlistenRoom();
+        this.room = { name: '' };
+      },
+      async kickPlayer(name) {
+        if (this.room.players.includes(name)) {
+          const index = this.room.players.indexOf(name);
+          this.room.players.splice(index, 1);
+          await this.saveRoom('players');
+        }
+      },
+      async makeMod(name) {
+        const index = this.room.players.indexOf(name);
+        if (index >= 0) {
+          // swap players[0] and players[index]
+          [this.room.players[0], this.room.players[index]] = [this.room.players[index], this.room.players[0]];
+          await this.saveRoom('players');
+        }
+      },
+      async submitPrompt() {
+        await updateRoom(this.room, {
+          'currentRound.prompt': this.room.currentRound.prompt,
+          'currentRound.state': 'RESPONSE',
+        });
+      },
+      async submitResponse() {
+        const update = {};
+        update[`currentRound.responses.${this.player.name}`] = this.player.response;
+        // If all responses are in, move to guessing
+        const done = this.room.players.every(
+          (p) => this.room.currentRound.responses[p] || p == this.room.currentRound.chooser
+        );
+        if (done) {
+          update['currentRound.state'] = 'CHOOSING';
+        }
+        await updateRoom(this.room, update);
+      },
+      async chooseResponse(player) {
+        await updateRoom(this.room, { 'currentRound.choice': player });
+        await this.newRound();
+      },
+      async nextStage() {
+        if (this.room.currentRound.state == 'PROMPT') {
+          return await updateRoom(this.room, { 'currentRound.state': 'RESPONSE' });
+        } else if (this.room.currentRound.state == 'RESPONSE') {
+          return await updateRoom(this.room, { 'currentRound.state': 'CHOOSING' });
+        } else if (this.room.currentRound.state == 'CHOOSING') {
+          await updateRoom(this.room, { 'currentRound.state': 'PROMPT' });
+          return await this.newRound();
+        }
+      },
+      async submitGuess() {
+        const update = {
+          'currentRound.choice': this.player.choice.toLowerCase().trim(),
+          'currentRound.state': 'DONE',
+        };
+        await updateRoom(this.room, update);
+      },
+      async newRound() {
+        this.room.history.push(this.room.currentRound);
+        this.room.currentRound = {
+          state: 'PROMPT',
+          chooser: nextChooser(this.room.currentRound.chooser, this.room.players),
+          choice: '',
+          responses: {},
+        };
+        this.room.lastUpdateTime = Date.now();
+
+        // Overwrite existing room;
+        await setRoom(this.room);
+      },
+      // Sync any number of properties of this.room to firebase
+      async saveRoom(...props) {
+        await updateRoom(this.room, Object.fromEntries(props.map((prop) => [prop, this.room[prop]])));
+      },
+      async upsell(...props) {
+        if (this.user.supporter) {
+          await this.saveRoom(...props);
+        } else {
+          const result = await swal({
+            title: 'Want private rooms?',
+            text: 'Earn perks like private rooms, custom avatars, and more by becoming a supporter 😍',
+            buttons: {
+              cancel: 'Not now',
+              support: 'Okay!',
+            },
+          });
+          if (result === 'support') {
+            firebase.analytics().logEvent('view_promotion', {
+              source: 'modtools',
+            });
+            window.open('./supporter.html', '_blank');
+          }
+          // Reset UI to non-supporter defaults
+          this.room.public = true;
+        }
+      },
+    },
+  });
+
+  listenForLogin(vueApp);
+
+  function nextChooser(lastchooser, players) {
+    const nextIndex = (players.indexOf(lastchooser) + 1 + players.length) % players.length;
+    return players[nextIndex];
+  }
+
+  function randomWord(category = 'nouns', customWords = '') {
+    const custom = customWords.split(/\s/);
+    const categories = { nouns, compounds, verbs, adjectives, custom };
+    const words = categories[category];
+    return words[Math.floor(Math.random() * words.length)].toLowerCase();
+  }
+
+  function capitalize(str) {
+    return str ? str[0].toLocaleUpperCase() + str.substring(1) : '';
+  }
+</script>
