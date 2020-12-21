@@ -65,7 +65,15 @@
         </select>
       </div>
       <button class="button" @click="pickPartner(player.target)">Pick</button>
+
+      <!-- List partners for now -->
+      <h3>Not-so-secret partners</h3>
+      <div v-for="value, player in room.round.secret">{{ player }} picked {{ value.target }}</div>
     </div>
+
+    <!-- 1:1 chat -->
+    <h3>Second Chat</h3>
+    <!-- Goes here -->
     <br /><br />
 
     <!-- Mod tools -->
@@ -117,17 +125,18 @@
             partner: 'carol',
             chatlog: {...}
           }
-          murder: {
-            target: 'bob'
-          }
         }
         main2: { // 120s
+          murder: {
+            target: 'bob',
+            approved: 'SORCERER',
+          }
           chatlog: {...}
         }
         night: { // 60s
           assasination: {
             target: 'alice',
-            // flavor: 'Alice tripped on a suspiciously placed rock and died'
+            // flavor: 'A ambitious caption fired Alice, and they died'????
           }
         }
       }
