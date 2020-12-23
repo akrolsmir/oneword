@@ -66,6 +66,10 @@
       font-size: 0.875rem !important; /* Bulma's normal tag (0.75 rem) is too small and medium tag (1 rem) is too big */
     }
 
+    .halfOpacity {
+      opacity: 0.5;
+    }
+
     [v-cloak] {
       display: none;
     }
@@ -113,7 +117,7 @@
     <div v-if="!room.players" class="container mx-4">
       <!-- Announcements -->
       <div class="notification is-link has-text-centered">
-        Try our new team-vs-team word game, <a href="incrypt.html">Incrypt</a>!
+        Join our official <a href="https://discord.gg/23wKGz2sNw">discord</a> to chat with other players!
       </div>
 
       <div class="fancy big">Welcome!</div>
@@ -144,7 +148,7 @@
           ({{ moment(privateRoom.lastUpdateTime).fromNow() }})
         </p>
         <h2 class="fancy">Open Rooms</h2>
-        <p v-for="openRoom in allRooms">
+        <p v-for="openRoom in allRooms" v-bind:class="{ halfOpacity: isMuteOpenRoom(openRoom) }">
           <a @click="room.name = openRoom.name; enterRoom()"><b>{{ openRoom.name }}</b></a
           >, with {{ openRoom.players.join(', ') }} ({{ moment(openRoom.lastUpdateTime).fromNow() }})
         </p>
@@ -305,6 +309,9 @@
               </span>
               <span class="control">
                 <button class="button is-small" @click="newRound(true)">Skip Word</button>
+              </span>
+              <span v-if="this.user.supporter == 'ADMIN'" class="control">
+                <button class="button is-small" @click="resetRoom">Reset Room</button>
               </span>
             </div>
             <div class="field has-addons is-inline-flex">
@@ -476,21 +483,21 @@
   } from './firebase-network.js';
 
   /**
-   Room: {
-     name: apple,
-     players: ['alice', 'bob', 'carol'],
-     currentRound: {
-       state: 'clueing' // or 'guessing', or 'done'
-       guesser: 'alice',
-       word: 'company'
-       clues: {
-         alice: 'corporation',
-         bob: 'collected'
-         carol: 'collected'
-       }
-     }
-     history: [{round1}, ...]
-   }
+  Room: {
+    name: apple,
+      players: ['alice', 'bob', 'carol'],
+      currentRound: {
+        state: 'clueing' // or 'guessing', or 'done'
+        guesser: 'alice',
+        word: 'company'
+        clues: {
+          alice: 'corporation',
+          bob: 'collected'
+          carol: 'collected'
+        }
+      }
+      history: [{round1}, ...]
+    }
   */
   const vueApp = new Vue({
     el: '#vue',
@@ -554,6 +561,17 @@
         if (this.room && this.room.players) {
           return this.player.name == this.room.players[0];
         }
+      },
+      // Returns the set of open room names that matches the current `room.name`.
+      filteredRoomNameSet() {
+        const filtered = new Set();
+        const roomNameRe = new RegExp(this.room.name, 'i');
+        for (const openRoom of this.allRooms) {
+          if (openRoom.name.match(roomNameRe)) {
+            filtered.add(openRoom.name);
+          }
+        }
+        return filtered;
       },
     },
     methods: {
@@ -760,6 +778,11 @@
         }
       },
       referSupporter,
+      // Returns a bool indicating if the provided Room object should be muted due to not matching the
+      // currently entered Room field. Will always return false if no open rooms match the current room name.
+      isMuteOpenRoom: function (openRoom) {
+        return this.filteredRoomNameSet.size != 0 && !this.filteredRoomNameSet.has(openRoom.name);
+      },
       correct,
       isEnd,
       score,
