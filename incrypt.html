@@ -72,9 +72,9 @@
   <div id="vue">
     <navbar ref="navbar" v-model="user"></navbar>
     <!-- Beta announcement -->
-    <div class="notification is-danger is-light">
+    <!-- <div class="notification is-danger is-light">
       Incrypt is currently in beta. Got feedback? Email <a href="mailto:austin@oneword.games">austin@oneword.games</a>!
-    </div>
+    </div> -->
     <!-- Home page -->
     <div v-if="!room.redTeam">
       <h1>Welcome to Incrypt!</h1>
@@ -119,60 +119,6 @@
         <span>{{ room.blueTeam.name }}</span> team 🙂
       </div>
 
-      <!-- Team rosters -->
-      <div v-if="room.state !== 'NOT_STARTED'" class="mb-2">
-        <div class="columns">
-          <div class="column" v-for="team in ['redTeam', 'blueTeam']">
-            <h3>{{ room[team].name }} team: {{ room[team].players.join(', ') }}</h3>
-            <!-- Show the current scores on each team -->
-            👻 {{ intercepted(other(team), room.history) }} interceptions ({{ 2 * room[team].players.length }} to win)
-            <br />
-            🤦‍♀️ {{ dropped(team, room.history) }} dropped messages ({{ 2 * room[team].players.length - 2}} to lose)
-            <br />
-          </div>
-        </div>
-      </div>
-
-      <div v-if="room.state !== 'NOT_STARTED'" class="mb-2">
-        <!-- Show the current words -->
-        <div class="columns words">
-          <div class="column" v-for="(word, i) in myTeam.words">
-            <div class="notification" :class="isRed ? 'is-danger' : 'is-info'">
-              <small>Word {{ i + 1 }}</small>
-              <h2>{{ word }}</h2>
-            </div>
-          </div>
-        </div>
-
-        <!-- Show the current state of the game -->
-        <div class="notification has-text-centered">
-          Round {{ room.history.length + 1 }}:
-          <span v-if="room.state === 'ENCODING'"><b>🔏 Incrypt</b></span>
-          <span v-else>Incrypt</span> -
-          <template v-if="room.history.length === 0">
-            <span v-if="room.state === 'BOTH_DECODE'"><b>🔴🔵 Decrypt</b></span>
-            <span v-else>Decrypt</span> -
-          </template>
-          <template v-else>
-            <span v-if="room.state === 'RED_DECODE'"><b>🔴 Decrypt Red</b></span>
-            <span v-else>Decrypt Red</span> -
-            <span v-if="room.state === 'BLUE_DECODE'"><b>🔵 Decrypt Blue</b></span>
-            <span v-else>Decrypt Blue</span> -
-          </template>
-          <span v-if="room.state === 'DONE'"><b>✔️ Debrief</b></span>
-          <span v-else>Debrief</span>
-
-          <!-- Show the timer. -->
-          <timer
-            class="mt-2"
-            :length="room.timerLength"
-            :on-finish="nextState"
-            v-if="room.timerLength > 0 && room.state !== 'DONE'"
-            :key="room.state"
-          ></timer>
-        </div>
-      </div>
-
       <!-- Pre-game: Waiting for players -->
       <div v-if="room.state === 'NOT_STARTED'">
         <h2>Room: {{ room.name }}</h2>
@@ -209,6 +155,38 @@
         <div class="mb-2">Invite your friends to play!</div>
         <sharelink :link="'https://oneword.games/incrypt?room=' + room.name"></sharelink>
       </div>
+
+      <!-- Team rosters -->
+      <div v-if="room.state !== 'NOT_STARTED'" class="mb-2">
+        <!-- Show the current state of the game -->
+        <div class="notification has-text-centered">
+          Round {{ room.history.length + 1 }}:
+          <span v-if="room.state === 'ENCODING'"><b>🔏 Incrypt</b></span>
+          <span v-else>Incrypt</span> -
+          <template v-if="room.history.length === 0">
+            <span v-if="room.state === 'BOTH_DECODE'"><b>🔴🔵 Decrypt</b></span>
+            <span v-else>Decrypt</span> -
+          </template>
+          <template v-else>
+            <span v-if="room.state === 'RED_DECODE'"><b>🔴 Decrypt Red</b></span>
+            <span v-else>Decrypt Red</span> -
+            <span v-if="room.state === 'BLUE_DECODE'"><b>🔵 Decrypt Blue</b></span>
+            <span v-else>Decrypt Blue</span> -
+          </template>
+          <span v-if="room.state === 'DONE'"><b>✔️ Debrief</b></span>
+          <span v-else>Debrief</span>
+
+          <!-- Show the timer. -->
+          <timer
+            class="mt-2"
+            :length="room.timerLength"
+            :on-finish="nextState"
+            v-if="room.timerLength > 0 && room.state !== 'DONE'"
+            :key="room.state"
+          ></timer>
+        </div>
+      </div>
+
       <!-- Part 1: Spies are encoding their messages -->
       <div v-cloak v-if="room.state === 'ENCODING'" class="box">
         <div v-if="player.name === myTeam.round.spy">
@@ -373,21 +351,27 @@
         <button v-else class="button" @click="newRound">Next round</button>
       </div>
 
-      <!-- Mod tools -->
-      <div class="notification" v-if="isMod">
-        <h2>Mod tools</h2>
-        <br />
+      <div v-if="room.state !== 'NOT_STARTED'" class="mb-2 mt-6">
         <div class="columns">
-          <div class="column">
-            <button class="button is-small is-danger" @click="resetRoom">Reset game</button>
+          <div class="column" v-for="team in ['redTeam', 'blueTeam']">
+            <h3>{{ room[team].name }} team: {{ room[team].players.join(', ') }}</h3>
+            <!-- Show the current scores on each team -->
+            👻 {{ intercepted(other(team), room.history) }} interceptions ({{ 2 * room[team].players.length }} to win)
+            <br />
+            🤦‍♀️ {{ dropped(team, room.history) }} dropped messages ({{ 2 * room[team].players.length - 2}} to lose)
+            <br />
           </div>
-          <div class="column">
-            <button class="button is-small" @click="nextState">Next stage</button>
-          </div>
-          <div class="column">
-            <input class="input is-small" style="flex: 1 2 48px" v-model.number="player.timerLength" />
+        </div>
+      </div>
 
-            <button class="button is-small" @click="updateTimer">Set Timer</button>
+      <div v-if="room.state !== 'NOT_STARTED'" class="mb-6">
+        <!-- Show the current words -->
+        <div class="columns words">
+          <div class="column" v-for="(word, i) in myTeam.words">
+            <div class="notification" :class="isRed ? 'is-danger' : 'is-info'">
+              <small>Word {{ i + 1 }}</small>
+              <h2>{{ word }}</h2>
+            </div>
           </div>
         </div>
       </div>
@@ -431,6 +415,25 @@
             </div>
           </div>
         </template>
+      </div>
+
+      <!-- Mod tools -->
+      <div class="notification mt-4 mb-6" v-if="isMod">
+        <h2>Mod tools</h2>
+        <br />
+        <div class="columns">
+          <div class="column">
+            <button class="button is-small is-danger" @click="resetRoom">Reset game</button>
+          </div>
+          <div class="column">
+            <button class="button is-small" @click="nextState">Next stage</button>
+          </div>
+          <div class="column">
+            <input class="input is-small" style="flex: 1 2 48px" v-model.number="player.timerLength" />
+
+            <button class="button is-small" @click="updateTimer">Set Timer</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
