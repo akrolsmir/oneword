@@ -84,15 +84,33 @@
 <body class="has-navbar-fixed-top">
   <div id="vue">
     <navbar ref="navbar" v-model="user"></navbar>
-    <!-- Notification -->
-    <div class="modal" :class="{'is-active': alertIsShowing}">
-      <div class="modal-background" @click="alertIsShowing=false"></div>
+    <!-- Share Link Notification -->
+    <div class="modal" :class="{'is-active': showShareModal}">
+      <div class="modal-background" @click="showShareModal=false"></div>
       <div class="modal-content">
         <div class="notification">
           <label class="is-block mb-2">Invite your friends to play!</label>
           <sharelink :link="'https://oneword.games/?room=' + room.name"></sharelink>
-          <button class="delete" aria-label="close" @click="alertIsShowing=false"></button>
+          <button class="delete" aria-label="close" @click="showShareModal=false"></button>
         </div>
+      </div>
+    </div>
+    <!-- Private Room Notification -->
+    <div class="modal" :class="{'is-active': showPrivateModal}">
+      <div class="modal-background" @click="showPrivateModal=false"></div>
+      <div class="modal-card">
+        <header class="modal-card-head">
+          <p class="modal-card-title">Private room</p>
+          <button class="delete" aria-label="close" @click="showPrivateModal=false"></button>
+        </header>
+        <section class="modal-card-body">
+          This room is private. To join, ask your teammates for the room name or link.<br /><br />
+
+          To make your own private room, become a supporter!<br />
+        </section>
+        <footer class="modal-card-foot">
+          <button class="button is-warning" @click="referSupporter('private_room_modal')">Become a supporter</button>
+        </footer>
       </div>
     </div>
     <!-- Home page -->
@@ -122,15 +140,20 @@
       </template>
 
       <br /><br />
-      <h2 class="fancy">Open Rooms</h2>
-      <template v-for="openRoom in allRooms">
-        <div v-bind:class="{ halfOpacity: isMuteOpenRoom(openRoom) }">
-          <p>
-            <a @click="room.name = openRoom.name; enterRoom()"><b>{{ openRoom.name }}</b></a
-            >, with {{ openRoom.players.join(', ') }} ({{ moment(openRoom.lastUpdateTime).fromNow() }})
-          </p>
-        </div>
-      </template>
+      <div v-cloak>
+        <h2 class="fancy">Open Rooms</h2>
+        <p v-for="openRoom in allRooms" v-bind:class="{ halfOpacity: isMuteOpenRoom(openRoom) }">
+          <a @click="room.name = openRoom.name; enterRoom()"><b>{{ openRoom.name }}</b></a
+          >, with {{ openRoom.players.join(', ') }} ({{ moment(openRoom.lastUpdateTime).fromNow() }})
+        </p>
+        <h2 class="fancy">Private Rooms</h2>
+        <p v-for="privateRoom in privateRooms">
+          <a @click="showPrivateModal = true"><b>{{ "Private room" }} with {{ privateRoom.players[0] }}</b></a>
+          <span v-if="privateRoom.players.length > 1"> and {{ privateRoom.players.length }} others</span>
+          ({{ moment(privateRoom.lastUpdateTime).fromNow() }})
+        </p>
+      </div>
+      <br /><br /><br /><br /><br />
     </div>
     <!-- In game -->
     <div v-cloak v-else class="container mx-4">
@@ -141,7 +164,7 @@
           <span class="fancy capitalize">Round {{ room.history.length + 1 }}</span>
           <!-- Navigation -->
           <span class="buttons are-small">
-            <button class="button is-dark is-inverted is-outlined" @click="alertIsShowing=true">Invite</button>
+            <button class="button is-dark is-inverted is-outlined" @click="showShareModal=true">Invite</button>
             <button
               v-if="room.players.includes(player.name)"
               class="button is-dark is-inverted is-outlined"
@@ -460,27 +483,28 @@
   } from './firebase-network.js';
 
   /**
-   Room: {
-     name: apple,
-     players: ['alice', 'bob', 'carol'],
-     currentRound: {
-       state: 'clueing' // or 'guessing', or 'done'
-       guesser: 'alice',
-       word: 'company'
-       clues: {
-         alice: 'corporation',
-         bob: 'collected'
-         carol: 'collected'
-       }
-     }
-     history: [{round1}, ...]
-   }
+  Room: {
+    name: apple,
+      players: ['alice', 'bob', 'carol'],
+      currentRound: {
+        state: 'clueing' // or 'guessing', or 'done'
+        guesser: 'alice',
+        word: 'company'
+        clues: {
+          alice: 'corporation',
+          bob: 'collected'
+          carol: 'collected'
+        }
+      }
+      history: [{round1}, ...]
+    }
   */
   const vueApp = new Vue({
     el: '#vue',
     data: {
       user: {},
       allRooms: [],
+      privateRooms: [],
       room: {
         name: randomWord('adjectives') + '-' + randomWord('nouns'),
         history: [],
@@ -490,7 +514,8 @@
         clue: '',
         guess: '',
       },
-      alertIsShowing: false,
+      showShareModal: false,
+      showPrivateModal: false,
       newMod: '',
       wordsSaved: false,
     },
@@ -499,7 +524,7 @@
       this.CATEGORY_ORDER = ['nouns', 'verbs', 'adjectives', 'compounds', 'custom'];
     },
     async mounted() {
-      this.allRooms = (await listRooms()).filter((room) => room.players.length > 0);
+      this.populateHome(); // Begin listing rooms, but don't wait for the result to mount
       const parsedUrl = new URL(window.location.href);
       const roomName = parsedUrl.searchParams.get('room');
       const playerName = parsedUrl.searchParams.get('player');
@@ -554,6 +579,10 @@
       moment,
       listRooms,
       dedupe,
+      async populateHome() {
+        this.privateRooms = (await listRooms(5, false)).filter((room) => room.players.length > 0);
+        this.allRooms = (await listRooms(20, true)).filter((room) => room.players.length > 0);
+      },
       async enterRoom() {
         if (!this.player.name) {
           this.$refs.navbar.logIn();
@@ -741,16 +770,14 @@
             },
           });
           if (result === 'support') {
-            firebase.analytics().logEvent('view_promotion', {
-              source: 'modtools',
-            });
-            window.open('./supporter.html', '_blank');
+            referSupporter('modtools');
           }
           // Reset UI to non-supporter defaults
           this.room.public = true;
           this.room.roundsInGame = 13;
         }
       },
+      referSupporter,
       // Returns a bool indicating if the provided Room object should be muted due to not matching the
       // currently entered Room field. Will always return false if no open rooms match the current room name.
       isMuteOpenRoom: function (openRoom) {
@@ -761,6 +788,13 @@
       score,
     },
   });
+
+  function referSupporter(source) {
+    firebase.analytics().logEvent('view_promotion', {
+      source: source,
+    });
+    window.open('./supporter.html', '_blank');
+  }
 
   listenForLogin(vueApp);
 
