@@ -48,7 +48,7 @@ const vueApp = new Vue({
       name: '',
       // Local values & UI controls, before they get uploaded
       encode: [],
-      timerLength: 100,
+      timerLength: 120,
     },
     room: {
       // See below in created()
@@ -128,7 +128,7 @@ const vueApp = new Vue({
           round: {},
         },
         history: [],
-        timerLength: 100,
+        timerLength: 120,
         public: true,
         lastUpdateTime: Date.now(),
       };
