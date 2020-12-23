@@ -226,18 +226,7 @@
         <div v-else>
           <h3>Waiting for {{ myTeam.round.spy }} to incrypt the key...</h3>
           <br />
-          In the meantime, think of what incryptions you might use!
-          <!-- Section: Show past clues, so teammates can think -->
-          <div v-if="room.history.length > 0" class="columns mt-2">
-            <div class="column" v-for="(word, i) in myTeam.words">
-              <b>{{ i + 1 }} - {{ word }}</b>
-              <ul>
-                <li v-for="(entry, e) in room.history" v-if="entry[myTeamId].round.key.includes(i + 1)">
-                  {{ entry[myTeamId].round.encode[entry[myTeamId].round.key.indexOf(i + 1)] }}
-                </li>
-              </ul>
-            </div>
-          </div>
+          Meanwhile, think of good incryptions, or try to guess the other team's words!
         </div>
       </div>
       <div v-if="['RED_DECODE', 'BLUE_DECODE', 'BOTH_DECODE'].includes(room.state)" class="box">
@@ -371,6 +360,15 @@
             <div class="notification" :class="isRed ? 'is-danger' : 'is-info'">
               <small>Word {{ i + 1 }}</small>
               <h2>{{ word }}</h2>
+              <ul>
+                <li v-for="(entry, e) in room.history">
+                  <span v-if="entry[myTeamId].round.key.includes(i + 1)">
+                    {{ entry[myTeamId].round.encode[entry[myTeamId].round.key.indexOf(i + 1)] }}
+                  </span>
+                  &nbsp;
+                  <!-- <span v-else> ---.</span> -->
+                </li>
+              </ul>
             </div>
           </div>
         </div>
