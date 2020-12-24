@@ -56,6 +56,7 @@ const vueApp = new Vue({
     },
     user: {},
     allRooms: [],
+    showRules: false,
   },
   async created() {
     this.KEY_LENGTH = 3;

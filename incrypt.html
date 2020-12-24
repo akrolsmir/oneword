@@ -71,10 +71,35 @@
 <body class="has-navbar-fixed-top">
   <div id="vue">
     <navbar ref="navbar" v-model="user"></navbar>
-    <!-- Beta announcement -->
-    <!-- <div class="notification is-danger is-light">
-      Incrypt is currently in beta. Got feedback? Email <a href="mailto:austin@oneword.games">austin@oneword.games</a>!
-    </div> -->
+    <!-- Rules Notification -->
+    <div class="modal" :class="{'is-active': showRules}">
+      <div class="modal-background" @click="showRules=false"></div>
+      <div class="modal-content">
+        <div class="notification">
+          <h2>Incrypt Rules</h2>
+          Incrypt is a word game for two teams, based on
+          <a target="_blank" rel="noopener noreferrer" href="https://amzn.to/384qWYi">Decrypto</a>.<br />
+          Each spy incrypts three words by writing down three clues...<br />
+          Too complex? Your own team won't get the message 🤦‍♀️<br />
+          Too simple? The other team will intercept it! 👻<br />
+          <br />
+          <b>Picking clues</b><br />
+          Your incryptions should relate to the <i>meaning</i> of each word.<br />
+          NOT its <i>number</i>, or how the word <i>rhymes</i> or <i>sounds</i>.<br />
+          Don't reuse words or past incryptions!<br />
+          <br />
+          <b>Game end</b><br />
+          The game is over when either team has dropped or intercepted twice per player.<br />
+          Your team gets 10 points for an intercept, and loses 10 for a dropped message.<br />
+          Plus one bonus point for each word you can guess from their team!<br />
+          <br /><br />
+          <label class="is-block mb-2">Invite your friends to spectate!</label>
+          <sharelink :link="'https://oneword.games/?room=' + room.name"></sharelink>
+          <button class="delete" aria-label="close" @click="showRules=false"></button>
+        </div>
+      </div>
+    </div>
+
     <!-- Home page -->
     <div v-if="!room.redTeam">
       <h1>Welcome to Incrypt!</h1>
@@ -156,8 +181,11 @@
         <sharelink :link="'https://oneword.games/incrypt?room=' + room.name"></sharelink>
       </div>
 
-      <!-- Team rosters -->
       <div v-if="room.state !== 'NOT_STARTED'" class="mb-2">
+        <div class="has-text-right is-size-7 mb-1">
+          <a @click="showRules = true">Rules</a>
+        </div>
+
         <!-- Show the current state of the game -->
         <div class="notification has-text-centered">
           Round {{ room.history.length + 1 }}:
@@ -213,15 +241,7 @@
               </button>
             </div>
           </div>
-          <!-- Remind spy of the rules -->
-          <div class="content">
-            <b>Rules</b>
-            <ul>
-              <li>Your incryptions should relate to the <i>meaning</i> of each word</li>
-              <li>NOT its <i>number</i>, or how the word <i>rhymes</i> or <i>sounds</i></li>
-              <li>Don't reuse words or past incryptions!</li>
-            </ul>
-          </div>
+          <i>Don't forget the <a @click="showRules = true">rules</a>: pick meaningful clues!</i>
         </div>
         <div v-else>
           <h3>Waiting for {{ myTeam.round.spy }} to incrypt the key...</h3>
@@ -340,6 +360,7 @@
         <button v-else class="button" @click="newRound">Next round</button>
       </div>
 
+      <!-- Team rosters -->
       <div v-if="room.state !== 'NOT_STARTED'" class="mb-2 mt-6">
         <div class="columns">
           <div class="column" v-for="team in ['redTeam', 'blueTeam']">
