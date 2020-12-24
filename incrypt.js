@@ -57,6 +57,7 @@ const vueApp = new Vue({
     user: {},
     allRooms: [],
     showRules: false,
+    previewTeam: '',
   },
   async created() {
     this.KEY_LENGTH = 3;
@@ -291,6 +292,15 @@ const vueApp = new Vue({
     },
     myTeamId() {
       return this.isRed ? 'redTeam' : 'blueTeam';
+    },
+    // Which team's cards the player is looking at
+    previewTeamId: {
+      get() {
+        return this.previewTeam || this.myTeamId;
+      },
+      set(id) {
+        this.previewTeam = id;
+      },
     },
     myTeam() {
       return this.room[this.myTeamId];

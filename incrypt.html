@@ -42,6 +42,12 @@
       max-width: 95vw;
     }
 
+    /* Override with a red color, when Red Team roster is selected */
+    .tabs.is-toggle li#redTeam.is-active a {
+      background-color: crimson;
+      border-color: crimson;
+    }
+
     /* Narrow the gap between words */
     .words {
       margin: -0.25rem;
@@ -362,29 +368,33 @@
 
       <!-- Team rosters -->
       <div v-if="room.state !== 'NOT_STARTED'" class="mb-2 mt-6">
-        <div class="columns">
-          <div class="column" v-for="team in ['redTeam', 'blueTeam']">
-            <h3>{{ room[team].name }} team: {{ room[team].players.join(', ') }}</h3>
-            <!-- Show the current scores on each team -->
-            👻 {{ intercepted(other(team), room.history) }} interceptions ({{ 2 * room[team].players.length }} to win)
-            <br />
-            🤦‍♀️ {{ dropped(team, room.history) }} dropped messages ({{ 2 * room[team].players.length - 2}} to lose)
-            <br />
-          </div>
+        <div class="tabs is-toggle is-fullwidth">
+          <li v-for="team in ['redTeam', 'blueTeam']" :class="previewTeamId == team ? 'is-active' : ''" :id="team">
+            <a @click="previewTeamId = team">
+              <div>
+                <h3>{{ room[team].name }} team: {{ room[team].players.join(', ') }}</h3>
+                <!-- Show the current scores on each team -->
+                👻 {{ intercepted(other(team), room.history) }} interceptions ({{ 2 * room[team].players.length }} to
+                win)
+                <br />
+                🤦‍♀️ {{ dropped(team, room.history) }} dropped messages ({{ 2 * room[team].players.length - 2}} to lose)
+                <br />
+              </div>
+            </a>
+          </li>
         </div>
       </div>
 
       <div v-if="room.state !== 'NOT_STARTED'" class="mb-6">
-        <!-- Show the current words -->
         <div class="columns words">
           <div class="column" v-for="(word, i) in myTeam.words">
-            <div class="notification" :class="isRed ? 'is-danger' : 'is-info'">
+            <div class="notification" :class="previewTeamId == 'redTeam' ? 'is-danger' : 'is-info'">
               <small>Word {{ i + 1 }}</small>
-              <h2>{{ word }}</h2>
+              <h2>{{ previewTeamId == myTeamId ? word : '???' }}</h2>
               <ul>
                 <li v-for="(entry, e) in room.history">
-                  <span v-if="entry[myTeamId].round.key.includes(i + 1)">
-                    {{ entry[myTeamId].round.encode[entry[myTeamId].round.key.indexOf(i + 1)] }}
+                  <span v-if="entry[previewTeamId].round.key.includes(i + 1)">
+                    {{ entry[previewTeamId].round.encode[entry[previewTeamId].round.key.indexOf(i + 1)] }}
                   </span>
                   &nbsp;
                   <!-- <span v-else> ---.</span> -->
