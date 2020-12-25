@@ -66,6 +66,11 @@
       font-size: 0.875rem !important; /* Bulma's normal tag (0.75 rem) is too small and medium tag (1 rem) is too big */
     }
 
+    #custom-word-tags {
+      overflow-x: auto;
+      max-height: 100px;
+    }
+
     .halfOpacity {
       opacity: 0.5;
     }
@@ -270,10 +275,13 @@
                 <textarea
                   class="textarea is-small mb-2"
                   :class="{'is-primary': wordsSaved}"
-                  placeholder="Input your own word list"
+                  placeholder='Input your own word list e.g. "sneezy, phylum, europe, sloth, guacamole, data, colossus"...'
                   v-model="room.customWords"
                   @input="wordsSaved = false"
                 ></textarea>
+                <div id="custom-word-tags" class="tags mb-1">
+                  <span class="tag is-info" v-for="word in customWordList.slice(0, 30)">{{ word }}</span>
+                </div>
               </div>
               <div class="control">
                 <button v-if="wordsSaved" class="button is-small" disabled>Saved</button>
@@ -573,6 +581,15 @@
         }
         return filtered;
       },
+      customWordList() {
+        // If there are any commas, parse as csv; else, parse with whitespace
+        let words = this.room.customWords.split(',');
+        if (words.length <= 1) {
+          words = this.room.customWords.split(/\s/);
+        }
+        // Lowercase and trim out whitespace; take out empty words
+        return words.map((w) => w.toLowerCase().trim()).filter((w) => w);
+      },
     },
     methods: {
       md5,
@@ -740,7 +757,7 @@
             ? this.room.currentRound.guesser
             : nextGuesser(this.room.currentRound.guesser, this.room.players),
           guess: '',
-          word: nextWord(this.room.history, category, this.room.customWords),
+          word: nextWord(this.room.history, category, this.customWordList),
           clues: {},
           category,
         };
@@ -868,14 +885,13 @@
     return players[nextIndex];
   }
 
-  function randomWord(category = 'nouns', customWords = '') {
-    const custom = customWords.split(/\s/);
-    const categories = { nouns, compounds, verbs, adjectives, custom };
+  function randomWord(category = 'nouns', customWordList = []) {
+    const categories = { nouns, compounds, verbs, adjectives, custom: customWordList };
     const words = categories[category];
     return words[Math.floor(Math.random() * words.length)].toLowerCase();
   }
 
-  function nextWord(history, category = 'nouns', customWords = '') {
+  function nextWord(history, category = 'nouns', customWordList = []) {
     let word;
     let loops = 0;
     do {
@@ -884,7 +900,7 @@
         return "You're out of custom words...";
       }
       // TODO: consider generating a stable next word using seeded RNG.
-      word = randomWord(category, customWords);
+      word = randomWord(category, customWordList);
     } while (history.map((round) => round.word).includes(word));
     return word;
   }
