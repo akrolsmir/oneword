@@ -11,6 +11,10 @@ import {
 } from './firebase-network.js';
 
 const NO_VOTE = '?';
+const KEY_LENGTH = 3;
+function emptyKey() {
+  return Array(KEY_LENGTH).fill('');
+}
 
 /**
 Room: {
@@ -43,11 +47,10 @@ Room: {
 const vueApp = new Vue({
   el: '#vue',
   data: {
-    nouns,
     player: {
       name: '',
       // Local values & UI controls, before they get uploaded
-      encode: [],
+      encode: emptyKey(),
       timerLength: 120,
     },
     room: {
@@ -84,7 +87,7 @@ const vueApp = new Vue({
       this.$emit('reset-timer');
       // Clean up past inputs on each new round.
       if (state === 'DONE') {
-        this.player.encode = [];
+        this.player.encode = emptyKey();
       }
     },
   },
@@ -147,17 +150,6 @@ const vueApp = new Vue({
         BOTH_DECODE: 'DONE',
         DONE: 'ENCODING',
       };
-      // If the cluer timed out, at least fill in with empty strings
-      if (this.room.state === 'ENCODING') {
-        while (this.room.redTeam.round.encode.length < this.KEY_LENGTH) {
-          this.room.redTeam.round.encode.push('');
-          toUpdate.push('redTeam.round.encode');
-        }
-        while (this.room.blueTeam.round.encode.length < this.KEY_LENGTH) {
-          this.room.blueTeam.round.encode.push('');
-          toUpdate.push('blueTeam.round.encode');
-        }
-      }
       this.room.state = next[this.room.state];
       if (this.room.state === 'DONE') {
         // Add current round to history on DONE, to update victory conditions
@@ -179,10 +171,12 @@ const vueApp = new Vue({
       unpush(this.room[other(team)].players, this.player.name);
       await this.saveRoom('redTeam.players', 'blueTeam.players');
     },
-    async submitEncode() {
+    async prefillEncode() {
       this.myTeam.round.encode = this.player.encode;
       await this.saveRoom(`${this.myTeamId}.round.encode`);
-
+    },
+    async submitEncode() {
+      await this.prefillEncode;
       // Once both spies are done, move to intercepting (or straight to decoding in round 1)
       if (this.otherTeam.round.encode.length === this.myTeam.round.encode.length) {
         await this.nextState();
@@ -217,14 +211,14 @@ const vueApp = new Vue({
       this.room.redTeam.round = {
         spy: nextSpy(this.room.redTeam.round.spy, this.room.redTeam.players),
         key: randomKey(this.KEY_LENGTH, this.WORDS_SHOWN),
-        encode: [],
+        encode: emptyKey(),
         interceptVotes: {},
         decodeVotes: {},
       };
       this.room.blueTeam.round = {
         spy: nextSpy(this.room.blueTeam.round.spy, this.room.blueTeam.players),
         key: randomKey(this.KEY_LENGTH, this.WORDS_SHOWN),
-        encode: [],
+        encode: emptyKey(),
         interceptVotes: {},
         decodeVotes: {},
       };
@@ -262,7 +256,7 @@ const vueApp = new Vue({
     },
     other,
     keysEqual,
-    finished,
+    finishedEncoding,
     intercepted,
     dropped,
     moment,
@@ -407,9 +401,9 @@ function nextSpy(lastSpy, players) {
   return players[nextIndex];
 }
 
-// keyType = 'encode', 'intercept', 'decode'
-function finished(keyType, round) {
-  return round[keyType].length === vueApp.KEY_LENGTH;
+function finishedEncoding(round) {
+  // If any element is not true (aka empty string), still not done.
+  return !round.encode.some((e) => !e);
 }
 
 // votes = { alice: [1, 2, 3], ...}; players = ['alice', ...]

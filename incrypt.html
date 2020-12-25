@@ -228,7 +228,13 @@
           <br />
           <div class="columns">
             <div class="column" v-for="(digit, i) in myTeam.round.key">
-              <input class="input" v-model="player.encode[i]" @keyup.enter="submitEncode" />
+              <input
+                class="input"
+                v-model="player.encode[i]"
+                @keyup.enter="submitEncode"
+                @change="prefillEncode"
+                placeholder="Clue"
+              />
               <br /><br />
               <b>{{ digit }} - {{ myTeam.words[digit - 1] }}</b>
               <ul>
@@ -241,7 +247,7 @@
               <button
                 class="button"
                 @click="submitEncode()"
-                :class="finished('encode', myTeam.round) ? 'is-success' : ''"
+                :class="finishedEncoding(myTeam.round) ? 'is-success' : ''"
               >
                 Incrypt
               </button>
