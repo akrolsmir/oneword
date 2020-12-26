@@ -40,6 +40,9 @@ Vue.component('navbar', {
       });
       window.open('./incrypt.html', '_blank');
     },
+    referAbout() {
+      firebase.analytics().logEvent('view_about', { source: 'navbar' });
+    },
   },
   computed: {
     isSupporter() {
@@ -70,6 +73,7 @@ Vue.component('navbar', {
 
     <div class="navbar-end">
       <a class="navbar-item" @click="referAmazon">Buy the board game</a>
+      <a class="navbar-item" href="./about.html" @click="referAbout">About us</a>
       <a v-if="value.id" class="navbar-item" @click="logOut">
         Sign out, {{ value.name.split(' ')[0] }}?
       </a>

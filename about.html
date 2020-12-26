@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+
+<head>
+  <title>About Us</title>
+  <link
+    href="https://fonts.googleapis.com/css?family=Fjalla+One|Merienda+One|Righteous|Sriracha&display=swap"
+    rel="stylesheet"
+  />
+  <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    html {
+      margin: 0;
+      height: 100%;
+      background-color: #eaeff6;
+      position: relative;
+      overflow: auto;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: 'Merienda One', cursive;
+    }
+
+    body {
+      margin: 48px auto;
+      width: 800px;
+      max-width: 95vw;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 60px;
+    }
+
+    h2 {
+      margin-bottom: 6px;
+      font-size: 24px;
+    }
+
+    .tag {
+      font-size: 0.875rem !important;
+    }
+  </style>
+
+  <meta name="description" content="Meet the One Word team" />
+
+  <!-- Dolphin favicon courtesy of Twemoji -->
+  <link rel="icon" href="https://twemoji.maxcdn.com/v/13.0.1/72x72/1f42c.png" />
+</head>
+
+<body class="has-navbar-fixed-top">
+  <div id="about">
+    <navbar></navbar>
+    <h1>About Us</h1>
+    <article class="message container">
+      <div class="message-body" style="border: none">
+        <div class="field">
+          <nametag name="Austin Chen" :user="{ email: 'akrolsmir@gmail.com', supporter: 'ADMIN' }"></nametag>
+        </div>
+        <p>
+          I'm Austin, and I made One Word. I created this around March as a covid side project just so I could play it
+          with my friends, then to my delighted surprise it grew to what it is today. My day job is being Tech Lead at
+          <a href="https://www.streamlit.io/">Streamlit</a>. In my free time I like to host board game nights and
+          hackathons with my friends.
+        </p>
+        <br />
+        <p>Email: <a href="mailto:austin@oneword.games">austin@oneword.games</a></p>
+        <br /><br />
+        <div class="field">
+          <nametag name="Sinclair Chen" :user="{ email: 'sinclair@oneword.games', supporter: 'ADMIN' }"></nametag>
+        </div>
+        <p>
+          I'm Sinclair, Austin's sister, and I started working on One Word in July. For some reason, right after I
+          started and added a ton of site improvements, many more people started playing 🤔. Now, I continue to work on
+          this site full time as well as run our official discord, though I am currently looking for a job as a software
+          engineer.
+        </p>
+        <br />
+        <p>
+          Email: <a href="mailto:sinclair@oneword.games">sinclair@oneword.games</a><br />
+          Or contact me via my site: <a href="https://sipec.github.io">sipec.github.io</a>.
+        </p>
+        <br /><br />
+        <div class="field">
+          <nametag name="Michael Liu" :user="{ email: 'liu.titin@gmail.com', supporter: 'ADMIN'}"></nametag>
+        </div>
+        <p>
+          I'm Michael, Austin's high school friend. I do analytics for One Word, and occasionally I program new features
+          as well.
+        </p>
+        <br />
+        <p>Email: <a href="mailto:michael@oneword.games">michael@oneword.games</a></p>
+        <br /><br />
+        <div class="field">
+          <nametag name="Alice Pang" :user="{ email: 'pang.alice@gmail.com', supporter: 'ADMIN' }"></nametag>
+        </div>
+        <p>
+          I'm Alice, Austin's friend from college. I design the pretty parts of One Word &mdash; the ugly parts were
+          designed by the engineers.
+        </p>
+        <br />
+        <p>Email: <a href="mailto:alice@oneword.games">alice@oneword.games</a></p>
+        <br /><br /><br />
+        With additional thanks to Alex Lien, Shawn Xie, Harrison Tu and friends.
+      </div>
+    </article>
+    <div style="height: 4em" class="has-text-centered">
+      Want to contribute? Contact us at <a href="mailto:hello@oneword.games">hello@oneword.games</a>.<br />
+      As always, feel free to contact us if you have any questions or need support.
+    </div>
+  </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.2/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/blueimp-md5@2.13.0/js/md5.min.js"></script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-firestore.js"></script>
+
+<script type="module" src="components/navbar.js"></script>
+<script type="module" src="components/nametag.js"></script>
+<script type="module" src="firebase-network.js"></script>
+<script type="module">
+  new Vue({
+    el: '#about',
+  });
+</script>
