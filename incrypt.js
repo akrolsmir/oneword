@@ -10,6 +10,7 @@ import {
   listenForLogin,
 } from './firebase-network.js';
 
+const POINTS_PER_INTERCEPT = 10;
 const NO_VOTE = '?';
 const KEY_LENGTH = 3;
 const WORDS_SHOWN = 4; // TODO: Call these "keywords"?
@@ -21,6 +22,7 @@ function emptyKey() {
 function emptyGuesses() {
   return Array(WORDS_SHOWN).fill('');
 }
+const SUM = (a, b) => a + b;
 
 /**
 Room: {
@@ -45,7 +47,10 @@ Room: {
       },
       decodeVotes: {
         bob: [3, 1, 2],
-      }
+      },
+      // TODO: Maybe add the timer here too? And would ideally wait for each player?
+      // That'd be easier if players were a map (aka Rethink Playerdata)
+      allGuessesIn: false,
   },
   blueTeam: ...
   history: [{
@@ -74,6 +79,7 @@ const vueApp = new Vue({
     previewTeam: '',
     KEY_LENGTH,
     WORDS_SHOWN,
+    POINTS_PER_INTERCEPT,
   },
   async created() {
     const parsedUrl = new URL(window.location.href);
@@ -136,6 +142,7 @@ const vueApp = new Vue({
           wordGuesses: {},
           // Current round
           round: {},
+          allGuessesIn: false,
         },
         blueTeam: {
           name: 'Blue',
@@ -143,6 +150,7 @@ const vueApp = new Vue({
           words: randomWords(4),
           wordGuesses: {},
           round: {},
+          allGuessesIn: false,
         },
         history: [],
         timerLength: 120,
@@ -277,7 +285,13 @@ const vueApp = new Vue({
     dropped,
     moment,
     points(team) {
-      return intercepted(other(team), this.room.history) - dropped(team, this.room.history);
+      const delta = intercepted(other(team), this.room.history) - dropped(team, this.room.history);
+      return POINTS_PER_INTERCEPT * delta + this.pointsFromGuesses(team);
+    },
+    pointsFromGuesses(team) {
+      return Object.entries(this.room[other(team)].wordGuesses)
+        .map(([player, guesses]) => checkGuesses(guesses, this.room[other(team)].words))
+        .reduce(SUM, 0);
     },
     decrypters(team) {
       // Exclude the spy, as the are not decoding
@@ -445,16 +459,23 @@ function intercepted(team, history) {
     .flatMap((entry) =>
       Object.values(entry[team].round.interceptVotes).map((vote) => keysEqual(vote, entry[team].round.key))
     )
-    .reduce((a, b) => a + b, 0);
+    .reduce(SUM, 0);
 }
 
 // Returns how many of <team>'s messages have not been correctly decoded
 function dropped(team, history) {
-  const sum = (a, b) => a + b;
   // Abusing the fact that 0 + false + true = 1
   return history
     .flatMap((entry) =>
       Object.values(entry[team].round.decodeVotes).map((vote) => !keysEqual(vote, entry[team].round.key))
     )
-    .reduce(sum, 0);
+    .reduce(SUM, 0);
+}
+
+// Return how many of these guesses match the words
+function checkGuesses(guesses, words) {
+  if (guesses.length !== words.length) {
+    throw `Guesses and words must be same length! Got ${guesses}, ${words}`;
+  }
+  return guesses.map((guess, i) => guess === words[i]).reduce(SUM, 0);
 }

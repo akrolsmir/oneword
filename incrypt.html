@@ -355,22 +355,74 @@
           </div>
           <br /><br />
         </template>
-        <!-- Game over -->
+        <!-- Game end -->
         <div v-if="gameOver">
-          <h2>Game Over</h2>
-          <template v-for="team in ['redTeam', 'blueTeam']">
-            <b>{{ room[team].name }} team has {{ points(team) }} points.</b><br />
-            + {{ intercepted(other(team), room.history) }} 👻 interceptions<br />
-            − {{ dropped(team, room.history) }} 🤦‍♀️ dropped messages<br />
-            <br />
-          </template>
-          <div v-if="points('redTeam') === points('blueTeam')">
-            <h2>It's a tie!</h2>
-            The tiebreaker is which team can guess more of the other team's words.
+          <!-- Prompt each team to submit their guesses -->
+          <div v-if="!(room.redTeam.allGuessesIn && room.blueTeam.allGuessesIn)">
+            <h2>Game Over</h2>
+            <b>Final chance: Guess {{ otherTeam.name }} team's words!</b><br />
+            Has everyone on your team entered finished guessing?<br /><br />
+            <!-- TODO: Disallow submission when some field is still empty -->
+            <!-- TODO: Copy the guess area up top, so it's obvious -->
+            <button
+              class="button"
+              :class="{'is-success is-light': myTeam.allGuessesIn}"
+              @click="myTeam.allGuessesIn = true; saveRoom(`${myTeamId}.allGuessesIn`)"
+            >
+              Submit your team's guesses
+            </button>
           </div>
+          <!-- Show the results -->
           <div v-else>
-            <h2>{{ points('redTeam') > points('blueTeam') ? room.redTeam.name : room.blueTeam.name }} team wins!</h2>
-            Congratulations! GG and well played~
+            <div v-if="points('redTeam') === points('blueTeam')">
+              <h2>It's a tie!</h2>
+              Wow, what are the chances? Both teams win!
+            </div>
+            <div v-else>
+              <h2>{{ points('redTeam') > points('blueTeam') ? room.redTeam.name : room.blueTeam.name }} team wins!</h2>
+              Congratulations! GG and well played~
+            </div>
+            <br />
+
+            <template v-for="team in ['redTeam', 'blueTeam']">
+              <b>{{ room[team].name }} team has {{ points(team) }} points.</b><br />
+              + {{ intercepted(other(team), room.history) }} × {{ POINTS_PER_INTERCEPT }} 👻 interceptions<br />
+              − {{ dropped(team, room.history) }} × {{ POINTS_PER_INTERCEPT }} 🤦‍♀️ dropped messages<br />
+              + {{ pointsFromGuesses(team) }} 🔮 correct guesses<br />
+              <br />
+
+              <!-- Show the words, clues, and guesses. TODO: Dedupe with below -->
+              <div class="columns words">
+                <div class="column" v-for="(word, i) in room[team].words">
+                  <div class="notification words" :class="team == 'redTeam' ? 'is-danger' : 'is-info'">
+                    <small>Word {{ i + 1 }}</small>
+                    <!-- Show the word, or a guess box if previewing the other team. -->
+                    <h2>{{ word }}</h2>
+                    <!-- Show past guesses for this word -->
+                    <ul>
+                      <li v-for="(entry, e) in room.history">
+                        <span v-if="entry[team].round.key.includes(i + 1)">
+                          {{ entry[team].round.encode[entry[team].round.key.indexOf(i + 1)] }}
+                        </span>
+                        &nbsp;
+                      </li>
+                    </ul>
+                    <!-- If previewing guesses, also show what your teammates think -->
+                    <div>
+                      <br />
+                      <div v-for="(guesses, player) in room[team].wordGuesses" v-if="guesses[i]">
+                        {{ player }}: {{ guesses[i] }}
+                      </div>
+                    </div>
+                    <ul>
+                      <li v-for="(entry, e) in room.history"></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <br /><br />
+            </template>
+            <!-- TODO: Generate a new room, and/or upsell -->
           </div>
         </div>
         <button v-else class="button" @click="newRound">Next round</button>
@@ -395,6 +447,7 @@
         </div>
       </div>
 
+      <!-- Show the words and all clues/guesses so far -->
       <div v-if="room.state !== 'NOT_STARTED'" class="mb-6">
         <div class="columns words">
           <div class="column" v-for="(word, i) in myTeam.words">
