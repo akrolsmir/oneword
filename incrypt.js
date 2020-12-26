@@ -333,9 +333,9 @@ const vueApp = new Vue({
         // twice, or dropped two messages
         // TODO: could extract 2 to a constant
         intercepted('redTeam', this.room.history) >= 2 * this.room.blueTeam.players.length ||
-        dropped('redTeam', this.room.history) >= 2 * this.room.blueTeam.players.length - 2 ||
+        dropped('redTeam', this.room.history) >= 2 * this.room.redTeam.players.length - 2 ||
         intercepted('blueTeam', this.room.history) >= 2 * this.room.redTeam.players.length ||
-        dropped('blueTeam', this.room.history) >= 2 * this.room.redTeam.players.length - 2
+        dropped('blueTeam', this.room.history) >= 2 * this.room.blueTeam.players.length - 2
       );
     },
   },
