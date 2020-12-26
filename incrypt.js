@@ -178,7 +178,7 @@ const vueApp = new Vue({
     async submitEncode() {
       await this.prefillEncode;
       // Once both spies are done, move to intercepting (or straight to decoding in round 1)
-      if (this.otherTeam.round.encode.length === this.myTeam.round.encode.length) {
+      if (finishedEncoding(this.myTeam.round) && finishedEncoding(this.otherTeam.round)) {
         await this.nextState();
       }
     },
