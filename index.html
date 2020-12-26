@@ -370,7 +370,12 @@
                 />
               </div>
               <div class="control">
-                <button class="button" @click="submitClue" :disabled="!room.players.includes(player.name)">
+                <button
+                  class="button"
+                  @click="submitClue"
+                  :disabled="!room.players.includes(player.name)"
+                  :class="{'is-primary': room.currentRound.clues[player.name]}"
+                >
                   Submit
                 </button>
               </div>
