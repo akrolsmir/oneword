@@ -49,12 +49,16 @@
     }
 
     /* Narrow the gap between words */
-    .words {
+    .words.columns {
       margin: -0.25rem;
     }
 
-    .words > .column {
+    .words.columns > .column {
       padding: 0.25rem;
+    }
+
+    .words.notification {
+      padding: 1rem 1.25rem 1rem 1.25rem;
     }
 
     .table {
@@ -394,17 +398,36 @@
       <div v-if="room.state !== 'NOT_STARTED'" class="mb-6">
         <div class="columns words">
           <div class="column" v-for="(word, i) in myTeam.words">
-            <div class="notification" :class="previewTeamId == 'redTeam' ? 'is-danger' : 'is-info'">
+            <div class="notification words" :class="previewTeamId == 'redTeam' ? 'is-danger' : 'is-info'">
               <small>Word {{ i + 1 }}</small>
-              <h2>{{ previewTeamId == myTeamId ? word : '???' }}</h2>
+              <!-- Show the word, or a guess box if previewing the other team. -->
+              <h2 v-if="previewTeamId == myTeamId">{{ word }}</h2>
+              <input
+                v-else
+                class="input mt-3"
+                v-model="player.wordGuesses[i]"
+                @change="prefillGuesses"
+                type="text"
+                placeholder="Guess"
+              />
+              <!-- Show past guesses for this word -->
               <ul>
                 <li v-for="(entry, e) in room.history">
                   <span v-if="entry[previewTeamId].round.key.includes(i + 1)">
                     {{ entry[previewTeamId].round.encode[entry[previewTeamId].round.key.indexOf(i + 1)] }}
                   </span>
                   &nbsp;
-                  <!-- <span v-else> ---.</span> -->
                 </li>
+              </ul>
+              <!-- If previewing guesses, also show what your teammates think -->
+              <div v-if="previewTeamId != myTeamId">
+                <br />
+                <div v-for="(guesses, player) in room[previewTeamId].wordGuesses" v-if="guesses[i]">
+                  {{ player }}: {{ guesses[i] }}
+                </div>
+              </div>
+              <ul>
+                <li v-for="(entry, e) in room.history"></li>
               </ul>
             </div>
           </div>

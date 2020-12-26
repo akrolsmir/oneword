@@ -12,8 +12,14 @@ import {
 
 const NO_VOTE = '?';
 const KEY_LENGTH = 3;
+const WORDS_SHOWN = 4; // TODO: Call these "keywords"?
+// Initialize to empty strings, since Firebase won't handle 'undefined'
 function emptyKey() {
+  // TODO: Rename to emptyEncode?
   return Array(KEY_LENGTH).fill('');
+}
+function emptyGuesses() {
+  return Array(WORDS_SHOWN).fill('');
 }
 
 /**
@@ -25,6 +31,10 @@ Room: {
     // TODO name: 'Ugliest Carriages', emoji: '🤦‍♀️', color: '#FF4422'
     players: ['alice', 'bob'], // First player is team lead aka mod
     words: ['student', 'bible', 'catholic', 'eraser'],
+    wordGuesses: {
+      alice: ['dumb', 'dict', 'deacon', 'deer'],
+      ...
+    },
     round: {
       spy: 'alice',
       key: [4, 1, 2], // sometimes referred to as "message"
@@ -51,6 +61,7 @@ const vueApp = new Vue({
       name: '',
       // Local values & UI controls, before they get uploaded
       encode: emptyKey(),
+      wordGuesses: emptyGuesses(),
       timerLength: 120,
     },
     room: {
@@ -61,11 +72,10 @@ const vueApp = new Vue({
     allRooms: [],
     showRules: false,
     previewTeam: '',
+    KEY_LENGTH,
+    WORDS_SHOWN,
   },
   async created() {
-    this.KEY_LENGTH = 3;
-    this.WORDS_SHOWN = 4;
-
     const parsedUrl = new URL(window.location.href);
     const roomName = parsedUrl.searchParams.get('room');
     const playerName = parsedUrl.searchParams.get('player');
@@ -123,6 +133,7 @@ const vueApp = new Vue({
           name: 'Red',
           players: [],
           words: randomWords(4),
+          wordGuesses: {},
           // Current round
           round: {},
         },
@@ -130,6 +141,7 @@ const vueApp = new Vue({
           name: 'Blue',
           players: [],
           words: randomWords(4),
+          wordGuesses: {},
           round: {},
         },
         history: [],
@@ -181,6 +193,10 @@ const vueApp = new Vue({
       if (finishedEncoding(this.myTeam.round) && finishedEncoding(this.otherTeam.round)) {
         await this.nextState();
       }
+    },
+    async prefillGuesses() {
+      this.otherTeam.wordGuesses[this.player.name] = this.player.wordGuesses;
+      await this.saveRoom(`${other(this.myTeamId)}.wordGuesses.${this.player.name}`);
     },
     async checkIfDecrypted() {
       if (!['RED_DECODE', 'BLUE_DECODE', 'BOTH_DECODE'].includes(this.room.state)) {
