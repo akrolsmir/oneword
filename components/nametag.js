@@ -35,6 +35,14 @@ Vue.component('nametag', {
         };
       }
       if (this.user.supporter == 'ADMIN') {
+        if (this.user.email === 'pang.alice@gmail.com') {
+          return {
+            title: 'Designer',
+            style: {
+              boxShadow: '-1px 1px 3px #2d26ff, 1px 1px 3px #2d26ff, -1px -1px 3px #ff217a, 1px -1px 3px #ff217a',
+            },
+          };
+        }
         return {
           title: 'Developer',
           style: {
