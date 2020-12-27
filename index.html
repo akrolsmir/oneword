@@ -373,7 +373,7 @@
                   :disabled="!room.players.includes(player.name)"
                   :class="{'is-primary': room.currentRound.clues[player.name]}"
                 >
-                  Submit
+                  {{ room.currentRound.clues[player.name] ? 'Submitted' : 'Submit' }}
                 </button>
               </div>
             </div>
