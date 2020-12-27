@@ -96,7 +96,7 @@ const vueApp = new Vue({
     }
   },
   async mounted() {
-    this.allRooms = await listRooms();
+    this.allRooms = await listRooms(/*limit=*/ 40);
   },
   watch: {
     'room.state'(state) {

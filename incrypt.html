@@ -134,7 +134,7 @@
 
       <br /><br />
       <h2>Open Rooms</h2>
-      <p v-for="openRoom in allRooms.filter((room) => allPlayers(room) && room.state === 'NOT_STARTED')">
+      <p v-for="openRoom in allRooms.filter((room) => allPlayers(room) && room.state === 'NOT_STARTED').slice(5)">
         <a @click="room.name = openRoom.name; enterRoom()"><b>{{ openRoom.name }}</b></a
         >, with {{ allPlayers(openRoom) }}
         <span>({{ moment(openRoom.lastUpdateTime).fromNow() }})</span>
