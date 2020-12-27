@@ -361,9 +361,24 @@
           <div v-if="!(room.redTeam.allGuessesIn && room.blueTeam.allGuessesIn)">
             <h2>Game Over</h2>
             <b>Final chance: Guess {{ otherTeam.name }} team's words!</b><br />
+
+            <keyword-cards :room="room" :team="other(myTeamId)" :my-team-id="myTeamId"></keyword-cards>
+
+            <!-- Allow guessing of the other team's words -->
+            <div class="words columns">
+              <div class="words column" v-for="(word, i) in otherTeam.words">
+                <input
+                  class="input mt-3"
+                  v-model="player.wordGuesses[i]"
+                  @change="prefillGuesses"
+                  type="text"
+                  :placeholder="`Word ${i + 1} guess`"
+                />
+              </div>
+            </div>
+
             Has everyone on your team entered finished guessing?<br /><br />
-            <!-- TODO: Disallow submission when some field is still empty -->
-            <!-- TODO: Copy the guess area up top, so it's obvious -->
+            <!-- TODO: Disallow guess submission when someone isn't done yet -->
             <button
               class="button"
               :class="{'is-success is-light': myTeam.allGuessesIn}"
@@ -425,8 +440,8 @@
         <keyword-cards :room="room" :team="previewTeamId" :my-team-id="myTeamId"></keyword-cards>
 
         <!-- Allow guessing of the other team's words -->
-        <div v-if="previewTeamId !== myTeamId" class="columns">
-          <div class="column" v-for="(word, i) in room[previewTeamId].words">
+        <div v-if="previewTeamId !== myTeamId" class="words columns">
+          <div class="words column" v-for="(word, i) in room[previewTeamId].words">
             <input
               class="input mt-3"
               v-model="player.wordGuesses[i]"
