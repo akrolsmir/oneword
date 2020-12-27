@@ -10,6 +10,7 @@ import {
   listenForLogin,
 } from './firebase-network.js';
 
+// TODO: This is kind of weird; intercepts should be worth less than drops?
 const POINTS_PER_INTERCEPT = 10;
 const NO_VOTE = '?';
 const KEY_LENGTH = 3;
@@ -34,7 +35,7 @@ Room: {
     players: ['alice', 'bob'], // First player is team lead aka mod
     words: ['student', 'bible', 'catholic', 'eraser'],
     wordGuesses: {
-      alice: ['dumb', 'dict', 'deacon', 'deer'],
+      carol: ['dumb', 'dict', 'deacon', 'deer'],
       ...
     },
     round: {
@@ -115,11 +116,7 @@ const vueApp = new Vue({
         return;
       }
       // Sanitize room name
-      this.room.name = this.room.name
-        .trim()
-        .toLowerCase()
-        .replace(/\s/g, '-') // whitespace
-        .replace(/[^\p{L}-]/gu, ''); // not (dash or letter in any language)
+      this.room.name = sanitize(this.room.name);
 
       const room = await getRoom(this.room);
 
@@ -477,5 +474,14 @@ function checkGuesses(guesses, words) {
   if (guesses.length !== words.length) {
     throw `Guesses and words must be same length! Got ${guesses}, ${words}`;
   }
-  return guesses.map((guess, i) => guess === words[i]).reduce(SUM, 0);
+  return guesses.map((guess, i) => sanitize(guess) === sanitize(words[i])).reduce(SUM, 0);
+}
+
+// TODO: extract to util?
+function sanitize(text) {
+  return text
+    .trim()
+    .toLowerCase()
+    .replace(/\s/g, '-') // whitespace
+    .replace(/[^\p{L}-]/gu, ''); // not (dash or letter in any language)
 }
