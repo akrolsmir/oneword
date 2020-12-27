@@ -168,20 +168,20 @@
         <div class="columns">
           <div class="column" v-for="team in ['redTeam', 'blueTeam']">
             <h3>
-              {{ room[team].name }} team: {{ room[team].players.join(', ') }}
-              <a v-if="!room[team].players.includes(player.name)" @click="joinTeam(team)">(join)</a>
+              {{ room[team].name }} team: {{ players(team).join(', ') }}
+              <a v-if="!players(team).includes(player.name)" @click="joinTeam(team)">(join)</a>
             </h3>
           </div>
         </div>
-        <div v-if="room.redTeam.players.length < 2 ">
-          {{ room.redTeam.name }} team needs {{ 2 - room.redTeam.players.length }} more, before we can start...
+        <div v-if="players('redTeam').length < 2 ">
+          {{ room.redTeam.name }} team needs {{ 2 - players('redTeam').length }} more, before we can start...
         </div>
-        <div v-else-if="room.blueTeam.players.length < 2 ">
-          {{ room.blueTeam.name }} team needs {{ 2 - room.blueTeam.players.length }} more, before we can start...
+        <div v-else-if="players('blueTeam').length < 2 ">
+          {{ room.blueTeam.name }} team needs {{ 2 - players('blueTeam').length }} more, before we can start...
         </div>
         <div v-else>
-          Awesome! There are {{ room.redTeam.players.length }} players on {{ room.redTeam.name }} team and {{
-          room.blueTeam.players.length }} players on {{ room.blueTeam.name }} team. <br />
+          Awesome! There are {{ players('redTeam').length }} players on {{ room.redTeam.name }} team and {{
+          players('blueTeam').length }} players on {{ room.blueTeam.name }} team. <br />
           Ready to start? <br />
           <br />
           <button class="button" @click="newRound">Start game!</button>
@@ -422,12 +422,11 @@
           <li v-for="team in ['redTeam', 'blueTeam']" :class="previewTeamId === team ? 'is-active' : ''" :id="team">
             <a @click="previewTeamId = team">
               <div>
-                <h3>{{ room[team].name }} team: {{ room[team].players.join(', ') }}</h3>
+                <h3>{{ room[team].name }} team: {{ players(team).join(', ') }}</h3>
                 <!-- Show the current scores on each team -->
-                👻 {{ intercepted(other(team), room.history) }} interceptions ({{ 2 * room[team].players.length }} to
-                win)
+                👻 {{ intercepted(other(team), room.history) }} interceptions ({{ 2 * players(team).length }} to win)
                 <br />
-                🤦‍♀️ {{ dropped(team, room.history) }} dropped messages ({{ 2 * room[team].players.length - 2}} to lose)
+                🤦‍♀️ {{ dropped(team, room.history) }} dropped messages ({{ 2 * players(team).length - 2}} to lose)
                 <br />
               </div>
             </a>

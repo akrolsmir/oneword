@@ -57,7 +57,13 @@ Room: {
   history: [{
     redTeam: { round: {...} }
     blueTeam: { round: {...} }
-  }, ...]
+  }, ...],
+  people: {
+    alice: {
+      id: 'ff0f9dsKDF9' // or '' for anonymous
+      team: 'redTeam' // or '' for spectators?
+    }, ...
+  }
 }
 */
 const vueApp = new Vue({
@@ -71,7 +77,6 @@ const vueApp = new Vue({
       timerLength: 120,
     },
     room: {
-      // See below in created()
       name: randomWord('adjectives') + '-' + randomWord('nouns'),
     },
     user: {},
@@ -134,7 +139,6 @@ const vueApp = new Vue({
         state: 'NOT_STARTED',
         redTeam: {
           name: 'Red',
-          players: [],
           words: randomWords(4),
           wordGuesses: {},
           // Current round
@@ -143,7 +147,6 @@ const vueApp = new Vue({
         },
         blueTeam: {
           name: 'Blue',
-          players: [],
           words: randomWords(4),
           wordGuesses: {},
           round: {},
@@ -153,6 +156,7 @@ const vueApp = new Vue({
         timerLength: 120,
         public: true,
         lastUpdateTime: Date.now(),
+        people: {},
       };
       await setRoom(this.room);
     },
@@ -183,10 +187,11 @@ const vueApp = new Vue({
       await this.saveRoom(...toUpdate);
     },
     async joinTeam(team) {
-      this.room[team].players.push(this.player.name);
-      // Also remove from existing team
-      unpush(this.room[other(team)].players, this.player.name);
-      await this.saveRoom('redTeam.players', 'blueTeam.players');
+      this.room.people[this.player.name] = {
+        id: this.user.id || '',
+        team,
+      };
+      await this.saveRoom(`people.${this.player.name}`);
     },
     async prefillEncode() {
       this.myTeam.round.encode = this.player.encode;
@@ -220,7 +225,7 @@ const vueApp = new Vue({
         }
       } else if (
         !finishedVoting(this.room[team].round.decodeVotes, this.decrypters(team)) ||
-        !finishedVoting(this.room[team].round.interceptVotes, this.room[other(team)].players)
+        !finishedVoting(this.room[team].round.interceptVotes, this.players(other(team)))
       ) {
         // Only move forward when decoding and intercepting are both finished
         return;
@@ -230,14 +235,14 @@ const vueApp = new Vue({
     async newRound() {
       this.room.state = 'ENCODING';
       this.room.redTeam.round = {
-        spy: nextSpy(this.room.redTeam.round.spy, this.room.redTeam.players),
+        spy: nextSpy(this.room.redTeam.round.spy, this.players('redTeam')),
         key: randomKey(this.KEY_LENGTH, this.WORDS_SHOWN),
         encode: emptyKey(),
         interceptVotes: {},
         decodeVotes: {},
       };
       this.room.blueTeam.round = {
-        spy: nextSpy(this.room.blueTeam.round.spy, this.room.blueTeam.players),
+        spy: nextSpy(this.room.blueTeam.round.spy, this.players('blueTeam')),
         key: randomKey(this.KEY_LENGTH, this.WORDS_SHOWN),
         encode: emptyKey(),
         interceptVotes: {},
@@ -290,26 +295,44 @@ const vueApp = new Vue({
         .map(([player, guesses]) => checkGuesses(guesses, this.room[other(team)].words))
         .reduce(SUM, 0);
     },
+    players(team) {
+      // TODO 2021-01-03: remove legacy backport
+      if (!this.room.people) {
+        return this.room[team].players;
+      }
+
+      return Object.entries(this.room.people)
+        .map(([name, player]) => (player.team === team ? name : ''))
+        .filter(Boolean);
+    },
     decrypters(team) {
       // Exclude the spy, as the are not decoding
-      const decrypters = this.room[team].players.slice();
+      const decrypters = this.players(team);
       unpush(decrypters, this.room[team].round.spy);
       return decrypters;
     },
+    // Used to list who is there on the front page
     allPlayers(room) {
-      return room.redTeam.players.concat(room.blueTeam.players).join(', ');
+      // TODO 2021-01-03: remove legacy backport
+      if (!room.people) {
+        return room.redTeam.players.concat(room.blueTeam.players).join(', ');
+      }
+
+      return Object.entries(room.people)
+        .map(([name, player]) => (['redTeam', 'blueTeam'].includes(player.team) ? name : ''))
+        .filter(Boolean);
     },
   },
   computed: {
     isMod() {
       // For now, the first red team player is always the mod. Also me.
-      return this.room.redTeam.players.indexOf(this.player.name) === 0 || this.player.name === 'Austin';
+      return this.players('redTeam').indexOf(this.player.name) === 0 || this.player.name === 'Austin';
     },
     isRed() {
-      return this.room.redTeam.players.includes(this.player.name);
+      return this.players('redTeam').includes(this.player.name);
     },
     isPlaying() {
-      return this.isRed || this.room.blueTeam.players.includes(this.player.name);
+      return this.isRed || this.players('blueTeam').includes(this.player.name);
     },
     myTeamId() {
       return this.isRed ? 'redTeam' : 'blueTeam';
@@ -343,10 +366,10 @@ const vueApp = new Vue({
         // Game is over when every player on a team has (on average) intercepted
         // twice, or dropped two messages
         // TODO: could extract 2 to a constant
-        intercepted('redTeam', this.room.history) >= 2 * this.room.blueTeam.players.length ||
-        dropped('redTeam', this.room.history) >= 2 * this.room.redTeam.players.length - 2 ||
-        intercepted('blueTeam', this.room.history) >= 2 * this.room.redTeam.players.length ||
-        dropped('blueTeam', this.room.history) >= 2 * this.room.blueTeam.players.length - 2
+        intercepted('redTeam', this.room.history) >= 2 * this.players('blueTeam').length ||
+        dropped('redTeam', this.room.history) >= 2 * this.players('redTeam').length - 2 ||
+        intercepted('blueTeam', this.room.history) >= 2 * this.players('redTeam').length ||
+        dropped('blueTeam', this.room.history) >= 2 * this.players('blueTeam').length - 2
       );
     },
   },
