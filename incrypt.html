@@ -391,35 +391,8 @@
               + {{ pointsFromGuesses(team) }} 🔮 correct guesses<br />
               <br />
 
+              <keyword-cards :room="room" :team="team"></keyword-cards>
               <!-- Show the words, clues, and guesses. TODO: Dedupe with below -->
-              <div class="columns words">
-                <div class="column" v-for="(word, i) in room[team].words">
-                  <div class="notification words" :class="team == 'redTeam' ? 'is-danger' : 'is-info'">
-                    <small>Word {{ i + 1 }}</small>
-                    <!-- Show the word, or a guess box if previewing the other team. -->
-                    <h2>{{ word }}</h2>
-                    <!-- Show past guesses for this word -->
-                    <ul>
-                      <li v-for="(entry, e) in room.history">
-                        <span v-if="entry[team].round.key.includes(i + 1)">
-                          {{ entry[team].round.encode[entry[team].round.key.indexOf(i + 1)] }}
-                        </span>
-                        &nbsp;
-                      </li>
-                    </ul>
-                    <!-- If previewing guesses, also show what your teammates think -->
-                    <div>
-                      <br />
-                      <div v-for="(guesses, player) in room[team].wordGuesses" v-if="guesses[i]">
-                        {{ player }}: {{ guesses[i] }}
-                      </div>
-                    </div>
-                    <ul>
-                      <li v-for="(entry, e) in room.history"></li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
               <br /><br />
             </template>
             <!-- TODO: Generate a new room, and/or upsell -->
@@ -431,7 +404,7 @@
       <!-- Team rosters -->
       <div v-if="room.state !== 'NOT_STARTED'" class="mb-2 mt-6">
         <div class="tabs is-toggle is-fullwidth">
-          <li v-for="team in ['redTeam', 'blueTeam']" :class="previewTeamId == team ? 'is-active' : ''" :id="team">
+          <li v-for="team in ['redTeam', 'blueTeam']" :class="previewTeamId === team ? 'is-active' : ''" :id="team">
             <a @click="previewTeamId = team">
               <div>
                 <h3>{{ room[team].name }} team: {{ room[team].players.join(', ') }}</h3>
@@ -449,40 +422,18 @@
 
       <!-- Show the words and all clues/guesses so far -->
       <div v-if="room.state !== 'NOT_STARTED'" class="mb-6">
-        <div class="columns words">
-          <div class="column" v-for="(word, i) in myTeam.words">
-            <div class="notification words" :class="previewTeamId == 'redTeam' ? 'is-danger' : 'is-info'">
-              <small>Word {{ i + 1 }}</small>
-              <!-- Show the word, or a guess box if previewing the other team. -->
-              <h2 v-if="previewTeamId == myTeamId">{{ word }}</h2>
-              <input
-                v-else
-                class="input mt-3"
-                v-model="player.wordGuesses[i]"
-                @change="prefillGuesses"
-                type="text"
-                placeholder="Guess"
-              />
-              <!-- Show past guesses for this word -->
-              <ul>
-                <li v-for="(entry, e) in room.history">
-                  <span v-if="entry[previewTeamId].round.key.includes(i + 1)">
-                    {{ entry[previewTeamId].round.encode[entry[previewTeamId].round.key.indexOf(i + 1)] }}
-                  </span>
-                  &nbsp;
-                </li>
-              </ul>
-              <!-- If previewing guesses, also show what your teammates think -->
-              <div v-if="previewTeamId != myTeamId">
-                <br />
-                <div v-for="(guesses, player) in room[previewTeamId].wordGuesses" v-if="guesses[i]">
-                  {{ player }}: {{ guesses[i] }}
-                </div>
-              </div>
-              <ul>
-                <li v-for="(entry, e) in room.history"></li>
-              </ul>
-            </div>
+        <keyword-cards :room="room" :team="previewTeamId" :my-team-id="myTeamId"></keyword-cards>
+
+        <!-- Allow guessing of the other team's words -->
+        <div v-if="previewTeamId !== myTeamId" class="columns">
+          <div class="column" v-for="(word, i) in room[previewTeamId].words">
+            <input
+              class="input mt-3"
+              v-model="player.wordGuesses[i]"
+              @change="prefillGuesses"
+              type="text"
+              :placeholder="`Word ${i + 1} guess`"
+            />
           </div>
         </div>
       </div>
@@ -564,4 +515,5 @@
 </script>
 <script type="module" src="components/navbar.js"></script>
 <script type="module" src="components/sharelink.js"></script>
+<script type="module" src="components/keyword-cards.js"></script>
 <script type="module" src="incrypt.js"></script>
