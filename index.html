@@ -148,12 +148,14 @@
       <div v-cloak>
         <h2 class="fancy">Open Rooms</h2>
         <p v-for="openRoom in allRooms" v-bind:class="{ halfOpacity: isMuteOpenRoom(openRoom) }">
-          <a @click="room.name = openRoom.name; enterRoom()"><b>{{ openRoom.name }}</b></a
+          <a href="#" @click.prevent="room.name = openRoom.name; enterRoom()"><b>{{ openRoom.name }}</b></a
           >, with {{ openRoom.players.join(', ') }} ({{ moment(openRoom.lastUpdateTime).fromNow() }})
         </p>
         <h2 class="fancy">Private Rooms</h2>
         <p v-for="privateRoom in privateRooms">
-          <a @click="showPrivateModal = true"><b>{{ "Private room" }} with {{ privateRoom.players[0] }}</b></a>
+          <a href="#" @click.prevent="showPrivateModal = true">
+            <b>{{ "Private room" }} with {{ privateRoom.players[0] }}</b>
+          </a>
           <span v-if="privateRoom.players.length > 1"> and {{ privateRoom.players.length }} others</span>
           ({{ moment(privateRoom.lastUpdateTime).fromNow() }})
         </p>
