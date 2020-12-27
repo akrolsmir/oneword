@@ -54,10 +54,10 @@
 <body class="has-navbar-fixed-top">
   <div id="vue">
     <navbar ref="navbar" v-model="user"></navbar>
-    <h2>{{ users.length > 0 ? "Users" : "Loading users..." }}</h2>
+    <h2 v-if="users.length == 0">Loading users...</h2>
     <template>
-      <b-table :data="users" :paginated="true" :per-page="15">
-        <b-table-column field="id" label="ID" v-slot="props"> {{ props.row.id }} </b-table-column>
+      <b-table narrowed :data="users" :paginated="true" :per-page="20">
+        <b-table-column field="id" label="ID" v-slot="props" searchable> {{ props.row.id }} </b-table-column>
         <b-table-column field="name" label="Name" v-slot="props" searchable> {{ props.row.name }} </b-table-column>
         <b-table-column field="email" label="Email" v-slot="props" searchable> {{ props.row.email }} </b-table-column>
         <b-table-column field="createTime" label="Created" v-slot="props" sortable>
