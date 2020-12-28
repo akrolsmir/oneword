@@ -202,7 +202,7 @@
         </div>
 
         <!-- Show the current state of the game -->
-        <div class="notification has-text-centered" v-if="room.state !=='FINALE'">
+        <div class="has-text-centered" v-if="room.state !=='FINALE'">
           Round {{ room.history.length + 1 }}:
           <span v-if="room.state === 'ENCODING'"><b>🔏 Incrypt</b></span>
           <span v-else>Incrypt</span> -
@@ -231,8 +231,8 @@
       </div>
 
       <!-- Part 1: Spies are encoding their messages -->
-      <div v-cloak v-if="room.state === 'ENCODING'" class="box">
-        <div v-if="player.name === myTeam.round.spy">
+      <div v-cloak v-if="room.state === 'ENCODING'">
+        <div v-if="player.name === myTeam.round.spy" class="box">
           <h3>You are the {{ myTeam.name }} spy! Incrypt for your team: "{{ myTeam.round.key.join(' - ') }}"</h3>
           <br />
           <div class="columns">
@@ -265,14 +265,14 @@
           <i>Don't forget the <a @click="showRules = true">rules</a>: pick meaningful clues!</i>
         </div>
         <div v-else>
-          <h3>Waiting for {{ myTeam.round.spy }} to incrypt the key...</h3>
           <br />
+          <h3>Waiting for {{ myTeam.round.spy }} to incrypt the key...</h3>
           Meanwhile, think of good incryptions, or try to guess the other team's words!
         </div>
       </div>
-      <div v-if="['RED_DECODE', 'BLUE_DECODE', 'BOTH_DECODE'].includes(room.state)" class="box">
+      <div v-if="['RED_DECODE', 'BLUE_DECODE', 'BOTH_DECODE'].includes(room.state)">
         <!-- Parts 2 and 4: Other team tries to intercept -->
-        <div v-if="myTeamId !== smugglersId">
+        <div v-if="myTeamId !== smugglersId" class="box">
           <!-- Section: Show the smugglers' code -->
           <h3>
             The {{ otherTeam.name }} spy, {{ otherTeam.round.spy }}, incrypted "{{ otherTeam.round.encode.join(' - ')
@@ -312,8 +312,9 @@
           </div>
         </div>
         <!-- Parts 2 and 4: Meanwhile, the smugglers tries to decrypt the key -->
-        <div v-else>
+        <div v-else :class="{'box': player.name !== myTeam.round.spy}">
           <div v-if="player.name === myTeam.round.spy">
+            <br />
             <h3>Waiting for your teammates to decrypt "{{ myTeam.round.encode.join(' - ') }}"...</h3>
           </div>
           <div v-else>
@@ -387,7 +388,8 @@
               </div>
             </div>
 
-            Has everyone on your team entered finished guessing?<br /><br />
+            <br />
+            Has everyone on your team entered finished guessing?<br />
             <!-- TODO: Disallow guess submission when someone isn't done yet -->
             <button
               class="button"
