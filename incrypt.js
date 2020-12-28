@@ -23,6 +23,12 @@ function emptyKey() {
 function emptyGuesses() {
   return Array(WORDS_SHOWN).fill('');
 }
+function emptyDecodeVotes(players) {
+  function emptyVotes() {
+    return Array(KEY_LENGTH).fill(NO_VOTE);
+  }
+  return Object.fromEntries(players.map((player) => [player, emptyVotes()]));
+}
 const SUM = (a, b) => a + b;
 
 /**
@@ -229,14 +235,14 @@ const vueApp = new Vue({
           key: randomKey(this.KEY_LENGTH, this.WORDS_SHOWN),
           encode: emptyKey(),
           interceptVotes: {},
-          decodeVotes: {},
+          decodeVotes: emptyDecodeVotes(this.players('redTeam')),
         };
         this.room.blueTeam.round = {
           spy: nextSpy(this.room.blueTeam.round.spy, this.players('blueTeam')),
           key: randomKey(this.KEY_LENGTH, this.WORDS_SHOWN),
           encode: emptyKey(),
           interceptVotes: {},
-          decodeVotes: {},
+          decodeVotes: emptyDecodeVotes(this.players('blueTeam')),
         };
       }
 
@@ -255,6 +261,7 @@ const vueApp = new Vue({
       const team = voteType === 'decodeVotes' ? this.myTeamId : other(this.myTeamId);
       if (!this.room[team].round[voteType][name]) {
         // Need to fill in a dummy value so Firestore is happy
+        // TODO: Once we also initialize emptyInterceptVotes, this will no longer be needed
         this.room[team].round[voteType][name] = Array(this.KEY_LENGTH).fill(NO_VOTE);
       }
       const currentVote = this.room[team].round[voteType][name][keyIndex];
