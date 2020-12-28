@@ -167,10 +167,15 @@
       <div v-if="room.state === 'NOT_STARTED'" class="box">
         <div class="columns">
           <div class="column" v-for="team in ['redTeam', 'blueTeam']">
-            <h3>
-              {{ room[team].name }} team: {{ players(team).join(', ') }}
-              <a v-if="!players(team).includes(player.name)" @click="joinTeam(team)">(join)</a>
-            </h3>
+            <h3>{{ room[team].name }} team: {{ players(team).join(', ') }}</h3>
+            <br />
+            <button
+              class="button is-medium is-fullwidth"
+              :class="team == 'redTeam' ? 'is-danger' : 'is-info'"
+              @click="joinTeam(team)"
+            >
+              {{ !players(team).includes(player.name) ? 'Join' : 'Joined ✔️' }}
+            </button>
           </div>
         </div>
         <div v-if="players('redTeam').length < 2 ">
