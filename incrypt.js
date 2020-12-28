@@ -320,7 +320,8 @@ const vueApp = new Vue({
 
       return Object.entries(room.people)
         .map(([name, player]) => (['redTeam', 'blueTeam'].includes(player.team) ? name : ''))
-        .filter(Boolean);
+        .filter(Boolean)
+        .join(', ');
     },
   },
   computed: {
