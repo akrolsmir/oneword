@@ -257,7 +257,10 @@ const vueApp = new Vue({
         // Need to fill in a dummy value so Firestore is happy
         this.room[team].round[voteType][name] = Array(this.KEY_LENGTH).fill(NO_VOTE);
       }
-      this.room[team].round[voteType][name][keyIndex] = wordIndex;
+      const currentVote = this.room[team].round[voteType][name][keyIndex];
+      // If this is the second click on the same vote, deselect that vote.
+      const newVote = currentVote === wordIndex ? NO_VOTE : wordIndex;
+      this.room[team].round[voteType][name][keyIndex] = newVote;
       await this.saveRoom(`${team}.round.${voteType}.${name}`);
     },
     voters(voteType, keyIndex, wordIndex) {
