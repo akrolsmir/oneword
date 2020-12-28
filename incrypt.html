@@ -240,7 +240,7 @@
               <input
                 class="input"
                 v-model="player.encode[i]"
-                @keyup.enter="submitEncode"
+                @keyup.enter="submitForMyTeam"
                 @change="prefillEncode"
                 placeholder="Clue"
               />
@@ -252,17 +252,16 @@
                 </li>
               </ul>
             </div>
-            <div class="column">
-              <button
-                class="button"
-                @click="submitEncode()"
-                :class="finishedEncoding(myTeam.round) ? 'is-success' : ''"
-              >
-                Incrypt
-              </button>
-            </div>
           </div>
-          <i>Don't forget the <a @click="showRules = true">rules</a>: pick meaningful clues!</i>
+          <i>Don't forget the <a @click="showRules = true">rules</a>: pick meaningful clues!</i><br />
+          <!-- Doesn't work cuz disabled on last input: `:disabled="myTeam.round.encode.some(Boolean)` -->
+          <button
+            class="button is-fullwidth"
+            :class="{'is-success is-light': myTeam.submitted}"
+            @click="submitForMyTeam"
+          >
+            Submit your incryption
+          </button>
         </div>
         <div v-else>
           <br />
@@ -310,6 +309,16 @@
               </ul>
             </div>
           </div>
+
+          <!-- TODO: Change button text to be "Submitted"? -->
+          <button
+            class="button is-fullwidth"
+            :class="{'is-success is-light': myTeam.submitted}"
+            @click="submitForMyTeam"
+            :disabled="!finishedVoting(otherTeam.round.interceptVotes, players(myTeamId))"
+          >
+            Submit your team's interceptions
+          </button>
         </div>
         <!-- Parts 2 and 4: Meanwhile, the smugglers tries to decrypt the key -->
         <div v-else :class="{'box': player.name !== myTeam.round.spy}">
@@ -342,6 +351,16 @@
               </div>
             </div>
           </div>
+
+          <button
+            v-if="decrypters(myTeamId).includes(player.name)"
+            class="button is-fullwidth"
+            :class="{'is-success is-light': myTeam.submitted}"
+            @click="submitForMyTeam"
+            :disabled="!finishedVoting(myTeam.round.decodeVotes, decrypters(myTeamId))"
+          >
+            Submit your team's decryptions
+          </button>
         </div>
       </div>
       <!-- Results for both teams! -->
@@ -369,7 +388,7 @@
       <div v-if="room.state === 'FINALE'" class="box">
         <div>
           <!-- Prompt each team to submit their guesses -->
-          <div v-if="!(room.redTeam.allGuessesIn && room.blueTeam.allGuessesIn)">
+          <div v-if="!(room.redTeam.submitted && room.blueTeam.submitted)">
             <h2>Final round</h2>
             <b>Guess {{ otherTeam.name }} team's words!</b><br />
 
@@ -392,9 +411,9 @@
             Has everyone on your team entered finished guessing?<br />
             <!-- TODO: Disallow guess submission when someone isn't done yet -->
             <button
-              class="button"
-              :class="{'is-success is-light': myTeam.allGuessesIn}"
-              @click="myTeam.allGuessesIn = true; saveRoom(`${myTeamId}.allGuessesIn`)"
+              class="button is-fullwidth"
+              :class="{'is-success is-light': myTeam.submitted}"
+              @click="submitForMyTeam"
             >
               Submit your team's guesses
             </button>

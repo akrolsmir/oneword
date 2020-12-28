@@ -32,7 +32,6 @@ Room: {
   redTeam: {
     // Red team goes first on intercepts (TODO alternate?)
     // TODO name: 'Ugliest Carriages', emoji: '🤦‍♀️', color: '#FF4422'
-    players: ['alice', 'bob'], // First player is team lead aka mod
     words: ['student', 'bible', 'catholic', 'eraser'],
     wordGuesses: {
       carol: ['dumb', 'dict', 'deacon', 'deer'],
@@ -49,9 +48,9 @@ Room: {
       decodeVotes: {
         bob: [3, 1, 2],
       },
-      // TODO: Maybe add the timer here too? And would ideally wait for each player?
-      // That'd be easier if players were a map (aka Rethink Playerdata)
-      allGuessesIn: false,
+    },
+    // Whether the team has confirmed their encode/intercept/decode/guess
+    submitted: false,
   },
   blueTeam: ...
   history: [{
@@ -143,14 +142,14 @@ const vueApp = new Vue({
           wordGuesses: {},
           // Current round
           round: {},
-          allGuessesIn: false,
+          submitted: false,
         },
         blueTeam: {
           name: 'Blue',
           words: randomWords(4),
           wordGuesses: {},
           round: {},
-          allGuessesIn: false,
+          submitted: false,
         },
         history: [],
         timerLength: 120,
@@ -161,8 +160,12 @@ const vueApp = new Vue({
       await setRoom(this.room);
     },
     async nextState() {
+      if (this.room.state === 'FINALE') {
+        return;
+      }
+      this.room.redTeam.submitted = false;
+      this.room.blueTeam.submitted = false;
       // Figure out what the next state should be, then go there.
-      const toUpdate = ['state'];
       const next = {
         ENCODING: this.room.history.length > 0 ? 'RED_DECODE' : 'BOTH_DECODE',
         RED_DECODE: 'BLUE_DECODE',
@@ -172,6 +175,8 @@ const vueApp = new Vue({
         DONE: 'ENCODING',
       };
       this.room.state = next[this.room.state];
+      const toUpdate = ['state', 'redTeam.submitted', 'blueTeam.submitted'];
+
       if (this.room.state === 'DONE') {
         // Add current round to history on DONE, to update victory conditions
         this.room.history.push({
@@ -197,40 +202,20 @@ const vueApp = new Vue({
       this.myTeam.round.encode = this.player.encode;
       await this.saveRoom(`${this.myTeamId}.round.encode`);
     },
-    async submitEncode() {
-      await this.prefillEncode;
-      // Once both spies are done, move to intercepting (or straight to decoding in round 1)
-      if (finishedEncoding(this.myTeam.round) && finishedEncoding(this.otherTeam.round)) {
+    async submitForMyTeam() {
+      this.myTeam.submitted = true;
+      // Always write to Firestore (since FINALE needs to see submitted)
+      // TODO: alternatively, have FINALE => GAME_OVER? Then only do this in `else`
+      await this.saveRoom(`${this.myTeamId}.submitted`);
+
+      // If both spies are done, move to intercepting (or straight to decoding in round 1)
+      if (this.myTeam.submitted && this.otherTeam.submitted) {
         await this.nextState();
       }
     },
     async prefillGuesses() {
       this.otherTeam.wordGuesses[this.player.name] = this.player.wordGuesses;
       await this.saveRoom(`${other(this.myTeamId)}.wordGuesses.${this.player.name}`);
-    },
-    async checkIfDecrypted() {
-      if (!['RED_DECODE', 'BLUE_DECODE', 'BOTH_DECODE'].includes(this.room.state)) {
-        console.error('intercept or decode called from invalid round!');
-        return;
-      }
-
-      const team = this.smugglersId;
-      if (this.room.state === 'BOTH_DECODE') {
-        if (
-          !finishedVoting(this.myTeam.round.decodeVotes, this.decrypters(this.myTeamId)) ||
-          !finishedVoting(this.otherTeam.round.decodeVotes, this.decrypters(other(this.myTeamId)))
-        ) {
-          // Only move forward when both teams are finished decoding
-          return;
-        }
-      } else if (
-        !finishedVoting(this.room[team].round.decodeVotes, this.decrypters(team)) ||
-        !finishedVoting(this.room[team].round.interceptVotes, this.players(other(team)))
-      ) {
-        // Only move forward when decoding and intercepting are both finished
-        return;
-      }
-      await this.nextState();
     },
     async newRound() {
       this.room.lastUpdateTime = Date.now();
@@ -274,7 +259,6 @@ const vueApp = new Vue({
       }
       this.room[team].round[voteType][name][keyIndex] = wordIndex;
       await this.saveRoom(`${team}.round.${voteType}.${name}`);
-      await this.checkIfDecrypted();
     },
     voters(voteType, keyIndex, wordIndex) {
       const team = voteType === 'decodeVotes' ? this.myTeamId : other(this.myTeamId);
@@ -286,7 +270,7 @@ const vueApp = new Vue({
     },
     other,
     keysEqual,
-    finishedEncoding,
+    finishedVoting,
     intercepted,
     dropped,
     moment,
@@ -462,11 +446,6 @@ function randomKey(length, max) {
 function nextSpy(lastSpy, players) {
   const nextIndex = (players.indexOf(lastSpy) + 1 + players.length) % players.length;
   return players[nextIndex];
-}
-
-function finishedEncoding(round) {
-  // If any element is not true (aka empty string), still not done.
-  return !round.encode.some((e) => !e);
 }
 
 // votes = { alice: [1, 2, 3], ...}; players = ['alice', ...]
