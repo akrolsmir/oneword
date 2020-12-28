@@ -197,7 +197,7 @@
         </div>
 
         <!-- Show the current state of the game -->
-        <div class="notification has-text-centered">
+        <div class="notification has-text-centered" v-if="room.state !=='FINALE'">
           Round {{ room.history.length + 1 }}:
           <span v-if="room.state === 'ENCODING'"><b>🔏 Incrypt</b></span>
           <span v-else>Incrypt</span> -
@@ -355,12 +355,17 @@
           </div>
           <br /><br />
         </template>
-        <!-- Game end -->
-        <div v-if="gameOver">
+        <b v-if="gameOver">Ready for the final showdown?</b><br />
+        <button class="button" @click="newRound">{{ gameOver ? 'Final round' : 'Next round' }}</button>
+      </div>
+
+      <!-- Game end -->
+      <div v-if="room.state === 'FINALE'" class="box">
+        <div>
           <!-- Prompt each team to submit their guesses -->
           <div v-if="!(room.redTeam.allGuessesIn && room.blueTeam.allGuessesIn)">
-            <h2>Game Over</h2>
-            <b>Final chance: Guess {{ otherTeam.name }} team's words!</b><br />
+            <h2>Final round</h2>
+            <b>Guess {{ otherTeam.name }} team's words!</b><br />
 
             <keyword-cards :room="room" :team="other(myTeamId)" :my-team-id="myTeamId"></keyword-cards>
 
@@ -389,16 +394,6 @@
           </div>
           <!-- Show the results -->
           <div v-else>
-            <div v-if="points('redTeam') === points('blueTeam')">
-              <h2>It's a tie!</h2>
-              Wow, what are the chances? Both teams win!
-            </div>
-            <div v-else>
-              <h2>{{ points('redTeam') > points('blueTeam') ? room.redTeam.name : room.blueTeam.name }} team wins!</h2>
-              Congratulations! GG and well played~
-            </div>
-            <br />
-
             <template v-for="team in ['redTeam', 'blueTeam']">
               <b>{{ room[team].name }} team has {{ points(team) }} points.</b><br />
               + {{ intercepted(other(team), room.history) }} × {{ POINTS_PER_INTERCEPT }} 👻 interceptions<br />
@@ -410,10 +405,20 @@
               <!-- Show the words, clues, and guesses. TODO: Dedupe with below -->
               <br /><br />
             </template>
-            <!-- TODO: Generate a new room, and/or upsell -->
+            <div v-if="points('redTeam') === points('blueTeam')">
+              <h2>It's a tie!</h2>
+              Wow, what are the chances? Both teams win!
+            </div>
+            <div v-else>
+              <h2>{{ points('redTeam') > points('blueTeam') ? room.redTeam.name : room.blueTeam.name }} team wins!</h2>
+              Congratulations! GG and well played~
+            </div>
+            <!-- TODO: upsell? -->
+            Want to go again?
+            <br /><br />
+            <button class="button" @click="backupAndReset">New game!</button>
           </div>
         </div>
-        <button v-else class="button" @click="newRound">Next round</button>
       </div>
 
       <!-- Team rosters -->

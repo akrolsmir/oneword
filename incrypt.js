@@ -28,7 +28,7 @@ const SUM = (a, b) => a + b;
 /**
 Room: {
   name: 'apple',
-  state: 'ENCODING', // or 'NOT_STARTED'/'RED_DECODE'/'BLUE_DECODE'/'BOTH_DECODE/'DONE'
+  state: 'ENCODING', // or 'NOT_STARTED'/'RED_DECODE'/'BLUE_DECODE'/'BOTH_DECODE/'DONE'/'FINALE'
   redTeam: {
     // Red team goes first on intercepts (TODO alternate?)
     // TODO name: 'Ugliest Carriages', emoji: '🤦‍♀️', color: '#FF4422'
@@ -233,23 +233,27 @@ const vueApp = new Vue({
       await this.nextState();
     },
     async newRound() {
-      this.room.state = 'ENCODING';
-      this.room.redTeam.round = {
-        spy: nextSpy(this.room.redTeam.round.spy, this.players('redTeam')),
-        key: randomKey(this.KEY_LENGTH, this.WORDS_SHOWN),
-        encode: emptyKey(),
-        interceptVotes: {},
-        decodeVotes: {},
-      };
-      this.room.blueTeam.round = {
-        spy: nextSpy(this.room.blueTeam.round.spy, this.players('blueTeam')),
-        key: randomKey(this.KEY_LENGTH, this.WORDS_SHOWN),
-        encode: emptyKey(),
-        interceptVotes: {},
-        decodeVotes: {},
-      };
-      // TODO when we're tracking separate rooms
       this.room.lastUpdateTime = Date.now();
+
+      if (this.gameOver) {
+        this.room.state = 'FINALE';
+      } else {
+        this.room.state = 'ENCODING';
+        this.room.redTeam.round = {
+          spy: nextSpy(this.room.redTeam.round.spy, this.players('redTeam')),
+          key: randomKey(this.KEY_LENGTH, this.WORDS_SHOWN),
+          encode: emptyKey(),
+          interceptVotes: {},
+          decodeVotes: {},
+        };
+        this.room.blueTeam.round = {
+          spy: nextSpy(this.room.blueTeam.round.spy, this.players('blueTeam')),
+          key: randomKey(this.KEY_LENGTH, this.WORDS_SHOWN),
+          encode: emptyKey(),
+          interceptVotes: {},
+          decodeVotes: {},
+        };
+      }
 
       // Overwrite existing room;
       await setRoom(this.room);
@@ -322,6 +326,14 @@ const vueApp = new Vue({
         .map(([name, player]) => (['redTeam', 'blueTeam'].includes(player.team) ? name : ''))
         .filter(Boolean)
         .join(', ');
+    },
+    async backupAndReset() {
+      // Copy all content to a new room with this name, plus a random adjective
+      const roomCopy = { ...this.room };
+      roomCopy.name = `${randomWord('adjectives')}-${roomCopy.name}`;
+      await setRoom(roomCopy);
+
+      await this.resetRoom();
     },
   },
   computed: {
