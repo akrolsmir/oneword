@@ -22,11 +22,6 @@ Vue.component('navbar', {
       // Reset user info
       Object.assign(this.value, { id: '', email: '', supporter: '' });
     },
-    referAmazon() {
-      firebase.analytics().logEvent('view_amazon', {
-        source: 'navbar',
-      });
-    },
     referPremium() {
       firebase.analytics().logEvent('view_promotion', {
         source: 'navbar',
@@ -36,9 +31,6 @@ Vue.component('navbar', {
       firebase.analytics().logEvent('view_promotion', {
         source: 'navbar',
       });
-    },
-    referAbout() {
-      firebase.analytics().logEvent('view_about', { source: 'navbar' });
     },
   },
   computed: {
@@ -53,6 +45,9 @@ Vue.component('navbar', {
     <a class="navbar-item" href="./">
       <span style="font-family: 'Merienda One', cursive; font-size: 24px; color:  #4a4a4a" >One Word</span>
     </a>
+    <a class="navbar-item" href="./incrypt.html" target="_blank" @click="referIncrypt">
+      Play Incrypt
+    </a>
     <a role="button" class="navbar-burger burger" :class= "{'is-active': burgerOpen}" aria-label="menu"
         data-target="navbuttons" @click="burgerOpen = !burgerOpen;">
       <!-- burger/x icon: -->
@@ -62,15 +57,8 @@ Vue.component('navbar', {
     </a>
   </div>
   <div id="navbuttons" class="navbar-menu" :class = "{'is-active': burgerOpen}">
-    <div class="navbar-start">
-      <a class="navbar-item" href="./incrypt.html" target="_blank" @click="referIncrypt">
-        Play Incrypt
-      </a>
-    </div>
 
     <div class="navbar-end">
-      <a class="navbar-item" href="https://amzn.to/3bbSpZn" target="_blank" @click="referAmazon">Buy the board game</a>
-      <a class="navbar-item" href="./about.html" @click="referAbout">About us</a>
       <a v-if="value.id" class="navbar-item" href="#" @click.prevent="logOut">
         Sign out, {{ value.name.split(' ')[0] }}?
       </a>
