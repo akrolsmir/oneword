@@ -40,6 +40,14 @@
       margin: 48px auto;
       width: 600px;
       max-width: 95vw;
+      /* Always keep footer at the bottom: https://stackoverflow.com/a/52779563/1222351 */
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #vue {
+      flex: 1;
     }
 
     /* Override with a red color, when Red Team roster is selected */
@@ -67,6 +75,10 @@
 
     .label {
       margin-top: 20px;
+    }
+
+    .nowrap {
+      white-space: nowrap;
     }
 
     [v-cloak] {
@@ -145,7 +157,7 @@
         >, with {{ allPlayers(openRoom) }}
         <span>({{ moment(openRoom.lastUpdateTime).fromNow() }})</span>
       </p>
-      <br /><br /><br /><br /><br />
+      <br /><br />
     </div>
     <div v-else>
       <!-- Alert spectators that the game can't be joined. -->
@@ -543,6 +555,14 @@
         </div>
       </div>
     </div>
+  </div>
+  <!-- TODO: Componentize with One Word's footer -->
+  <div class="content has-text-centered mt-6 mb-4">
+    <p>
+      <span class="nowrap"><a href="about.html">👋 About us</a></span> •
+      <span class="nowrap"><a href="https://discord.gg/AP7ssVPPCr">💬 Join us on Discord</a></span> •
+      <span class="nowrap"><a href="https://amzn.to/384qWYi">🎲 Buy the board game</a></span>
+    </p>
   </div>
 </body>
 

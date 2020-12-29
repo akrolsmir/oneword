@@ -40,6 +40,14 @@
       margin: 48px auto;
       width: 600px;
       max-width: 95vw;
+      /* Always keep footer at the bottom: https://stackoverflow.com/a/52779563/1222351 */
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #vue {
+      flex: 1;
     }
 
     .spacy {
@@ -52,6 +60,10 @@
 
     .newline {
       white-space: pre-wrap;
+    }
+
+    .nowrap {
+      white-space: nowrap;
     }
 
     .capitalize {
@@ -155,7 +167,7 @@
           ({{ moment(privateRoom.lastUpdateTime).fromNow() }})
         </p>
       </div>
-      <br /><br /><br /><br /><br />
+      <br /><br />
     </div>
     <!-- In game -->
     <div v-cloak v-else class="container mx-4">
@@ -460,6 +472,13 @@
         <br />
       </template>
     </div>
+  </div>
+  <div class="content has-text-centered mt-6 mb-4">
+    <p>
+      <span class="nowrap"><a href="about.html">👋 About us</a></span> •
+      <span class="nowrap"><a href="https://discord.gg/AP7ssVPPCr">💬 Join us on Discord</a></span> •
+      <span class="nowrap"><a href="https://amzn.to/3bbSpZn">🎲 Buy the board game</a></span>
+    </p>
   </div>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/vue@2.6.2/dist/vue.js"></script>
