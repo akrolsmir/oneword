@@ -360,6 +360,10 @@ const vueApp = new Vue({
     otherTeam() {
       return this.room[other(this.myTeamId)];
     },
+    allInterceptsIn() {
+      // Extracted; while inlined there was a Vue update bug (???)
+      return this.finishedVoting(this.otherTeam.round.interceptVotes, this.players(this.myTeamId));
+    },
     smugglersId() {
       // AKA interceptees
       const map = {
