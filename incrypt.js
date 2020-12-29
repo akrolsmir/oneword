@@ -235,15 +235,16 @@ const vueApp = new Vue({
           key: randomKey(this.KEY_LENGTH, this.WORDS_SHOWN),
           encode: emptyKey(),
           interceptVotes: {},
-          decodeVotes: emptyDecodeVotes(this.players('redTeam')),
         };
         this.room.blueTeam.round = {
           spy: nextSpy(this.room.blueTeam.round.spy, this.players('blueTeam')),
           key: randomKey(this.KEY_LENGTH, this.WORDS_SHOWN),
           encode: emptyKey(),
           interceptVotes: {},
-          decodeVotes: emptyDecodeVotes(this.players('blueTeam')),
         };
+        // decrypters() needs round.spy to be filled in, so we do this last
+        this.room.redTeam.round.decodeVotes = emptyDecodeVotes(this.decrypters('redTeam'));
+        this.room.blueTeam.round.decodeVotes = emptyDecodeVotes(this.decrypters('blueTeam'));
       }
 
       // Overwrite existing room;
