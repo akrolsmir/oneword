@@ -80,7 +80,7 @@ const vueApp = new Vue({
       // Local values & UI controls, before they get uploaded
       encode: emptyKey(),
       wordGuesses: emptyGuesses(),
-      timerLength: 120,
+      timerLength: 0,
     },
     room: {
       name: randomWord('adjectives') + '-' + randomWord('nouns'),
@@ -160,7 +160,7 @@ const vueApp = new Vue({
           submitted: false,
         },
         history: [],
-        timerLength: 120,
+        timerLength: 0,
         public: true,
         lastUpdateTime: Date.now(),
         people: {},
