@@ -112,8 +112,9 @@
           <br />
           <b>Game end</b><br />
           The game is over when either team has dropped or intercepted twice per player.<br />
-          Your team gets 10 points for an intercept, and loses 10 for a dropped message.<br />
-          Plus one bonus point for each word you can guess from their team!<br />
+          Your team gets {{ POINTS_PER_INTERCEPT }} points for an intercept, and loses {{ POINTS_PER_INTERCEPT }} for a
+          dropped message.<br />
+          Plus {{ POINTS_PER_GUESS }} bonus points for each word you can guess from their team!<br />
           <br /><br />
           <label class="is-block mb-2">Invite your friends to spectate!</label>
           <sharelink :link="'https://oneword.games/incrypt?room=' + room.name"></sharelink>
@@ -434,9 +435,12 @@
           <div v-else>
             <template v-for="team in ['redTeam', 'blueTeam']">
               <b>{{ room[team].name }} team has {{ points(team) }} points.</b><br />
-              + {{ intercepted(other(team), room.history) }} × {{ POINTS_PER_INTERCEPT }} 👻 interceptions<br />
-              − {{ dropped(team, room.history) }} × {{ POINTS_PER_INTERCEPT }} 🤦‍♀️ dropped messages<br />
-              + {{ pointsFromGuesses(team) }} 🔮 correct guesses<br />
+              + {{ numCorrectGuesses(team) * POINTS_PER_GUESS }} = {{ POINTS_PER_GUESS }} × {{ numCorrectGuesses(team)
+              }} 🔮 correct guesses<br />
+              + {{ intercepted(other(team), room.history) * POINTS_PER_INTERCEPT }} = {{ POINTS_PER_INTERCEPT }} × {{
+              intercepted(other(team), room.history) }} 👻 interceptions<br />
+              − {{ dropped(team, room.history) * POINTS_PER_INTERCEPT }} = {{ POINTS_PER_INTERCEPT }} × {{ dropped(team,
+              room.history) }} 🤦‍♀️ dropped messages<br />
               <br />
 
               <keyword-cards :room="room" :team="team"></keyword-cards>

@@ -12,6 +12,7 @@ import {
 
 // TODO: This is kind of weird; intercepts should be worth less than drops?
 const POINTS_PER_INTERCEPT = 10;
+const POINTS_PER_GUESS = 2;
 const NO_VOTE = '?';
 const KEY_LENGTH = 3;
 const WORDS_SHOWN = 4; // TODO: Call these "keywords"?
@@ -91,6 +92,7 @@ const vueApp = new Vue({
     KEY_LENGTH,
     WORDS_SHOWN,
     POINTS_PER_INTERCEPT,
+    POINTS_PER_GUESS,
   },
   async created() {
     const parsedUrl = new URL(window.location.href);
@@ -287,9 +289,9 @@ const vueApp = new Vue({
     moment,
     points(team) {
       const delta = intercepted(other(team), this.room.history) - dropped(team, this.room.history);
-      return POINTS_PER_INTERCEPT * delta + this.pointsFromGuesses(team);
+      return POINTS_PER_INTERCEPT * delta + POINTS_PER_GUESS * this.numCorrectGuesses(team);
     },
-    pointsFromGuesses(team) {
+    numCorrectGuesses(team) {
       return Object.entries(this.room[other(team)].wordGuesses)
         .map(([player, guesses]) => checkGuesses(guesses, this.room[other(team)].words))
         .reduce(SUM, 0);
