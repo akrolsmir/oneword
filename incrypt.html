@@ -246,16 +246,20 @@
       <!-- Part 1: Spies are encoding their messages -->
       <div v-cloak v-if="room.state === 'ENCODING'">
         <div v-if="player.name === myTeam.round.spy" class="box">
-          <h3>You are the {{ myTeam.name }} spy! Incrypt for your team: "{{ myTeam.round.key.join(' - ') }}"</h3>
+          <h2>
+            You are the {{ myTeam.name }} incrypter!<br />
+            Write clues for "{{ myTeam.round.key.join(' - ') }}":
+          </h2>
           <br />
           <div class="columns">
             <div class="column" v-for="(digit, i) in myTeam.round.key">
               <input
                 class="input"
+                :class="{'is-active': !player.encode[i]}"
                 v-model="player.encode[i]"
                 @keyup.enter="submitForMyTeam"
                 @change="prefillEncode"
-                placeholder="Clue"
+                :placeholder='`Clue for "${myTeam.words[digit - 1]}"`'
               />
               <br /><br />
               <b>{{ digit }} - {{ myTeam.words[digit - 1] }}</b>
@@ -269,11 +273,11 @@
           <i>Don't forget the <a @click="showRules = true">rules</a>: pick meaningful clues!</i><br />
           <!-- Doesn't work cuz disabled on last input: `:disabled="myTeam.round.encode.some(Boolean)` -->
           <button
-            class="button is-fullwidth"
-            :class="{'is-success is-light': myTeam.submitted}"
+            class="button is-fullwidth is-medium"
+            :class="{'is-success is-light': myTeam.submitted, 'is-focused': myTeam.round.encode.every(Boolean)}"
             @click="submitForMyTeam"
           >
-            Submit your incryption
+            {{ myTeam.submitted ? 'Submitted ✔️' : 'Submit' }}
           </button>
         </div>
         <div v-else>
