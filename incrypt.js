@@ -334,6 +334,9 @@ const vueApp = new Vue({
     },
   },
   computed: {
+    devMode() {
+      return location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    },
     isMod() {
       // For now, the first red team player is always the mod. Also me.
       return this.players('redTeam').indexOf(this.player.name) === 0 || this.player.name === 'Austin';
