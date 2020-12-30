@@ -10,7 +10,7 @@ Vue.component('keyword-cards', {
 <div class="columns words">
   <div class="column" v-for="(word, i) in room[team].words">
     <div class="notification words" :class="team === 'redTeam' ? 'is-danger' : 'is-info'">
-      <small>Word {{ i + 1 }}</small>
+      <small>Keyword {{ i + 1 }}</small>
 
       <!-- Show the word, or '???' if previewing the other team. -->
       <h2 v-if="myTeamId && myTeamId !== team">???</h2>

@@ -69,6 +69,13 @@
       padding: 1rem 1.25rem 1rem 1.25rem;
     }
 
+    .column-divider {
+      display: block;
+      width: 1px;
+      background: #dbdbdb;
+      margin: 0.5rem 0 1rem 0;
+    }
+
     .table {
       background-color: #fff6;
     }
@@ -344,39 +351,43 @@
             <h3>Waiting for your teammates to decrypt "{{ myTeam.round.encode.join(' - ') }}"...</h3>
           </div>
           <div v-else>
-            <h3>Decrypt what {{ myTeam.round.spy }} meant by "{{ myTeam.round.encode.join(' - ') }}":</h3>
+            <h2>{{ myTeam.round.spy }} incrypted "{{ myTeam.round.encode.join(' - ') }}"<br /></h2>
+            For each clue, pick the matching keyword:
           </div>
           <br />
           <!-- (TODO: deduplicate or component-ize with above) -->
           <!-- Section: Vote for the code -->
           <div class="columns">
-            <div class="column" v-for="(encoded, e) in myTeam.round.encode">
-              <h3 class="has-text-centered">"{{ encoded }}"</h3>
-              <div v-for="(word, w) in myTeam.words">
-                <button
-                  class="button is-fullwidth"
-                  :disabled="!decrypters(myTeamId).includes(player.name)"
-                  :class="voters('decodeVotes', e, w + 1).includes(player.name) ? 'is-success' : ''"
-                  @click="vote('decodeVotes', player.name, e, w + 1)"
-                >
-                  {{ word }}
-                </button>
-                <div class="mb-2">
-                  <span v-if="voters('decodeVotes', e, w + 1).length > 0" class="is-size-7">Chosen by </span>
-                  <span class="tag" v-for="voter of voters('decodeVotes', e, w + 1)">{{ voter }}</span>
+            <template v-for="(encoded, e) in myTeam.round.encode">
+              <div class="column-divider" v-if="e > 0"></div>
+              <div class="column">
+                <h3 class="has-text-centered">"{{ encoded }}"</h3>
+                <div v-for="(word, w) in myTeam.words">
+                  <button
+                    class="button is-fullwidth"
+                    :disabled="!decrypters(myTeamId).includes(player.name)"
+                    :class="voters('decodeVotes', e, w + 1).includes(player.name) ? 'is-success' : ''"
+                    @click="vote('decodeVotes', player.name, e, w + 1)"
+                  >
+                    {{ word }}
+                  </button>
+                  <div class="mb-2">
+                    <span v-if="voters('decodeVotes', e, w + 1).length > 0" class="is-size-7">Chosen by </span>
+                    <span class="tag" v-for="voter of voters('decodeVotes', e, w + 1)">{{ voter }}</span>
+                  </div>
                 </div>
               </div>
-            </div>
+            </template>
           </div>
 
           <button
             v-if="decrypters(myTeamId).includes(player.name)"
-            class="button is-fullwidth"
-            :class="{'is-success is-light': myTeam.submitted}"
+            class="button is-fullwidth is-medium"
+            :class="{'is-success is-light': myTeam.submitted, 'is-focused': finishedVoting(myTeam.round.decodeVotes, decrypters(myTeamId))}"
             @click="submitForMyTeam"
             :disabled="!finishedVoting(myTeam.round.decodeVotes, decrypters(myTeamId))"
           >
-            Submit your team's decryptions
+            {{ myTeam.submitted ? 'Submitted ✔️' : `Submit for ${myTeam.name} team` }}
           </button>
         </div>
       </div>
