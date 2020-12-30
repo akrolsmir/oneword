@@ -297,35 +297,38 @@
         <!-- Parts 2 and 4: Other team tries to intercept -->
         <div v-if="myTeamId !== smugglersId" class="box">
           <!-- Section: Show the smugglers' code -->
-          <h3>
-            The {{ otherTeam.name }} spy, {{ otherTeam.round.spy }}, incrypted "{{ otherTeam.round.encode.join(' - ')
-            }}". Try intercepting it:
-          </h3>
-          <br />
+          <h2>
+            {{ otherTeam.round.spy }} clued "{{ otherTeam.round.encode.join(' - ') }}" to {{ otherTeam.name }} team
+          </h2>
+          Guess which keyword each clue was for:
+          <br /><br />
           <!-- Section: Vote for the intercept -->
           <div class="columns">
-            <div class="column" v-for="(encoded, e) in otherTeam.round.encode">
-              <h3 class="has-text-centered">"{{ encoded }}"</h3>
-              <div v-for="(word, w) in otherTeam.words">
-                <button
-                  class="button is-fullwidth"
-                  :class="voters('interceptVotes', e, w + 1).includes(player.name) ? 'is-success' : ''"
-                  @click="vote('interceptVotes', player.name, e, w + 1)"
-                >
-                  Word {{ w + 1 }}
-                </button>
-                <div class="mb-2">
-                  <span v-if="voters('interceptVotes', e, w + 1).length > 0" class="is-size-7">Chosen by </span>
-                  <span class="tag" v-for="voter of voters('interceptVotes', e, w + 1)">{{ voter }}</span>
+            <template v-for="(encoded, e) in otherTeam.round.encode">
+              <div class="column-divider" v-if="e > 0"></div>
+              <div class="column">
+                <h3 class="has-text-centered">"{{ encoded }}"</h3>
+                <div v-for="(word, w) in otherTeam.words">
+                  <button
+                    class="button is-fullwidth"
+                    :class="voters('interceptVotes', e, w + 1).includes(player.name) ? 'is-success' : ''"
+                    @click="vote('interceptVotes', player.name, e, w + 1)"
+                  >
+                    Keyword {{ w + 1 }}
+                  </button>
+                  <div class="mb-2">
+                    <span v-if="voters('interceptVotes', e, w + 1).length > 0" class="is-size-7">Chosen by </span>
+                    <span class="tag" v-for="voter of voters('interceptVotes', e, w + 1)">{{ voter }}</span>
+                  </div>
                 </div>
               </div>
-            </div>
+            </template>
           </div>
 
           <!-- Section: See all past clues -->
           <div class="columns">
             <div class="column" v-for="(word, i) in otherTeam.words">
-              <b>Word {{ i + 1 }}</b>
+              <b>Keyword {{ i + 1 }}</b>
               <ul>
                 <li v-for="(entry, e) in room.history" v-if="entry[other(myTeamId)].round.key.includes(i + 1)">
                   {{ entry[other(myTeamId)].round.encode[entry[other(myTeamId)].round.key.indexOf(i + 1)] }}
@@ -336,12 +339,12 @@
 
           <!-- TODO: Change button text to be "Submitted"? -->
           <button
-            class="button is-fullwidth"
-            :class="{'is-success is-light': myTeam.submitted}"
+            class="button is-fullwidth is-medium"
+            :class="{'is-success is-light': myTeam.submitted, 'is-focused': finishedVoting(otherTeam.round.interceptVotes, players(myTeamId))}"
             @click="submitForMyTeam"
             :disabled="!finishedVoting(otherTeam.round.interceptVotes, players(myTeamId))"
           >
-            Submit your team's interceptions
+            {{ myTeam.submitted ? 'Submitted ✔️' : `Submit for ${myTeam.name} team` }}
           </button>
         </div>
         <!-- Parts 2 and 4: Meanwhile, the smugglers tries to decrypt the key -->
