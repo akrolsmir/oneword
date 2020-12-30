@@ -281,6 +281,11 @@ const vueApp = new Vue({
         })
         .filter((player) => player);
     },
+    decodedCorrectly(team) {
+      return Object.values(this.room[team].round.decodeVotes).every((vote) =>
+        keysEqual(vote, this.room[team].round.key)
+      );
+    },
     other,
     keysEqual,
     finishedVoting,

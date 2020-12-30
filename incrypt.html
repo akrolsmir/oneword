@@ -396,11 +396,8 @@
       </div>
       <!-- Results for both teams! -->
       <div v-if="room.state === 'DONE'" class="box">
-        <h2>Round {{ room.history.length + 1 }} debrief</h2>
-        <br />
         <template v-for="team in ['redTeam', 'blueTeam']">
-          <b>{{ room[team].name }} team's message was "{{ room[team].round.key.join(' - ') }}"</b><br />
-          {{ room[team].round.spy }} incrypted it as "{{ room[team].round.encode.join(' - ') }}"
+          <h2>"{{ room[team].round.encode.join(' - ') }}" was "{{ room[team].round.key.join(' - ') }}"</h2>
           <div v-for="vote, voter in room[team].round.interceptVotes">
             <div v-if="keysEqual(vote, room[team].round.key)">👻 {{ voter }} intercepted the message!</div>
           </div>
@@ -408,6 +405,9 @@
             <div v-if="!keysEqual(vote, room[team].round.key)">
               🤦‍♀️ {{ voter }} thought it was "{{ vote.join(' - ') }}"...
             </div>
+          </div>
+          <div v-if="decodedCorrectly(team)">
+            ✔️ {{ room[team].name }} team decrypted {{ room[team].round.spy }}'s clues!
           </div>
           <br /><br />
         </template>
