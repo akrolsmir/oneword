@@ -237,7 +237,9 @@
                   <button class="button" @click="submitPrompt">Submit</button>
                 </div>
               </div>
-              <!-- TODO suggested actions -->
+
+              <i>Suggestions:</i>
+              <div v-for n in 3>{{ randomWord('verbs')}} {{ randomWord('nouns')}}</div>
             </template>
           </template>
           <!-- Response -->
