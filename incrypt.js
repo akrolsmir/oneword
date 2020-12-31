@@ -8,6 +8,7 @@ import {
   listenRoom,
   unlistenRoom,
   listenForLogin,
+  updateUserGame,
 } from './firebase-network.js';
 
 // TODO: This is kind of weird; intercepts should be worth less than drops?
@@ -209,6 +210,8 @@ const vueApp = new Vue({
     async prefillEncode() {
       this.myTeam.round.encode = this.player.encode;
       await this.saveRoom(`${this.myTeamId}.round.encode`);
+      // Store this for user profiles, but don't await for the result
+      updateUserGame(this.user.id, this.room.name);
     },
     async submitForMyTeam() {
       this.myTeam.submitted = true;
@@ -224,6 +227,8 @@ const vueApp = new Vue({
     async prefillGuesses() {
       this.otherTeam.wordGuesses[this.player.name] = this.player.wordGuesses;
       await this.saveRoom(`${other(this.myTeamId)}.wordGuesses.${this.player.name}`);
+
+      updateUserGame(this.user.id, this.room.name);
     },
     async newRound() {
       this.room.lastUpdateTime = Date.now();
@@ -272,6 +277,8 @@ const vueApp = new Vue({
       const newVote = currentVote === wordIndex ? NO_VOTE : wordIndex;
       this.room[team].round[voteType][name][keyIndex] = newVote;
       await this.saveRoom(`${team}.round.${voteType}.${name}`);
+
+      updateUserGame(this.user.id, this.room.name);
     },
     voters(voteType, keyIndex, wordIndex) {
       const team = voteType === 'decodeVotes' ? this.myTeamId : other(this.myTeamId);

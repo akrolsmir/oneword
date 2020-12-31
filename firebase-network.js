@@ -85,6 +85,45 @@ export async function updateUser(userId, user) {
   await db.collection('users').doc(userId).update(user);
 }
 
+export async function updateUserGame(userId, roomId) {
+  if (!userId) {
+    // Do nothing for anonymous users
+    return;
+  }
+  const timestamp = Date.now();
+  const gameId = `${COLLECTION}:${roomId}`;
+  await db
+    .collection('users')
+    .doc(userId)
+    .update({
+      lastUpdateTime: timestamp,
+      [`games.${gameId}`]: {
+        roomDb: COLLECTION,
+        roomId,
+        lastUpdateTime: timestamp,
+      },
+    });
+}
+
+/**
+ * Example user:
+ * user: {
+ *   id: asjke63rlaj2
+ *   name: Austin Chen
+ *   email: akrolsmir@gmail.com
+ *   createTime: 12321478197
+ *   lastUpdateTime: 12321478197
+ *   games: {
+ *     'rooms:soggy-lunch': {
+ *       roomDb: 'rooms', // or 'incrypt', 'rapid-silver' etc
+ *       roomId: 'soggy-lunch',
+ *       // Remember when the user last interacted
+ *       lastInteraction: 1479159175,
+ *     }
+ *     ...
+ *   }
+ * }
+ */
 export function listenForLogin(vueApp) {
   firebase.auth().onAuthStateChanged(async function (user) {
     if (user) {
