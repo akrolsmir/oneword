@@ -211,7 +211,7 @@
       <div class="history">
         <template v-for="round in room.history">
           <div :title="round.chooser">&gt; {{ round.prompt }}</div>
-          <p>{{ round.responses[round.choice] }}</p>
+          <p :title="round.choice">{{ round.responses[round.choice] }}</p>
           <br />
         </template>
       </div>
@@ -384,11 +384,11 @@
       },
       prettyStatus() {
         if (this.room.currentRound.state == 'PROMPT') {
-          return this.isChooser ? 'What do?' : `Consider what ${this.room.currentRound.chooser} would do`;
+          return this.isChooser ? 'What do?' : `${this.room.currentRound.chooser} is deciding what to do`;
         } else if (this.room.currentRound.state == 'RESPONSE') {
           return this.isChooser ? 'The future has not yet been written' : 'Write what happens next';
         } else if (this.room.currentRound.state == 'CHOOSING') {
-          return this.isChooser ? 'Choose a fate' : `${this.room.currentRound.chooser} is deciding the future.`;
+          return this.isChooser ? 'Choose a fate' : `Fate is in ${this.room.currentRound.chooser}'s hands'.`;
         }
       },
     },
