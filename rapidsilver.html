@@ -2,7 +2,7 @@
 <meta charset="utf-8" />
 
 <head>
-  <title>Ruby Shoes</title>
+  <title>Curse Typwriter</title>
   <link
     href="https://fonts.googleapis.com/css?family=Fjalla+One|Merienda+One|Righteous|Sriracha&display=swap"
     rel="stylesheet"
@@ -237,9 +237,10 @@
                   <button class="button" @click="submitPrompt">Submit</button>
                 </div>
               </div>
-
-              <i>Suggestions:</i>
-              <div v-for n in 3>{{ randomWord('verbs')}} {{ randomWord('nouns')}}</div>
+              <i>Bonus Words</i>
+              <div>Actions: <template v-for="word in suggestions['verbs']">{{ word }} </template></div>
+              <div>Adjectives: <template v-for="word in suggestions['adjectives']">{{ word }} </template></div>
+              <div>Objects: <template v-for="word in suggestions['nouns']">{{ word }} </template></div>
             </template>
           </template>
           <!-- Response -->
@@ -264,6 +265,10 @@
                   </button>
                 </div>
               </div>
+              <i>Bonus Words</i>
+              <div>Actions: <template v-for="word in suggestions['verbs']">{{ word }} </template></div>
+              <div>Adjectives: <template v-for="word in suggestions['adjectives']">{{ word }} </template></div>
+              <div>Objects: <template v-for="word in suggestions['nouns']">{{ word }} </template></div>
             </template>
           </template>
           <!-- Choosing -->
@@ -272,7 +277,7 @@
             <div class="content">
               <ol>
                 <li v-for="(response, player) in room.currentRound.responses">
-                  {{ response }}<a v-if="isChooser" href="#" @click.prevent="chooseResponse(player)">Choose</a>
+                  {{ response }} <a v-if="isChooser" href="#" @click.prevent="chooseResponse(player)">Choose</a>
                 </li>
               </ol>
             </div>
@@ -347,6 +352,11 @@
         response: '',
         choice: '',
       },
+      suggestions: {
+        nouns: [randomWord('nouns'), randomWord('nouns'), randomWord('nouns')],
+        verbs: [randomWord('verbs'), randomWord('verbs'), randomWord('verbs')],
+        adjectives: [randomWord('adjectives'), randomWord('adjectives'), randomWord('adjectives')],
+      },
       alertIsShowing: false,
       newMod: '',
       wordsSaved: false,
@@ -397,6 +407,7 @@
     methods: {
       md5,
       moment,
+      randomWord,
       listRooms,
       async enterRoom() {
         if (!this.player.name) {
@@ -505,6 +516,7 @@
           'currentRound.prompt': this.room.currentRound.prompt,
           'currentRound.state': 'RESPONSE',
         });
+        this.replaceSuggestions(this.room.currentRound.prompt);
       },
       async submitResponse() {
         const update = {};
@@ -517,6 +529,7 @@
           update['currentRound.state'] = 'CHOOSING';
         }
         await updateRoom(this.room, update);
+        this.replaceSuggestions(this.player.response);
       },
       async chooseResponse(player) {
         await updateRoom(this.room, { 'currentRound.choice': player });
@@ -578,9 +591,21 @@
           this.room.public = true;
         }
       },
+      // generate new suggestions to replace used words, return increased score
+      replaceSuggestions(response) {
+        let score = 0;
+        for (let category of ['verbs', 'nouns', 'adjectives']) {
+          this.suggestions[category].forEach((word, i) => {
+            if (response.includes(word)) {
+              ++score;
+              this.suggestions[category][i] = randomWord(category);
+            }
+          });
+        }
+        return score;
+      },
     },
   });
-
   listenForLogin(vueApp);
 
   function nextChooser(lastchooser, players) {
