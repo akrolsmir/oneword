@@ -224,56 +224,58 @@
       </div>
 
       <div v-else class="card">
-        <h2 aria-live="polite">{{ prettyStatus }}</h2>
-        <!-- Prompt -->
-        <template v-if="room.currentRound.state == 'PROMPT'">
-          <template v-if="isChooser">
-            <div class="field has-addons">
-              <div class="control">
-                <input class="input" v-model="room.currentRound.prompt" />
+        <div class="card-content">
+          <h2 class="fancy" aria-live="polite">{{ prettyStatus }}</h2>
+          <!-- Prompt -->
+          <template v-if="room.currentRound.state == 'PROMPT'">
+            <template v-if="isChooser">
+              <div class="field has-addons">
+                <div class="control">
+                  <input class="input" v-model="room.currentRound.prompt" />
+                </div>
+                <div class="control">
+                  <button class="button" @click="submitPrompt">Submit</button>
+                </div>
               </div>
-              <div class="control">
-                <button class="button" @click="submitPrompt">Submit</button>
-              </div>
-            </div>
-            <!-- TODO suggested actions -->
+              <!-- TODO suggested actions -->
+            </template>
           </template>
-        </template>
-        <!-- Response -->
-        <template v-else-if="room.currentRound.state == 'RESPONSE'">
-          <strong class="is-size-3">&gt; {{ room.currentRound.prompt }}</strong>
-          <template v-if="!isChooser">
-            <div class="field has-addons">
-              <div class="control is-expanded">
-                <input
-                  class="input"
-                  id="responseInput"
-                  type="text"
-                  v-model="player.response"
-                  @keyup.enter="submitResponse"
-                  :class="{'is-primary': room.currentRound.responses[player.name]}"
-                  :disabled="!room.players.includes(player.name)"
-                />
+          <!-- Response -->
+          <template v-else-if="room.currentRound.state == 'RESPONSE'">
+            <strong class="is-size-3">&gt; {{ room.currentRound.prompt }}</strong>
+            <template v-if="!isChooser">
+              <div class="field has-addons">
+                <div class="control is-expanded">
+                  <input
+                    class="input"
+                    id="responseInput"
+                    type="text"
+                    v-model="player.response"
+                    @keyup.enter="submitResponse"
+                    :class="{'is-primary': room.currentRound.responses[player.name]}"
+                    :disabled="!room.players.includes(player.name)"
+                  />
+                </div>
+                <div class="control">
+                  <button class="button" @click="submitResponse" :disabled="!room.players.includes(player.name)">
+                    Submit
+                  </button>
+                </div>
               </div>
-              <div class="control">
-                <button class="button" @click="submitResponse" :disabled="!room.players.includes(player.name)">
-                  Submit
-                </button>
-              </div>
+            </template>
+          </template>
+          <!-- Choosing -->
+          <template v-else-if="room.currentRound.state == 'CHOOSING'">
+            <strong class="is-size-3">&gt; {{ room.currentRound.prompt }}</strong>
+            <div class="content">
+              <ol>
+                <li v-for="(response, player) in room.currentRound.responses">
+                  {{ response }}<a v-if="isChooser" href="#" @click.prevent="chooseResponse(player)">Choose</a>
+                </li>
+              </ol>
             </div>
           </template>
-        </template>
-        <!-- Choosing -->
-        <template v-else-if="room.currentRound.state == 'CHOOSING'">
-          <strong class="is-size-3">&gt; {{ room.currentRound.prompt }}</strong>
-          <div class="content">
-            <ol>
-              <li v-for="(response, player) in room.currentRound.responses">
-                {{ response }} <a v-if="isChooser" href="#" @click.prevent="chooseResponse(player)">Choose</a>
-              </li>
-            </ol>
-          </div>
-        </template>
+        </div>
       </div>
     </div>
   </div>
