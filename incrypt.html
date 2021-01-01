@@ -40,6 +40,14 @@
       margin: 48px auto;
       width: 600px;
       max-width: 95vw;
+      /* Always keep footer at the bottom: https://stackoverflow.com/a/52779563/1222351 */
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #vue {
+      flex: 1;
     }
 
     /* Override with a red color, when Red Team roster is selected */
@@ -49,12 +57,23 @@
     }
 
     /* Narrow the gap between words */
-    .words {
+    .words.columns {
       margin: -0.25rem;
     }
 
-    .words > .column {
+    .words.columns > .column {
       padding: 0.25rem;
+    }
+
+    .words.notification {
+      padding: 1rem 1.25rem 1rem 1.25rem;
+    }
+
+    .column-divider {
+      display: block;
+      width: 1px;
+      background: #dbdbdb;
+      margin: 0.5rem 0 1rem 0;
     }
 
     .table {
@@ -63,6 +82,10 @@
 
     .label {
       margin-top: 20px;
+    }
+
+    .nowrap {
+      white-space: nowrap;
     }
 
     [v-cloak] {
@@ -96,11 +119,12 @@
           <br />
           <b>Game end</b><br />
           The game is over when either team has dropped or intercepted twice per player.<br />
-          Your team gets 10 points for an intercept, and loses 10 for a dropped message.<br />
-          Plus one bonus point for each word you can guess from their team!<br />
+          Your team gets {{ POINTS_PER_INTERCEPT }} points for an intercept, and loses {{ POINTS_PER_INTERCEPT }} for a
+          dropped message.<br />
+          Plus {{ POINTS_PER_GUESS }} bonus points for each word you can guess from their team!<br />
           <br /><br />
           <label class="is-block mb-2">Invite your friends to spectate!</label>
-          <sharelink :link="'https://oneword.games/?room=' + room.name"></sharelink>
+          <sharelink :link="'https://oneword.games/incrypt?room=' + room.name"></sharelink>
           <button class="delete" aria-label="close" @click="showRules=false"></button>
         </div>
       </div>
@@ -130,7 +154,7 @@
 
       <br /><br />
       <h2>Open Rooms</h2>
-      <p v-for="openRoom in allRooms.filter((room) => allPlayers(room) && room.state === 'NOT_STARTED')">
+      <p v-for="openRoom in allRooms.filter((room) => allPlayers(room) && room.state === 'NOT_STARTED').slice(0, 5)">
         <a @click="room.name = openRoom.name; enterRoom()"><b>{{ openRoom.name }}</b></a
         >, with {{ allPlayers(openRoom) }}
         <span>({{ moment(openRoom.lastUpdateTime).fromNow() }})</span>
@@ -141,7 +165,7 @@
         >, with {{ allPlayers(openRoom) }}
         <span>({{ moment(openRoom.lastUpdateTime).fromNow() }})</span>
       </p>
-      <br /><br /><br /><br /><br />
+      <br /><br />
     </div>
     <div v-else>
       <!-- Alert spectators that the game can't be joined. -->
@@ -163,21 +187,26 @@
       <div v-if="room.state === 'NOT_STARTED'" class="box">
         <div class="columns">
           <div class="column" v-for="team in ['redTeam', 'blueTeam']">
-            <h3>
-              {{ room[team].name }} team: {{ room[team].players.join(', ') }}
-              <a v-if="!room[team].players.includes(player.name)" @click="joinTeam(team)">(join)</a>
-            </h3>
+            <h3>{{ room[team].name }} team: {{ players(team).join(', ') }}</h3>
+            <br />
+            <button
+              class="button is-medium is-fullwidth"
+              :class="team == 'redTeam' ? 'is-danger' : 'is-info'"
+              @click="joinTeam(team)"
+            >
+              {{ !players(team).includes(player.name) ? 'Join' : 'Joined ✔️' }}
+            </button>
           </div>
         </div>
-        <div v-if="room.redTeam.players.length < 2 ">
-          {{ room.redTeam.name }} team needs {{ 2 - room.redTeam.players.length }} more, before we can start...
+        <div v-if="players('redTeam').length < 2 ">
+          {{ room.redTeam.name }} team needs {{ 2 - players('redTeam').length }} more, before we can start...
         </div>
-        <div v-else-if="room.blueTeam.players.length < 2 ">
-          {{ room.blueTeam.name }} team needs {{ 2 - room.blueTeam.players.length }} more, before we can start...
+        <div v-else-if="players('blueTeam').length < 2 ">
+          {{ room.blueTeam.name }} team needs {{ 2 - players('blueTeam').length }} more, before we can start...
         </div>
         <div v-else>
-          Awesome! There are {{ room.redTeam.players.length }} players on {{ room.redTeam.name }} team and {{
-          room.blueTeam.players.length }} players on {{ room.blueTeam.name }} team. <br />
+          Awesome! There are {{ players('redTeam').length }} players on {{ room.redTeam.name }} team and {{
+          players('blueTeam').length }} players on {{ room.blueTeam.name }} team. <br />
           Ready to start? <br />
           <br />
           <button class="button" @click="newRound">Start game!</button>
@@ -193,7 +222,7 @@
         </div>
 
         <!-- Show the current state of the game -->
-        <div class="notification has-text-centered">
+        <div class="has-text-centered" v-if="room.state !=='FINALE'">
           Round {{ room.history.length + 1 }}:
           <span v-if="room.state === 'ENCODING'"><b>🔏 Incrypt</b></span>
           <span v-else>Incrypt</span> -
@@ -222,18 +251,22 @@
       </div>
 
       <!-- Part 1: Spies are encoding their messages -->
-      <div v-cloak v-if="room.state === 'ENCODING'" class="box">
-        <div v-if="player.name === myTeam.round.spy">
-          <h3>You are the {{ myTeam.name }} spy! Incrypt for your team: "{{ myTeam.round.key.join(' - ') }}"</h3>
+      <div v-cloak v-if="room.state === 'ENCODING'">
+        <div v-if="player.name === myTeam.round.spy" class="box">
+          <h2>
+            You are the {{ myTeam.name }} incrypter!<br />
+            Write clues for "{{ myTeam.round.key.join(' - ') }}":
+          </h2>
           <br />
           <div class="columns">
             <div class="column" v-for="(digit, i) in myTeam.round.key">
               <input
                 class="input"
+                :class="{'is-active': !player.encode[i]}"
                 v-model="player.encode[i]"
-                @keyup.enter="submitEncode"
+                @keyup.enter="submitForMyTeam"
                 @change="prefillEncode"
-                placeholder="Clue"
+                :placeholder='`Clue for "${myTeam.words[digit - 1]}"`'
               />
               <br /><br />
               <b>{{ digit }} - {{ myTeam.words[digit - 1] }}</b>
@@ -243,57 +276,59 @@
                 </li>
               </ul>
             </div>
-            <div class="column">
-              <button
-                class="button"
-                @click="submitEncode()"
-                :class="finishedEncoding(myTeam.round) ? 'is-success' : ''"
-              >
-                Incrypt
-              </button>
-            </div>
           </div>
-          <i>Don't forget the <a @click="showRules = true">rules</a>: pick meaningful clues!</i>
+          <i>Don't forget the <a @click="showRules = true">rules</a>: pick meaningful clues!</i><br />
+          <!-- Doesn't work cuz disabled on last input: `:disabled="myTeam.round.encode.some(Boolean)` -->
+          <button
+            class="button is-fullwidth is-medium"
+            :class="{'is-success is-light': myTeam.submitted, 'is-focused': myTeam.round.encode.every(Boolean)}"
+            @click="submitForMyTeam"
+          >
+            {{ myTeam.submitted ? 'Submitted ✔️' : 'Submit' }}
+          </button>
         </div>
         <div v-else>
-          <h3>Waiting for {{ myTeam.round.spy }} to incrypt the key...</h3>
           <br />
+          <h3>Waiting for {{ myTeam.round.spy }} to incrypt the key...</h3>
           Meanwhile, think of good incryptions, or try to guess the other team's words!
         </div>
       </div>
-      <div v-if="['RED_DECODE', 'BLUE_DECODE', 'BOTH_DECODE'].includes(room.state)" class="box">
+      <div v-if="['RED_DECODE', 'BLUE_DECODE', 'BOTH_DECODE'].includes(room.state)">
         <!-- Parts 2 and 4: Other team tries to intercept -->
-        <div v-if="myTeamId !== smugglersId">
+        <div v-if="myTeamId !== smugglersId" class="box">
           <!-- Section: Show the smugglers' code -->
-          <h3>
-            The {{ otherTeam.name }} spy, {{ otherTeam.round.spy }}, incrypted "{{ otherTeam.round.encode.join(' - ')
-            }}". Try intercepting it:
-          </h3>
-          <br />
+          <h2>
+            {{ otherTeam.round.spy }} clued "{{ otherTeam.round.encode.join(' - ') }}" to {{ otherTeam.name }} team
+          </h2>
+          Guess which keyword each clue was for:
+          <br /><br />
           <!-- Section: Vote for the intercept -->
           <div class="columns">
-            <div class="column" v-for="(encoded, e) in otherTeam.round.encode">
-              <h3 class="has-text-centered">"{{ encoded }}"</h3>
-              <div v-for="(word, w) in otherTeam.words">
-                <button
-                  class="button is-fullwidth"
-                  :class="voters('interceptVotes', e, w + 1).includes(player.name) ? 'is-success' : ''"
-                  @click="vote('interceptVotes', player.name, e, w + 1)"
-                >
-                  Word {{ w + 1 }}
-                </button>
-                <div class="mb-2">
-                  <span v-if="voters('interceptVotes', e, w + 1).length > 0" class="is-size-7">Chosen by </span>
-                  <span class="tag" v-for="voter of voters('interceptVotes', e, w + 1)">{{ voter }}</span>
+            <template v-for="(encoded, e) in otherTeam.round.encode">
+              <div class="column-divider" v-if="e > 0"></div>
+              <div class="column">
+                <h3 class="has-text-centered">"{{ encoded }}"</h3>
+                <div v-for="(word, w) in otherTeam.words">
+                  <button
+                    class="button is-fullwidth"
+                    :class="voters('interceptVotes', e, w + 1).includes(player.name) ? 'is-success' : ''"
+                    @click="vote('interceptVotes', player.name, e, w + 1)"
+                  >
+                    Keyword {{ w + 1 }}
+                  </button>
+                  <div class="mb-2">
+                    <span v-if="voters('interceptVotes', e, w + 1).length > 0" class="is-size-7">Chosen by </span>
+                    <span class="tag" v-for="voter of voters('interceptVotes', e, w + 1)">{{ voter }}</span>
+                  </div>
                 </div>
               </div>
-            </div>
+            </template>
           </div>
 
           <!-- Section: See all past clues -->
           <div class="columns">
             <div class="column" v-for="(word, i) in otherTeam.words">
-              <b>Word {{ i + 1 }}</b>
+              <b>Keyword {{ i + 1 }}</b>
               <ul>
                 <li v-for="(entry, e) in room.history" v-if="entry[other(myTeamId)].round.key.includes(i + 1)">
                   {{ entry[other(myTeamId)].round.encode[entry[other(myTeamId)].round.key.indexOf(i + 1)] }}
@@ -301,46 +336,68 @@
               </ul>
             </div>
           </div>
+
+          <!-- TODO: Change button text to be "Submitted"? -->
+          <button
+            class="button is-fullwidth is-medium"
+            :class="{'is-success is-light': myTeam.submitted, 'is-focused': finishedVoting(otherTeam.round.interceptVotes, players(myTeamId))}"
+            @click="submitForMyTeam"
+            :disabled="!finishedVoting(otherTeam.round.interceptVotes, players(myTeamId))"
+          >
+            {{ myTeam.submitted ? 'Submitted ✔️' : `Submit for ${myTeam.name} team` }}
+          </button>
         </div>
         <!-- Parts 2 and 4: Meanwhile, the smugglers tries to decrypt the key -->
-        <div v-else>
+        <div v-else :class="{'box': player.name !== myTeam.round.spy}">
           <div v-if="player.name === myTeam.round.spy">
+            <br />
             <h3>Waiting for your teammates to decrypt "{{ myTeam.round.encode.join(' - ') }}"...</h3>
           </div>
           <div v-else>
-            <h3>Decrypt what {{ myTeam.round.spy }} meant by "{{ myTeam.round.encode.join(' - ') }}":</h3>
+            <h2>{{ myTeam.round.spy }} incrypted "{{ myTeam.round.encode.join(' - ') }}"<br /></h2>
+            For each clue, pick the matching keyword:
           </div>
           <br />
           <!-- (TODO: deduplicate or component-ize with above) -->
           <!-- Section: Vote for the code -->
           <div class="columns">
-            <div class="column" v-for="(encoded, e) in myTeam.round.encode">
-              <h3 class="has-text-centered">"{{ encoded }}"</h3>
-              <div v-for="(word, w) in myTeam.words">
-                <button
-                  class="button is-fullwidth"
-                  :disabled="!decrypters(myTeamId).includes(player.name)"
-                  :class="voters('decodeVotes', e, w + 1).includes(player.name) ? 'is-success' : ''"
-                  @click="vote('decodeVotes', player.name, e, w + 1)"
-                >
-                  {{ word }}
-                </button>
-                <div class="mb-2">
-                  <span v-if="voters('decodeVotes', e, w + 1).length > 0" class="is-size-7">Chosen by </span>
-                  <span class="tag" v-for="voter of voters('decodeVotes', e, w + 1)">{{ voter }}</span>
+            <template v-for="(encoded, e) in myTeam.round.encode">
+              <div class="column-divider" v-if="e > 0"></div>
+              <div class="column">
+                <h3 class="has-text-centered">"{{ encoded }}"</h3>
+                <div v-for="(word, w) in myTeam.words">
+                  <button
+                    class="button is-fullwidth"
+                    :disabled="!decrypters(myTeamId).includes(player.name)"
+                    :class="voters('decodeVotes', e, w + 1).includes(player.name) ? 'is-success' : ''"
+                    @click="vote('decodeVotes', player.name, e, w + 1)"
+                  >
+                    {{ word }}
+                  </button>
+                  <div class="mb-2">
+                    <span v-if="voters('decodeVotes', e, w + 1).length > 0" class="is-size-7">Chosen by </span>
+                    <span class="tag" v-for="voter of voters('decodeVotes', e, w + 1)">{{ voter }}</span>
+                  </div>
                 </div>
               </div>
-            </div>
+            </template>
           </div>
+
+          <button
+            v-if="decrypters(myTeamId).includes(player.name)"
+            class="button is-fullwidth is-medium"
+            :class="{'is-success is-light': myTeam.submitted, 'is-focused': finishedVoting(myTeam.round.decodeVotes, decrypters(myTeamId))}"
+            @click="submitForMyTeam"
+            :disabled="!finishedVoting(myTeam.round.decodeVotes, decrypters(myTeamId))"
+          >
+            {{ myTeam.submitted ? 'Submitted ✔️' : `Submit for ${myTeam.name} team` }}
+          </button>
         </div>
       </div>
       <!-- Results for both teams! -->
       <div v-if="room.state === 'DONE'" class="box">
-        <h2>Round {{ room.history.length + 1 }} debrief</h2>
-        <br />
         <template v-for="team in ['redTeam', 'blueTeam']">
-          <b>{{ room[team].name }} team's message was "{{ room[team].round.key.join(' - ') }}"</b><br />
-          {{ room[team].round.spy }} incrypted it as "{{ room[team].round.encode.join(' - ') }}"
+          <h2>"{{ room[team].round.encode.join(' - ') }}" was "{{ room[team].round.key.join(' - ') }}"</h2>
           <div v-for="vote, voter in room[team].round.interceptVotes">
             <div v-if="keysEqual(vote, room[team].round.key)">👻 {{ voter }} intercepted the message!</div>
           </div>
@@ -349,41 +406,92 @@
               🤦‍♀️ {{ voter }} thought it was "{{ vote.join(' - ') }}"...
             </div>
           </div>
+          <div v-if="decodedCorrectly(team)">
+            ✔️ {{ room[team].name }} team decrypted {{ room[team].round.spy }}'s clues!
+          </div>
           <br /><br />
         </template>
-        <!-- Game over -->
-        <div v-if="gameOver">
-          <h2>Game Over</h2>
-          <template v-for="team in ['redTeam', 'blueTeam']">
-            <b>{{ room[team].name }} team has {{ points(team) }} points.</b><br />
-            + {{ intercepted(other(team), room.history) }} 👻 interceptions<br />
-            − {{ dropped(team, room.history) }} 🤦‍♀️ dropped messages<br />
+        <b v-if="gameOver">Ready for the final showdown?</b><br />
+        <button class="button" @click="newRound">{{ gameOver ? 'Final round' : 'Next round' }}</button>
+      </div>
+
+      <!-- Game end -->
+      <div v-if="room.state === 'FINALE'" class="box">
+        <div>
+          <!-- Prompt each team to submit their guesses -->
+          <div v-if="!(room.redTeam.submitted && room.blueTeam.submitted)">
+            <h2>Final round</h2>
+            <b>Guess {{ otherTeam.name }} team's words!</b><br />
+
+            <keyword-cards :room="room" :team="other(myTeamId)" :my-team-id="myTeamId"></keyword-cards>
+
+            <!-- Allow guessing of the other team's words -->
+            <div class="words columns">
+              <div class="words column" v-for="(word, i) in otherTeam.words">
+                <input
+                  class="input mt-3"
+                  v-model="player.wordGuesses[i]"
+                  @change="prefillGuesses"
+                  type="text"
+                  :placeholder="`Word ${i + 1} guess`"
+                />
+              </div>
+            </div>
+
             <br />
-          </template>
-          <div v-if="points('redTeam') === points('blueTeam')">
-            <h2>It's a tie!</h2>
-            The tiebreaker is which team can guess more of the other team's words.
+            Has everyone on your team entered finished guessing?<br />
+            <!-- TODO: Disallow guess submission when someone isn't done yet -->
+            <button
+              class="button is-fullwidth"
+              :class="{'is-success is-light': myTeam.submitted}"
+              @click="submitForMyTeam"
+            >
+              Submit your team's guesses
+            </button>
           </div>
+          <!-- Show the results -->
           <div v-else>
-            <h2>{{ points('redTeam') > points('blueTeam') ? room.redTeam.name : room.blueTeam.name }} team wins!</h2>
-            Congratulations! GG and well played~
+            <template v-for="team in ['redTeam', 'blueTeam']">
+              <b>{{ room[team].name }} team has {{ points(team) }} points.</b><br />
+              + {{ numCorrectGuesses(team) * POINTS_PER_GUESS }} = {{ POINTS_PER_GUESS }} × {{ numCorrectGuesses(team)
+              }} 🔮 correct guesses<br />
+              + {{ intercepted(other(team), room.history) * POINTS_PER_INTERCEPT }} = {{ POINTS_PER_INTERCEPT }} × {{
+              intercepted(other(team), room.history) }} 👻 interceptions<br />
+              − {{ dropped(team, room.history) * POINTS_PER_INTERCEPT }} = {{ POINTS_PER_INTERCEPT }} × {{ dropped(team,
+              room.history) }} 🤦‍♀️ dropped messages<br />
+              <br />
+
+              <keyword-cards :room="room" :team="team"></keyword-cards>
+              <!-- Show the words, clues, and guesses. TODO: Dedupe with below -->
+              <br /><br />
+            </template>
+            <div v-if="points('redTeam') === points('blueTeam')">
+              <h2>It's a tie!</h2>
+              Wow, what are the chances? Both teams win!
+            </div>
+            <div v-else>
+              <h2>{{ points('redTeam') > points('blueTeam') ? room.redTeam.name : room.blueTeam.name }} team wins!</h2>
+              Congratulations! GG and well played~
+            </div>
+            <!-- TODO: upsell? -->
+            Want to go again?
+            <br /><br />
+            <button class="button" @click="backupAndReset">New game!</button>
           </div>
         </div>
-        <button v-else class="button" @click="newRound">Next round</button>
       </div>
 
       <!-- Team rosters -->
       <div v-if="room.state !== 'NOT_STARTED'" class="mb-2 mt-6">
         <div class="tabs is-toggle is-fullwidth">
-          <li v-for="team in ['redTeam', 'blueTeam']" :class="previewTeamId == team ? 'is-active' : ''" :id="team">
+          <li v-for="team in ['redTeam', 'blueTeam']" :class="previewTeamId === team ? 'is-active' : ''" :id="team">
             <a @click="previewTeamId = team">
               <div>
-                <h3>{{ room[team].name }} team: {{ room[team].players.join(', ') }}</h3>
+                <h3>{{ room[team].name }} team: {{ players(team).join(', ') }}</h3>
                 <!-- Show the current scores on each team -->
-                👻 {{ intercepted(other(team), room.history) }} interceptions ({{ 2 * room[team].players.length }} to
-                win)
+                👻 {{ intercepted(other(team), room.history) }} interceptions ({{ 2 * players(team).length }} to win)
                 <br />
-                🤦‍♀️ {{ dropped(team, room.history) }} dropped messages ({{ 2 * room[team].players.length - 2}} to lose)
+                🤦‍♀️ {{ dropped(team, room.history) }} dropped messages ({{ 2 * players(team).length - 2}} to lose)
                 <br />
               </div>
             </a>
@@ -391,22 +499,20 @@
         </div>
       </div>
 
+      <!-- Show the words and all clues/guesses so far -->
       <div v-if="room.state !== 'NOT_STARTED'" class="mb-6">
-        <div class="columns words">
-          <div class="column" v-for="(word, i) in myTeam.words">
-            <div class="notification" :class="previewTeamId == 'redTeam' ? 'is-danger' : 'is-info'">
-              <small>Word {{ i + 1 }}</small>
-              <h2>{{ previewTeamId == myTeamId ? word : '???' }}</h2>
-              <ul>
-                <li v-for="(entry, e) in room.history">
-                  <span v-if="entry[previewTeamId].round.key.includes(i + 1)">
-                    {{ entry[previewTeamId].round.encode[entry[previewTeamId].round.key.indexOf(i + 1)] }}
-                  </span>
-                  &nbsp;
-                  <!-- <span v-else> ---.</span> -->
-                </li>
-              </ul>
-            </div>
+        <keyword-cards :room="room" :team="previewTeamId" :my-team-id="myTeamId"></keyword-cards>
+
+        <!-- Allow guessing of the other team's words -->
+        <div v-if="previewTeamId !== myTeamId" class="words columns">
+          <div class="words column" v-for="(word, i) in room[previewTeamId].words">
+            <input
+              class="input mt-3"
+              v-model="player.wordGuesses[i]"
+              @change="prefillGuesses"
+              type="text"
+              :placeholder="`Word ${i + 1} guess`"
+            />
           </div>
         </div>
       </div>
@@ -458,19 +564,34 @@
         <br />
         <div class="columns">
           <div class="column">
-            <button class="button is-small is-danger" @click="resetRoom">Reset game</button>
+            <button class="button is-small is-danger" @click="nextState">Next stage</button>
+            <button v-if="devMode" class="button is-small is-danger" @click="resetRoom">Reset game</button>
           </div>
-          <div class="column">
-            <button class="button is-small" @click="nextState">Next stage</button>
-          </div>
-          <div class="column">
-            <input class="input is-small" style="flex: 1 2 48px" v-model.number="player.timerLength" />
-
-            <button class="button is-small" @click="updateTimer">Set Timer</button>
+          <div class="column is-size-7">
+            <div class="field has-addons">
+              <div class="control">
+                <input class="input is-small" style="flex: 1 2 48px" v-model.number="player.timerLength" />
+              </div>
+              <div class="control">
+                <button class="button is-small" @click="updateTimer">Set round timer (secs)</button>
+              </div>
+            </div>
+            <br />
+            <b>Timer suggestion</b><br />
+            0 secs (timers off) for a new group<br />
+            120 secs for an experienced group<br />
           </div>
         </div>
       </div>
     </div>
+  </div>
+  <!-- TODO: Componentize with One Word's footer -->
+  <div class="content has-text-centered mt-6 mb-4">
+    <p>
+      <span class="nowrap"><a href="about.html">👋 About us</a></span> •
+      <span class="nowrap"><a href="https://discord.gg/AP7ssVPPCr">💬 Join us on Discord</a></span> •
+      <span class="nowrap"><a href="https://amzn.to/384qWYi">🎲 Buy the board game</a></span>
+    </p>
   </div>
 </body>
 
@@ -488,4 +609,5 @@
 </script>
 <script type="module" src="components/navbar.js"></script>
 <script type="module" src="components/sharelink.js"></script>
+<script type="module" src="components/keyword-cards.js"></script>
 <script type="module" src="incrypt.js"></script>

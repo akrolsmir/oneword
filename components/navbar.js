@@ -22,23 +22,15 @@ Vue.component('navbar', {
       // Reset user info
       Object.assign(this.value, { id: '', email: '', supporter: '' });
     },
-    referAmazon() {
-      firebase.analytics().logEvent('view_amazon', {
-        source: 'navbar',
-      });
-      window.open('https://amzn.to/3bbSpZn', '_blank');
-    },
     referPremium() {
       firebase.analytics().logEvent('view_promotion', {
         source: 'navbar',
       });
-      window.open('./supporter.html', '_blank');
     },
     referIncrypt() {
       firebase.analytics().logEvent('view_promotion', {
         source: 'navbar',
       });
-      window.open('./incrypt.html', '_blank');
     },
   },
   computed: {
@@ -53,6 +45,9 @@ Vue.component('navbar', {
     <a class="navbar-item" href="./">
       <span style="font-family: 'Merienda One', cursive; font-size: 24px; color:  #4a4a4a" >One Word</span>
     </a>
+    <a class="navbar-item" href="./incrypt.html" target="_blank" @click="referIncrypt">
+      Play Incrypt
+    </a>
     <a role="button" class="navbar-burger burger" :class= "{'is-active': burgerOpen}" aria-label="menu"
         data-target="navbuttons" @click="burgerOpen = !burgerOpen;">
       <!-- burger/x icon: -->
@@ -62,26 +57,20 @@ Vue.component('navbar', {
     </a>
   </div>
   <div id="navbuttons" class="navbar-menu" :class = "{'is-active': burgerOpen}">
-    <div class="navbar-start">
-      <a class="navbar-item" @click="referIncrypt">
-        Play Incrypt
-      </a>
-    </div>
 
     <div class="navbar-end">
-      <a class="navbar-item" @click="referAmazon">Buy the board game</a>
-      <a v-if="value.id" class="navbar-item" @click="logOut">
+      <a v-if="value.id" class="navbar-item" href="#" @click.prevent="logOut">
         Sign out, {{ value.name.split(' ')[0] }}?
       </a>
-      <a v-else-if="!value.hideLogin" class="navbar-item" @click="logIn">
+      <a v-else-if="!value.hideLogin" class="navbar-item" href="#" @click.prevent="logIn">
         Sign in
       </a>
       <div v-if="!isSupporter" class="navbar-item">
-        <a class="button is-warning" @click="referPremium">
+        <a class="button is-warning" href="./supporter.html" target="_blank" @click="referPremium">
           <strong>Become a supporter!</strong>
         </a>
       </div>
-      <a v-else class="navbar-item" @click="referPremium">Supporter page</a>
+      <a v-else class="navbar-item" href="./supporter.html" target="_blank" @click="referPremium">Supporter page</a>
     </div>
   </div>
 </nav>

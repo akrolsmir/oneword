@@ -40,6 +40,14 @@
       margin: 48px auto;
       width: 600px;
       max-width: 95vw;
+      /* Always keep footer at the bottom: https://stackoverflow.com/a/52779563/1222351 */
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #vue {
+      flex: 1;
     }
 
     .spacy {
@@ -52,6 +60,10 @@
 
     .newline {
       white-space: pre-wrap;
+    }
+
+    .nowrap {
+      white-space: nowrap;
     }
 
     .capitalize {
@@ -120,11 +132,6 @@
     </div>
     <!-- Home page -->
     <div v-if="!room.players" class="container mx-4">
-      <!-- Announcements -->
-      <div class="notification is-link has-text-centered">
-        Join our official <a href="https://discord.gg/23wKGz2sNw">discord</a> to chat with other players!
-      </div>
-
       <div class="fancy big">Welcome!</div>
       This is an online game based on
       <a target="_blank" rel="noopener noreferrer" href="https://amzn.to/2xV5lUm">Just One</a>, a co-op word game for 3+
@@ -148,17 +155,19 @@
       <div v-cloak>
         <h2 class="fancy">Open Rooms</h2>
         <p v-for="openRoom in allRooms" v-bind:class="{ halfOpacity: isMuteOpenRoom(openRoom) }">
-          <a @click="room.name = openRoom.name; enterRoom()"><b>{{ openRoom.name }}</b></a
+          <a href="#" @click.prevent="room.name = openRoom.name; enterRoom()"><b>{{ openRoom.name }}</b></a
           >, with {{ openRoom.players.join(', ') }} ({{ moment(openRoom.lastUpdateTime).fromNow() }})
         </p>
         <h2 class="fancy">Private Rooms</h2>
         <p v-for="privateRoom in privateRooms">
-          <a @click="showPrivateModal = true"><b>{{ "Private room" }} with {{ privateRoom.players[0] }}</b></a>
+          <a href="#" @click.prevent="showPrivateModal = true">
+            <b>{{ "Private room" }} with {{ privateRoom.players[0] }}</b>
+          </a>
           <span v-if="privateRoom.players.length > 1"> and {{ privateRoom.players.length }} others</span>
           ({{ moment(privateRoom.lastUpdateTime).fromNow() }})
         </p>
       </div>
-      <br /><br /><br /><br /><br />
+      <br /><br />
     </div>
     <!-- In game -->
     <div v-cloak v-else class="container mx-4">
@@ -370,8 +379,13 @@
                 />
               </div>
               <div class="control">
-                <button class="button" @click="submitClue" :disabled="!room.players.includes(player.name)">
-                  Submit
+                <button
+                  class="button"
+                  @click="submitClue"
+                  :disabled="!room.players.includes(player.name)"
+                  :class="{'is-primary': room.currentRound.clues[player.name]}"
+                >
+                  {{ room.currentRound.clues[player.name] ? 'Submitted' : 'Submit' }}
                 </button>
               </div>
             </div>
@@ -458,6 +472,13 @@
         <br />
       </template>
     </div>
+  </div>
+  <div class="content has-text-centered mt-6 mb-4">
+    <p>
+      <span class="nowrap"><a href="about.html">👋 About us</a></span> •
+      <span class="nowrap"><a href="https://discord.gg/AP7ssVPPCr">💬 Join us on Discord</a></span> •
+      <span class="nowrap"><a href="https://amzn.to/3bbSpZn">🎲 Buy the board game</a></span>
+    </p>
   </div>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/vue@2.6.2/dist/vue.js"></script>

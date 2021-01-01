@@ -10,21 +10,40 @@ import {
   listenForLogin,
 } from './firebase-network.js';
 
+// TODO: This is kind of weird; intercepts should be worth less than drops?
+const POINTS_PER_INTERCEPT = 10;
+const POINTS_PER_GUESS = 2;
 const NO_VOTE = '?';
 const KEY_LENGTH = 3;
+const WORDS_SHOWN = 4; // TODO: Call these "keywords"?
+// Initialize to empty strings, since Firebase won't handle 'undefined'
 function emptyKey() {
+  // TODO: Rename to emptyEncode?
   return Array(KEY_LENGTH).fill('');
 }
+function emptyGuesses() {
+  return Array(WORDS_SHOWN).fill('');
+}
+function emptyDecodeVotes(players) {
+  function emptyVotes() {
+    return Array(KEY_LENGTH).fill(NO_VOTE);
+  }
+  return Object.fromEntries(players.map((player) => [player, emptyVotes()]));
+}
+const SUM = (a, b) => a + b;
 
 /**
 Room: {
   name: 'apple',
-  state: 'ENCODING', // or 'NOT_STARTED'/'RED_DECODE'/'BLUE_DECODE'/'BOTH_DECODE/'DONE'
+  state: 'ENCODING', // or 'NOT_STARTED'/'RED_DECODE'/'BLUE_DECODE'/'BOTH_DECODE/'DONE'/'FINALE'
   redTeam: {
     // Red team goes first on intercepts (TODO alternate?)
     // TODO name: 'Ugliest Carriages', emoji: '🤦‍♀️', color: '#FF4422'
-    players: ['alice', 'bob'], // First player is team lead aka mod
     words: ['student', 'bible', 'catholic', 'eraser'],
+    wordGuesses: {
+      carol: ['dumb', 'dict', 'deacon', 'deer'],
+      ...
+    },
     round: {
       spy: 'alice',
       key: [4, 1, 2], // sometimes referred to as "message"
@@ -35,13 +54,22 @@ Room: {
       },
       decodeVotes: {
         bob: [3, 1, 2],
-      }
+      },
+    },
+    // Whether the team has confirmed their encode/intercept/decode/guess
+    submitted: false,
   },
   blueTeam: ...
   history: [{
     redTeam: { round: {...} }
     blueTeam: { round: {...} }
-  }, ...]
+  }, ...],
+  people: {
+    alice: {
+      id: 'ff0f9dsKDF9' // or '' for anonymous
+      team: 'redTeam' // or '' for spectators?
+    }, ...
+  }
 }
 */
 const vueApp = new Vue({
@@ -51,21 +79,22 @@ const vueApp = new Vue({
       name: '',
       // Local values & UI controls, before they get uploaded
       encode: emptyKey(),
-      timerLength: 120,
+      wordGuesses: emptyGuesses(),
+      timerLength: 0,
     },
     room: {
-      // See below in created()
       name: randomWord('adjectives') + '-' + randomWord('nouns'),
     },
     user: {},
     allRooms: [],
     showRules: false,
     previewTeam: '',
+    KEY_LENGTH,
+    WORDS_SHOWN,
+    POINTS_PER_INTERCEPT,
+    POINTS_PER_GUESS,
   },
   async created() {
-    this.KEY_LENGTH = 3;
-    this.WORDS_SHOWN = 4;
-
     const parsedUrl = new URL(window.location.href);
     const roomName = parsedUrl.searchParams.get('room');
     const playerName = parsedUrl.searchParams.get('player');
@@ -80,7 +109,7 @@ const vueApp = new Vue({
     }
   },
   async mounted() {
-    this.allRooms = await listRooms();
+    this.allRooms = await listRooms(/*limit=*/ 40);
   },
   watch: {
     'room.state'(state) {
@@ -99,11 +128,7 @@ const vueApp = new Vue({
         return;
       }
       // Sanitize room name
-      this.room.name = this.room.name
-        .trim()
-        .toLowerCase()
-        .replace(/\s/g, '-') // whitespace
-        .replace(/[^\p{L}-]/gu, ''); // not (dash or letter in any language)
+      this.room.name = sanitize(this.room.name);
 
       const room = await getRoom(this.room);
 
@@ -121,27 +146,34 @@ const vueApp = new Vue({
         state: 'NOT_STARTED',
         redTeam: {
           name: 'Red',
-          players: [],
           words: randomWords(4),
+          wordGuesses: {},
           // Current round
           round: {},
+          submitted: false,
         },
         blueTeam: {
           name: 'Blue',
-          players: [],
           words: randomWords(4),
+          wordGuesses: {},
           round: {},
+          submitted: false,
         },
         history: [],
-        timerLength: 120,
+        timerLength: 0,
         public: true,
         lastUpdateTime: Date.now(),
+        people: {},
       };
       await setRoom(this.room);
     },
     async nextState() {
+      if (this.room.state === 'FINALE') {
+        return;
+      }
+      this.room.redTeam.submitted = false;
+      this.room.blueTeam.submitted = false;
       // Figure out what the next state should be, then go there.
-      const toUpdate = ['state'];
       const next = {
         ENCODING: this.room.history.length > 0 ? 'RED_DECODE' : 'BOTH_DECODE',
         RED_DECODE: 'BLUE_DECODE',
@@ -151,6 +183,8 @@ const vueApp = new Vue({
         DONE: 'ENCODING',
       };
       this.room.state = next[this.room.state];
+      const toUpdate = ['state', 'redTeam.submitted', 'blueTeam.submitted'];
+
       if (this.room.state === 'DONE') {
         // Add current round to history on DONE, to update victory conditions
         this.room.history.push({
@@ -166,64 +200,54 @@ const vueApp = new Vue({
       await this.saveRoom(...toUpdate);
     },
     async joinTeam(team) {
-      this.room[team].players.push(this.player.name);
-      // Also remove from existing team
-      unpush(this.room[other(team)].players, this.player.name);
-      await this.saveRoom('redTeam.players', 'blueTeam.players');
+      this.room.people[this.player.name] = {
+        id: this.user.id || '',
+        team,
+      };
+      await this.saveRoom(`people.${this.player.name}`);
     },
     async prefillEncode() {
       this.myTeam.round.encode = this.player.encode;
       await this.saveRoom(`${this.myTeamId}.round.encode`);
     },
-    async submitEncode() {
-      await this.prefillEncode;
-      // Once both spies are done, move to intercepting (or straight to decoding in round 1)
-      if (this.otherTeam.round.encode.length === this.myTeam.round.encode.length) {
+    async submitForMyTeam() {
+      this.myTeam.submitted = true;
+      // Always write to Firestore (since FINALE needs to see submitted)
+      // TODO: alternatively, have FINALE => GAME_OVER? Then only do this in `else`
+      await this.saveRoom(`${this.myTeamId}.submitted`);
+
+      // If both spies are done, move to intercepting (or straight to decoding in round 1)
+      if (this.myTeam.submitted && this.otherTeam.submitted) {
         await this.nextState();
       }
     },
-    async checkIfDecrypted() {
-      if (!['RED_DECODE', 'BLUE_DECODE', 'BOTH_DECODE'].includes(this.room.state)) {
-        console.error('intercept or decode called from invalid round!');
-        return;
-      }
-
-      const team = this.smugglersId;
-      if (this.room.state === 'BOTH_DECODE') {
-        if (
-          !finishedVoting(this.myTeam.round.decodeVotes, this.decrypters(this.myTeamId)) ||
-          !finishedVoting(this.otherTeam.round.decodeVotes, this.decrypters(other(this.myTeamId)))
-        ) {
-          // Only move forward when both teams are finished decoding
-          return;
-        }
-      } else if (
-        !finishedVoting(this.room[team].round.decodeVotes, this.decrypters(team)) ||
-        !finishedVoting(this.room[team].round.interceptVotes, this.room[other(team)].players)
-      ) {
-        // Only move forward when decoding and intercepting are both finished
-        return;
-      }
-      await this.nextState();
+    async prefillGuesses() {
+      this.otherTeam.wordGuesses[this.player.name] = this.player.wordGuesses;
+      await this.saveRoom(`${other(this.myTeamId)}.wordGuesses.${this.player.name}`);
     },
     async newRound() {
-      this.room.state = 'ENCODING';
-      this.room.redTeam.round = {
-        spy: nextSpy(this.room.redTeam.round.spy, this.room.redTeam.players),
-        key: randomKey(this.KEY_LENGTH, this.WORDS_SHOWN),
-        encode: emptyKey(),
-        interceptVotes: {},
-        decodeVotes: {},
-      };
-      this.room.blueTeam.round = {
-        spy: nextSpy(this.room.blueTeam.round.spy, this.room.blueTeam.players),
-        key: randomKey(this.KEY_LENGTH, this.WORDS_SHOWN),
-        encode: emptyKey(),
-        interceptVotes: {},
-        decodeVotes: {},
-      };
-      // TODO when we're tracking separate rooms
       this.room.lastUpdateTime = Date.now();
+
+      if (this.gameOver) {
+        this.room.state = 'FINALE';
+      } else {
+        this.room.state = 'ENCODING';
+        this.room.redTeam.round = {
+          spy: nextSpy(this.room.redTeam.round.spy, this.players('redTeam')),
+          key: randomKey(this.KEY_LENGTH, this.WORDS_SHOWN),
+          encode: emptyKey(),
+          interceptVotes: {},
+        };
+        this.room.blueTeam.round = {
+          spy: nextSpy(this.room.blueTeam.round.spy, this.players('blueTeam')),
+          key: randomKey(this.KEY_LENGTH, this.WORDS_SHOWN),
+          encode: emptyKey(),
+          interceptVotes: {},
+        };
+        // decrypters() needs round.spy to be filled in, so we do this last
+        this.room.redTeam.round.decodeVotes = emptyDecodeVotes(this.decrypters('redTeam'));
+        this.room.blueTeam.round.decodeVotes = emptyDecodeVotes(this.decrypters('blueTeam'));
+      }
 
       // Overwrite existing room;
       await setRoom(this.room);
@@ -240,11 +264,14 @@ const vueApp = new Vue({
       const team = voteType === 'decodeVotes' ? this.myTeamId : other(this.myTeamId);
       if (!this.room[team].round[voteType][name]) {
         // Need to fill in a dummy value so Firestore is happy
+        // TODO: Once we also initialize emptyInterceptVotes, this will no longer be needed
         this.room[team].round[voteType][name] = Array(this.KEY_LENGTH).fill(NO_VOTE);
       }
-      this.room[team].round[voteType][name][keyIndex] = wordIndex;
+      const currentVote = this.room[team].round[voteType][name][keyIndex];
+      // If this is the second click on the same vote, deselect that vote.
+      const newVote = currentVote === wordIndex ? NO_VOTE : wordIndex;
+      this.room[team].round[voteType][name][keyIndex] = newVote;
       await this.saveRoom(`${team}.round.${voteType}.${name}`);
-      await this.checkIfDecrypted();
     },
     voters(voteType, keyIndex, wordIndex) {
       const team = voteType === 'decodeVotes' ? this.myTeamId : other(this.myTeamId);
@@ -254,35 +281,76 @@ const vueApp = new Vue({
         })
         .filter((player) => player);
     },
+    decodedCorrectly(team) {
+      return Object.values(this.room[team].round.decodeVotes).every((vote) =>
+        keysEqual(vote, this.room[team].round.key)
+      );
+    },
     other,
     keysEqual,
-    finishedEncoding,
+    finishedVoting,
     intercepted,
     dropped,
     moment,
     points(team) {
-      return intercepted(other(team), this.room.history) - dropped(team, this.room.history);
+      const delta = intercepted(other(team), this.room.history) - dropped(team, this.room.history);
+      return POINTS_PER_INTERCEPT * delta + POINTS_PER_GUESS * this.numCorrectGuesses(team);
+    },
+    numCorrectGuesses(team) {
+      return Object.entries(this.room[other(team)].wordGuesses)
+        .map(([player, guesses]) => checkGuesses(guesses, this.room[other(team)].words))
+        .reduce(SUM, 0);
+    },
+    players(team) {
+      // TODO 2021-01-03: remove legacy backport
+      if (!this.room.people) {
+        return this.room[team].players;
+      }
+
+      return Object.entries(this.room.people)
+        .map(([name, player]) => (player.team === team ? name : ''))
+        .filter(Boolean);
     },
     decrypters(team) {
       // Exclude the spy, as the are not decoding
-      const decrypters = this.room[team].players.slice();
+      const decrypters = this.players(team);
       unpush(decrypters, this.room[team].round.spy);
       return decrypters;
     },
+    // Used to list who is there on the front page
     allPlayers(room) {
-      return room.redTeam.players.concat(room.blueTeam.players).join(', ');
+      // TODO 2021-01-03: remove legacy backport
+      if (!room.people) {
+        return room.redTeam.players.concat(room.blueTeam.players).join(', ');
+      }
+
+      return Object.entries(room.people)
+        .map(([name, player]) => (['redTeam', 'blueTeam'].includes(player.team) ? name : ''))
+        .filter(Boolean)
+        .join(', ');
+    },
+    async backupAndReset() {
+      // Copy all content to a new room with this name, plus a random adjective
+      const roomCopy = { ...this.room };
+      roomCopy.name = `${randomWord('adjectives')}-${roomCopy.name}`;
+      await setRoom(roomCopy);
+
+      await this.resetRoom();
     },
   },
   computed: {
+    devMode() {
+      return location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    },
     isMod() {
       // For now, the first red team player is always the mod. Also me.
-      return this.room.redTeam.players.indexOf(this.player.name) === 0 || this.player.name === 'Austin';
+      return this.players('redTeam').indexOf(this.player.name) === 0 || this.player.name === 'Austin';
     },
     isRed() {
-      return this.room.redTeam.players.includes(this.player.name);
+      return this.players('redTeam').includes(this.player.name);
     },
     isPlaying() {
-      return this.isRed || this.room.blueTeam.players.includes(this.player.name);
+      return this.isRed || this.players('blueTeam').includes(this.player.name);
     },
     myTeamId() {
       return this.isRed ? 'redTeam' : 'blueTeam';
@@ -302,6 +370,10 @@ const vueApp = new Vue({
     otherTeam() {
       return this.room[other(this.myTeamId)];
     },
+    allInterceptsIn() {
+      // Extracted; while inlined there was a Vue update bug (???)
+      return this.finishedVoting(this.otherTeam.round.interceptVotes, this.players(this.myTeamId));
+    },
     smugglersId() {
       // AKA interceptees
       const map = {
@@ -316,10 +388,10 @@ const vueApp = new Vue({
         // Game is over when every player on a team has (on average) intercepted
         // twice, or dropped two messages
         // TODO: could extract 2 to a constant
-        intercepted('redTeam', this.room.history) >= 2 * this.room.blueTeam.players.length ||
-        dropped('redTeam', this.room.history) >= 2 * this.room.blueTeam.players.length - 2 ||
-        intercepted('blueTeam', this.room.history) >= 2 * this.room.redTeam.players.length ||
-        dropped('blueTeam', this.room.history) >= 2 * this.room.redTeam.players.length - 2
+        intercepted('redTeam', this.room.history) >= 2 * this.players('blueTeam').length ||
+        dropped('redTeam', this.room.history) >= 2 * this.players('redTeam').length - 2 ||
+        intercepted('blueTeam', this.room.history) >= 2 * this.players('redTeam').length ||
+        dropped('blueTeam', this.room.history) >= 2 * this.players('blueTeam').length - 2
       );
     },
   },
@@ -401,11 +473,6 @@ function nextSpy(lastSpy, players) {
   return players[nextIndex];
 }
 
-function finishedEncoding(round) {
-  // If any element is not true (aka empty string), still not done.
-  return !round.encode.some((e) => !e);
-}
-
 // votes = { alice: [1, 2, 3], ...}; players = ['alice', ...]
 function finishedVoting(votes, players) {
   // Not done if any player has not yet voted
@@ -429,16 +496,32 @@ function intercepted(team, history) {
     .flatMap((entry) =>
       Object.values(entry[team].round.interceptVotes).map((vote) => keysEqual(vote, entry[team].round.key))
     )
-    .reduce((a, b) => a + b, 0);
+    .reduce(SUM, 0);
 }
 
 // Returns how many of <team>'s messages have not been correctly decoded
 function dropped(team, history) {
-  const sum = (a, b) => a + b;
   // Abusing the fact that 0 + false + true = 1
   return history
     .flatMap((entry) =>
       Object.values(entry[team].round.decodeVotes).map((vote) => !keysEqual(vote, entry[team].round.key))
     )
-    .reduce(sum, 0);
+    .reduce(SUM, 0);
+}
+
+// Return how many of these guesses match the words
+function checkGuesses(guesses, words) {
+  if (guesses.length !== words.length) {
+    throw `Guesses and words must be same length! Got ${guesses}, ${words}`;
+  }
+  return guesses.map((guess, i) => sanitize(guess) === sanitize(words[i])).reduce(SUM, 0);
+}
+
+// TODO: extract to util?
+function sanitize(text) {
+  return text
+    .trim()
+    .toLowerCase()
+    .replace(/\s/g, '-') // whitespace
+    .replace(/[^\p{L}-]/gu, ''); // not (dash or letter in any language)
 }
