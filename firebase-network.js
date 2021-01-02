@@ -105,6 +105,8 @@ export async function updateUserGame(userId, roomId) {
     });
 }
 
+const CACHED_USER_KEY = 'CACHED_USER_KEY';
+
 /**
  * Example user:
  * user: {
@@ -125,6 +127,13 @@ export async function updateUserGame(userId, roomId) {
  * }
  */
 export function listenForLogin(vueApp) {
+  // Immediately load any persisted user object from browser cache.
+  const cachedUser = localStorage.getItem(CACHED_USER_KEY);
+  if (cachedUser) {
+    vueApp.user = JSON.parse(cachedUser);
+  }
+
+  // Then listen for any login changes (includes )
   firebase.auth().onAuthStateChanged(async function (user) {
     if (user) {
       let fetchedUser = await getUser(user.uid);
@@ -150,13 +159,18 @@ export function listenForLogin(vueApp) {
         // This allows devs to use "?player=Zed" for multi-account testing.
         vueApp.player.name = fetchedUser.name.split(' ')[0];
       }
+
+      // Persist to local storage, to reduce login blink next time.
+      // Note: Cap on localStorage size is ~5mb
+      localStorage.setItem(CACHED_USER_KEY, JSON.stringify(fetchedUser));
     }
   });
 }
 
-export function runUrl(runId) {
-  const parsedUrl = new URL(window.location.href);
-  return `${parsedUrl.origin}/draft-viewer?run=${runId}`;
+export async function firebaseLogout() {
+  firebase.analytics().logEvent('logout');
+  await firebase.auth().signOut();
+  localStorage.removeItem(CACHED_USER_KEY);
 }
 
 /**

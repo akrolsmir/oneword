@@ -60,7 +60,7 @@
       </div>
     </section>
     <br />
-    <button v-if="this.user.id" class="button" @click="logOut">Sign out</button>
+    <button v-if="this.user.id" class="button" @click="logout">Sign out</button>
     <br />
     <br />
 
@@ -101,7 +101,7 @@
 <script type="module" src="components/nametag.js"></script>
 <script type="module" src="firebase-network.js"></script>
 <script type="module">
-  import { listenForLogin } from './firebase-network.js';
+  import { listenForLogin, firebaseLogout } from './firebase-network.js';
 
   const vueApp = new Vue({
     el: '#profile',
@@ -114,11 +114,10 @@
       moment,
       url,
       title,
-      async logOut() {
-        firebase.analytics().logEvent('logout');
-        await firebase.auth().signOut();
-        // Reset user info
-        Object.assign(this.value, { id: '', email: '', supporter: '' });
+      async logout() {
+        await firebaseLogout();
+        // Reset user id to indicate logged out.
+        this.user = {};
       },
     },
     computed: {
