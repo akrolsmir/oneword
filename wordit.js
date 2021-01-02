@@ -302,11 +302,10 @@ const vueApp = new Vue({
     },
     async newRound(sameGuesser = false) {
       this.room.history.push(this.room.currentRound);
-      const category = nextCategory(this.room.categories);
       this.room.currentRound = {
         state: 'CLUER_PICKING',
         // Pick next guesser
-        clueGiver: nextGuesser(this.room.currentRound.guesser, this.room.players),
+        clueGiver: nextClueGiver(this.room.currentRound.clueGiver, this.room.players),
         // Stores the real word from the clue giver; resets every round.
         word: '',
         // Stores both the real word and all decoys from other players; resets every round.
@@ -315,7 +314,7 @@ const vueApp = new Vue({
         clue: '',
         // Stores counts of votes for both the real word and the decoy; resets every round.
         votes: {},
-        category, //remove this
+        category: 'nouns', //remove this
       };
       this.room.lastUpdateTime = Date.now();
       // Overwrite existing room;
@@ -353,9 +352,9 @@ const vueApp = new Vue({
         this.room.roundsInGame = 13;
       }
     },
-    other,
     keysEqual,
     finished,
+    shuffleArray,
     async tallyPoints() {
       // Note tallyPoints happens on client side; each player updates their own
       const wordThisRound = this.room.currentRound.word;
@@ -378,6 +377,7 @@ const vueApp = new Vue({
         // Otherwise for each time the decoy's word gets a vote, add 2 points
         else {
           _.forEach(this.room.currentRound.votes, (guess) => {
+            // alternatively _.values(currentRound.allWords).includes(guess)
             if (this.player.wordlist.includes(guess)) {
               this.room.players[this.player.name] += 2;
             }
@@ -389,9 +389,6 @@ const vueApp = new Vue({
     },
     dropped,
     moment,
-    points(team) {
-      return intercepted(other(team), this.room.history) - dropped(team, this.room.history);
-    },
   },
   computed: {
     timerLength() {
@@ -444,10 +441,6 @@ function unpush(array, value) {
   }
 }
 
-function other(team) {
-  return team === 'redTeam' ? 'blueTeam' : 'redTeam';
-}
-
 // Extracts a node from an object tree by its path, like "redTeam.players"
 function getIn(object, path) {
   let node = object;
@@ -479,20 +472,19 @@ function shuffleArray(array) {
   return array;
 }
 
+function nextClueGiver(lastGuesser, players) {
+  // players is a map from name->points; we just need the names
+  const playersList = _.keys(players);
+  const nextIndex = (playersList.indexOf(lastGuesser) + 1 + playersList.length) % playersList.length;
+  return playersList[nextIndex];
+}
+
 // Random word for a category, copied from index.html
 function randomWord(category = 'nouns', customWords = '') {
   const custom = customWords.split(/\s/);
   const categories = { nouns, compounds, verbs, adjectives, custom };
   const words = categories[category];
   return words[Math.floor(Math.random() * words.length)];
-}
-
-// Unique list of random words e.g. randomWords(4) => ['at', 'lol', 'cat', 'yo']
-function randomWords(length) {
-  // For now, take out nouns longer than 8 letters; ~758 of 825 nouns left
-  const filteredNouns = nouns.filter((word) => word.length <= 8);
-  // Assumes nouns has no duplicates.
-  return shuffleArray(filteredNouns).slice(0, length);
 }
 
 // Key elements will be unique e.g. randomKey(3, 4) => [2, 1, 4]

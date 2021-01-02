@@ -407,7 +407,7 @@
             <button
               class="button is-rounded"
               @click="submitVote(word)"
-              v-for="(word, i) in room.currentRound.allWords"
+              v-for="word in shuffleArray(_.values(room.currentRound.allWords))"
               :disabled="room.currentRound.allWords[player.name] == word"
               :class="{ 'is-success': room.currentRound.votes[player.name] == word }"
             >
@@ -431,7 +431,7 @@
           The word from "{{ room.currentRound.clueGiver }}" was "{{ room.currentRound.word }}"!
         </h2>
         <template v-for="(guess, voter) in room.currentRound.votes">
-          <div class="fancy has-text-success" role="alert">{{ voter }} guessed was "{{ guess }}".</div>
+          <div class="fancy has-text-success" role="alert">{{ voter }} guessed "{{ guess }}".</div>
         </template>
         <template v-for="(points, player) in room.players">
           <div class="fancy has-text-success" role="alert">{{ player }} is now has "{{ points }} points".</div>
@@ -445,7 +445,8 @@
           :supporter="!!user.supporter"
           @continue-game="newRound(false)"
         ></scoreboard>
-        <button v-else class="button" @click="newRound(false)">Next Round</button> -->
+        -->
+        <button class="button" @click="newRound(false)">Next Round</button>
       </div>
       <br /><br />
       <!-- History TO ADD LATER -->
