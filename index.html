@@ -509,6 +509,7 @@
     listenRoom,
     unlistenRoom,
     listenForLogin,
+    updateUserGame,
   } from './firebase-network.js';
 
   /**
@@ -752,6 +753,9 @@
         if (doneCluing) {
           await updateRoom(this.room, { 'currentRound.state': 'GUESSING' });
         }
+
+        // Store this for user profiles, but don't await for the result
+        updateUserGame(this.user.id, this.room.name);
       },
       async nextStage() {
         if (this.room.currentRound.state == 'CLUEING') {
@@ -768,6 +772,9 @@
           'currentRound.state': 'DONE',
         };
         await updateRoom(this.room, update);
+
+        // Store this for user profiles, but don't await for the result
+        updateUserGame(this.user.id, this.room.name);
       },
       async newRound(sameGuesser = false) {
         this.room.history.push(this.room.currentRound);
