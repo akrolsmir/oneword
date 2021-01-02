@@ -120,6 +120,14 @@ const vueApp = new Vue({
         this.player.encode = emptyKey();
       }
     },
+    async room(newRoom, oldRoom) {
+      // oldRoom.state means that we didn't just enter this room (eg from home page)
+      // newRoom.nextRoomName existing and changing means all clients should move to the new room.
+      if (oldRoom.state && newRoom.nextRoomName && newRoom.nextRoomName !== oldRoom.nextRoomName) {
+        this.room.name = newRoom.nextRoomName;
+        await this.enterRoom();
+      }
+    },
   },
   methods: {
     // Somewhat copied from One Word's index.html. TODO: Dedupe?
@@ -336,14 +344,12 @@ const vueApp = new Vue({
         .filter(Boolean)
         .join(', ');
     },
-    async backupAndReset() {
-      // Copy all content to a new room with this name, plus a random adjective
-      const roomCopy = { ...this.room };
-      roomCopy.name = `${randomWord('adjectives')}-${roomCopy.name}`;
-      await setRoom(roomCopy);
-
-      await this.resetRoom();
+    async createNewRoom() {
+      // Telling everyone to enter the new room is race-y, but enterRoom() is idempotent so wtv.
+      const nextRoomName = generateNextRoomName(this.room.nextRoomName || this.room.name);
+      await updateRoom(this.room, { nextRoomName });
     },
+    generateNextRoomName,
   },
   computed: {
     devMode() {
@@ -530,5 +536,18 @@ function sanitize(text) {
     .trim()
     .toLowerCase()
     .replace(/\s/g, '-') // whitespace
-    .replace(/[^\p{L}-]/gu, ''); // not (dash or letter in any language)
+    .replace(/[^-\d\p{L}]/gu, ''); // not (dash or number or letter in any language)
+}
+
+function generateNextRoomName(name) {
+  const idParts = name.split('-');
+  const lastNum = Math.floor(Number(idParts[idParts.length - 1]));
+  if (lastNum) {
+    // 'aback-place-4' => 'aback-place-5'
+    idParts[idParts.length - 1] = `${lastNum + 1}`;
+  } else {
+    // 'aback-place' => 'aback-place-1'
+    idParts.push('1');
+  }
+  return idParts.join('-');
 }

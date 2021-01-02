@@ -476,7 +476,9 @@
             <!-- TODO: upsell? -->
             Want to go again?
             <br /><br />
-            <button class="button" @click="backupAndReset">New game!</button>
+            <button class="button" @click="createNewRoom">
+              New room: {{ generateNextRoomName(room.nextRoomName || room.name) }}
+            </button>
           </div>
         </div>
       </div>
