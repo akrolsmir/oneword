@@ -262,9 +262,14 @@
                 </div>
               </div>
               <i>Bonus Words</i>
-              <div>Actions: <template v-for="word in suggestions['verbs']">{{ word }} </template></div>
-              <div>Adjectives: <template v-for="word in suggestions['adjectives']">{{ word }} </template></div>
-              <div>Objects: <template v-for="word in suggestions['nouns']">{{ word }} </template></div>
+              <div>
+                <span
+                  v-for="word in prettySuggestions"
+                  :class="{'has-text-weight-medium has-text-primary': player.response.includes(word)}"
+                >
+                  {{ word }}
+                </span>
+              </div>
             </template>
           </template>
           <!-- Choosing -->
@@ -350,8 +355,8 @@
       },
       suggestions: {
         nouns: [randomWord('nouns'), randomWord('nouns'), randomWord('nouns')],
-        verbs: [randomWord('verbs'), randomWord('verbs'), randomWord('verbs')],
-        adjectives: [randomWord('adjectives'), randomWord('adjectives'), randomWord('adjectives')],
+        verbs: [randomWord('verbs'), randomWord('verbs')],
+        adjectives: [randomWord('adjectives'), randomWord('adjectives')],
       },
       alertIsShowing: false,
       newMod: '',
@@ -398,6 +403,18 @@
         } else if (this.room.currentRound.state == 'CHOOSING') {
           return this.isChooser ? 'Choose a fate' : `Fate is in ${this.room.currentRound.chooser}'s hands'.`;
         }
+      },
+      prettySuggestions() {
+        // put suggestions in optimal order for creativity
+        return [
+          this.suggestions['nouns'][0],
+          this.suggestions['verbs'][0],
+          this.suggestions['adjectives'][0],
+          this.suggestions['nouns'][1],
+          this.suggestions['verbs'][1],
+          this.suggestions['adjectives'][1],
+          this.suggestions['nouns'][2],
+        ];
       },
     },
     methods: {
