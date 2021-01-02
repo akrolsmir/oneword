@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+
+<head>
+  <title>Profile</title>
+  <link
+    href="https://fonts.googleapis.com/css?family=Fjalla+One|Merienda+One|Righteous|Sriracha&display=swap"
+    rel="stylesheet"
+  />
+  <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    html {
+      margin: 0;
+      height: 100%;
+      background-color: #eaeff6;
+      position: relative;
+      overflow: auto;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: 'Merienda One', cursive;
+    }
+
+    body {
+      margin: 48px auto;
+      width: 800px;
+      max-width: 95vw;
+    }
+
+    h2 {
+      margin-bottom: 6px;
+      font-size: 24px;
+    }
+
+    .tag {
+      font-size: 0.875rem !important;
+    }
+  </style>
+
+  <meta name="description" content="All about you!" />
+
+  <!-- Dolphin favicon courtesy of Twemoji -->
+  <link rel="icon" href="https://twemoji.maxcdn.com/v/13.0.1/72x72/1f42c.png" />
+</head>
+
+<body class="has-navbar-fixed-top">
+  <div id="profile">
+    <navbar v-model="user"></navbar>
+    <section class="hero is-info is-bold">
+      <div class="hero-body">
+        <div class="container">
+          <h1 class="title">Hey there, {{ displayName }}. {{ user.id ? '' : 'Care to sign in?' }}</h1>
+          <h2 class="subtitle" v-if="user.supporter">Thanks for being a supporter!</h2>
+          <h2 class="subtitle" v-else>Thanks for playing!</h2>
+        </div>
+      </div>
+    </section>
+    <br />
+    <button v-if="this.user.id" class="button" @click="logOut">Sign out</button>
+    <br />
+    <br />
+
+    <h2>Your Avatar</h2>
+    <nametag :user="user" :name="displayName"></nametag>
+    <br />
+    <p v-if="user.supporter">You can change your avatar on <a href="https://en.gravatar.com/">Gravatar</a>.</p>
+    <p v-else>Become a <a href="./supporter?refer=profile">supporter</a> to change your avatar!</p>
+    <br />
+
+    <h2>Your Games</h2>
+    <div class="box">
+      <h3>One Word</h3>
+      <p v-for="game in gamesByTime" v-if="game.roomDb === 'rooms'">
+        <b><a :href="url(game)">{{ game.roomId }}</a></b
+        >, {{ moment(game.lastUpdateTime).fromNow() }}
+      </p>
+      <br />
+      <h3>Incrypt</h3>
+      <p v-for="game in gamesByTime" v-if="game.roomDb === 'incrypt'">
+        <b><a :href="url(game)">{{ game.roomId }}</a></b
+        >, {{ moment(game.lastUpdateTime).fromNow() }}
+      </p>
+    </div>
+  </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.2/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/blueimp-md5@2.13.0/js/md5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-auth.js"></script>
+
+<script type="module" src="components/navbar.js"></script>
+<script type="module" src="components/nametag.js"></script>
+<script type="module" src="firebase-network.js"></script>
+<script type="module">
+  import { listenForLogin } from './firebase-network.js';
+
+  const vueApp = new Vue({
+    el: '#profile',
+    data: {
+      user: {},
+      // Needed for listenForLogin:
+      player: {},
+    },
+    methods: {
+      moment,
+      url,
+      title,
+      async logOut() {
+        firebase.analytics().logEvent('logout');
+        await firebase.auth().signOut();
+        // Reset user info
+        Object.assign(this.value, { id: '', email: '', supporter: '' });
+      },
+    },
+    computed: {
+      displayName() {
+        return (this.user.name && this.user.name.split(' ')[0]) || 'friend';
+      },
+      gamesByTime() {
+        return Object.values(this.user.games || {}).sort((a, b) => b.lastUpdateTime - a.lastUpdateTime);
+      },
+    },
+  });
+  listenForLogin(vueApp);
+
+  function title(game) {
+    return {
+      rooms: 'One Word',
+      incrypt: 'Incrypt',
+    }[game.roomDb];
+  }
+
+  function url(game) {
+    return {
+      rooms: `https://oneword.games?room=${game.roomId}`,
+      incrypt: `https://oneword.games/incrypt?room=${game.roomId}`,
+    }[game.roomDb];
+  }
+</script>

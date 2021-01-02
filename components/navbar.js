@@ -16,12 +16,6 @@ Vue.component('navbar', {
       firebase.analytics().logEvent('login');
       window.open('login-widget.html', 'Sign In', 'width=400,height=600');
     },
-    async logOut() {
-      firebase.analytics().logEvent('logout');
-      await firebase.auth().signOut();
-      // Reset user info
-      Object.assign(this.value, { id: '', email: '', supporter: '' });
-    },
     referPremium() {
       firebase.analytics().logEvent('view_promotion', {
         source: 'navbar',
@@ -59,18 +53,17 @@ Vue.component('navbar', {
   <div id="navbuttons" class="navbar-menu" :class = "{'is-active': burgerOpen}">
 
     <div class="navbar-end">
-      <a v-if="value.id" class="navbar-item" href="#" @click.prevent="logOut">
-        Sign out, {{ value.name.split(' ')[0] }}?
+      <a v-if="value.id" class="navbar-item" href="./profile.html">
+        Signed in as {{ value.name.split(' ')[0] }}
       </a>
       <a v-else-if="!value.hideLogin" class="navbar-item" href="#" @click.prevent="logIn">
         Sign in
       </a>
-      <div v-if="!isSupporter" class="navbar-item">
+      <div class="navbar-item">
         <a class="button is-warning" href="./supporter.html" target="_blank" @click="referPremium">
-          <strong>Become a supporter!</strong>
+          <strong>{{ isSupporter ? 'Supporter' : 'Become a supporter!' }}</strong>
         </a>
       </div>
-      <a v-else class="navbar-item" href="./supporter.html" target="_blank" @click="referPremium">Supporter page</a>
     </div>
   </div>
 </nav>
