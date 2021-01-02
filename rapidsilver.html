@@ -237,10 +237,6 @@
                   <button class="button" @click="submitPrompt">Submit</button>
                 </div>
               </div>
-              <i>Bonus Words</i>
-              <div>Actions: <template v-for="word in suggestions['verbs']">{{ word }} </template></div>
-              <div>Adjectives: <template v-for="word in suggestions['adjectives']">{{ word }} </template></div>
-              <div>Objects: <template v-for="word in suggestions['nouns']">{{ word }} </template></div>
             </template>
           </template>
           <!-- Response -->
@@ -516,7 +512,6 @@
           'currentRound.prompt': this.room.currentRound.prompt,
           'currentRound.state': 'RESPONSE',
         });
-        this.replaceSuggestions(this.room.currentRound.prompt);
       },
       async submitResponse() {
         const update = {};
