@@ -52,7 +52,7 @@ const vueApp = new Vue({
       this.$emit('reset-timer');
       // Clean up past inputs when the round moves forward.
       if (state === 'DONE') {
-        await this.tallyPoints();
+        setTimeout(await this.tallyPoints(), Math.floor(Math.random() * 3000));
       }
     },
   },
@@ -76,7 +76,7 @@ const vueApp = new Vue({
       if (room) {
         // If the player's name collides with another user's,
         // prepend adjectives until it is unique
-        // TODO: UNCOMMENT THIS BEFORE COMMIT
+        /* TODO(shawnx): UNCOMMENT THIS BEFORE COMMIT */
         // while (
         //   _.keys(room.players).includes(this.player.name) &&
         //   (this.user.guest || this.user.email != room.playerData[this.player.name].email)
@@ -95,6 +95,7 @@ const vueApp = new Vue({
     /**
     Room: {
         name: 'apple',
+        mod: 'shawn',
         theme: 'none', // 'celebs', 'disney', 'horror', 'kitchen'
         wordsPerPlayer: 7, // customizable
         players: {
@@ -355,6 +356,7 @@ const vueApp = new Vue({
     keysEqual,
     finished,
     shuffleArray,
+    //BUG: points get re-tallied upon browser refresh
     async tallyPoints() {
       // Note tallyPoints happens on client side; each player updates their own
       const wordThisRound = this.room.currentRound.word;
@@ -384,7 +386,6 @@ const vueApp = new Vue({
           });
         }
       }
-      //Would there be race condition here?
       await setRoom(this.room);
     },
     dropped,
