@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+
+<head>
+  <title>Shiritori</title>
+  <link
+    href="https://fonts.googleapis.com/css?family=Fjalla+One|Merienda+One|Righteous|Sriracha&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    h1,
+    h2,
+    h3 {
+      font-family: 'Merienda One', cursive;
+    }
+
+    html {
+      background: #a86;
+    }
+
+    body {
+      margin: 48px auto;
+      width: 600px;
+      max-width: 95vw;
+    }
+  </style>
+
+  <meta name="description" content="Play the game Shiritori!" />
+
+  <!-- Dolphin favicon courtesy of Twemoji -->
+  <link rel="icon" href="https://twemoji.maxcdn.com/v/13.0.1/72x72/1f42c.png" />
+</head>
+
+<body class="has-navbar-fixed-top">
+  <div id="vueApp">
+    <!-- Login -->
+    <div class="box">
+      <b>Room</b>
+      <input class="input" v-model="room.name" disabled />
+      <b>Player</b>
+      <input class="input" v-model="player.name" />
+      <button class="button" @click="joinRoom">Join Room</button>
+      <br />
+      Playing: {{ players.join(', ') }}
+    </div>
+    <!-- Game -->
+    <div class="box" v-if="room.round">
+      <!-- Allow player to submit if it's their turn -->
+      <div v-if="room.round.turn === player.name">
+        <b>It's your turn, {{ player.name}}! Submit your word</b>
+        <input class="input" v-model="player.word" />
+        <button class="button" @click="submitWord">Submit Word</button>
+      </div>
+      <div v-else>
+        <b>Waiting for {{ room.round.turn }}</b>
+      </div>
+
+      <p v-for="word, player in room.round.words">{{ player }}'s word was <b>{{ word }}</b></p>
+
+      <p>The word chain you have made: <b>{{ chain }}</b></p>
+    </div>
+    <!-- History -->
+    <h2>History</h2>
+    <template v-for="(round, r) in room.history">
+      <b>Round {{ r + 1 }}</b>
+      <p v-for="word, player in round.words">{{ player }}'s word was <b>{{ word }}</b></p>
+    </template>
+
+    <!-- Mod tools -->
+    <div class="box mt-4">
+      <h2>Mod tools</h2>
+      <button class="button" @click="resetRoom">Reset room</button>
+    </div>
+  </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.2/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/blueimp-md5@2.13.0/js/md5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-firestore.js"></script>
+
+<script>
+  // This sets the name of the Firebase database you'll use
+  window.COLLECTION = 'shiritori';
+</script>
+<script type="module">
+  import { listenRoom, setRoom, updateRoom } from './firebase-network.js';
+
+  const vueApp = new Vue({
+    el: '#vueApp',
+    // Everything the Vue app needs to figure out what to do.
+    data: {
+      // Shared data across all players
+      room: {
+        name: 'default-room',
+        people: {},
+      },
+      // Things are that only used for this client
+      player: {
+        name: 'Austin',
+        word: '',
+      },
+    },
+    // Functions to call after the Vue app is initialized
+    created() {
+      // Download the initial room, and listen for all updates
+      listenRoom(this);
+    },
+    methods: {
+      async submitWord() {
+        const next = nextPlayer(this.players, this.player.name);
+        this.room.round.words[this.player.name] = this.player.word;
+        if (Object.keys(this.room.round.words).length >= this.players.length) {
+          // Everyone has submitted; time for a new round!
+          this.room.history.push(this.room.round);
+          this.room.round = {
+            turn: next,
+            words: {},
+          };
+          return await setRoom(this.room);
+        }
+        // Otherwise, let the next player go
+        await updateRoom(this.room, {
+          [`round.words.${this.player.name}`]: this.player.word,
+          'round.turn': next,
+        });
+      },
+      async resetRoom() {
+        this.room = {
+          name: this.room.name,
+          round: {
+            turn: '', // Who's currently up?
+            words: {
+              // players to their words
+              // e.g. austin: 'sheep'
+            },
+          },
+          // Array of past rounds
+          history: [],
+        };
+        await setRoom(this.room);
+      },
+      async joinRoom() {
+        await updateRoom(this.room, {
+          [`people.${this.player.name}`]: {
+            timestamp: Date.now(),
+            playing: true,
+          },
+        });
+
+        if (!this.room.round.turn) {
+          await updateRoom(this.room, { 'round.turn': this.player.name });
+        }
+      },
+    },
+    computed: {
+      players() {
+        return Object.entries(this.room.people || {})
+          .sort(([p1, d1], [p2, d2]) => d1.timestamp - d2.timestamp)
+          .map(([player, data]) => player);
+      },
+      chain() {
+        const chosenWords = this.players.map((player) => this.room.round.words[player] || '.');
+        if (chosenWords.length == 0) {
+          return '';
+        }
+        return chosenWords[0][0] + chosenWords.map((word) => word.slice(1)).join('');
+      },
+    },
+  });
+
+  function nextPlayer(players, current) {
+    const index = players.indexOf(current);
+    return players[(index + players.length + 1) % players.length];
+  }
+</script>
