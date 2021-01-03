@@ -38,7 +38,7 @@
 
     body {
       margin: 48px auto;
-      width: 600px;
+      width: 1200px;
       max-width: 95vw;
       /* Always keep footer at the bottom: https://stackoverflow.com/a/52779563/1222351 */
       min-height: 100vh;
@@ -130,6 +130,12 @@
       </div>
     </div>
 
+    <div class="columns is-centered">
+      <!-- Left pane is empty placeholder. Only shown in-game and when width > 1216px -->
+      <div class="column is-hidden-touch is-hidden-desktop-only" v-if="room.redTeam"></div>
+      <!-- Center (main) pane. TODO: Remove the below to get prettier formatting again -->
+      <!-- prettier-ignore -->
+      <div class="column is-two-thirds is-half-widescreen">
     <!-- Home page -->
     <div v-if="!room.redTeam">
       <h1>Welcome to Incrypt!</h1>
@@ -587,6 +593,17 @@
       </div>
     </div>
   </div>
+      <!-- Right pane for chat -->
+      <div class="column" v-if="room.redTeam">
+        <!-- Spacer div to get chatbox to line up with game area -->
+        <div class="mb-2">
+          <div class="is-size-7 mb-1"><br /></div>
+          <div><br /></div>
+        </div>
+        <chatbox v-model="room.chatlog" :name="player.name" :room-id="room.name"></chatbox>
+      </div>
+    </div>
+  </div>
   <!-- TODO: Componentize with One Word's footer -->
   <div class="content has-text-centered mt-6 mb-4">
     <p>
@@ -612,4 +629,5 @@
 <script type="module" src="components/navbar.js"></script>
 <script type="module" src="components/sharelink.js"></script>
 <script type="module" src="components/keyword-cards.js"></script>
+<script type="module" src="components/chatbox.js"></script>
 <script type="module" src="incrypt.js"></script>
