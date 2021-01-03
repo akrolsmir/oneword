@@ -465,20 +465,11 @@
             state: 'PROMPT',
             chooser: this.player.name,
             choice: '',
-            word: randomWord(),
             responses: {},
-            category: 'nouns',
           },
           history: [],
           public: true,
           lastUpdateTime: Date.now(),
-          categories: {
-            nouns: true,
-            verbs: false,
-            adjectives: false,
-            compounds: false,
-            custom: false,
-          },
           customWords: '',
           playerData: {
             [this.player.name]: {
