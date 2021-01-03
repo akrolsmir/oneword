@@ -231,7 +231,7 @@
             <template v-if="isChooser">
               <div class="field has-addons">
                 <div class="control">
-                  <input class="input" v-model="room.currentRound.prompt" />
+                  <input class="input" @keyup.enter="submitPrompt" v-model="room.currentRound.prompt" />
                 </div>
                 <div class="control">
                   <button class="button" @click="submitPrompt">Submit</button>
