@@ -211,7 +211,7 @@
       <div class="history">
         <template v-for="round in room.history">
           <div :title="round.chooser">&gt; {{ round.prompt }}</div>
-          <p :title="round.choice">{{ round.responses[round.choice] }}</p>
+          <p :title="round.choice">{{ round.responses[round.choice].story }}</p>
           <br />
         </template>
       </div>
@@ -278,11 +278,14 @@
             <div class="content">
               <ol>
                 <li v-for="(response, player) in room.currentRound.responses">
-                  {{ response }} <a v-if="isChooser" href="#" @click.prevent="chooseResponse(player)">Choose</a>
+                  {{ response.story }} <a v-if="isChooser" href="#" @click.prevent="chooseResponse(player)">Choose</a>
                 </li>
               </ol>
             </div>
           </template>
+          <!-- Score -->
+          <h2 class="fancy">Scores</h2>
+          <div v-for="player in room.players">{{ player }}: {{ room.playerData[player]?.score }}</div>
         </div>
       </div>
     </div>
@@ -330,9 +333,9 @@
        chooser: 'alice',
        prompt: 'Eat cake'
        responses: {
-         alice: 'You fall into a hole and die',
-         bob: 'A dragon appears in front of you'
-         carol: 'You start to hear a creepy yet entrancing chant'
+         alice: { story: 'You fall into a hole and die', words: ['hole'] }
+         bob: { story: 'A dragon appears in front of you', words: [] },
+         carol: { story: 'You start to hear a creepy yet entrancing chant', words: ['chant', 'creepy'] }
        }
        choice: 'alice'
      }
@@ -360,7 +363,6 @@
       },
       alertIsShowing: false,
       newMod: '',
-      wordsSaved: false,
     },
     async mounted() {
       this.allRooms = (await listRooms()).filter((room) => room.players.length > 0);
@@ -377,8 +379,9 @@
     },
     watch: {
       'room.currentRound.state'(state) {
-        // Clean up past inputs when the round moves forward.
-        if (state == 'GUESSING') {
+        // Clean up past inputs and replace used words when the round moves forward.
+        if (state == 'CHOOSING') {
+          this.replaceSuggestions(this.player.response);
           this.player.response = '';
         }
       },
@@ -479,6 +482,7 @@
           customWords: '',
           playerData: {
             [this.player.name]: {
+              score: 0,
               email: this.user.email || '',
               supporter: this.user.supporter || '',
             },
@@ -496,7 +500,7 @@
         }
 
         const { email = '', supporter = '' } = this.user;
-        this.room.playerData[this.player.name] = { email, supporter };
+        this.room.playerData[this.player.name] = { email, supporter, score: 0 };
 
         if (this.room.players.includes(this.player.name)) {
           await this.saveRoom('playerData');
@@ -532,7 +536,14 @@
       },
       async submitResponse() {
         const update = {};
-        update[`currentRound.responses.${this.player.name}`] = this.player.response;
+        update[`currentRound.responses.${this.player.name}.story`] = this.player.response;
+        const bonus = [
+          ...this.suggestions['nouns'],
+          ...this.suggestions['verbs'],
+          ...this.suggestions['adjectives'],
+        ].filter((word) => this.player.response.includes(word));
+        update[`currentRound.responses.${this.player.name}.words`] = bonus;
+
         // If all responses are in, move to guessing
         const done = this.room.players.every(
           (p) => this.room.currentRound.responses[p] || p == this.room.currentRound.chooser
@@ -541,10 +552,11 @@
           update['currentRound.state'] = 'CHOOSING';
         }
         await updateRoom(this.room, update);
-        this.replaceSuggestions(this.player.response);
       },
       async chooseResponse(player) {
-        await updateRoom(this.room, { 'currentRound.choice': player });
+        this.room.playerData[player].score += 10 + this.room.currentRound.responses[player].words.length;
+        this.room.currentRound.choice = player;
+        await this.saveRoom('playerData', 'currentRound');
         await this.newRound();
       },
       async nextStage() {
@@ -603,18 +615,16 @@
           this.room.public = true;
         }
       },
-      // generate new suggestions to replace used words, return increased score
+      // generate new suggestions to replace used words
       replaceSuggestions(response) {
-        let score = 0;
         for (let category of ['verbs', 'nouns', 'adjectives']) {
           this.suggestions[category].forEach((word, i) => {
             if (response.includes(word)) {
-              ++score;
-              this.suggestions[category][i] = randomWord(category);
+              //this.suggestions[category][i] = randomWord(category);
+              this.$set(this.suggestions[category], i, randomWord(category));
             }
           });
         }
-        return score;
       },
     },
   });
