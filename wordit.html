@@ -86,23 +86,22 @@
       <div class="modal-content">
         <div class="notification">
           <label class="is-block mb-2">Invite your friends to play!</label>
-          <sharelink :link="'https://oneword.games/?room=' + room.name"></sharelink>
+          <sharelink :link="'https://oneword.games/wordit.html?room=' + room.name"></sharelink>
           <button class="delete" aria-label="close" @click="alertIsShowing=false"></button>
         </div>
       </div>
     </div>
     <!-- Home page -->
     <div v-if="!room.players" class="container mx-4">
-      <!-- No Announcements :) -->
-      <!-- <div class="notification is-link has-text-centered">
-        Try our new team-vs-team word game, <a href="incrypt.html">Incrypt</a>!
-      </div> -->
+      <div class="notification is-link has-text-centered">
+        Try our new team-vs-team word game (that's actually ready for testers), <a href="incrypt.html">Incrypt</a>!
+      </div>
 
       <div class="fancy big">Welcome to Word It!</div>
       This is an online game inspired by
       <a target="_blank" rel="noopener noreferrer" href="https://amazon.com/dp/2914849656">Dixit</a>, a picture-based
       board game but modified so you can play a version with just words. <br />
-      Pick a theme, trick your friends, find the word (combos) ! <br />
+      Pick a theme, trick your friends, find the word! <br />
       But beware: If your clue is either too obvious or too off the wall, your friends will get ahead!<br />
       <form v-if="user.id || user.guest" @submit.prevent="enterRoom" method="POST">
         <label class="label">Player</label>
@@ -111,22 +110,18 @@
         <input class="input" type="text" v-model="room.name" placeholder="apple" required /><br /><br />
         <input class="button" type="submit" value="Enter Room" />
       </form>
-      <!-- <template v-else-if="room.name">
-        <h2 class="fancy">Joining Room: <span>{{ room.name }} </span></h2>
-
-        <br />
-        Sign in to get started! Click here if the authentication pop-up does not prompt automatically.
+      <template v-else-if="room.fromSearchParam">
+        <h2 class="fancy"><a @click="$refs.navbar.logIn()">Sign In</a> to join Room: <span>{{ room.name }} </span></h2>
         <a @click='$set(user, "guest", true)' class="is-size-10">Or play without an account</a>
-      </template> -->
+      </template>
       <template v-else>
-        <br />
         <button class="button is-large is-success" @click="$refs.navbar.logIn()">Sign in to get started</button><br />
         <a @click='$set(user, "guest", true)' class="is-size-7">Play without an account</a>
       </template>
-
-      <br /><br />
+      <br />
+      <br />
       <h2 class="fancy">Open Rooms</h2>
-      <p>Closed Beta</p>
+      <p>Alpha Testing Stage</p>
       <!-- <template v-for="openRoom in allRooms">
         <p>
           <a @click="room.name = openRoom.name; enterRoom()"><b>{{ openRoom.name }}</b></a
@@ -142,7 +137,7 @@
           <h1 class="fancy big">{{ room.name }}</h1>
           <span class="fancy capitalize">Round {{ room.history.length + 1 }}</span>
           <!-- Navigation -->
-          <!-- <span class="buttons are-small">
+          <span class="buttons are-small">
             <button class="button is-dark is-inverted is-outlined" @click="alertIsShowing=true">Invite</button>
             <button
               v-if="_.keys(room.players).includes(player.name)"
@@ -155,7 +150,7 @@
             <button class="button is-danger is-inverted is-outlined" @click="kickPlayer(player.name); goHome();">
               Exit
             </button>
-          </span> -->
+          </span>
         </div>
         <div>
           <div class="is-flex is-flex-wrap-wrap is-align-items-center">
@@ -166,19 +161,19 @@
               style="background: #ffef99; clip-path: polygon(0 0, 0 100%, 93% 100%, 100% 0)"
             > -->
             <!-- <div class="mx-1" v-if="isMod">
-                <span class="select is-small">
+              <span class="select is-small">
                   <select v-model="room.public" @change="upsell('public')">
-                    <option v-bind:value="true">Public</option>
-                    <option v-bind:value="false">Private</option>
+                  <option v-bind:value="true">Public</option>
+                  <option v-bind:value="false">Private</option>
                   </select>
-                </span>
-                <span class="select is-small">
-                  <select v-model="room.roundsInGame" @change="upsell('roundsInGame')">
-                    <option v-bind:value="13">13 rounds</option>
-                    <option v-bind:value="'Unlimited'">&infin; rounds</option>
-                  </select>
-                </span>
-              </div> -->
+              </span>
+              <span class="select is-small">
+                <select v-model="room.roundsInGame" @change="upsell('roundsInGame')">
+                <option v-bind:value="13">13 rounds</option>
+                <option v-bind:value="'Unlimited'">&infin; rounds</option>
+                </select>
+              </span>
+            </div> -->
             <!-- <template v-else>
                 <span class="mx-2">{{ room.public ? 'Public' : 'Private' }} Room</span>
                 <span class="mx-2">{{ room.roundsInGame == 'Unlimited' ? '&infin;' : room.roundsInGame}} rounds</span>
@@ -227,19 +222,19 @@
 
             <!-- Categories -->
             <span v-if="isMod" class="field is-grouped is-grouped-multiline mx-3 my-1">
-              <div class="control" v-for="category in this.CATEGORY_ORDER">
+              <!-- <div class="control" v-for="category in this.CATEGORY_ORDER">
                 <label class="capitalize checkbox">
                   <input type="checkbox" v-model="room.categories[category]" @change="saveRoom('categories')" />
                   {{ category }}
                 </label>
-              </div>
+              </div> -->
             </span>
             <span class="mx-3" v-else>
-              <template v-for="(category, i) in this.CATEGORY_ORDER.filter(c => room.categories[c])">
+              <!-- <template v-for="(category, i) in this.CATEGORY_ORDER.filter(c => room.categories[c])">
                 <span class="comma" :class="{'has-text-weight-bold': room.currentRound.category == category}">
                   {{ category }}</span
                 >
-              </template>
+              </template> -->
             </span>
           </div>
           <!-- Custom word editor (mod only) -->

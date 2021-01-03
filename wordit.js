@@ -31,7 +31,6 @@ const vueApp = new Vue({
     wordsSaved: false,
   },
   created() {
-    this.CATEGORY_ORDER = ['nouns', 'verbs', 'adjectives', 'compounds', 'custom'];
     this.generatePlayerWordlist();
   },
   async mounted() {
@@ -44,7 +43,7 @@ const vueApp = new Vue({
     }
     if (roomName) {
       this.room.name = roomName;
-      await this.enterRoom();
+      this.room.fromSearchParam = true;
     }
   },
   watch: {
