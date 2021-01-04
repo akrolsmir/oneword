@@ -211,7 +211,7 @@
       <div class="history">
         <template v-for="round in room.history">
           <div :title="round.chooser">&gt; {{ round.prompt }}</div>
-          <p :title="round.choice">{{ round.responses[round.choice].story }}</p>
+          <history-paragraph :title="round.choice" :response="round.responses[round.choice]" />
           <br />
         </template>
       </div>
@@ -309,6 +309,7 @@
 <script type="module" src="components/timer.js"></script>
 <script type="module" src="components/scoreboard.js"></script>
 <script type="module" src="components/sharelink.js"></script>
+<script type="module" src="components/rapidsilver/historypara.js"></script>
 <script>
   window.COLLECTION = 'silver';
 </script>
