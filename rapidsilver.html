@@ -2,7 +2,7 @@
 <meta charset="utf-8" />
 
 <head>
-  <title>Curse Typwriter</title>
+  <title>Curse Typewriter</title>
   <link
     href="https://fonts.googleapis.com/css?family=Fjalla+One|Merienda+One|Righteous|Sriracha&display=swap"
     rel="stylesheet"
@@ -404,7 +404,7 @@
         } else if (this.room.currentRound.state == 'RESPONSE') {
           return this.isChooser ? 'The future has not yet been written' : 'Write what happens next';
         } else if (this.room.currentRound.state == 'CHOOSING') {
-          return this.isChooser ? 'Choose a fate' : `Fate is in ${this.room.currentRound.chooser}'s hands'.`;
+          return this.isChooser ? 'Choose a fate' : `Fate is in ${this.room.currentRound.chooser}'s hands.`;
         }
       },
       prettySuggestions() {
