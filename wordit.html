@@ -402,7 +402,7 @@
             <button
               class="button is-rounded"
               @click="submitVote(word)"
-              v-for="word in shuffleArray(_.values(room.currentRound.allWords))"
+              v-for="word in _.values(room.currentRound.allWords).sort()"
               :disabled="room.currentRound.allWords[player.name] == word"
               :class="{ 'is-success': room.currentRound.votes[player.name] == word }"
             >
@@ -428,8 +428,8 @@
         <template v-for="(guess, voter) in room.currentRound.votes">
           <div class="fancy has-text-success" role="alert">{{ voter }} guessed "{{ guess }}".</div>
         </template>
-        <template v-for="(points, player) in room.players">
-          <div class="fancy has-text-success" role="alert">{{ player }} is now has "{{ points }} points".</div>
+        <template v-for="(points, player) in tallyPoints()">
+          <div class="fancy has-text-success" role="alert">{{ player }} now has "{{ points }} points".</div>
         </template>
         <br />
         <!-- <scoreboard

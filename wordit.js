@@ -49,12 +49,15 @@ const vueApp = new Vue({
   watch: {
     async 'room.currentRound.state'(state) {
       this.$emit('reset-timer');
-      // Clean up past inputs when the round moves forward.
-      if (state === 'DONE') {
-        setTimeout(await this.tallyPoints(), Math.floor(Math.random() * 3000));
-      }
     },
   },
+  // computed: {
+  //   // player's local view of overall score tally
+  //   playerScoreboard: function () {
+  //     // `this` points to the vm instance
+  //     return this.message.split('').reverse().join('');
+  //   },
+  // },
   methods: {
     // Somewhat copied from One Word's index.html. TODO: Dedupe?
     async enterRoom() {
@@ -204,6 +207,7 @@ const vueApp = new Vue({
         //   this.player.wordlist.push(randomWord('adjectives') + '-' + randomWord('nouns'));
         // }
         this.room.currentRound.state = 'DONE';
+        this.room.history.push(this.room.currentRound);
       }
       await setRoom(this.room);
     },
@@ -301,7 +305,6 @@ const vueApp = new Vue({
       // return result;
     },
     async newRound(sameGuesser = false) {
-      this.room.history.push(this.room.currentRound);
       this.room.currentRound = {
         state: 'CLUER_PICKING',
         // Pick next guesser
@@ -354,38 +357,52 @@ const vueApp = new Vue({
     },
     keysEqual,
     finished,
-    shuffleArray,
-    //BUG: points get re-tallied upon browser refresh
-    async tallyPoints() {
-      // Note tallyPoints happens on client side; each player updates their own
-      const wordThisRound = this.room.currentRound.word;
-      //For the clueGiver
-      if (this.room.currentRound.clueGiver == this.player.name) {
-        // add 3 points if someone else (but not everyone) guessed the word.
-        if (
-          _.includes(_.values(this.room.currentRound.votes), wordThisRound) &&
-          !_.every(_.values(this.room.currentRound.votes), (guess) => guess === wordThisRound)
-        ) {
-          this.room.players[this.player.name] += 3;
-        }
-      }
-      // For decoy throwers / guessers
-      else {
-        // If everyone else also guessed the word, add one point
-        if (_.every(_.values(this.room.currentRound.votes), (guess) => guess === wordThisRound)) {
-          this.room.players[this.player.name] += 1;
-        }
-        // Otherwise for each time the decoy's word gets a vote, add 2 points
-        else {
-          _.forEach(this.room.currentRound.votes, (guess) => {
-            // alternatively _.values(currentRound.allWords).includes(guess)
-            if (this.player.wordlist.includes(guess)) {
-              this.room.players[this.player.name] += 2;
+    tallyPoints() {
+      // Tallypoints only counts rounds that have been pushed to history
+      const allRoundsInHistory = this.room.history;
+      const scoreBoard = {};
+      //initiate scoreBoard at 0 for every player
+      _.forEach(_.keys(this.room.players), (player) => {
+        scoreBoard[player] = 0;
+      });
+      // Each player's client computes point totals for everyone independently
+      _.forEach(allRoundsInHistory, (round) => {
+        // If all players found the clueGiver's image, all except clueGiver gets 2pts automatically
+        if (_.every(_.values(round.votes), (guess) => guess === round.word)) {
+          _.forEach(scoreBoard, function (_score, player) {
+            if (player != round.clueGiver) {
+              scoreBoard[player] += 2;
             }
           });
         }
-      }
-      await setRoom(this.room);
+        // If some players found the clueGiver's image but not all, clueGiver gets 3 points
+        else if (_.includes(_.values(round.votes), round.word)) {
+          scoreBoard[round.clueGiver] += 3;
+          _.forEach(scoreBoard, function (_score, player) {
+            // And so does every guesser who guessed correctly
+            if (round.votes[player] == round.word) {
+              scoreBoard[player] += 3;
+            }
+            // Incorrect guesses awards 1 point to whoever threw the decoy that earned the guess
+            else {
+              // invert makes the mapping [word -> player]
+              scoreBoard[_.get(_.invert(round.allWords), round.votes[player])] += 1;
+            }
+          });
+        }
+        // nobody guessed the word
+        else {
+          // ClueGiver gets 0 points but all others get 2pts automatically
+          _.forEach(scoreBoard, function (_score, player) {
+            if (player != round.clueGiver) {
+              scoreBoard[player] += 2;
+              // also give a point to whoever threw the decoy earned this player's
+              scoreBoard[_.get(_.invert(round.allWords), round.votes[player])] += 1;
+            }
+          });
+        }
+      });
+      return scoreBoard;
     },
     dropped,
     moment,
@@ -461,15 +478,6 @@ function keysEqual(key1, key2) {
     }
   }
   return true;
-}
-
-function shuffleArray(array) {
-  // From https://stackoverflow.com/a/12646864/1222351
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
 }
 
 function nextClueGiver(lastGuesser, players) {
