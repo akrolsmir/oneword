@@ -96,7 +96,7 @@
     <div v-if="!room.players" class="container mx-4">
       You and your friends find yourself in a text adventure, but you are all controlling the same person. On your turn,
       choose what the character will do, then your friends will continue the story... But you get to choose your
-      friend's adventure!
+      friends' adventure!
       <form v-if="user.id || user.guest" @submit.prevent="enterRoom" method="POST">
         <label class="label">Player</label>
         <input class="input" type="text" v-model="player.name" placeholder="Ringo" />
@@ -243,18 +243,20 @@
           <template v-else-if="room.currentRound.state == 'RESPONSE'">
             <strong class="is-size-3">&gt; {{ room.currentRound.prompt }}</strong>
             <template v-if="!isChooser">
-              <div class="field has-addons">
+              <div class="field">
                 <div class="control is-expanded">
-                  <input
-                    class="input"
+                  <textarea
+                    class="textarea"
                     id="responseInput"
-                    type="text"
+                    rows="4"
                     v-model="player.response"
                     @keyup.enter="submitResponse"
                     :class="{'is-primary': room.currentRound.responses[player.name]}"
                     :disabled="!room.players.includes(player.name)"
-                  />
+                  ></textarea>
                 </div>
+              </div>
+              <div class="field">
                 <div class="control">
                   <button class="button" @click="submitResponse" :disabled="!room.players.includes(player.name)">
                     Submit
