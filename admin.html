@@ -37,7 +37,7 @@
 
     body {
       margin: 48px auto;
-      width: 1200px;
+      max-width: 1400px;
     }
 
     [v-cloak] {
@@ -62,6 +62,15 @@
         <b-table-column field="email" label="Email" v-slot="props" searchable> {{ props.row.email }} </b-table-column>
         <b-table-column field="createTime" label="Created" v-slot="props" sortable>
           {{ props.row.createdDate.toLocaleDateString() }}
+        </b-table-column>
+        <b-table-column field="lastUpdateTime" label="Last Game" v-slot="props" sortable>
+          {{ props.row.updatedTime.toLocaleDateString() }}
+        </b-table-column>
+        <b-table-column field="onewordGames" label="One Word" v-slot="props" sortable>
+          {{ props.row.onewordGames }}
+        </b-table-column>
+        <b-table-column field="incryptGames" label="Incrypt" v-slot="props" sortable>
+          {{ props.row.incryptGames }}
         </b-table-column>
         <b-table-column field="supporter" label="Supporter" v-slot="props" sortable>
           <div class="field has-addons">
@@ -115,6 +124,9 @@
           this.users = await listUsers();
           for (const user of this.users) {
             user.createdDate = new Date(user.createTime);
+            user.updatedTime = new Date(user.lastUpdateTime);
+            user.onewordGames = countGames(user, 'rooms');
+            user.incryptGames = countGames(user, 'incrypt');
           }
         } catch (e) {
           alert('Error fetching users. Do you have admin permissions?');
@@ -175,5 +187,10 @@
       return [name.substring(0, index), name.substring(index + 1)];
     }
     return [name, name];
+  }
+
+  function countGames(user, roomDb) {
+    const gamesList = Object.values(user.games || {});
+    return gamesList.filter((game) => game.roomDb === roomDb).length;
   }
 </script>
