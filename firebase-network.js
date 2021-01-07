@@ -205,7 +205,8 @@ Welcome to One Word! Have a great time cluing and colliding with your comrades~
 I'm Austin, and https://oneword.games was my COVID side-project that suddenly got popular.
 
 If you've got a minute, I'd love to hear from you!
-(Like, how did you find out about us? Any issues, or feedback? I read and respond to every email.)
+Like, how did you find out about us? Any issues, or feedback? We read and respond to every email.
+Or come chat with us on Discord (https://discord.gg/AP7ssVPPCr).
 
 But most of all: thanks for playing!
 Austin
