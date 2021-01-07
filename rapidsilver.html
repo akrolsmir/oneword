@@ -223,78 +223,80 @@
         <!-- TODO: choose your starting prompt -->
       </div>
 
-      <div v-else class="card">
-        <div class="card-content">
-          <h2 class="fancy" aria-live="polite">{{ prettyStatus }}</h2>
-          <!-- Prompt -->
-          <template v-if="room.currentRound.state == 'PROMPT'">
-            <template v-if="isChooser">
-              <div class="field has-addons">
-                <div class="control">
-                  <input class="input" @keyup.enter="submitPrompt" v-model="room.currentRound.prompt" />
+      <template v-else>
+        <div class="card">
+          <div class="card-content">
+            <h2 class="fancy" aria-live="polite">{{ prettyStatus }}</h2>
+            <!-- Prompt -->
+            <template v-if="room.currentRound.state == 'PROMPT'">
+              <template v-if="isChooser">
+                <div class="field has-addons">
+                  <div class="control">
+                    <input class="input" @keyup.enter="submitPrompt" v-model="room.currentRound.prompt" />
+                  </div>
+                  <div class="control">
+                    <button class="button" @click="submitPrompt">Submit</button>
+                  </div>
                 </div>
-                <div class="control">
-                  <button class="button" @click="submitPrompt">Submit</button>
-                </div>
-              </div>
+              </template>
             </template>
-          </template>
-          <!-- Response -->
-          <template v-else-if="room.currentRound.state == 'RESPONSE'">
-            <strong class="is-size-3">&gt; {{ room.currentRound.prompt }}</strong>
-            <template v-if="!isChooser">
-              <div class="field">
-                <div class="control is-expanded">
-                  <textarea
-                    class="textarea"
-                    id="responseInput"
-                    rows="4"
-                    v-model="player.response"
-                    @keyup.enter="submitResponse"
-                    :class="{'is-primary': room.currentRound.responses[player.name]}"
-                    :disabled="!room.players.includes(player.name)"
-                  ></textarea>
+            <!-- Response -->
+            <template v-else-if="room.currentRound.state == 'RESPONSE'">
+              <strong class="is-size-3">&gt; {{ room.currentRound.prompt }}</strong>
+              <template v-if="!isChooser">
+                <div class="field">
+                  <div class="control is-expanded">
+                    <textarea
+                      class="textarea"
+                      id="responseInput"
+                      rows="4"
+                      v-model="player.response"
+                      @keyup.enter="submitResponse"
+                      :class="{'is-primary': room.currentRound.responses[player.name]}"
+                      :disabled="!room.players.includes(player.name)"
+                    ></textarea>
+                  </div>
+                  <span class="help" :class="{ 'has-text-danger': charCount > 280 }">{{ charCount }} / 280</span>
                 </div>
-                <span class="help" :class="{ 'has-text-danger': charCount > 280 }">{{ charCount }} / 280</span>
-              </div>
-              <div class="field">
-                <div class="control">
-                  <button
-                    class="button"
-                    @click="submitResponse"
-                    :disabled="!room.players.includes(player.name) || charCount > 280"
+                <div class="field">
+                  <div class="control">
+                    <button
+                      class="button"
+                      @click="submitResponse"
+                      :disabled="!room.players.includes(player.name) || charCount > 280"
+                    >
+                      Submit
+                    </button>
+                  </div>
+                </div>
+                <i>Bonus Words</i>
+                <div>
+                  <span
+                    v-for="word in prettySuggestions"
+                    :class="{'has-text-weight-medium has-text-primary': player.response.includes(word)}"
                   >
-                    Submit
-                  </button>
+                    {{ word }}
+                  </span>
                 </div>
-              </div>
-              <i>Bonus Words</i>
-              <div>
-                <span
-                  v-for="word in prettySuggestions"
-                  :class="{'has-text-weight-medium has-text-primary': player.response.includes(word)}"
-                >
-                  {{ word }}
-                </span>
+              </template>
+            </template>
+            <!-- Choosing -->
+            <template v-else-if="room.currentRound.state == 'CHOOSING'">
+              <strong class="is-size-3">&gt; {{ room.currentRound.prompt }}</strong>
+              <div class="content">
+                <ol>
+                  <li v-for="(response, player) in room.currentRound.responses">
+                    {{ response.story }} <a v-if="isChooser" href="#" @click.prevent="chooseResponse(player)">Choose</a>
+                  </li>
+                </ol>
               </div>
             </template>
-          </template>
-          <!-- Choosing -->
-          <template v-else-if="room.currentRound.state == 'CHOOSING'">
-            <strong class="is-size-3">&gt; {{ room.currentRound.prompt }}</strong>
-            <div class="content">
-              <ol>
-                <li v-for="(response, player) in room.currentRound.responses">
-                  {{ response.story }} <a v-if="isChooser" href="#" @click.prevent="chooseResponse(player)">Choose</a>
-                </li>
-              </ol>
-            </div>
-          </template>
-          <!-- Score -->
-          <h2 class="fancy">Scores</h2>
-          <div v-for="player in room.players">{{ player }}: {{ room.playerData[player]?.score }}</div>
+            <!-- Score -->
+            <h2 class="fancy">Scores</h2>
+            <div v-for="player in room.players">{{ player }}: {{ room.playerData[player]?.score }}</div>
+          </div>
         </div>
-      </div>
+      </template>
     </div>
   </div>
 </body>
