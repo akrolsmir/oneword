@@ -255,10 +255,15 @@
                     :disabled="!room.players.includes(player.name)"
                   ></textarea>
                 </div>
+                <span class="help" :class="{ 'has-text-danger': charCount > 280 }">{{ charCount }} / 280</span>
               </div>
               <div class="field">
                 <div class="control">
-                  <button class="button" @click="submitResponse" :disabled="!room.players.includes(player.name)">
+                  <button
+                    class="button"
+                    @click="submitResponse"
+                    :disabled="!room.players.includes(player.name) || charCount > 280"
+                  >
                     Submit
                   </button>
                 </div>
@@ -422,6 +427,9 @@
           this.suggestions['nouns'][2],
         ];
       },
+      charCount() {
+        return this.player.response.length;
+      },
     },
     methods: {
       md5,
@@ -530,6 +538,7 @@
       },
       async submitResponse() {
         const update = {};
+        //this.room.currentRound.responses[this.player.name].story = this.player.response;
         update[`currentRound.responses.${this.player.name}.story`] = this.player.response;
         const bonus = [
           ...this.suggestions['nouns'],
