@@ -162,6 +162,46 @@
                 <span class="mx-2">{{ room.public ? 'Public' : 'Private' }} Room</span>
               </template>
             </span>
+
+            <!-- Timers -->
+            <span class="ml-1 mr-2 my-1 is-flex is-align-items-center">
+              <template v-if="isMod">
+                <label for="clue-timer" class="is-size-7 mx-1 is-flex-grow-1">Writing:</label>
+                <input
+                  class="input is-small"
+                  style="flex: 1 2 48px"
+                  id="clue-timer"
+                  type="number"
+                  min="1"
+                  max="99"
+                  placeholder="&infin;"
+                  v-model.number="room.timers.RESPONSE"
+                  :disabled="room.timers.running"
+                />
+                <label for="guess-timer" class="is-size-7 mx-1 is-flex-grow-1">Choosing:</label>
+                <input
+                  class="input is-small"
+                  style="flex: 1 2 48px"
+                  id="guess-timer"
+                  type="number"
+                  min="1"
+                  max="99"
+                  placeholder="&infin;"
+                  v-model.number="room.timers.CHOOSING"
+                  :disabled="room.timers.running"
+                />
+                <button class="button is-small mx-1 is-flex-grow-1" @click="toggleTimers">
+                  {{ room.timers.running ? 'Stop' : 'Start' }} Timers
+                </button>
+              </template>
+              <template v-else>
+                <template v-if="room.timers.running">
+                  <span v-if="room.timers.RESPONSE" class="mx-2">Writing: {{ room.timers.RESPONSE }}s</span>
+                  <span v-if="room.timers.CHOOSING" class="mx-2">Choosing: {{ room.timers.CHOOSING }}s</span>
+                </template>
+                <span v-else class="mx-1">No timers</span>
+              </template>
+            </span>
           </div>
         </div>
 
@@ -224,6 +264,13 @@
       </div>
 
       <template v-else>
+        <timer
+          :length="timerLength"
+          :on-finish="nextStage"
+          v-if="timerLength > 0"
+          :key="room.currentRound.state"
+        ></timer>
+
         <div class="card">
           <div class="card-content">
             <h2 class="fancy" aria-live="polite">{{ prettyStatus }}</h2>
@@ -397,6 +444,12 @@
       },
     },
     computed: {
+      timerLength() {
+        if (this.room.currentRound && this.room?.timers.running) {
+          return this.room.timers[this.room.currentRound.state];
+        }
+        return 0;
+      },
       isMod() {
         if (this.user.supporter == 'ADMIN') {
           return true;
@@ -483,6 +536,7 @@
           history: [],
           public: true,
           lastUpdateTime: Date.now(),
+          timers: { PROMPT: '', RESPONSE: '', CHOOSING: '', running: false },
           customWords: '',
           playerData: {
             [this.player.name]: {
@@ -549,7 +603,7 @@
         ].filter((word) => this.player.response.includes(word));
         update[`currentRound.responses.${this.player.name}.words`] = bonus;
 
-        // If all responses are in, move to guessing
+        // If all responses are in, move to choosing
         const done = this.room.players.every(
           (p) => this.room.currentRound.responses[p] || p == this.room.currentRound.chooser
         );
@@ -593,6 +647,10 @@
 
         // Overwrite existing room;
         await setRoom(this.room);
+      },
+      async toggleTimers() {
+        this.room.timers.running = !this.room.timers.running;
+        await this.saveRoom('timers');
       },
       // Sync any number of properties of this.room to firebase
       async saveRoom(...props) {
