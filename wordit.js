@@ -172,41 +172,35 @@ const vueApp = new Vue({
     async saveWordToAllWordsInRoom(w) {
       this.room.currentRound.allWords[this.player.name] = w;
       if (_.keys(this.room.currentRound.allWords).length == this.room.players.length) {
-        //-- move block below to nextStage() --
-        // const indexToRemove = this.player.wordlist.indexOf(w);
-        // if (indexToRemove > -1) {
-        //   this.player.wordlist.splice(indexToRemove, 1);
-        //   this.player.wordlist.push(randomWord('adjectives') + '-' + randomWord('nouns'));
-        // }
         this.room.currentRound.state = 'GUESSING';
       }
       await setRoom(this.room);
     },
-    async submitClue(c) {
+    async submitClue() {
       //-- move block below to nextStage()
-      // const indexToRemove = this.player.wordlist.indexOf(this.room.currentRound.word);
-      // if (indexToRemove > -1) {
-      //   this.player.wordlist.splice(indexToRemove, 1);
-      //   this.player.wordlist.push(randomWord('adjectives') + '-' + randomWord('nouns'));
-      // }
+      const indexToRemove = this.player.wordlist.indexOf(this.room.currentRound.word);
+      if (indexToRemove > -1) {
+        this.player.wordlist.splice(indexToRemove, 1);
+        this.player.wordlist.push(randomWord('adjectives') + '-' + randomWord('nouns'));
+      }
       this.room.currentRound.state = 'TOSS_IN_DECOYS';
       // room.currentRound.clue should already be updated due to bi-di binding
       await setRoom(this.room);
     },
-    async submitDecoy(w) {
-      this.saveWordToAllWordsInRoom(w);
+    async submitDecoy(decoy) {
+      this.saveWordToAllWordsInRoom(decoy);
     },
     // vote is the word the guesser picked
     async submitVote(vote) {
+      // Remove player's own decoy from their wordlist when they submit vote.
+      const indexToRemove = this.player.wordlist.indexOf(this.room.currentRound.allWords[this.player.name]);
+      if (indexToRemove > -1) {
+        this.player.wordlist.splice(indexToRemove, 1);
+        this.player.wordlist.push(randomWord('adjectives') + '-' + randomWord('nouns'));
+      }
       this.room.currentRound.votes[this.player.name] = vote;
       // Total votes are players.length - 1 since clueGiver can't vote.
       if (_.keys(this.room.currentRound.votes).length >= this.room.players.length - 1) {
-        //-- move block below to nextStage() --
-        // const indexToRemove = this.player.wordlist.indexOf(w);
-        // if (indexToRemove > -1) {
-        //   this.player.wordlist.splice(indexToRemove, 1);
-        //   this.player.wordlist.push(randomWord('adjectives') + '-' + randomWord('nouns'));
-        // }
         this.room.currentRound.state = 'DONE';
         this.room.history.push(this.room.currentRound);
       }
