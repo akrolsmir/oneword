@@ -96,7 +96,8 @@
       <div class="notification is-link has-text-centered">
         Try our new team-vs-team word game (that's actually ready for testers), <a href="incrypt.html">Incrypt</a>!
       </div>
-
+      <!-- // Commented out b/c rendering lags too much -->
+      <!-- <div v-if="player.name">Hi {{ player.name }}!</div> -->
       <div class="fancy big">Welcome to Word It!</div>
       This is an online game inspired by
       <a target="_blank" rel="noopener noreferrer" href="https://amazon.com/dp/2914849656">Dixit</a>, a picture-based
@@ -110,11 +111,14 @@
         <input class="input" type="text" v-model="room.name" placeholder="apple" required /><br /><br />
         <input class="button" type="submit" value="Enter Room" />
       </form>
-      <template v-else-if="room.fromSearchParam">
-        <h2 class="fancy"><a @click="$refs.navbar.logIn()">Sign In</a> to join Room: <span>{{ room.name }} </span></h2>
+      <template v-else-if="player.currentRoom">
+        <h2 class="fancy">
+          <a @click="$refs.navbar.logIn()">Sign In</a> to join Room: <span>{{ player.currentRoom }} </span>
+        </h2>
         <a @click='$set(user, "guest", true)' class="is-size-10">Or play without an account</a>
       </template>
       <template v-else>
+        <br />
         <button class="button is-large is-success" @click="$refs.navbar.logIn()">Sign in to get started</button><br />
         <a @click='$set(user, "guest", true)' class="is-size-7">Play without an account</a>
       </template>
@@ -140,7 +144,7 @@
           <span class="buttons are-small">
             <button class="button is-dark is-inverted is-outlined" @click="alertIsShowing=true">Invite</button>
             <button
-              v-if="_.keys(room.players).includes(player.name)"
+              v-if="room.players.includes(player.name)"
               class="button is-dark is-inverted is-outlined"
               @click="kickPlayer(player.name)"
             >
@@ -264,7 +268,7 @@
           <div class="field is-grouped is-grouped-multiline">
             <span class="mb-2 mr-2">Players:</span>
             <nametag
-              v-for="(player, i) in _.keys(room.players)"
+              v-for="(player, i) in room.players"
               :name="player"
               :user="room.playerData && room.playerData[player]"
               :index="i"
@@ -293,7 +297,7 @@
               <span class="control">
                 <span class="select is-small">
                   <select v-model="newMod">
-                    <option v-for="player in _.keys(this.room.players).slice(1)">{{ player }}</option>
+                    <option v-for="player in this.room.players.slice(1)">{{ player }}</option>
                   </select>
                 </span>
               </span>
@@ -305,7 +309,7 @@
 
       <!-- Input area (CLUER_PICKING) -->
       <div v-if="room.currentRound.state == 'CLUER_PICKING'">
-        <div v-if="_.keys(room.players).length < 4">
+        <div v-if="room.players.length < 4">
           <h2 class="fancy" role="alert">Waiting for 4 players...</h2>
           <p class="mt-5 mb-2">Invite your friends to play!</p>
           <sharelink :link="'https://oneword.games/?room=' + room.name"></sharelink>
@@ -341,7 +345,7 @@
                   />
                 </div>
                 <div class="control">
-                  <button class="button" @click="submitClue" :disabled="!_.keys(room.players).includes(player.name)">
+                  <button class="button" @click="submitClue" :disabled="!room.players.includes(player.name)">
                     Submit
                   </button>
                 </div>
@@ -397,17 +401,17 @@
           <div v-else>
             <h2 class="fancy has-text-centered" role="alert">
               Can you find the right word from {{ room.currentRound.clueGiver }} among the decoys.. ?
+              <br /><br />
+              <button
+                class="button is-rounded"
+                @click="submitVote(word)"
+                v-for="word in _.values(room.currentRound.allWords).sort()"
+                :disabled="room.currentRound.allWords[player.name] == word"
+                :class="{ 'is-success': room.currentRound.votes[player.name] == word }"
+              >
+                {{ word }}
+              </button>
             </h2>
-            <br /><br />
-            <button
-              class="button is-rounded"
-              @click="submitVote(word)"
-              v-for="word in _.values(room.currentRound.allWords).sort()"
-              :disabled="room.currentRound.allWords[player.name] == word"
-              :class="{ 'is-success': room.currentRound.votes[player.name] == word }"
-            >
-              {{ word }}
-            </button>
             <h2 class="fancy has-text-centered">Your clue from {{ room.currentRound.clueGiver }}:</h2>
             <div class="fancy has-text-centered newline">{{ room.currentRound.clue }}</div>
             <!-- <label class="label" for="guess-input">Your Guess</label>

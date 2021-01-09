@@ -19,12 +19,14 @@ const vueApp = new Vue({
     numItemsPerPlayer: 7, // customizable
     room: {
       // bare bones room, to be overwritten from db if needed
-      name: randomWord('adjectives') + '-' + randomWord('nouns'),
+      name:
+        new URL(window.location.href).searchParams.get('room') || randomWord('adjectives') + '-' + randomWord('nouns'),
       history: [],
     },
     player: {
-      name: '',
+      name: new URL(window.location.href).searchParams.get('player') || '',
       wordlist: [],
+      currentRoom: new URL(window.location.href).searchParams.get('room'),
     },
     alertIsShowing: false,
     newMod: '',
@@ -33,18 +35,19 @@ const vueApp = new Vue({
   created() {
     this.generatePlayerWordlist();
   },
-  async mounted() {
+  // Should this code be in mounted?
+  mounted() {
     //this.allRooms = (await listRooms()).filter((room) => room.players.length > 0);
-    const parsedUrl = new URL(window.location.href);
-    const roomName = parsedUrl.searchParams.get('room');
-    const playerName = parsedUrl.searchParams.get('player');
-    if (playerName) {
-      this.player.name = playerName;
-    }
-    if (roomName) {
-      this.room.name = roomName;
-      this.room.fromSearchParam = true;
-    }
+    // const parsedUrl = new URL(window.location.href);
+    // const roomName = parsedUrl.searchParams.get('room');
+    // const playerName = parsedUrl.searchParams.get('player');
+    // if (playerName) {
+    //   this.player.name = playerName;
+    // }
+    // if (roomName) {
+    //   this.room.name = roomName;
+    //   this.player.currentRoom = roomName;
+    // }
   },
   watch: {
     async 'room.currentRound.state'(state) {
@@ -119,9 +122,7 @@ const vueApp = new Vue({
         // moderator of the room (One Word used to rely on index position in players list)
         mod: '',
         // players changed from list to object so it can also store each player's points
-        players: {
-          [this.player.name]: 0,
-        },
+        players: [this.player.name],
         currentRound: {
           state: 'CLUER_PICKING',
           // First player becomes the first one to pick a word and a clue
@@ -170,7 +171,7 @@ const vueApp = new Vue({
     },
     async saveWordToAllWordsInRoom(w) {
       this.room.currentRound.allWords[this.player.name] = w;
-      if (_.keys(this.room.currentRound.allWords).length == _.keys(this.room.players).length) {
+      if (_.keys(this.room.currentRound.allWords).length == this.room.players.length) {
         //-- move block below to nextStage() --
         // const indexToRemove = this.player.wordlist.indexOf(w);
         // if (indexToRemove > -1) {
@@ -199,7 +200,7 @@ const vueApp = new Vue({
     async submitVote(vote) {
       this.room.currentRound.votes[this.player.name] = vote;
       // Total votes are players.length - 1 since clueGiver can't vote.
-      if (_.keys(this.room.currentRound.votes).length >= _.keys(this.room.players).length - 1) {
+      if (_.keys(this.room.currentRound.votes).length >= this.room.players.length - 1) {
         //-- move block below to nextStage() --
         // const indexToRemove = this.player.wordlist.indexOf(w);
         // if (indexToRemove > -1) {
@@ -232,10 +233,10 @@ const vueApp = new Vue({
       const { email = '', supporter = '' } = this.user;
       this.room.playerData[this.player.name] = { email, supporter };
 
-      if (_.keys(this.room.players).includes(this.player.name)) {
+      if (this.room.players.includes(this.player.name)) {
         await this.saveRoom('playerData');
       } else {
-        this.room.players[this.player.name] = 0;
+        this.room.players.push(this.player.name);
         await this.saveRoom('playerData', 'players');
       }
     },
@@ -244,18 +245,20 @@ const vueApp = new Vue({
       this.room = { name: '' };
     },
     async kickPlayer(name) {
-      delete this.room.players[name];
-      await this.saveRoom('players');
+      if (this.room.players.includes(name)) {
+        const index = this.room.players.indexOf(name);
+        this.room.players.splice(index, 1);
+        await this.saveRoom('players');
+      }
     },
-    /* mod for one word relies on index position, need to find an alternative */
-    // async makeMod(name) {
-    //   const index = this.room.players.indexOf(name);
-    //   if (index >= 0) {
-    //     // swap players[0] and players[index]
-    //     [this.room.players[0], this.room.players[index]] = [this.room.players[index], this.room.players[0]];
-    //     await this.saveRoom('players');
-    //   }
-    // },
+    async makeMod(name) {
+      const index = this.room.players.indexOf(name);
+      if (index >= 0) {
+        // swap players[0] and players[index]
+        [this.room.players[0], this.room.players[index]] = [this.room.players[index], this.room.players[0]];
+        await this.saveRoom('players');
+      }
+    },
     wordForWord(category) {
       return (
         {
@@ -362,7 +365,7 @@ const vueApp = new Vue({
       const allRoundsInHistory = this.room.history;
       const scoreBoard = {};
       //initiate scoreBoard at 0 for every player
-      _.forEach(_.keys(this.room.players), (player) => {
+      _.forEach(this.room.players, (player) => {
         scoreBoard[player] = 0;
       });
       // Each player's client computes point totals for everyone independently
@@ -418,9 +421,9 @@ const vueApp = new Vue({
       if (this.user.supporter == 'ADMIN') {
         return true;
       }
-      // if (this.room && this.room.players) {
-      //   return this.player.name == this.room.players[0];
-      // }
+      if (this.room && this.room.players) {
+        return this.player.name == this.room.players[0];
+      }
     },
     // Returns the set of open room names that matches the current `room.name`.
     // filteredRoomNameSet() {
@@ -482,9 +485,8 @@ function keysEqual(key1, key2) {
 
 function nextClueGiver(lastGuesser, players) {
   // players is a map from name->points; we just need the names
-  const playersList = _.keys(players);
-  const nextIndex = (playersList.indexOf(lastGuesser) + 1 + playersList.length) % playersList.length;
-  return playersList[nextIndex];
+  const nextIndex = (players.indexOf(lastGuesser) + 1 + players.length) % players.length;
+  return players[nextIndex];
 }
 
 // Random word for a category, copied from index.html
