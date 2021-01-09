@@ -81,7 +81,7 @@ Vue.component('chatbox', {
     </div>
     <div class="field has-addons mt-2">
       <div class="control is-expanded">
-        <input class="input" v-model="inputText" @keyup.enter="submitLine" placeholder="Message..." />
+        <input class="input" v-model="inputText" @keyup.enter="submitLine" placeholder="Please be nice~" />
       </div>
       <div class="control">
         <button class="button" @click="submitLine"><span class="icon"> ➤ </span></button>
