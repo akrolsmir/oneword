@@ -605,7 +605,7 @@
 
         // If all responses are in, move to choosing
         const done = this.room.players.every(
-          (p) => this.room.currentRound.responses[p] || p == this.room.currentRound.chooser
+          (p) => this.room.currentRound.responses[p] || p == this.room.currentRound.chooser || p == this.player.name
         );
         if (done) {
           update['currentRound.state'] = 'CHOOSING';
