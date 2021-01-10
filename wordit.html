@@ -388,7 +388,17 @@
           </div>
         </div>
         <div v-else>
-          <h2 class="fancy" role="alert">Waiting for other players to guess...</h2>
+          <h2 class="fancy" role="alert">Waiting for other players to toss in decoys based on your clue...</h2>
+          <h2 class="fancy has-text-centered" role="alert">
+            <br /><br />
+            <button
+              class="button is-primary is-light"
+              v-for="(word, player) in room.currentRound.allWords"
+              :disabled="true"
+            >
+              {{ player }} tossed in {{ word }}!
+            </button>
+          </h2>
         </div>
       </div>
 
@@ -398,6 +408,16 @@
         <div class="box">
           <div v-if="room.currentRound.clueGiver == player.name">
             <h2 class="fancy" role="alert">Waiting for other players to guess...</h2>
+            <h2 class="fancy has-text-centered" role="alert">
+              <button
+                class="button is-rounded"
+                v-for="word in _.values(room.currentRound.allWords).sort()"
+                :disabled="true"
+                :class="{ 'is-success': _.values(room.currentRound.votes).includes(word) }"
+              >
+                {{ word }}
+              </button>
+            </h2>
           </div>
           <div v-else>
             <h2 class="fancy has-text-centered" role="alert">
