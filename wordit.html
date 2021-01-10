@@ -368,8 +368,8 @@
       <!-- Input area (toossing in decoys) -->
       <div v-if="room.currentRound.state == 'TOSS_IN_DECOYS'">
         <!-- All except the clueGiver guesses which word is the real one, based on the clue giver's clues. -->
-        <div v-if="room.currentRound.clueGiver != player.name">
-          <div class="box">
+        <div class="box">
+          <div v-if="room.currentRound.clueGiver != player.name">
             <h2 class="fancy has-text-centered" role="alert">
               Pick one decoy among the following, based on the clue giver's clue
               <br /><br />
@@ -386,19 +386,19 @@
             <h2 class="fancy has-text-centered" role="alert">Your clue from {{ room.currentRound.clueGiver }} is:</h2>
             <div class="fancy has-text-centered newline">{{ room.currentRound.clue }}</div>
           </div>
-        </div>
-        <div v-else>
-          <h2 class="fancy" role="alert">Waiting for other players to toss in decoys based on your clue...</h2>
-          <h2 class="fancy has-text-centered" role="alert">
-            <br /><br />
-            <button
-              class="button is-primary is-light"
-              v-for="(word, player) in room.currentRound.allWords"
-              :disabled="true"
-            >
-              {{ player }} tossed in {{ word }}!
-            </button>
-          </h2>
+          <div v-else>
+            <h2 class="fancy" role="alert">Waiting for other players to toss in decoys based on your clue...</h2>
+            <h2 class="fancy has-text-centered" role="alert">
+              <button
+                class="button is-rounded"
+                v-for="(word, decoyTosser) in room.currentRound.allWords"
+                :disabled="true"
+              >
+                <template v-if="decoyTosser != player.name"> {{ decoyTosser }} tossed in {{ word }}! </template>
+                <template v-else>The real word from you was {{ word }}</template>
+              </button>
+            </h2>
+          </div>
         </div>
       </div>
 
