@@ -298,7 +298,6 @@
                       id="responseInput"
                       rows="4"
                       v-model="player.response"
-                      @keyup.enter="submitResponse"
                       :class="{'is-primary': room.currentRound.responses[player.name]}"
                       :disabled="!room.players.includes(player.name)"
                     ></textarea>
