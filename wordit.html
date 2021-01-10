@@ -267,13 +267,14 @@
           <!-- Players -->
           <div class="field is-grouped is-grouped-multiline">
             <span class="mb-2 mr-2">Players:</span>
+            <!-- TODO: refactor submitted/guessing into functions -->
             <nametag
               v-for="(player, i) in room.players"
               :name="player"
               :user="room.playerData && room.playerData[player]"
               :index="i"
-              :submitted="room.currentRound.clueGiver == player"
-              :guessing="room.currentRound.clueGiver == player"
+              :submitted="_.keys(room.currentRound.allWords).includes(player) && player != room.currentRound.clueGiver"
+              :guessing="_.keys(room.currentRound.votes).includes(player) || (player == room.currentRound.clueGiver && _.keys(room.currentRound.allWords).includes(player))"
               :mod="isMod"
               @kick="kickPlayer(player)"
             ></nametag>
