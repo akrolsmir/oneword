@@ -8,14 +8,8 @@
     rel="stylesheet"
   />
   <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
-  <link
-    rel="stylesheet"
-    href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css"
-  />
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css"
-  />
+  <link rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css" />
   <style>
     html {
       margin: 0;
@@ -27,13 +21,16 @@
 
     h1,
     h2,
-    h3 {
+    h3,
+    .header,
+    .title {
       font-family: 'Merienda One', cursive;
     }
 
     body {
-      margin: 48px;
-      width: 600px;
+      margin: 48px auto;
+      width: 900px;
+      max-width: 95vw;
     }
 
     .card {
@@ -41,114 +38,145 @@
       margin-bottom: 8px;
     }
   </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Play the word game Contact, online!" />
 
   <!-- Dolphin favicon courtesy of Twemoji -->
   <link rel="icon" href="https://twemoji.maxcdn.com/v/13.0.1/72x72/1f42c.png" />
 </head>
 
-<body>
+<body class="has-navbar-fixed-top">
   <div id="vue">
-    Player Name: <input v-model="player.name" /> <br />
-    Room Name: <input v-model="room.name" /> <br />
-    <button @click="resetRoom">Reset room</button>
-    <button @click="enterRoom">Enter room</button>
-    <button @click="nextRound">Next round</button>
+    <navbar ref="navbar" v-model="user"></navbar>
+    <!-- Notifications -->
+    <div class="modal" :class="{'is-active': !!alertState}">
+      <div class="modal-background" @click="alertState=''"></div>
+      <div class="modal-content">
+        <div class="notification">
+          <template v-if="alertState=='share'">
+            <label class="is-block mb-2">Invite your friends to play!</label>
+            <sharelink :link="'https://oneword.games/?room=' + room.name"></sharelink>
+          </template>
+          <button class="delete" aria-label="close" @click="alertState=''"></button>
+        </div>
+      </div>
+    </div>
+    <div style="max-width: 400px">
+      Player Name
+      <input class="input" v-model="player.name" /> <br />
+      Room Name
+      <input class="input" v-model="room.name" @keyup.enter="enterRoom" />
+      <div class="buttons mt-4">
+        <button class="button" @click="resetRoom">Reset room</button>
+        <button class="button" @click="enterRoom">Enter room</button>
+        <button class="button" @click="nextRound">Next round</button>
+        <button
+          v-if="player.name === room?.currentRound?.wordmaster"
+          class="button"
+          @click="room.currentRound.history.push({ event: 'nextLetter'}); nextLetter()"
+        >
+          Next Letter
+        </button>
+        <button class="button" @click="alertState='share'">Invite Friends</button>
+      </div>
+    </div>
     <br /><br />
-    <div v-if="room && room.currentRound">
+    <div v-if="room?.currentRound">
       <!-- Room header -->
-      <article class="message">
+      <div class="message">
         <div class="message-header">
-          <h1>{{ room.name }}</h1>
-          <h2 class="capitalize">
-            Round ???
-          </h2>
+          <span class="header">Room: {{ room.name }}</span>
+          <span class="header">Round ???</span>
         </div>
         <div class="message-body">
           Players: {{ room.players.join(', ') }} <br />
           Wordmaster: {{ room.currentRound.wordmaster }}
         </div>
-      </article>
-
-      <!-- Word -->
-      <h3>Word</h3>
-      <div v-if="room.currentRound.word">
-        <h2 class="title has-text-centered is-size-1">
-          {{ prefix.toUpperCase() }}...?
-        </h2>
       </div>
-      <div v-else-if="player.name == room.currentRound.wordmaster">
-        <input class="input" v-model="player.word" @keyup.enter="chooseWord" />
-        <button class="button" @click="chooseWord">Choose!</button>
-      </div>
-      <br /><br />
 
-      <div class="columns">
-        <!-- Clues -->
-        <div class="column">
-          <h3>Clues</h3>
-          <div v-if="!clueGiven">
-            <div class="card">
-              <h3>Add a clue!</h3>
-              <input class="input" v-model="player.hint" placeholder="Hint" />
-              <Submit
-                placeholder="Word"
-                button-text="Create"
-                :on-submit="createClue"
-                :invalid="(word) => room.currentRound.banned.includes(word) || !word.startsWith(prefix)"
-              />
-            </div>
-          </div>
-          <template v-for="(clue, cluer) in room.currentRound.clues">
-            <div class="card">
-              <h3>{{ cluer }}'s clue: {{ clue.hint }}</h3>
-              <template v-if="clue.contact">
-                Contacted {{clue.contact}}!
-                <!-- Need to debug this... -->
-                <timer :length="10" :on-finish="onContact(cluer, clue)"></timer>
-                <button
-                  v-if="player.name == room.currentRound.wordmaster"
-                  @click="onContact(cluer, clue)()"
-                >
-                  Resolve
-                </button>
-              </template>
-              <template v-else-if="cluer === player.name">
-                {{ clue.word }}
-                <button @click="withdrawClue">Withdraw</button>
-              </template>
-              <template
-                v-else-if="player.name !== room.currentRound.wordmaster"
-              >
+      <template v-if="room.players.length < 3">
+        <label class="header is-block mb-1">Invite your friends!</label>
+        <sharelink :link="'https://oneword.games/contact?room=' + room.name"></sharelink>
+      </template>
+      <template v-else>
+        <!-- Word -->
+        <h1>Word</h1>
+        <div v-if="room.currentRound.word" class="title has-text-centered is-1">
+          <template v-if="player.name == room.currentRound.wordmaster">
+            <span class="has-text-danger">{{ prefix }}</span>{{
+            room.currentRound.word.substr(room.currentRound.revealed) }}
+          </template>
+          <template v-else>{{ prefix }}...?</template>
+        </div>
+        <div v-else-if="player.name == room.currentRound.wordmaster">
+          <input class="input" v-model="player.word" @keyup.enter="chooseWord" />
+          <button class="button" @click="chooseWord">Choose!</button>
+        </div>
+        <br /><br />
+
+        <div class="columns">
+          <!-- Clues -->
+          <div class="column is-half">
+            <h1>Clues</h1>
+            <div v-if="!clueGiven">
+              <div class="card">
+                <h2>Add a clue!</h2>
+                <input class="input" v-model="player.hint" placeholder="Hint" />
                 <Submit
                   placeholder="Word"
-                  button-text="Contact!"
-                  :on-submit="contact(cluer)"
-                  :invalid="(word) => room.currentRound.banned.includes(word) || !word.startsWith(prefix)"
+                  button-text="Create"
+                  @submitted="createClue"
+                  :invalid="(word) => banned.includes(word) || !word.startsWith(prefix)"
                 />
-              </template>
+              </div>
             </div>
-          </template>
-        </div>
+            <template v-for="(clue, cluer) in room.currentRound.clues">
+              <div class="card">
+                <div>
+                  <h2 class="is-inline mr-1">{{ cluer }}'s clue:</h2>
+                  {{ clue.hint }}
+                </div>
+                <template v-if="clue.guesser">
+                  Contacted {{clue.guesser}}!
+                  <timer :length="4" @finish="onContact(cluer, clue)"></timer>
+                  <button v-if="player.name == room.currentRound.wordmaster" @click="onContact(cluer, clue)">
+                    Resolve
+                  </button>
+                </template>
+                <div v-else-if="cluer === player.name">
+                  <h2 class="is-inline mr-1">word:</h2>
+                  <span>{{ clue.word }}</span>
+                  <button class="button is-small" @click="withdrawClue">Withdraw</button>
+                </div>
+                <template v-else-if="player.name !== room.currentRound.wordmaster">
+                  <Submit
+                    placeholder="Word"
+                    button-text="Contact!"
+                    @submitted="(word) => guess(cluer, word)"
+                    :invalid="(word) => banned.includes(word) || !word.startsWith(prefix)"
+                  />
+                </template>
+              </div>
+            </template>
+          </div>
 
-        <!-- Banned -->
-        <div class="column">
-          <h3>Banned</h3>
-          <div class="card">
-            <div v-if="player.name == room.currentRound.wordmaster">
-              <Submit
-                placeholder="Word"
-                button-text="Ban!"
-                :on-submit="banWord"
-                :invalid="(word) => room.currentRound.banned.includes(word) || !word.startsWith(prefix)"
-              />
+          <!-- History -->
+          <div class="column is-half">
+            <h1>History</h1>
+            <div class="card">
+              <div v-if="player.name == room.currentRound.wordmaster" class="mb-1">
+                <Submit
+                  placeholder="Word"
+                  button-text="Ban!"
+                  @submitted="banWord"
+                  :invalid="(word) => word == room.currentRound.word || banned.includes(word) || !word.startsWith(prefix)"
+                />
+              </div>
+              <history :round="room.currentRound"></history>
             </div>
-            <ul v-for="word in room.currentRound.banned">
-              <li>{{ word }}</li>
-            </ul>
           </div>
         </div>
-      </div>
+      </template>
     </div>
   </div>
 </body>
@@ -167,9 +195,11 @@
   window.COLLECTION = 'contact';
 </script>
 <script type="module" src="./firebase-network.js"></script>
+<script type="module" src="components/contact-history.js"></script>
 <script type="module" src="components/navbar.js"></script>
 <script type="module" src="components/timer.js"></script>
 <script type="module" src="components/scoreboard.js"></script>
+<script type="module" src="components/sharelink.js"></script>
 <script type="module" src="components/submit.js"></script>
 <script type="module">
   import {
@@ -183,27 +213,38 @@
   } from './firebase-network.js';
 
   /**
-    Room: {
+    room: {
       name: 'apple',
       players: ['alice', 'bob', 'carol'],
       currentRound: {
         revealed: 2,
         wordmaster: 'alice',
         word: 'company'
-        banned: ['cloak', 'collar', 'condone'],
         clues: {
           bob: {
             hint: 'square',
             word: 'corner',
-            contact: 'carol',
-            contactedWord: 'corner',
+            guesser: 'carol',
+            guess: 'corner',
           },
           carol: ...
-        }
+        },
+        history: [
+          {
+            event: 'ban', // or 'miss' or 'contact'
+            word: 'cloak',
+            clues: { bob: {...}, carol: {...}} // clues thwarted by the ban, or just the clue contacted/missed
+          },
+          {
+            event: 'skipLetter'
+          },
+          // TODO: events for people entering, leaving, or winning
+          ...
+        ]
       }
-      history: [{round1}, ...]
+      previousRounds: [{round1}, ...]
     }
-    */
+  */
   const vueApp = new Vue({
     el: '#vue',
     data: {
@@ -211,7 +252,7 @@
       allRooms: [],
       room: {
         name: 'default-room',
-        history: [],
+        previousRounds: [],
       },
       player: {
         name: '',
@@ -220,6 +261,7 @@
         word: '',
         toBan: '',
       },
+      alertState: '', // or 'share', 'win', 'update' etc.
     },
     async mounted() {
       // Detect url params like ?room=party&player=austin
@@ -253,15 +295,15 @@
       async resetRoom() {
         this.room = {
           name: this.room.name,
-          players: [],
+          players: [this.player.name],
           currentRound: {
             revealed: 1,
             wordmaster: this.player.name,
             word: '',
-            banned: [],
             clues: {},
+            history: [],
           },
-          history: [],
+          previousRounds: [],
         };
         await setRoom(this.room);
       },
@@ -283,8 +325,8 @@
             [`currentRound.clues.${this.player.name}`]: {
               word,
               hint: this.player.hint,
-              contact: '',
-              contactedWord: '',
+              guesser: '',
+              guess: '',
             },
           };
           await updateRoom(this.room, update);
@@ -306,84 +348,78 @@
           await updateRoom(this.room, { currentRound: this.room.currentRound });
         }
       },
-      // Wrapper, since Submit onEnter expects a function.
-      contact(cluer) {
-        return async (word) => {
-          const update = {
-            [`currentRound.clues.${cluer}.contact`]: this.player.name,
-            [`currentRound.clues.${cluer}.contactedWord`]: word,
-          };
-          await updateRoom(this.room, update);
+      async guess(cluer, word) {
+        const update = {
+          [`currentRound.clues.${cluer}.guesser`]: this.player.name,
+          [`currentRound.clues.${cluer}.guess`]: word,
         };
+        await updateRoom(this.room, update);
       },
-      // Wrapper, since timer onFinish expects a function.
-      onContact(cluer, clue) {
-        return async () => {
-          // Show everyone the "Contact message"
-          const matched = clue.word === clue.contactedWord;
-          const message = `${matched ? '' : 'NO '} CONTACT!\n${cluer}: ${
-            clue.word
-          }\n${clue.contact}: ${clue.contactedWord}`;
-          swal(message);
+      async onContact(cluer, clue) {
+        // Show everyone the "Contact message"
+        const matched = clue.word === clue.guess;
+        const message = `${matched ? '' : 'NO '} CONTACT!\n${cluer}: ${clue.word}\n${clue.guesser}: ${clue.guess}`;
+        swal(message);
 
-          if (this.player.name !== this.room.currentRound.wordmaster) {
-            return;
+        if (matched) {
+          // Go to the next letter, but don't go to the one after
+          if (!this.banned.includes(clue.word)) {
+            this.room.currentRound.history.push({ event: 'contact', clues: { [cluer]: clue } });
+            await this.nextLetter();
           }
-
-          if (matched) {
-            this.room.currentRound.banned.push(clue.word);
-            this.room.currentRound.revealed++;
-            delete this.room.currentRound.clues;
-            this.room.currentRound.clues = {};
-          } else {
-            // Ban both words and reset
-            this.room.currentRound.banned.push(clue.word);
-            this.room.currentRound.banned.push(clue.contactedWord);
-            delete this.room.currentRound.clues[cluer];
+        } else {
+          if (!this.banned.includes(clue.word)) {
+            this.room.currentRound.history.push({ event: 'miss', clues: { [cluer]: clue } });
           }
-          await updateRoom(this.room, {
-            currentRound: this.room.currentRound,
-          });
-        };
+          // Ban both words
+          await Promise.all([this.removeBannedClues(clue.word), this.removeBannedClues(clue.guess)]);
+          await updateRoom(this.room, { currentRound: this.room.currentRound });
+        }
       },
-      async banWord(toBan) {
-        if (this.room.currentRound.banned.includes(toBan)) {
+      async banWord(word) {
+        if (this.banned.includes(word)) {
           return; // Word is already banned.
         }
-
-        this.room.currentRound.banned.push(toBan);
-        for (const [cluer, clue] of Object.entries(
-          this.room.currentRound.clues,
-        )) {
+        let clues = this.removeBannedClues(word);
+        this.room.currentRound.history.push({ event: 'ban', word, clues });
+        await updateRoom(this.room, { currentRound: this.room.currentRound });
+      },
+      // Remove clues with word toBan and uncontact clues with guess toBan. updateRoom() needs to be called after.
+      removeBannedClues(toBan) {
+        let bannedClues = {};
+        for (const [cluer, clue] of Object.entries(this.room.currentRound.clues)) {
           if (clue.word === toBan) {
+            bannedClues[cluer] = clue;
             // Remove the clue entirely
             delete this.room.currentRound.clues[cluer];
-          } else if (clue.contactedWord === toBan) {
+          } else if (clue.guess === toBan) {
             // Remove the contacted information, but NOT the original clue.
-            clue.contact = '';
-            clue.contactedWord = '';
+            clue.guesser = '';
+            clue.guess = '';
           }
         }
-        await updateRoom(this.room, {
-          currentRound: this.room.currentRound,
-        });
+        return bannedClues;
       },
       async chooseWord() {
+        this.player.word = this.player.word.toLowerCase();
         await updateRoom(this.room, {
           'currentRound.word': this.player.word,
         });
       },
       async nextRound() {
+        const wordmaster = this.room.players[
+          (this.room.players.indexOf(this.room.currentRound.wordmaster) + 1) % this.room.players.length
+        ];
         const newRound = {
           revealed: 1,
-          wordmaster: this.player.name,
+          wordmaster,
           word: '',
-          banned: [],
           clues: {},
+          history: [],
         };
         await updateRoom(this.room, {
           currentRound: newRound,
-          history: [...this.room.history, this.room.currentRound],
+          previousRounds: [...this.room.previousRounds, this.room.currentRound],
         });
       },
     },
@@ -395,10 +431,20 @@
         );
       },
       prefix() {
-        return this.room.currentRound.word.slice(
-          0,
-          this.room.currentRound.revealed,
-        );
+        return this.room.currentRound.word.slice(0, this.room.currentRound.revealed);
+      },
+      banned() {
+        return this.room.currentRound.history.flatMap((data) => {
+          if (data.event == 'ban') {
+            return data.word;
+          } else if (data.event == 'miss') {
+            const clue = Object.values(data.clues)[0];
+            return [clue.word, clue.guess];
+          } else if (data.event == 'contact') {
+            return Object.values(data.clues)[0].word;
+          }
+          return [];
+        });
       },
     },
   });

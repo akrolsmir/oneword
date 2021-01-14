@@ -8,7 +8,6 @@ Vue.component('timer', {
   },
   props: {
     length: [Number, String],
-    onFinish: Function,
   },
   created() {
     this.startMs = performance.now();
@@ -17,10 +16,10 @@ Vue.component('timer', {
     this.$parent.$on('reset-timer', () => (this.startMs = performance.now()));
     const updateProgress = async (timestamp) => {
       this.secondsElapsed = (timestamp - this.startMs) / 1000;
-      if (this.secondsElapsed >= this.length + 2 /* 2s padding*/) {
+      if (this.secondsElapsed >= this.length + 0.25 /* 0.25s padding*/) {
         // We're done! Run onFinish if the timer's still visible.
         if (!this.destroyed) {
-          await this.onFinish();
+          this.$emit('finish');
         }
         this.startMs = timestamp;
       } else {
@@ -36,7 +35,7 @@ Vue.component('timer', {
   },
   template: `
 <progress class="progress" :value="secondsElapsed" :max="length"
-  :class="{'is-warning': length - 10 < secondsElapsed && secondsElapsed < length - 3,
-    'is-danger': secondsElapsed > length - 3}"></progress>
+  :class="{'is-warning': length - 10 < secondsElapsed && secondsElapsed < length - 5,
+    'is-danger': secondsElapsed > length - 5}"></progress>
 `,
 });

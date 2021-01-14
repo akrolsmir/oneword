@@ -9,12 +9,11 @@ Vue.component('Submit', {
     placeholder: String,
     // Should take in the contents as the sole parameter
     invalid: Function,
-    onSubmit: Function,
   },
   methods: {
     submit() {
       if (!this.invalid(this.contents)) {
-        this.onSubmit(this.contents);
+        this.$emit('submitted', this.contents)
         this.contents = '';
       }
     },
