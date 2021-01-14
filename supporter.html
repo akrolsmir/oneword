@@ -13,6 +13,7 @@
     rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/bulma-extensions@6.2.7/bulma-pricingtable/dist/css/bulma-pricingtable.min.css"
   />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     html {
       margin: 0;
@@ -29,9 +30,9 @@
     }
 
     body {
-      margin: 40px;
-      margin-left: 140px;
-      margin-right: 140px;
+      margin: 48px auto;
+      width: 800px;
+      max-width: 95vw;
     }
 
     h1 {
@@ -106,11 +107,71 @@
           />
         </div>
         <div class="caption">Configure your avatar on <a href="https://en.gravatar.com/">Gravatar</a></div>
+        Supporters also get priority support and an ad-free experience. Does that all sound good?<br />
         <br />
+        <div class="has-text-centered">
+          <button class="button is-medium is-warning" @click="checkout('supporter')">
+            Become a Supporter! ($2.99/month)
+          </button>
+        </div>
+        <br />
+        <br />
+
+        <h2>Champion</h2>
+        Become a Champion, and you'll get two new perks. First, you get the ability to override our scoring system and
+        mark ANY guess as correct.
+        <div class="columns">
+          <div class="column">
+            <div class="promo-img">
+              <img
+                class="border"
+                width="377px"
+                src="./images/spot-bad.png"
+                alt="An example game round, where Amey guessed 'speckled' but the word was 'spot'."
+              />
+            </div>
+            <div class="caption">If you think "speckled" was close enough...</div>
+          </div>
+          <div class="column">
+            <div class="promo-img">
+              <img
+                class="border"
+                width="377px"
+                src="./images/spot-good.png"
+                alt="The same game round, but now 'speckled' is marked as correct."
+              />
+            </div>
+            <div class="caption">You can mark it as correct!</div>
+          </div>
+        </div>
+        You'll also unlock a bunch of specially-themed word lists to play with:<br />
+        <div class="promo-img">
+          <img
+            class="border"
+            src="./images/themed-lists.png"
+            alt="Some different word lists to play with, like Countries and Pokemon."
+          />
+        </div>
+        <div class="caption">Tired of nouns, verbs, and adjectives? Try these!</div>
+        <br />
+        And of course, you'll get all the benefits that Supporters get: private rooms and a custom user avatar!<br />
+        <br />
+        <div class="has-text-centered">
+          <button class="button is-medium is-primary" @click="checkout('champion')">
+            Become a Champion! ($4.99/month)
+          </button>
+        </div>
+        <br />
+        <br />
+
         <h2>Sponsor</h2>
-        Besides the rewards that all supporters get, you'll also be credited on our home page for EVERYONE to see.<br />
+        As a Sponsor of One Word, you'll be credited on our home page for EVERYONE to see.<br />
+        <div class="promo-img">
+          <img class="border" width="299px" src="./images/sponsors.png" alt="Frontpage listing of our sponsors" />
+        </div>
+        <div class="caption">Really, you're the best.</div>
         <br />
-        Plus, you now get a *purple* border. One-up those normal supporters!<br />
+        Plus, you now get a *purple* border. One-up all the other supporters!<br />
         <div class="promo-img">
           <img
             class="border"
@@ -120,11 +181,17 @@
         </div>
         <div class="caption">Purple, the color of royalty, emperors... and you!</div>
         <br />
-        <h2>Producer</h2>
-        One Word gets hundreds of daily players, looking to share great games with their friends. Want to promote your
-        own game or website? Reach out to me at <a href="mailto:austin@oneword.games">austin@oneword.games</a>!
+        And naturally, all the Supporter and Champion perks are yours as well. Private rooms! Correct guesses! Themed
+        word lists! What are you waiting for?<br />
+        <br />
+        <div class="has-text-centered">
+          <button class="button is-medium is-danger" @click="checkout('sponsor')">
+            Become a Sponsor! ($9.99/month)
+          </button>
+        </div>
         <br />
         <br />
+
         <h2>Testimonials</h2>
         Here's what our fans have to say:
         <br />
@@ -177,7 +244,7 @@
     <div id="error-message"></div>
 
     <div class="pricing-table container">
-      <div class="pricing-plan is-danger">
+      <div class="pricing-plan">
         <div class="plan-header">Supporter</div>
         <div class="plan-price">
           <span class="plan-price-amount"><span class="plan-price-currency">$</span>2.99</span>/month
@@ -191,14 +258,14 @@
           <div class="plan-item">-</div>
         </div>
         <div class="plan-footer">
-          <button class="button is-fullwidth" @click="checkout('supporter')">Support us!</button>
+          <button class="button is-fullwidth is-warning" @click="checkout('supporter')">Support us!</button>
         </div>
       </div>
 
       <div class="pricing-plan is-active">
-        <div class="plan-header">Sponsor</div>
+        <div class="plan-header">Champion</div>
         <div class="plan-price">
-          <span class="plan-price-amount"><span class="plan-price-currency">$</span>9.99</span>/month
+          <span class="plan-price-amount"><span class="plan-price-currency">$</span>4.99</span>/month
         </div>
         <div class="plan-items">
           <div class="plan-item"><b>Frontpage Sponsor credit!</b></div>
@@ -209,13 +276,15 @@
           <div class="plan-item">-</div>
         </div>
         <div class="plan-footer">
-          <button class="button is-fullwidth" @click="checkout('sponsor')">Sponsor One Word!</button>
+          <button class="button is-fullwidth" @click="checkout('champion')">Champion One Word!</button>
         </div>
       </div>
 
-      <div class="pricing-plan">
-        <div class="plan-header">Producer</div>
-        <div class="plan-price"><span class="plan-price-amount">Contact Us</span></div>
+      <div class="pricing-plan is-danger">
+        <div class="plan-header">Sponsor</div>
+        <div class="plan-price">
+          <span class="plan-price-amount"><span class="plan-price-currency">$</span>9.99</span>/month
+        </div>
         <div class="plan-items">
           <div class="plan-item"><b>Promote your own game!</b></div>
           <div class="plan-item"><b>Frontpage Sponsor credit!</b></div>
@@ -225,7 +294,7 @@
           <div class="plan-item">Ad-free experience</div>
         </div>
         <div class="plan-footer">
-          <button class="button is-fullwidth is-warning" @click="contactUs()">Get in touch</button>
+          <button class="button is-fullwidth" @click="checkout('sponsor')">Sponsor us!</button>
         </div>
       </div>
     </div>
@@ -258,7 +327,7 @@
         );
       },
       checkout(planName) {
-        const planValues = { supporter: 2.99, sponsor: 9.99 };
+        const planValues = { supporter: 2.99, champion: 4.99, sponsor: 9.99 };
         firebase.analytics().logEvent('purchase', {
           value: planValues[planName],
           currency: 'USD',
@@ -275,6 +344,7 @@
         var stripe = Stripe('pk_live_V662ekSpUVB7NK0YRz6mZRrg00VtBZqQ6k');
         const plans = {
           supporter: 'plan_H3ICnHNAVRYziM',
+          champion: 'price_1I9JRXCGj90UZkiJNKLtWiVe',
           sponsor: 'plan_H3IEHNqkNsWgXz',
         };
 
