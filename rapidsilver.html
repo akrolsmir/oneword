@@ -319,7 +319,7 @@
                 <div>
                   <span
                     v-for="word in prettySuggestions"
-                    :class="{'has-text-weight-medium has-text-primary': player.response.includes(word)}"
+                    :class="{'has-text-weight-medium has-text-primary': player.response.toLowerCase().includes(word)}"
                   >
                     {{ word }}
                   </span>
@@ -599,7 +599,7 @@
           ...this.suggestions['nouns'],
           ...this.suggestions['verbs'],
           ...this.suggestions['adjectives'],
-        ].filter((word) => this.player.response.includes(word));
+        ].filter((word) => this.player.response.toLowerCase().includes(word));
         update[`currentRound.responses.${this.player.name}.words`] = bonus;
 
         // If all responses are in, move to choosing
