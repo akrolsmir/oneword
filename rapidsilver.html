@@ -251,13 +251,17 @@
       <div class="history">
         <template v-for="round in room.history">
           <div :title="round.chooser">&gt; {{ round.prompt }}</div>
-          <history-paragraph :title="round.choice" :response="round.responses[round.choice]" />
+          <history-paragraph :title="round.choice" :response="round.responses[round.choice]"></history-paragraph>
+          <div>Points</div>
+          <div v-for="(score, player) in score(round)" :title="round.responses[player].story">
+            {{ player }}: {{ round.responses[player].votes.length }} votes (+{{ score }} pts)
+          </div>
           <br />
         </template>
       </div>
 
-      <div v-if="room.players.length < 3">
-        <h2 class="fancy" role="alert">Waiting for 3 players...</h2>
+      <div v-if="room.players.length < 4">
+        <h2 class="fancy" role="alert">Waiting for 4 players...</h2>
         <p class="mt-5 mb-2">Invite your friends to play!</p>
         <sharelink :link="'https://oneword.games/rapidsilver.html?room=' + room.name"></sharelink>
         <!-- TODO: choose your starting prompt -->
@@ -331,10 +335,19 @@
               <strong class="is-size-3">&gt; {{ room.currentRound.prompt }}</strong>
               <div class="content">
                 <ol>
-                  <li v-for="(response, player) in room.currentRound.responses">
-                    {{ response.story }} <a v-if="isChooser" href="#" @click.prevent="chooseResponse(player)">Choose</a>
+                  <li v-for="(response, p) in room.currentRound.responses">
+                    {{ response.story }}
+                    <a
+                      v-if="p != player.name && !voted.includes(player.name)"
+                      href="#"
+                      @click.prevent="chooseResponse(p)"
+                    >
+                      Vote
+                    </a>
+                    <template v-else-if="response.votes.includes(player.name)"> (Voted)</template>
                   </li>
                 </ol>
+                <p>Players who've voted: {{ voted.join(', ') }}</p>
               </div>
             </template>
             <!-- Score -->
@@ -389,9 +402,9 @@
        chooser: 'alice',
        prompt: 'Eat cake'
        responses: {
-         alice: { story: 'You fall into a hole and die', words: ['hole'] }
-         bob: { story: 'A dragon appears in front of you', words: [] },
-         carol: { story: 'You start to hear a creepy yet entrancing chant', words: ['chant', 'creepy'] }
+         alice: { story: 'You fall into a hole and die', words: ['hole'], votes: ['bob', 'carol'] }
+         bob: { story: 'A dragon appears in front of you', words: [], votes: []},
+         carol: { story: 'You start to hear a creepy chant', words: ['chant', 'creepy'], votes: ['alice'] }
        }
        choice: 'alice'
      }
@@ -464,9 +477,9 @@
         if (this.room.currentRound.state == 'PROMPT') {
           return this.isChooser ? 'What do?' : `${this.room.currentRound.chooser} is deciding what to do`;
         } else if (this.room.currentRound.state == 'RESPONSE') {
-          return this.isChooser ? 'The future has not yet been written' : 'Write what happens next';
+          return 'Write what happens next';
         } else if (this.room.currentRound.state == 'CHOOSING') {
-          return this.isChooser ? 'Choose a fate' : `Fate is in ${this.room.currentRound.chooser}'s hands.`;
+          return 'Fate is in your hands';
         }
       },
       prettySuggestions() {
@@ -483,6 +496,9 @@
       },
       charCount() {
         return this.player.response.length;
+      },
+      voted() {
+        return Object.values(this.room.currentRound.responses).flatMap((r) => r.votes);
       },
     },
     methods: {
@@ -601,6 +617,7 @@
           ...this.suggestions['adjectives'],
         ].filter((word) => this.player.response.toLowerCase().includes(word));
         update[`currentRound.responses.${this.player.name}.words`] = bonus;
+        update[`currentRound.responses.${this.player.name}.votes`] = [];
 
         // If all responses are in, move to choosing
         const done = this.room.players.every(
@@ -612,10 +629,24 @@
         await updateRoom(this.room, update);
       },
       async chooseResponse(player) {
-        this.room.playerData[player].score += 10 + this.room.currentRound.responses[player].words.length;
-        this.room.currentRound.choice = player;
-        await this.saveRoom('playerData', 'currentRound');
-        await this.newRound();
+        this.room.currentRound.responses[player].votes.push(this.player.name);
+        await this.saveRoom('currentRound');
+        // if all votes are in, go to next round
+        if (this.room.players.every((p) => this.voted.includes(p))) {
+          await this.nextStage();
+        }
+      },
+      maxVotes(round) {
+        return Math.max(...Object.values(round.responses).map((resp) => resp.votes.length));
+      },
+      score(round) {
+        const maxVotes = this.maxVotes(round);
+        return Object.fromEntries(
+          Object.entries(round.responses).map((entry) => {
+            const [name, resp] = entry;
+            return [name, resp.votes.length * (5 + resp.words.length) + (resp.votes.length === maxVotes) * 5];
+          })
+        );
       },
       async nextStage() {
         if (this.room.currentRound.state == 'PROMPT') {
@@ -623,7 +654,16 @@
         } else if (this.room.currentRound.state == 'RESPONSE') {
           return await updateRoom(this.room, { 'currentRound.state': 'CHOOSING' });
         } else if (this.room.currentRound.state == 'CHOOSING') {
-          await updateRoom(this.room, { 'currentRound.state': 'PROMPT' });
+          // Choose the story continuation
+          const winners = Object.entries(this.room.currentRound.responses)
+            .filter((entry) => entry[1].votes.length === this.maxVotes(this.room.currentRound))
+            .map((entry) => entry[0]);
+          this.room.currentRound.choice = winners[Math.floor(Math.random() * winners.length)];
+          // update scores
+          const newScores = this.score(this.room.currentRound);
+          for (const player in newScores) {
+            this.room.playerData[player].score += newScores[player];
+          }
           return await this.newRound();
         }
       },
