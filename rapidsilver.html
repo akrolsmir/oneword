@@ -9,7 +9,8 @@
   />
   <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
   <link rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/buefy@0.9.4/dist/buefy.min.css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     html {
@@ -248,16 +249,8 @@
         </div>
       </div>
 
-      <div class="history">
-        <template v-for="round in room.history">
-          <div :title="round.chooser">&gt; {{ round.prompt }}</div>
-          <history-paragraph :title="round.choice" :response="round.responses[round.choice]"></history-paragraph>
-          <div>Points</div>
-          <div v-for="(score, player) in score(round)" :title="round.responses[player].story">
-            {{ player }}: {{ round.responses[player].votes.length }} votes (+{{ score }} pts)
-          </div>
-          <br />
-        </template>
+      <div class="history block">
+        <history-segment v-for="(round, i) in room.history" :key="i" :round="round" :scores="score(round)" />
       </div>
 
       <div v-if="room.players.length < 4">
@@ -364,6 +357,8 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert@2.1.2/dist/sweetalert.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/blueimp-md5@2.13.0/js/md5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pluralize@8.0.0/pluralize.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/buefy@0.9.4/dist/buefy.min.js"></script>
+
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-analytics.js"></script>
