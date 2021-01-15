@@ -7,15 +7,16 @@ Vue.component('history-segment', {
     shownPlayer: String, // name
   }),
   computed: {
+    // list of players sorted by score, bonus words, then brevity (highest first)
     players() {
-      return Object.keys(this.round.responses).sort((a, b) => {
-        if (a[0] === this.round.choice) {
-          return 1;
-        } else if (b[0] === this.round.choice) {
-          return -1;
-        }
-        return this.scores[a[0]] - this.scores[b[0]];
-      });
+      return Object.entries(this.round.responses)
+        .sort(
+          (a, b) =>
+            this.scores[b[0]] - this.scores[a[0]] ||
+            b[1].words.length - a[1].words.length ||
+            a[1].story.length - b[1].story.length
+        )
+        .map((entry) => entry[0]);
     },
   },
   template: `

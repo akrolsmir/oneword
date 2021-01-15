@@ -401,7 +401,6 @@
          bob: { story: 'A dragon appears in front of you', words: [], votes: []},
          carol: { story: 'You start to hear a creepy chant', words: ['chant', 'creepy'], votes: ['alice'] }
        }
-       choice: 'alice'
      }
      history: [{round1}, ...]
    }
@@ -418,7 +417,6 @@
       player: {
         name: '',
         response: '',
-        choice: '',
       },
       suggestions: {
         nouns: [randomWord('nouns'), randomWord('nouns'), randomWord('nouns')],
@@ -540,7 +538,6 @@
           currentRound: {
             state: 'PROMPT',
             chooser: this.player.name,
-            choice: '',
             responses: {},
           },
           history: [],
@@ -653,7 +650,6 @@
           const winners = Object.entries(this.room.currentRound.responses)
             .filter((entry) => entry[1].votes.length === this.maxVotes(this.room.currentRound))
             .map((entry) => entry[0]);
-          this.room.currentRound.choice = winners[Math.floor(Math.random() * winners.length)];
           // update scores
           const newScores = this.score(this.room.currentRound);
           for (const player in newScores) {
@@ -662,19 +658,11 @@
           return await this.newRound();
         }
       },
-      async submitGuess() {
-        const update = {
-          'currentRound.choice': this.player.choice.toLowerCase().trim(),
-          'currentRound.state': 'DONE',
-        };
-        await updateRoom(this.room, update);
-      },
       async newRound() {
         this.room.history.push(this.room.currentRound);
         this.room.currentRound = {
           state: 'PROMPT',
           chooser: nextChooser(this.room.currentRound.chooser, this.room.players),
-          choice: '',
           responses: {},
         };
         this.room.lastUpdateTime = Date.now();
