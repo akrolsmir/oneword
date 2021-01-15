@@ -44,16 +44,8 @@
       max-width: 95vw;
     }
 
-    .spacy {
-      white-space: pre-wrap;
-    }
-
     .label {
       margin-top: 20px;
-    }
-
-    .newline {
-      white-space: pre-wrap;
     }
 
     .capitalize {
@@ -271,23 +263,23 @@
 
         <div class="card">
           <div class="card-content">
-            <h2 class="fancy" aria-live="polite">{{ prettyStatus }}</h2>
+            <h2 class="fancy mb-4" aria-live="polite">{{ prettyStatus }}</h2>
             <!-- Prompt -->
             <template v-if="room.currentRound.state == 'PROMPT'">
               <template v-if="isChooser">
                 <div class="field has-addons">
-                  <div class="control">
-                    <input class="input" @keyup.enter="submitPrompt" v-model="room.currentRound.prompt" />
+                  <div class="control is-expanded">
+                    <input class="input is-large" @keyup.enter="submitPrompt" v-model="room.currentRound.prompt" />
                   </div>
                   <div class="control">
-                    <button class="button" @click="submitPrompt">Submit</button>
+                    <button class="button is-large" @click="submitPrompt">Submit</button>
                   </div>
                 </div>
               </template>
             </template>
             <!-- Response -->
             <template v-else-if="room.currentRound.state == 'RESPONSE'">
-              <div class="is-size-4">&gt; {{ room.currentRound.prompt }}</div>
+              <div class="is-size-4 mb-2">{{ room.currentRound.chooser }}&gt; {{ room.currentRound.prompt }}</div>
               <template v-if="!isChooser">
                 <div class="field">
                   <div class="control is-expanded">
@@ -300,27 +292,33 @@
                       :disabled="!room.players.includes(player.name)"
                     ></textarea>
                   </div>
-                  <span class="help" :class="{ 'has-text-danger': charCount > 280 }">{{ charCount }} / 280</span>
                 </div>
-                <div class="field">
-                  <div class="control">
-                    <button
-                      class="button"
-                      @click="submitResponse"
-                      :disabled="!room.players.includes(player.name) || charCount > 280"
-                    >
-                      Submit
-                    </button>
+                <div class="level">
+                  <div class="level-left">
+                    <div>
+                      Bonus Words:
+                      <span
+                        v-for="word in prettySuggestions"
+                        :class="{'has-text-weight-medium has-text-primary': player.response.toLowerCase().includes(word)}"
+                      >
+                        {{ word }}
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <i>Bonus Words</i>
-                <div>
-                  <span
-                    v-for="word in prettySuggestions"
-                    :class="{'has-text-weight-medium has-text-primary': player.response.toLowerCase().includes(word)}"
-                  >
-                    {{ word }}
-                  </span>
+                  <div class="level-right">
+                    <span class="level-item help" :class="{ 'has-text-danger': charCount > 280 }">
+                      {{ charCount }} / 280
+                    </span>
+                    <div class="level-item">
+                      <button
+                        class="button"
+                        @click="submitResponse"
+                        :disabled="!room.players.includes(player.name) || charCount > 280"
+                      >
+                        Submit
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </template>
             </template>
