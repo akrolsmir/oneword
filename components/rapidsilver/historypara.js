@@ -20,20 +20,19 @@ Vue.component('history-segment', {
     },
   },
   template: `
-  <div style="background-color: #f5f5f5; border-radius: 4px" class="py-4 px-5 my-4">
-    <span class="is-size-4">{{ round.chooser }}&gt; {{ round.prompt }}</span>
-    <b-carousel :autoplay="false" iconPack="fa">
-      <b-carousel-item v-for="(player, i) in players " :key="i">
+  <div style="background-color: #f5f5f5;" class="py-3 px-5 mb-1">
+    <span class="is-size-5">{{ round.chooser }}&gt; {{ round.prompt }}</span>
+    <b-carousel :autoplay="false" :indicator-inside="false" indicator-style="is-dots" iconPack="fa">
+      <b-carousel-item v-for="(player, i) in players " :key="i" :style="{ backgroundColor: i==0 ? 'default' : '#f9ced7', borderRadius: '4px' }">
+        <div style="height: 6rem; overflow: auto">
+          <history-paragraph :response='round.responses[player]' />
+        </div>  
         <div>
           {{ player }}
-          <span v-if="i==0">(canon)</span>
           &mdash;
           <span :title="round.responses[player].votes.join(', ')">
             {{ round.responses[player].votes.length }} votes (+{{ scores[player] }} pts)
           </span> 
-        </div>
-        <div style="height: 100px; overflow: auto">
-          <history-paragraph :response='round.responses[player]' />
         </div>
       </b-carousel-item>
     </b-carousel>
