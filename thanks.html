@@ -160,14 +160,27 @@
       user: {},
       player: {}, // Just because listenForLogin() expects vueApp.player.name
       finished: false,
+      type: 'supporter',
+    },
+    mounted() {
+      // Supporter tier is passed through URL param
+      const parsedUrl = new URL(window.location.href);
+      const planName = parsedUrl.searchParams.get('type');
+      if (planName) {
+        this.type = planName;
+      }
     },
     watch: {
       async 'user.id'() {
         // We just registered the firebase login.
         if (!this.user.supporter) {
-          // Could pass supporter tier through URL param, but assume BASE for now.
-          await updateUser(this.user.id, { supporter: 'BASE' });
-          await sendSupporterEmail(this.user);
+          const typeToConstant = {
+            supporter: 'BASE',
+            champion: 'CHAMPION',
+            sponsor: 'SPONSOR',
+          };
+          await updateUser(this.user.id, { supporter: typeToConstant[this.type] });
+          await sendSupporterEmail(this.user, this.type);
 
           // Load for 4 more seconds to provide illusion of work.
           setTimeout(() => (this.finished = true), 4000);

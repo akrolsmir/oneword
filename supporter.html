@@ -359,7 +359,7 @@
             // a successful payment.
             // Instead use one of the strategies described in
             // https://stripe.com/docs/payments/checkout/fulfillment
-            successUrl: window.location.origin + '/thanks.html',
+            successUrl: window.location.origin + `/thanks.html?type=${planName}`,
             cancelUrl: window.location.origin + '/supporter.html',
           })
           .then(function (result) {

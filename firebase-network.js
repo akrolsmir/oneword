@@ -215,7 +215,7 @@ Austin
   });
 }
 
-export async function sendSupporterEmail(user) {
+export async function sendSupporterEmail(user, type = 'supporter') {
   const firstName = user.name.split(' ')[0];
   await sendMail({
     from: 'Austin Chen <austin@oneword.games>',
@@ -226,7 +226,7 @@ export async function sendSupporterEmail(user) {
       subject: 'Thanks for supporting One Word!',
       text: `Hi ${firstName},
 
-Just wanted to thank you for becoming a supporter ☺. We're so glad you love our game!
+Just wanted to thank you for becoming a ${type} ☺. We're so glad you love our game!
 Your benefits are now active; let me know if you have any issues (or any time you'd like to cancel).
 
 Also, just curious: what led you to support us in the first place?
