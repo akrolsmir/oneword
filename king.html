@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+
+<head>
+  <title>Kingdom Royale</title>
+  <link
+    href="https://fonts.googleapis.com/css?family=Fjalla+One|Merienda+One|Righteous|Sriracha&display=swap"
+    rel="stylesheet"
+  />
+  <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
+  <link rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    html {
+      margin: 0;
+      height: 100%;
+      background-color: #efd8fa;
+      position: relative;
+      overflow: auto;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: 'Merienda One', cursive;
+    }
+
+    body {
+      margin: 48px auto;
+      width: 600px;
+      max-width: 95vw;
+    }
+  </style>
+
+  <meta name="description" content="Conspire and backstab your friends in this cutthroat kingdom!" />
+
+  <!-- Octopus favicon courtesy of Twemoji -->
+  <link rel="icon" href="https://twemoji.maxcdn.com/v/13.0.1/72x72/1f419.png" />
+</head>
+
+<body class="has-navbar-fixed-top">
+  <div id="vue">
+    <!-- <div v-for="enemies, role in winConditions">{{ role }} -- {{ enemies }}</div> -->
+    <!-- Main chat area -->
+    <div>
+      <h3>First Chat</h3>
+      Name:
+      <input class="input" v-model="player.name" />
+      <br /><br />
+
+      <chatbox
+        :name="player.name"
+        :room-id="room.name"
+        v-model="room.round.main1.chatlog"
+        chatlog-path="round.main1.chatlog"
+      ></chatbox>
+
+      <!-- Pick your secret partner -->
+      <h3>Pick your secret partner</h3>
+      <div class="select">
+        <select v-model="player.target">
+          <option v-for="player, name in room.players" :value="name">{{ name }}</option>
+        </select>
+      </div>
+      <button class="button" @click="pickPartner(player.target)">Pick</button>
+
+      <!-- List partners for now -->
+      <h3>Not-so-secret partners</h3>
+      <div v-for="value, player in room.round.secret">{{ player }} picked {{ value.target }}</div>
+    </div>
+
+    <!-- 1:1 chat -->
+    <h3>Second Chat</h3>
+    <!-- Goes here -->
+    <br /><br />
+
+    <!-- Mod tools -->
+    <div class="box">
+      <h3>Mod tools</h3>
+      <button class="button is-small is-danger" @click="resetRoom">Reset room</button>
+    </div>
+  </div>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.2/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-firestore.js"></script>
+
+<script type="module" src="components/chatbox.js"></script>
+
+<script>
+  window.COLLECTION = 'kingdom-royale';
+</script>
+<script type="module">
+  import { listenRoom, updateRoom, setRoom, getRoom } from './firebase-network.js';
+  /**
+   Room: {
+      name: apple,
+      players: {
+        alice : {
+          role: 'KING'
+          dead: true
+        }
+      },
+      round: {
+        state: 'MAIN1', // or 'SECRET1', 'SECRET2'..., 'MAIN2', 'NIGHT'
+        main1: { // 120s
+          chatlog: {
+            // ID is timestamp, for now.
+            // TODO: Will there be collisions? Could hash timestamp + name
+            // TODO: Is it too expensive to sort? Probably not?
+            123456: { player: 'alice', text: 'Hello World'}
+          }
+        },
+        secret: { // 60s each, parallelized
+          alice: {
+            partner: 'bob',
+            chatlog: {...}
+          }
+          bob: {
+            partner: 'carol',
+            chatlog: {...}
+          }
+        }
+        main2: { // 120s
+          murder: {
+            target: 'bob',
+            approved: 'SORCERER',
+          }
+          chatlog: {...}
+        }
+        night: { // 60s
+          assassination: {
+            target: 'alice',
+            // flavor: 'A ambitious caption fired Alice, and they died'????
+          }
+        }
+      }
+      history: [{round1}, ...]
+   }
+  */
+  const winConditions = {
+    KING: ['PRINCE', 'REVOLUTIONARY'],
+    PRINCE: ['KING', 'DOUBLE', 'REVOLUTIONARY'],
+    DOUBLE: ['PRINCE', 'REVOLUTIONARY'],
+    SORCERER: [''],
+    KNIGHT: ['KING', 'PRINCE'],
+    REVOLUTIONARY: ['KING', 'PRINCE', 'DOUBLE'],
+  };
+
+  const vueApp = new Vue({
+    el: '#vue',
+    data: {
+      winConditions,
+      player: {
+        name: 'Austin',
+        chat: '',
+        target: '',
+      },
+      room: {
+        name: 'apple',
+      },
+    },
+    async mounted() {
+      const room = await getRoom(this.room);
+      if (room) {
+        this.room = room;
+      } else {
+        await resetRoom();
+      }
+    },
+    methods: {
+      async resetRoom() {
+        this.room = {
+          name: 'apple',
+          players: {
+            Alice: {
+              role: 'KING',
+            },
+            Bob: {
+              role: 'PRINCE',
+            },
+            Carol: {
+              role: 'DOUBLE',
+            },
+            David: {
+              role: 'SORCERER',
+            },
+            Eve: {
+              role: 'KNIGHT',
+            },
+            Frank: {
+              role: 'REVOLUTIONARY',
+            },
+          },
+          round: {
+            state: 'MAIN1',
+            main1: {
+              chatlog: {
+                123456: {
+                  name: 'Alice',
+                  text: 'Bob is the imposter!',
+                  timestamp: 123456,
+                },
+                234567: {
+                  name: 'Bob',
+                  text: "No, I swear it's Carol...",
+                  timestamp: 234567,
+                },
+              },
+            },
+            secret: {},
+          },
+        };
+        await setRoom(this.room);
+      },
+      async pickPartner(target) {
+        await updateRoom(this.room, {
+          [`round.secret.${this.player.name}.target`]: target,
+        });
+      },
+    },
+  });
+  listenRoom(vueApp);
+
+  // Returns a list of blocks, eg [{alice: {partner: 'bob'}, ...}, {carol: {partner: 'alice'}} ]
+  function sequenceChats(secret) {
+    // Naive implementation: serial
+    return Object.entries(secret).map(([player, secret]) => {
+      return { [player]: secret };
+    });
+
+    // 1. find the first person and give them their partner
+    // const remaining = Object.keys(secret);
+  }
+</script>
