@@ -2,7 +2,7 @@
 <meta charset="utf-8" />
 
 <head>
-  <title>Curse Typewriter</title>
+  <title>Storytime</title>
   <link
     href="https://fonts.googleapis.com/css?family=Fjalla+One|Merienda+One|Righteous|Sriracha&display=swap"
     rel="stylesheet"
@@ -250,7 +250,22 @@
         <h2 class="fancy" role="alert">Waiting for 4 players...</h2>
         <p class="mt-5 mb-2">Invite your friends to play!</p>
         <sharelink :link="'https://oneword.games/rapidsilver.html?room=' + room.name"></sharelink>
-        <!-- TODO: choose your starting prompt -->
+        <div class="card my-4">
+          <div class="card-header">
+            <h2 class="card-header-title">Optional: Choose a starting prompt</h2>
+          </div>
+          <div class="card-content">
+            <b-carousel v-model="prompt" :autoplay="false" icon-pack="fas">
+              <b-carousel-item v-for="(prompt, i) in prompts" :key="i">
+                <div style="height: 160px">{{ prompt }}</div>
+              </b-carousel-item>
+            </b-carousel>
+          </div>
+          <div class="card-footer">
+            <a href="#" class="card-footer-item" @click.prevent="chooseStartingPrompt">Choose</a>
+          </div>
+        </div>
+        <br />
       </div>
 
       <template v-else>
@@ -377,6 +392,7 @@
 </script>
 <script type="module">
   import { nouns, compounds, verbs, adjectives } from './many-words.js';
+  import prompts from './prompts.js';
   import {
     setRoom,
     updateRoom,
@@ -424,6 +440,8 @@
       },
       alertIsShowing: false,
       newMod: '',
+      prompts,
+      prompt: 0,
     },
     async mounted() {
       this.allRooms = (await listRooms()).filter((room) => room.players.length > 0);
@@ -709,6 +727,21 @@
             }
           });
         }
+      },
+      async chooseStartingPrompt() {
+        this.room.history = [
+          {
+            chooser: 'Premise',
+            responses: {
+              ' ': {
+                story: this.prompts[this.prompt],
+                words: [],
+                votes: [],
+              },
+            },
+          },
+        ];
+        await this.saveRoom('history');
       },
     },
   });
