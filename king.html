@@ -31,6 +31,10 @@
       width: 600px;
       max-width: 95vw;
     }
+
+    .pre-wrap {
+      white-space: pre-wrap;
+    }
   </style>
 
   <meta name="description" content="Conspire and backstab your friends in this cutthroat kingdom!" />
@@ -41,12 +45,25 @@
 
 <body class="has-navbar-fixed-top">
   <div id="vue">
-    <!-- <div v-for="enemies, role in winConditions">{{ role }} -- {{ enemies }}</div> -->
+    <!-- <div v-for="enemies, role in WIN_CONDITIONS">{{ role }} -- {{ enemies }}</div> -->
     <!-- Main chat area -->
     <div>
-      <h3>First Chat</h3>
       Name:
       <input class="input" v-model="player.name" />
+      <button class="button" @click="enterGame">Enter game</button>
+
+      <div v-if="room.state === 'NOT_STARTED'"></div>
+      <div v-else>
+        {{ player.name }}, you are the {{ playerRole }}.<br />
+        <span class="pre-wrap">{{ FLAVOR[playerRole] }}</span>
+      </div>
+
+      <button class="button" @click="assignRoles">Assign Roles</button>
+
+      <h3>Players</h3>
+      <span class="tag m-1" v-for="name in Object.keys(room.players)">{{ name }}</span>
+
+      <h3>First Chat</h3>
       <br /><br />
 
       <chatbox
@@ -99,52 +116,52 @@
 <script type="module">
   import { listenRoom, updateRoom, setRoom, getRoom } from './firebase-network.js';
   /**
-   Room: {
-      name: apple,
-      players: {
-        alice : {
-          role: 'KING'
-          dead: true
-        }
-      },
-      round: {
-        state: 'MAIN1', // or 'SECRET1', 'SECRET2'..., 'MAIN2', 'NIGHT'
-        main1: { // 120s
-          chatlog: {
-            // ID is timestamp, for now.
-            // TODO: Will there be collisions? Could hash timestamp + name
-            // TODO: Is it too expensive to sort? Probably not?
-            123456: { player: 'alice', text: 'Hello World'}
+     Room: {
+        name: apple,
+        players: {
+          alice : {
+            role: 'KING'
+            dead: true
           }
         },
-        secret: { // 60s each, parallelized
-          alice: {
-            partner: 'bob',
+        round: {
+          state: MAIN1', // or 'NOT_STARTED', 'SECRET1', 'SECRET2'..., 'MAIN2', 'NIGHT'
+          main1: { // 120s
+            chatlog: {
+              // ID is timestamp, for now.
+              // TODO: Will there be collisions? Could hash timestamp + name
+              // TODO: Is it too expensive to sort? Probably not?
+              123456: { player: 'alice', text: 'Hello World'}
+            }
+          },
+          secret: { // 60s each, parallelized
+            alice: {
+              partner: 'bob',
+              chatlog: {...}
+            }
+            bob: {
+              partner: 'carol',
+              chatlog: {...}
+            }
+          }
+          main2: { // 120s
+            murder: {
+              target: 'bob',
+              approved: 'SORCERER',
+            }
             chatlog: {...}
           }
-          bob: {
-            partner: 'carol',
-            chatlog: {...}
+          night: { // 60s
+            assassination: {
+              target: 'alice',
+              // flavor: 'A ambitious caption fired Alice, and they died'????
+            }
           }
         }
-        main2: { // 120s
-          murder: {
-            target: 'bob',
-            approved: 'SORCERER',
-          }
-          chatlog: {...}
-        }
-        night: { // 60s
-          assassination: {
-            target: 'alice',
-            // flavor: 'A ambitious caption fired Alice, and they died'????
-          }
-        }
-      }
-      history: [{round1}, ...]
-   }
-  */
-  const winConditions = {
+        history: [{round1}, ...]
+     }
+    */
+  const WIN_CONDITIONS = {
     KING: ['PRINCE', 'REVOLUTIONARY'],
     PRINCE: ['KING', 'DOUBLE', 'REVOLUTIONARY'],
     DOUBLE: ['PRINCE', 'REVOLUTIONARY'],
@@ -153,10 +170,60 @@
     REVOLUTIONARY: ['KING', 'PRINCE', 'DOUBLE'],
   };
 
+  const ROLES = Object.keys(WIN_CONDITIONS);
+
+  const FLAVOR = {
+    KING: `He is the king who has ascended to the throne by assassinating the previous ruler and has carried out many invasions. Having a distrustful personality, he's scheming murder of the ones that threaten his throne.
+
+Skills
+
+[Murder]. He can select a player he wants to kill another player to Sorcerer and or the Knight to execute this action, using [Sorcery] or [Deathblow].
+
+Victory conditions: To protect his throne, death of the Prince and Revolutionary.`,
+    PRINCE: `An ambitious person. He was originally only at the third place in the inheritance order of the king's rank. But taking advantage of the king's mistrust, he made him murder other princes and moved up to the first place.
+
+Skills
+
+[Throne succession]. He is able to use Murder once the King and The Double die.
+[Anti-magic]. He can't be killed by Sorcery.
+
+Victory conditions: To become the king, death of King, The Double, and Revolutionary.`,
+    DOUBLE: `An ex-farmer who is loyal to the king and looks exactly the same as him. He is not really ambitious.
+
+Skills
+
+[Inheritance]. If the King dies or [Substitution] was executed, he is able to use [Murder].
+
+Victory conditions: Death of those who try to kill him, Prince and Revolutionary.`,
+    SORCERER: `King's subordinate and Prince's teacher. He has no interest in the king's throne whatsoever.
+
+Skills
+
+[Sorcery]. He can choose whether to kill the character that was selected by [Murder]. The targeted character will become a burnt corpse.
+
+Victory conditions: To survive.`,
+    KNIGHT: `King's subordinate, but he is plotting a revenge on the royal family for they have ruined his homeland.
+
+Skills
+
+[Deathblow]. He can choose whether to kill the character that was selected by [Murder]. The targeted character will die due to beheading. Only executable when the Sorcerer is dead.
+
+Victory conditions: To take revenge, death of King and Prince.`,
+    REVOLUTIONARY: `The right arm of the king and prepares himself to take over the land.
+
+Skills
+
+[Assassination]. He can assassinate the selected character. The targeted character will become a strangulated corpse.
+
+Victory conditions: Death of the King, the Prince, and the Double`,
+  };
+
   const vueApp = new Vue({
     el: '#vue',
     data: {
-      winConditions,
+      WIN_CONDITIONS,
+      ROLES,
+      FLAVOR,
       player: {
         name: 'Austin',
         chat: '',
@@ -179,24 +246,12 @@
         this.room = {
           name: 'apple',
           players: {
-            Alice: {
-              role: 'KING',
-            },
-            Bob: {
-              role: 'PRINCE',
-            },
-            Carol: {
-              role: 'DOUBLE',
-            },
-            David: {
-              role: 'SORCERER',
-            },
-            Eve: {
-              role: 'KNIGHT',
-            },
-            Frank: {
-              role: 'REVOLUTIONARY',
-            },
+            // Alice: { role: '' },
+            Bob: { role: '' },
+            Carol: { role: '' },
+            David: { role: '' },
+            Eve: { role: '' },
+            Frank: { role: '' },
           },
           round: {
             state: 'MAIN1',
@@ -219,10 +274,39 @@
         };
         await setRoom(this.room);
       },
+      async enterGame() {
+        await updateRoom(this.room, { [`players.${this.player.name}`]: {} });
+      },
+      async assignRoles() {
+        if (Object.keys(this.room.players).length != 6) {
+          alert('Wrong number of players; need exactly 6!');
+          return;
+        }
+
+        const roles = ROLES.slice();
+        shuffleArray(roles);
+        for (let i = 0; i < 6; i++) {
+          const name = this.playerNames[i];
+          this.room.players[name].role = roles[i];
+        }
+        await updateRoom(this.room, { players: this.room.players });
+      },
       async pickPartner(target) {
         await updateRoom(this.room, {
           [`round.secret.${this.player.name}.target`]: target,
         });
+      },
+    },
+    computed: {
+      playerNames() {
+        return Object.keys(this.room.players);
+      },
+      playerRole() {
+        try {
+          return this.room.players[this.player.name].role;
+        } catch (error) {
+          return 'KING';
+        }
       },
     },
   });
@@ -237,5 +321,14 @@
 
     // 1. find the first person and give them their partner
     // const remaining = Object.keys(secret);
+  }
+
+  function shuffleArray(array) {
+    // From https://stackoverflow.com/a/12646864/1222351
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
   }
 </script>
