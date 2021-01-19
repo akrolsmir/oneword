@@ -59,7 +59,6 @@
     .history {
       max-height: 612px;
       background-color: white;
-      overflow: auto;
     }
 
     [v-cloak] {
@@ -242,9 +241,9 @@
         </div>
       </div>
 
-      <div class="history block">
+      <scroll-to-bottom class="history block">
         <history-segment v-for="(round, i) in room.history" :key="i" :round="round" :scores="score(round)" />
-      </div>
+      </scroll-to-bottom>
 
       <div v-if="room.players.length < 4">
         <h2 class="fancy" role="alert">Waiting for 4 players...</h2>
@@ -387,6 +386,7 @@
 <script type="module" src="components/scoreboard.js"></script>
 <script type="module" src="components/sharelink.js"></script>
 <script type="module" src="components/rapidsilver/historypara.js"></script>
+<script type="module" src="components/rapidsilver/scrollbottom.js"></script>
 <script>
   window.COLLECTION = 'silver';
 </script>
