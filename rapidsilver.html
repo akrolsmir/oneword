@@ -664,6 +664,10 @@
         if (this.room.currentRound.state == 'PROMPT') {
           return await updateRoom(this.room, { 'currentRound.state': 'RESPONSE' });
         } else if (this.room.currentRound.state == 'RESPONSE') {
+          // submit current text as response if player has not yet submitted
+          if (!this.room.currentRound.responses[this.player.name]) {
+            await this.submitResponse();
+          }
           return await updateRoom(this.room, { 'currentRound.state': 'CHOOSING' });
         } else if (this.room.currentRound.state == 'CHOOSING') {
           // Choose the story continuation
