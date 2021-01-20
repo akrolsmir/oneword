@@ -241,7 +241,7 @@
         </div>
       </div>
 
-      <scroll-to-bottom class="history block">
+      <scroll-to-bottom ref="history" class="history block">
         <history-segment v-for="(round, i) in room.history" :key="i" :round="round" :scores="score(round)" />
       </scroll-to-bottom>
 
@@ -463,6 +463,9 @@
           this.replaceSuggestions(this.player.response);
           this.player.response = '';
         }
+      },
+      'room.history'(history) {
+        this.$refs.history.stickToBottom();
       },
     },
     computed: {

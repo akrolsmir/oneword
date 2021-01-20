@@ -11,12 +11,8 @@ Vue.component('ScrollToBottom', {
     atBottom: false,
   }),
   mounted() {
-    new ResizeObserver((entries) => {
-      if (this.atBottom) {
-        this.toBottom();
-      }
-    });
-    this.toBottom();
+    // wait for childeren to finish rendering, then go to bottom
+    setTimeout(this.toBottom, 100);
   },
   methods: {
     height() {
@@ -25,6 +21,11 @@ Vue.component('ScrollToBottom', {
     toBottom() {
       // TODO: smooth scrolling in Safari
       this.$refs.feed.scroll({ top: this.height(), left: 0, behavior: 'smooth' });
+    },
+    stickToBottom() {
+      if (this.atBottom) {
+        this.toBottom();
+      }
     },
     onScroll() {
       // TODO: throttle this
