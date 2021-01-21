@@ -19,6 +19,13 @@ Vue.component('history-segment', {
         .map((entry) => entry[0]);
     },
   },
+  methods: {
+    prettyPointBreakdown(response, win = false) {
+      return `${response.words.length ? `(${response.words.length} words + 5)` : '5 points/vote'} × ${
+        response.votes.length
+      } votes${win ? ' + 5 for best writing' : ''}`;
+    },
+  },
   template: `
   <div style="background-color: #f5f5f5;" class="py-3 px-5 mb-1">
     <span class="is-size-5">{{ round.chooser }}&gt; {{ round.prompt }}</span>
@@ -30,9 +37,12 @@ Vue.component('history-segment', {
         <div>
           {{ player }}
           &mdash;
-          <span :title="round.responses[player].votes.join(', ')">
-            {{ round.responses[player].votes.length }} votes (+{{ scores[player] }} pts)
-          </span> 
+          <b-tooltip :label="round.responses[player].votes.join(', ')" position="is-bottom">
+            {{ round.responses[player].votes.length }} votes
+          </b-tooltip>
+          <b-tooltip :label="prettyPointBreakdown(round.responses[player], i==0)" position="is-bottom">
+            (+{{ scores[player] }} points)
+          </b-tooltip>
         </div>
       </b-carousel-item>
     </b-carousel>
