@@ -275,12 +275,64 @@
             </span>
 
             <!-- Categories -->
-            <span v-if="isMod" class="field is-grouped is-grouped-multiline mx-3 my-1">
-              <div class="control" v-for="category in this.CATEGORY_ORDER">
-                <label class="capitalize checkbox">
-                  <input type="checkbox" v-model="room.categories[category]" @change="saveRoom('categories')" />
-                  {{ category }}
-                </label>
+            <span v-if="isMod && showCategories" class="control mx-3 my-1">
+              <div class="mb-2 mr-2">Default Categories:</div>
+              <span class="field is-grouped is-grouped-multiline mx-3 my-1">
+                <div class="control" v-for="category in this.DEFAULT_CATEGORIES">
+                  <label class="capitalize checkbox">
+                    <input type="checkbox" v-model="room.categories[category]" />
+                    {{ category }}
+                  </label>
+                </div>
+              </span>
+              <div class="mb-2 mr-2">Themed Categories:</div>
+              <span class="field is-grouped is-grouped-multiline mx-3 my-1">
+                <div class="control" v-for="category in this.THEMED_CATEGORIES">
+                  <label class="capitalize checkbox">
+                    <input type="checkbox" v-model="room.categories[category]" />
+                    {{ category }}
+                  </label>
+                </div>
+              </span>
+              <div class="mb-2 mr-2">Custom Categories:</div>
+              <span class="field is-grouped is-grouped-multiline mx-3 my-1">
+                <div class="control">
+                  <label class="capitalize checkbox">
+                    <input type="checkbox" v-model="room.categories['custom']" />
+                    Custom
+                  </label>
+                </div>
+              </span>
+              <!-- Custom word editor (mod only) -->
+              <div v-if="isMod && room.categories['custom']" class="is-flex is-justify-content-center">
+                <div class="field mb-2" style="width: 500px; max-width: 90%">
+                  <div class="control">
+                    <textarea
+                      class="textarea is-small mb-2"
+                      :class="{'is-primary': wordsSaved}"
+                      placeholder='Input your own word list e.g. "sneezy, phylum, europe, sloth, guacamole, data, colossus"...'
+                      v-model="room.customWords"
+                      @input="wordsSaved = false"
+                    ></textarea>
+                    <div id="custom-word-tags" class="tags mb-1">
+                      <span class="tag is-info" v-for="word in customWordList.slice(0, 30)">{{ word }}</span>
+                    </div>
+                  </div>
+                  <div class="control">
+                    <button v-if="wordsSaved" class="button is-small" disabled>Saved</button>
+                    <button v-else class="button is-small" @click="wordsSaved = true; saveRoom('customWords');">
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <button class="button is-small" @click="showCategories = false; saveRoom('categories')">
+                Save Categories
+              </button>
+            </span>
+            <span v-else-if="isMod && !showCategories" class="field is-grouped is-grouped-multiline mx-3 my-1">
+              <div class="control">
+                <button class="button is-small" @click="showCategories = true;">Show Categories</button>
               </div>
             </span>
             <span class="mx-3" v-else>
@@ -290,29 +342,6 @@
                 >
               </template>
             </span>
-          </div>
-          <!-- Custom word editor (mod only) -->
-          <div v-if="isMod && room.categories['custom']" class="is-flex is-justify-content-center">
-            <div class="field mb-2" style="width: 500px; max-width: 90%">
-              <div class="control">
-                <textarea
-                  class="textarea is-small mb-2"
-                  :class="{'is-primary': wordsSaved}"
-                  placeholder='Input your own word list e.g. "sneezy, phylum, europe, sloth, guacamole, data, colossus"...'
-                  v-model="room.customWords"
-                  @input="wordsSaved = false"
-                ></textarea>
-                <div id="custom-word-tags" class="tags mb-1">
-                  <span class="tag is-info" v-for="word in customWordList.slice(0, 30)">{{ word }}</span>
-                </div>
-              </div>
-              <div class="control">
-                <button v-if="wordsSaved" class="button is-small" disabled>Saved</button>
-                <button v-else class="button is-small" @click="wordsSaved = true; saveRoom('customWords');">
-                  Save
-                </button>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -526,7 +555,17 @@
 <script type="module" src="components/link-footer.js"></script>
 <script type="module" src="components/chatbox.js"></script>
 <script type="module">
-  import { nouns, compounds, verbs, adjectives } from './many-words.js';
+  import {
+    nouns,
+    compounds,
+    verbs,
+    adjectives,
+    pokemonGen1,
+    lolChampions,
+    dotaHeroes,
+    ssbCharacters,
+    countries,
+  } from './many-words.js';
   import {
     setRoom,
     updateRoom,
@@ -574,10 +613,25 @@
       showPrivateModal: false,
       newMod: '',
       wordsSaved: false,
+      showCategories: false,
+      showCustom: false,
     },
     created() {
       // global constant
-      this.CATEGORY_ORDER = ['nouns', 'verbs', 'adjectives', 'compounds', 'custom'];
+      this.CATEGORY_ORDER = [
+        'nouns',
+        'verbs',
+        'adjectives',
+        'compounds',
+        'custom',
+        'pokemonGen1',
+        'lolChampions',
+        'dotaHeroes',
+        'ssbCharacters',
+        'countries',
+      ];
+      this.DEFAULT_CATEGORIES = ['nouns', 'verbs', 'adjectives', 'compounds'];
+      this.THEMED_CATEGORIES = ['pokemonGen1', 'lolChampions', 'dotaHeroes', 'ssbCharacters', 'countries'];
     },
     async mounted() {
       this.populateHome(); // Begin listing rooms, but don't wait for the result to mount
@@ -704,6 +758,11 @@
             adjectives: false,
             compounds: false,
             custom: false,
+            pokemonGen1: false,
+            lolChampions: false,
+            dotaHeroes: false,
+            ssbCharacters: false,
+            countries: false,
           },
           customWords: '',
           playerData: {
@@ -945,7 +1004,18 @@
   }
 
   function randomWord(category = 'nouns', customWordList = []) {
-    const categories = { nouns, compounds, verbs, adjectives, custom: customWordList };
+    const categories = {
+      nouns,
+      compounds,
+      verbs,
+      adjectives,
+      custom: customWordList,
+      pokemonGen1,
+      lolChampions,
+      dotaHeroes,
+      ssbCharacters,
+      countries,
+    };
     const words = categories[category];
     return words[Math.floor(Math.random() * words.length)].toLowerCase();
   }
