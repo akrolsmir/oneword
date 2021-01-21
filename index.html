@@ -389,14 +389,17 @@
                 <button
                   class="button"
                   @click="submitClue"
-                  :disabled="!room.players.includes(player.name)"
+                  :disabled="!room.players.includes(player.name) || dupes(player.clue, room.currentRound.word)"
                   :class="{'is-primary': room.currentRound.clues[player.name]}"
                 >
                   {{ room.currentRound.clues[player.name] ? 'Submitted' : 'Submit' }}
                 </button>
               </div>
             </div>
-            <div class="notification is-danger" role="alert" v-if="hasSpecialCharacters(player.clue)">
+            <div class="notification is-danger" role="alert" v-if="dupes(player.clue, room.currentRound.word)">
+              This clue is too similar to the word
+            </div>
+            <div class="notification is-danger" role="alert" v-else-if="hasSpecialCharacters(player.clue)">
               Are you sure this is a real word?
             </div>
           </div>
@@ -624,6 +627,7 @@
       md5,
       moment,
       listRooms,
+      dupes,
       dedupe,
       async populateHome() {
         this.privateRooms = (await listRooms(5, false)).filter((room) => room.players.length > 0);
@@ -749,6 +753,10 @@
       },
       async submitClue() {
         this.player.clue = this.player.clue.toLowerCase().trim();
+        if (dupes(this.player.clue, this.room.currentRound.word)) {
+          return;
+        }
+
         const update = {};
         update[`currentRound.clues.${this.player.name}`] = this.player.clue;
         await updateRoom(this.room, update);
