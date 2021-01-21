@@ -8,7 +8,7 @@ Vue.component('ScrollToBottom', {
     },
   },
   data: () => ({
-    atBottom: false,
+    atBottom: true,
   }),
   mounted() {
     // wait for childeren to finish rendering, then go to bottom
