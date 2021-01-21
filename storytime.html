@@ -91,9 +91,10 @@
     </div>
     <!-- Home page -->
     <div v-if="!room.players" class="container mx-4">
-      You and your friends find yourself in a text adventure, but you are all controlling the same person. On your turn,
-      choose what the character will do, then your friends will continue the story... But you get to choose your
-      friends' adventure!
+      You and your friends find yourself in a text adventure! Each turn, one of your friends will decide what their
+      character does, then you and your friends will continue the story. <br />
+      After that, you all vote for who wrote it the best - or in other words, you choose your friends' adventure!
+      <br />
       <form v-if="user.id || user.guest" @submit.prevent="enterRoom" method="POST">
         <label class="label">Player</label>
         <input class="input" type="text" v-model="player.name" placeholder="Ringo" />
@@ -287,7 +288,12 @@
               <template v-if="isChooser">
                 <div class="field has-addons">
                   <div class="control is-expanded">
-                    <input class="input is-large" @keyup.enter="submitPrompt" v-model="room.currentRound.prompt" />
+                    <input
+                      class="input is-large"
+                      @keyup.enter="submitPrompt"
+                      v-model="room.currentRound.prompt"
+                      :placeholder="randomWord('verbs') + ' ' + randomWord('nouns')"
+                    />
                   </div>
                   <div class="control">
                     <button class="button is-large" @click="submitPrompt">Submit</button>
@@ -492,11 +498,13 @@
       },
       prettyStatus() {
         if (this.room.currentRound.state == 'PROMPT') {
-          return this.isChooser ? 'What do?' : `${this.room.currentRound.chooser} is deciding what to do`;
+          return this.isChooser
+            ? 'What do you do now?'
+            : `${this.room.currentRound.chooser} is writing their next action`;
         } else if (this.room.currentRound.state == 'RESPONSE') {
-          return 'Write what happens next';
+          return 'Write the next paragraph of this story';
         } else if (this.room.currentRound.state == 'CHOOSING') {
-          return 'Fate is in your hands';
+          return 'Fate is in your hands.';
         }
       },
       prettySuggestions() {
