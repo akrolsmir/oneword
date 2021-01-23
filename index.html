@@ -3,10 +3,7 @@
 
 <head>
   <title>One Word</title>
-  <link
-    href="https://fonts.googleapis.com/css?family=Fjalla+One|Merienda+One|Righteous|Sriracha&display=swap"
-    rel="stylesheet"
-  />
+  <link href="https://fonts.googleapis.com/css?family=Merienda+One|Space+Mono&display=swap" rel="stylesheet" />
   <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
   <link rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css" />
@@ -20,8 +17,14 @@
       overflow: auto;
     }
 
+    @font-face {
+      font-family: 'Nimbus Sans';
+      src: url('assets/fonts/NimbusSanL-Reg.otf') format('opentype');
+    }
+
     .fancy {
-      font-family: 'Merienda One', cursive;
+      /* font-family: 'Merienda One', cursive; */
+      font-family: 'Nimbus Sans', sans-serif;
       margin-top: 16px;
       font-size: 24px;
     }
@@ -37,6 +40,7 @@
     }
 
     body {
+      font-family: 'Space Mono', monospace;
       margin: 48px auto;
       width: 600px;
       max-width: 95vw;
