@@ -24,6 +24,10 @@ if (!firebase.apps.length) {
   }
 }
 
+const functions = firebase.functions();
+export const helloWorld = functions.httpsCallable('helloWorld');
+export const customerPortal = functions.httpsCallable('customerPortal');
+
 const COLLECTION = window.COLLECTION || 'rooms';
 
 const db = firebase.firestore();

@@ -48,6 +48,11 @@
     <!-- <div v-for="enemies, role in WIN_CONDITIONS">{{ role }} -- {{ enemies }}</div> -->
     <!-- Main chat area -->
     <div>
+      <button class="button" @click="waitCustomerPortal">Customer Portal</button>
+      {{ portalUrl }}
+      <button class="button" @click="waitHelloWorld">Hello World</button>
+      {{ helloUrl }}<br /><br />
+
       Name:
       <input class="input" v-model="player.name" />
       <button class="button" @click="enterGame">Enter game</button>
@@ -107,6 +112,7 @@
 <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-analytics.js"></script>
 <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-functions.js"></script>
 
 <script type="module" src="components/chatbox.js"></script>
 
@@ -114,7 +120,7 @@
   window.COLLECTION = 'kingdom-royale';
 </script>
 <script type="module">
-  import { listenRoom, updateRoom, setRoom, getRoom } from './firebase-network.js';
+  import { listenRoom, updateRoom, setRoom, getRoom, helloWorld, customerPortal } from './firebase-network.js';
   /**
      Room: {
         name: apple,
@@ -159,7 +165,7 @@
           }
         }
         history: [{round1}, ...]
-     }
+      }
     */
   const WIN_CONDITIONS = {
     KING: ['PRINCE', 'REVOLUTIONARY'],
@@ -224,6 +230,8 @@ Victory conditions: Death of the King, the Prince, and the Double`,
       WIN_CONDITIONS,
       ROLES,
       FLAVOR,
+      portalUrl: 'p',
+      helloUrl: 'h',
       player: {
         name: 'Austin',
         chat: '',
@@ -242,6 +250,16 @@ Victory conditions: Death of the King, the Prince, and the Double`,
       }
     },
     methods: {
+      helloWorld,
+      customerPortal,
+      async waitHelloWorld() {
+        this.helloUrl = await helloWorld();
+      },
+      async waitCustomerPortal() {
+        this.portalUrl = await customerPortal({
+          returnUrl: 'http://oneword.games',
+        });
+      },
       async resetRoom() {
         this.room = {
           name: 'apple',
