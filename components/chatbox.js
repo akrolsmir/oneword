@@ -87,6 +87,9 @@ Vue.component('chatbox', {
         <button class="button" @click="submitLine"><span class="icon"> ➤ </span></button>
       </div>
     </div>
+    <div class="is-size-7">
+      <a href="https://discord.gg/AP7ssVPPCr">Or hop on our Discord for voice chat 🎤</a>
+    </div>
   </div>
 </div>
   `,
