@@ -37,7 +37,7 @@ Vue.component('navbar', {
   style="font-weight: 500">
   <div class="navbar-brand">
     <a class="navbar-item" href="./">
-      <span style="font-family: 'Merienda One', cursive; font-size: 24px; color:  #4a4a4a" >One Word</span>
+      <img src="./images/oneword-logo.png" width="80" style="max-height: none">
     </a>
     <a class="navbar-item" href="./incrypt.html" target="_blank" @click="referIncrypt">
       Play Incrypt
