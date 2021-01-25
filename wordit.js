@@ -21,6 +21,7 @@ const vueApp = new Vue({
       // bare bones room, to be overwritten from db if needed
       name:
         new URL(window.location.href).searchParams.get('room') || randomWord('adjectives') + '-' + randomWord('nouns'),
+      currentRound: {},
       history: [],
     },
     player: {
@@ -354,53 +355,6 @@ const vueApp = new Vue({
     },
     keysEqual,
     finished,
-    tallyPoints() {
-      // Tallypoints only counts rounds that have been pushed to history
-      const allRoundsInHistory = this.room.history;
-      const scoreBoard = {};
-      //initiate scoreBoard at 0 for every player
-      _.forEach(this.room.players, (player) => {
-        scoreBoard[player] = 0;
-      });
-      // Each player's client computes point totals for everyone independently
-      _.forEach(allRoundsInHistory, (round) => {
-        // If all players found the clueGiver's image, all except clueGiver gets 2pts automatically
-        if (_.every(_.values(round.votes), (guess) => guess === round.word)) {
-          _.forEach(scoreBoard, function (_score, player) {
-            if (player != round.clueGiver) {
-              scoreBoard[player] += 2;
-            }
-          });
-        }
-        // If some players found the clueGiver's image but not all, clueGiver gets 3 points
-        else if (_.includes(_.values(round.votes), round.word)) {
-          scoreBoard[round.clueGiver] += 3;
-          _.forEach(scoreBoard, function (_score, player) {
-            // And so does every guesser who guessed correctly
-            if (round.votes[player] == round.word) {
-              scoreBoard[player] += 3;
-            }
-            // Incorrect guesses awards 1 point to whoever threw the decoy that earned the guess
-            else {
-              // invert makes the mapping [word -> player]
-              scoreBoard[_.get(_.invert(round.allWords), round.votes[player])] += 1;
-            }
-          });
-        }
-        // nobody guessed the word
-        else {
-          // ClueGiver gets 0 points but all others get 2pts automatically
-          _.forEach(scoreBoard, function (_score, player) {
-            if (player != round.clueGiver) {
-              scoreBoard[player] += 2;
-              // also give a point to whoever threw the decoy earned this player's
-              scoreBoard[_.get(_.invert(round.allWords), round.votes[player])] += 1;
-            }
-          });
-        }
-      });
-      return scoreBoard;
-    },
     dropped,
     moment,
   },
