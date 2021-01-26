@@ -148,10 +148,6 @@ export function listenForLogin(vueApp) {
         };
         await db.collection('users').doc(fetchedUser.id).set(fetchedUser);
         await sendWelcomeEmail(fetchedUser);
-      } else {
-        // Just update the email and name provided by Firebase Auth.
-        fetchedUser.name = user.displayName;
-        fetchedUser.email = user.email;
       }
       vueApp.user = fetchedUser;
       if (!vueApp.player.name) {
