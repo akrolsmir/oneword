@@ -9,7 +9,7 @@
   />
   <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
   <link rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/buefy@0.9.3/dist/buefy.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     html {
@@ -343,8 +343,26 @@
               </template>
             </span>
           </div>
+          <!-- Actual Categories -->
+          <b-field label="Word List">
+            <b-autocomplete
+              v-model="filterInput"
+              :data="filteredWordLists"
+              field="name"
+              open-on-focus
+              keep-first
+              expanded
+              confirm-keys="['Enter', 'Space']"
+              @select="selectWordList"
+            >
+              <template #footer>
+                <a>Use custom word list</a>
+              </template>
+            </b-autocomplete>
+          </b-field>
+          <!-- <b-tag >
+          </b-tag> -->
         </div>
-
         <div class="message-body" style="border-width: 0">
           <!-- Players -->
           <div class="field is-grouped is-grouped-multiline">
@@ -535,6 +553,7 @@
   </div>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/vue@2.6.2/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/buefy@0.9.3/dist/buefy.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert@2.1.2/dist/sweetalert.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/blueimp-md5@2.13.0/js/md5.min.js"></script>
@@ -615,6 +634,7 @@
       wordsSaved: false,
       showCategories: false,
       showCustom: false,
+      filterInput: '',
     },
     created() {
       // global constant
@@ -682,6 +702,23 @@
           }
         }
         return filtered;
+      },
+      // all available wordslists
+      wordLists() {
+        return [
+          { name: 'Nouns', words: nouns, category: 'default' },
+          { name: 'Verbs', words: verbs },
+          { name: 'Adjectives', words: adjectives },
+          { name: 'Compound Words', words: compounds },
+          { name: 'Pokemon Gen 1', words: pokemonGen1 },
+          { name: 'League of Legends Champions', words: lolChampions },
+          { name: 'Dota Heroes', words: dotaHeroes },
+          { name: 'Super Smash Bros fighters', words: ssbCharacters },
+          { name: 'Countries', words: countries },
+        ];
+      },
+      filteredWordLists() {
+        return this.wordLists.filter((l) => l.name.toLowerCase().includes(this.filterInput.toLowerCase()));
       },
       customWordList() {
         // If there are any commas, parse as csv; else, parse with whitespace
@@ -752,18 +789,7 @@
           roundsInGame: 13,
           lastUpdateTime: Date.now(),
           timers: { CLUEING: '', GUESSING: '', DONE: '', running: false },
-          categories: {
-            nouns: true,
-            verbs: false,
-            adjectives: false,
-            compounds: false,
-            custom: false,
-            pokemonGen1: false,
-            lolChampions: false,
-            dotaHeroes: false,
-            ssbCharacters: false,
-            countries: false,
-          },
+          categories: ['nouns'],
           customWords: '',
           playerData: {
             [this.player.name]: {
@@ -888,6 +914,11 @@
         this.room.timers.running = !this.room.timers.running;
         await this.saveRoom('timers');
       },
+      async selectWordList() {
+        this.room.categories.push(this.selectedWordList.name);
+        //clear multiselect
+        this.filterInput = '';
+      },
       // Sync any number of properties of this.room to firebase
       async saveRoom(...props) {
         await updateRoom(this.room, Object.fromEntries(props.map((prop) => [prop, this.room[prop]])));
@@ -1004,19 +1035,7 @@
   }
 
   function randomWord(category = 'nouns', customWordList = []) {
-    const categories = {
-      nouns,
-      compounds,
-      verbs,
-      adjectives,
-      custom: customWordList,
-      pokemonGen1,
-      lolChampions,
-      dotaHeroes,
-      ssbCharacters,
-      countries,
-    };
-    const words = categories[category];
+    const words = this.wordLists.find(list => list.name = category)?.words
     return words[Math.floor(Math.random() * words.length)].toLowerCase();
   }
 
@@ -1035,8 +1054,7 @@
   }
 
   function nextCategory(categories) {
-    const enabled = Object.keys(categories).filter((c) => categories[c]);
-    return enabled[Math.floor(Math.random() * enabled.length)];
+    return categories[Math.floor(Math.random() * categories.length)];
   }
 
   function capitalize(str) {
