@@ -736,8 +736,7 @@
       replaceSuggestions(response) {
         for (let category of ['verbs', 'nouns', 'adjectives']) {
           this.suggestions[category].forEach((word, i) => {
-            if (response.includes(word)) {
-              //this.suggestions[category][i] = randomWord(category);
+            if (response.toLowerCase().includes(word)) {
               this.$set(this.suggestions[category], i, randomWord(category));
             }
           });
