@@ -366,7 +366,7 @@
             </template>
             <!-- Score -->
             <h2 class="fancy">Scores</h2>
-            <div v-for="player in room.players">{{ player }}: {{ room.playerData[player]?.score }}</div>
+            <div v-for="player in room.players">{{ player }}: {{ scores[player] }}</div>
           </div>
         </div>
       </template>
@@ -523,6 +523,16 @@
       voted() {
         return Object.values(this.room.currentRound.responses).flatMap((r) => r.votes);
       },
+      scores() {
+        const scores = Object.fromEntries(this.room.players.map((player) => [player, 0]));
+        for (let round of this.room.history) {
+          const roundScores = this.score(round);
+          for (let player in roundScores) {
+            scores[player] += roundScores[player];
+          }
+        }
+        return scores;
+      },
     },
     methods: {
       md5,
@@ -577,7 +587,6 @@
           customWords: '',
           playerData: {
             [this.player.name]: {
-              score: 0,
               email: this.user.email || '',
               supporter: this.user.supporter || '',
             },
@@ -595,7 +604,7 @@
         }
 
         const { email = '', supporter = '' } = this.user;
-        this.room.playerData[this.player.name] = { email, supporter, score: 0 };
+        this.room.playerData[this.player.name] = { email, supporter };
 
         if (this.room.players.includes(this.player.name)) {
           await this.saveRoom('playerData');
@@ -682,11 +691,6 @@
           const winners = Object.entries(this.room.currentRound.responses)
             .filter((entry) => entry[1].votes.length === this.maxVotes(this.room.currentRound))
             .map((entry) => entry[0]);
-          // update scores
-          const newScores = this.score(this.room.currentRound);
-          for (const player in newScores) {
-            this.room.playerData[player].score += newScores[player];
-          }
           return await this.newRound();
         }
       },
