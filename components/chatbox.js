@@ -84,7 +84,7 @@ Vue.component('chatbox', {
         <input class="input" v-model="inputText" @keyup.enter="submitLine" placeholder="Please be nice~" />
       </div>
       <div class="control">
-        <button class="button" @click="submitLine"><span class="icon"> ➤ </span></button>
+        <button class="button" @click="submitLine" aria-label="send"><span class="icon"> ➤ </span></button>
       </div>
     </div>
     <div class="is-size-7">

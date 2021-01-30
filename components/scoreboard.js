@@ -32,10 +32,7 @@ Vue.component('scoreboard', {
       this.$emit('continue-game');
     },
     referPremium() {
-      firebase.analytics().logEvent('view_promotion', {
-        source: 'game_end',
-      });
-      window.open('./supporter.html', '_blank');
+      firebase.analytics().logEvent('view_promotion', { source: 'game_end' });
     },
   },
   mounted() {
@@ -57,10 +54,10 @@ Vue.component('scoreboard', {
       If you enjoyed One Word, consider becoming a supporter!<br>
       You can earn nice perks like private rooms, while helping cover our server costs.<br>
       <br>
-      <a @click="referPremium" class="button is-link">Become a supporter!</a><br>
+      <a href="./supporter.html" target="_blank" @click="referPremium" class="button is-link">Become a supporter!</a><br>
       <br>
     </template>
-    <a @click="continuePlaying()">(Not done playing? Alright, click here to continue.)</a>
+    <a href="#" @click.prevent="continuePlaying">(Not done playing? Alright, click here to continue.)</a>
   </div>
 `,
 });
