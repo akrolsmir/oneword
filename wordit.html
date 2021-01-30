@@ -91,15 +91,11 @@
         </div>
       </div>
     </div>
-    <!-- Column-based layout for leadership board, Main UI, and Chat box -->
+    <!-- Column-based layout for leader board, Main UI, and Chat box -->
     <div class="columns is-centered">
-      <!-- Left pane is for leadership board. Only shown in-game and when width > 1216px -->
+      <!-- Left pane is for leader board. Only shown in-game and when width > 1216px -->
       <div class="column">
-        <leadershipboard
-          :state="room.currentRound.state"
-          :history="room.history"
-          :players="room.players"
-        ></leadershipboard>
+        <leaderboard :state="room.currentRound.state" :history="room.history" :players="room.players"></leaderboard>
       </div>
       <!-- Center (main) pane. TODO: Remove the below to get prettier formatting again -->
       <!-- prettier-ignore -->
@@ -372,8 +368,13 @@
               <!-- Not current player's turn -->
               <div v-else>
                 <h2 class="fancy" role="alert">
-                  Waiting for {{ room.currentRound.clueGiver }} to pick a word and a clue...
+                  Waiting for {{ room.currentRound.clueGiver }} to pick a word combination and a clue...
                 </h2>
+                <br/>
+                <div>
+                  {{ room.currentRound.clueGiver }}'s clue should relate to the word combination in some way. <br/> <br/> Your job in the next section will be to try to come up with another word combination (a decoy) that also matches the clue.
+                  <br/><br/>The goal is to trick other players to pick YOUR word combo (and not {{ room.currentRound.clueGiver }}'s actual word) based on {{ room.currentRound.clueGiver }}'s own clue. :)
+                </div>
               </div>
             </div>
           </div>
@@ -533,7 +534,7 @@
 <script type="module" src="components/scoreboard.js"></script>
 <script type="module" src="components/sharelink.js"></script>
 <script type="module" src="components/wordit/navbarshawn.js"></script>
-<script type="module" src="components/wordit/leadershipboard.js"></script>
+<script type="module" src="components/wordit/leaderboard.js"></script>
 <script type="module" src="wordit.js"></script>
 
 <script>
