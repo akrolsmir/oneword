@@ -27,9 +27,17 @@ const vueApp = new Vue({
     },
     player: {
       name: new URL(window.location.href).searchParams.get('player') || '',
-      wordlist: [],
+      choicesPerDecoyCategory: 7,
       // currentRoom is not used at the moment
       currentRoom: new URL(window.location.href).searchParams.get('room'),
+      // wordlist for as future clue giver
+      wordList: [],
+      // decoy adj & list
+      decoyAdj: '',
+      decoyAdjList: [],
+      // decoy noun & list
+      decoyNoun: '',
+      decoyNounList: [],
     },
     alertIsShowing: false,
     newMod: '',
@@ -43,8 +51,13 @@ const vueApp = new Vue({
   },
   watch: {
     // Timer currently not yet implemented for wordit
-    async 'room.currentRound.state'(state) {
+    'room.currentRound.state'(state) {
+      console.log('state change: ' + state);
       this.$emit('reset-timer');
+      if (state === 'TOSS_IN_DECOYS') {
+        this.player.decoyAdjList = this.generateDecoyWordList('adjectives');
+        this.player.decoyNounList = this.generateDecoyWordList('nouns');
+      }
     },
   },
   methods: {
@@ -80,6 +93,7 @@ const vueApp = new Vue({
       } else {
         // Create a new room
         listenRoom(this);
+        this.generatePlayerWordList();
         return await this.resetRoom();
       }
     },
@@ -148,26 +162,26 @@ const vueApp = new Vue({
       if (this.room.currentRound.clue === '') {
         return alert('Write a clue for your phrase!');
       }
-      const indexToRemove = this.player.wordlist.indexOf(this.room.currentRound.word);
+      const indexToRemove = this.player.wordList.indexOf(this.room.currentRound.word);
       if (indexToRemove > -1) {
-        this.player.wordlist.splice(indexToRemove, 1);
-        this.player.wordlist.push(randomWord('adjectives') + '-' + randomWord('nouns'));
+        this.player.wordList.splice(indexToRemove, 1);
+        this.player.wordList.push(randomWord('adjectives') + '-' + randomWord('nouns'));
       }
       this.room.currentRound.state = 'TOSS_IN_DECOYS';
       // room.currentRound.clue should already be updated due to bi-di binding
       await setRoom(this.room);
     },
-    async submitDecoy(decoy) {
-      this.saveWordToAllWordsInRoom(decoy);
+    async submitDecoy() {
+      if (!this.player.decoyAdj) {
+        return alert('Pick the adjective for your decoy phrase!');
+      }
+      if (!this.player.decoyNoun) {
+        return alert('Pick the noun for your decoy phrase!');
+      }
+      this.saveWordToAllWordsInRoom(this.player.decoyAdj + '-' + this.player.decoyNoun);
     },
     // vote is the word the guesser picked
     async submitVote(vote) {
-      // Remove player's own decoy from their wordlist when they submit vote.
-      const indexToRemove = this.player.wordlist.indexOf(this.room.currentRound.allWords[this.player.name]);
-      if (indexToRemove > -1) {
-        this.player.wordlist.splice(indexToRemove, 1);
-        this.player.wordlist.push(randomWord('adjectives') + '-' + randomWord('nouns'));
-      }
       const update = {};
       update[`currentRound.votes.${this.player.name}`] = vote;
       await updateRoom(this.room, update);
@@ -205,19 +219,25 @@ const vueApp = new Vue({
         this.room.players.push(this.player.name);
         await this.saveRoom('playerData', 'players');
       }
-      // generate playerWordlist so wordlist keeps some state after page refresh.
-      this.generatePlayerWordlist();
+      // generate playerWordList so wordList keeps some state after page refresh.
+      this.generatePlayerWordList();
     },
-    generatePlayerWordlist() {
+    generatePlayerWordList() {
       const allWordsThisRound = this.room.currentRound.allWords;
-      console.log(allWordsThisRound);
       // If the user refreshed their page, we preserve the word they had
       if (allWordsThisRound && allWordsThisRound[this.player.name]) {
-        this.player.wordlist.push(allWordsThisRound[this.player.name]);
+        this.player.wordList.push(allWordsThisRound[this.player.name]);
       }
-      while (this.player.wordlist.length < this.numItemsPerPlayer) {
-        this.player.wordlist.push(randomWord('adjectives') + '-' + randomWord('nouns'));
+      while (this.player.wordList.length < this.numItemsPerPlayer) {
+        this.player.wordList.push(randomWord('adjectives') + '-' + randomWord('nouns'));
       }
+    },
+    generateDecoyWordList(type) {
+      const wordList = [];
+      while (wordList.length < this.player.choicesPerDecoyCategory) {
+        wordList.push(randomWord(type));
+      }
+      return wordList;
     },
     goHome() {
       unlistenRoom();

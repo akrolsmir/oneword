@@ -336,7 +336,7 @@
                     <button
                       class="button is-rounded"
                       @click="cluerSelectsWord(word)"
-                      v-for="(word, i) in player.wordlist"
+                      v-for="(word, i) in player.wordList"
                       :class="{ 'is-info': room.currentRound.word == word }"
                     >
                       {{ word }}
@@ -393,20 +393,48 @@
             <div class="box">
               <div v-if="room.currentRound.clueGiver != player.name">
                 <h2 class="fancy has-text-centered" role="alert">
-                  Pick a decoy phrase best matching <strong>{{ room.currentRound.clueGiver }}</strong>'s clue:
+                  Construct a decoy phrase best matching <strong>{{ room.currentRound.clueGiver }}</strong>'s clue by picking one option from each word category.
                   <br /><br />
-                  <button
-                    class="button is-rounded"
-                    @click="submitDecoy(word)"
-                    v-for="(word, i) in player.wordlist"
-                    :class="{ 'is-success': room.currentRound.allWords[player.name] == word }"
-                  >
-                    {{ word }}
-                  </button>
                 </h2>
-                <br />
-                <h2 class="fancy has-text-centered" role="alert">Your clue from {{ room.currentRound.clueGiver }} is:</h2>
-                <div class="fancy has-text-centered newline">{{ room.currentRound.clue }}</div>
+                <div class="columns">
+                  <!-- Left pane is for leader board. Only shown in-game and when width > 1216px -->
+                  <div class="column has-text-centered">
+                    <strong> Adjectives </strong> 
+                    <br/><br/>
+                    <button
+                      class="button is-rounded"
+                      @click="player.decoyAdj = word"
+                      v-for="(word, i) in player.decoyAdjList"
+                      :class="{ 'is-success': player.decoyAdj === word }"
+                    >
+                      {{ word }}
+                    </button>
+                  </div>
+                  <!-- Center (main) pane. TODO: Remove the below to get prettier formatting again -->
+                  <!-- prettier-ignore -->
+                  <div class="column has-text-centered">
+                    <strong> Nouns </strong> 
+                    <br/><br/>
+                    <button
+                      class="button is-rounded"
+                      @click="player.decoyNoun = word"
+                      v-for="(word, i) in player.decoyNounList"
+                      :class="{ 'is-success': player.decoyNoun === word }"
+                    >
+                      {{ word }}
+                    </button>
+                  </div>
+                </div>
+                <div class="has-text-centered">                
+                  Your decoy phrase:
+                  <label class="label" for="guess-input">
+                    <span v-if="player.decoyAdj || player.decoyNoun">
+                      "{{ player.decoyAdj }}-{{ player.decoyNoun }}"
+                    </span>
+                  </label>
+                  <button class="button" @click="submitDecoy">Submit</button>
+                </div>
+                <h2 class="fancy has-text-centered" role="alert">Your clue from {{ room.currentRound.clueGiver }} is: <strong>{{ room.currentRound.clue }}</strong> </h2>
               </div>
               <div v-else>
                 <h2 class="fancy" role="alert">Waiting for other players to toss in decoys based on your clue...</h2>
@@ -458,12 +486,6 @@
                 </h2>
                 <h2 class="fancy has-text-centered">Your clue from {{ room.currentRound.clueGiver }}:</h2>
                 <div class="fancy has-text-centered newline">{{ room.currentRound.clue }}</div>
-                <!-- <label class="label" for="guess-input">Your Guess</label>
-                <div class="field has-addons">
-                  <div class="control">
-                    <button class="button" @click="submitDecoy">Submit</button>
-                  </div>
-                </div> -->
               </div>
             </div>
           </div>
