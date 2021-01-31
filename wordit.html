@@ -472,20 +472,17 @@
           <div v-if="room.currentRound.state == 'DONE'">
             <div class="box">
               <h2 class="fancy has-text-centered" role="alert">
-              The word from "{{ room.currentRound.clueGiver }}" was "{{ room.currentRound.word }}"!
+              The phrase from <strong>{{ room.currentRound.clueGiver }}</strong> was "{{ room.currentRound.word }}"!
               </h2>
               <br />
-              <!-- <scoreboard
-                v-if="isEnd(room)"
-                :score="score(room)"
-                :rounds-in-game="room.roundsInGame"
-                :name="user.name && user.name.split(' ')[0]"
-                :supporter="!!user.supporter"
-                @continue-game="newRound(false)"
-              ></scoreboard>
-              -->
             </div>
             <button class="button" @click="newRound(false)">Next Round</button>
+            <br /><br />
+            <div class="box">
+              <div v-for="(vote, player) in room.currentRound.votes">
+                <strong> {{ player }} </strong> guessed "{{ vote }}"!
+              </div>
+            </div>
           </div>
           <br /><br />
           <!-- History TO ADD LATER -->
