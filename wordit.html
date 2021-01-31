@@ -276,13 +276,13 @@
               <!-- Players -->
               <div class="field is-grouped is-grouped-multiline">
                 <span class="mb-2 mr-2">Players:</span>
-                <!-- TODO: refactor submitted/guessing into functions -->
+                <!-- TODO: refactor submitted/guessing into functions. This is currently a hack -->
                 <nametag
                   v-for="(player, i) in room.players"
                   :name="player"
                   :user="room.playerData && room.playerData[player]"
                   :index="i"
-                  :submitted="_.keys(room.currentRound.allWords).includes(player) && player != room.currentRound.clueGiver"
+                  :submitted="(_.keys(room.currentRound.allWords).includes(player) && player != room.currentRound.clueGiver) || (player == room.currentRound.clueGiver && !_.keys(room.currentRound.allWords).includes(player))"
                   :guessing="_.keys(room.currentRound.votes).includes(player) || (player == room.currentRound.clueGiver && _.keys(room.currentRound.allWords).includes(player))"
                   :mod="isMod"
                   @kick="kickPlayer(player)"
@@ -476,7 +476,7 @@
               </h2>
               <br />
             </div>
-            <button class="button" @click="newRound(false)">Next Round</button>
+            <button class="button" @click="newRound(false)">Next</button>
             <br /><br />
             <div class="box">
               <div v-for="(vote, player) in room.currentRound.votes">

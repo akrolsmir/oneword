@@ -155,7 +155,7 @@ const vueApp = new Vue({
       }
       this.room.currentRound.state = 'TOSS_IN_DECOYS';
       // room.currentRound.clue should already be updated due to bi-di binding
-      await updateRoom(this.room, { 'currentRound.state': 'TOSS_IN_DECOYS' });
+      await setRoom(this.room);
     },
     async submitDecoy(decoy) {
       this.saveWordToAllWordsInRoom(decoy);
