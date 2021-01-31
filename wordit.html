@@ -109,7 +109,7 @@
           <!-- <div v-if="player.name">Hi {{ player.name }}!</div> -->
           <div class="fancy big">Welcome to Word It!</div>
           This is an online game inspired by
-          <a target="_blank" rel="noopener noreferrer" href="https://amazon.com/dp/2914849656">Dixit</a>, a picture-based
+          <strong><a target="_blank" rel="noopener noreferrer" href="https://amazon.com/dp/2914849656">Dixit</a></strong>, a picture-based
           board game but modified so you can play a version with just words. <br />
           Pick a theme, trick your friends, find the word! <br />
           But beware: If your clue is either too obvious or too off the wall, your friends will get ahead!<br />
@@ -122,7 +122,7 @@
           </form>
           <template v-else-if="player.currentRoom">
             <h2 class="fancy">
-              <a @click="$refs.navbar.logIn()">Sign In</a> to join Room: <span>{{ player.currentRoom }} </span>
+              <a @click="$refs.navbar.logIn()">Sign In</a> to join Room: <span><strong>{{ player.currentRoom }}</strong></span>
             </h2>
             <a @click='$set(user, "guest", true)' class="is-size-10">Or play without an account</a>
           </template>
@@ -331,7 +331,7 @@
               <div v-if="room.currentRound.clueGiver == player.name">
                 <div class="box">
                   <h2 class="fancy has-text-centered" role="alert">
-                    Pick one among the following, and write a phrase that describes it in the clue box!
+                    Pick a phrase among the following, and write a clue that describes it in the clue box!
                     <br /><br />
                     <button
                       class="button is-rounded"
@@ -368,12 +368,18 @@
               <!-- Not current player's turn -->
               <div v-else>
                 <h2 class="fancy" role="alert">
-                  Waiting for {{ room.currentRound.clueGiver }} to pick a word combination and a clue...
+                  Waiting for <strong>{{ room.currentRound.clueGiver }}</strong> to pick a phrase and a clue...
                 </h2>
                 <br/>
                 <div>
-                  {{ room.currentRound.clueGiver }}'s clue should relate to the word combination in some way. <br/> <br/> Your job in the next section will be to try to come up with another word combination (a decoy) that also matches the clue.
-                  <br/><br/>The goal is to trick other players to pick YOUR word combo (and not {{ room.currentRound.clueGiver }}'s actual word) based on {{ room.currentRound.clueGiver }}'s own clue. :)
+                  1) <strong>{{ room.currentRound.clueGiver }}</strong> picks a random phrase, and writes a clue
+                  <br/> 2) Other players each throw in a decoy phrases best matching the clue
+                  <br/> 3) All players (except <strong>{{ room.currentRound.clueGiver }}</strong>) try to guess the real phrase amongst the decoys
+                  <br/><br/>You earn points if you can: 
+                  <br/><br/>* Correctly guess <strong>{{ room.currentRound.clueGiver }}</strong>'s phrase among other players' decoys
+                  <br/>* Trick other players into picking your decoy. The more players you trick, the more points you earn.
+                  <br/><br/>You also earn points if everyone guesses correctly, or if noone does!
+                  <br/>
                 </div>
               </div>
             </div>
@@ -385,7 +391,7 @@
             <div class="box">
               <div v-if="room.currentRound.clueGiver != player.name">
                 <h2 class="fancy has-text-centered" role="alert">
-                  Pick one decoy among the following, based on the clue giver's clue
+                  Create a decoy phrase best matching <strong>{{ room.currentRound.clueGiver }}</strong>'s clue:
                   <br /><br />
                   <button
                     class="button is-rounded"

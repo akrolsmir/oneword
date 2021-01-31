@@ -11,13 +11,13 @@ Vue.component('leaderboard', {
     tallyPoints: function () {
       // Tallypoints only counts rounds that have been pushed to history
       const leaderBoard = {};
-      //initiate leaderBoard at 0 for every player
+      //initiate leaderBoard at 0 for every current player
       _.forEach(this.players, (player) => {
         leaderBoard[player] = 0;
       });
       // Each player's client computes point totals for everyone independently
       _.forEach(this.history, (round) => {
-        // If all players found the clueGiver's image
+        // If all players found the clueGiver's phrase
         if (_.every(_.values(round.votes), (guess) => guess === round.word)) {
           // all players from that round who are still in the room
           _.forEach(leaderBoard, function (_score, player) {
@@ -85,7 +85,6 @@ Vue.component('leaderboard', {
         result[topPlayer] = topScore;
         delete leaderBoard[topPlayer];
       }
-      console.log(result);
       return result;
     },
   },
