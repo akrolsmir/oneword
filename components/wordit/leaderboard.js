@@ -70,14 +70,14 @@ Vue.component('leaderboard', {
           });
         }
       });
-      //sort the leaderBoard highest score first; inefficient sort since index not numeric.
+      // sort the leaderBoard highest score first; inefficient sort since index not numeric.
       const result = {};
       for (var i = 0; i < this.players.length; i++) {
         // Find the top scorer and delete from leaderBoard
         var topPlayer;
-        var topScore;
+        var topScore = 0;
         _.forEach(leaderBoard, function (score, player) {
-          if (!topScore || score >= topScore) {
+          if (score >= topScore) {
             topScore = score;
             topPlayer = player;
           }

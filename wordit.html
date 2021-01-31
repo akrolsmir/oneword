@@ -148,7 +148,7 @@
             <!-- Room header -->
             <div class="message-header has-text-weight-normal is-flex-wrap-wrap">
               <h1 class="fancy big">{{ room.name }}</h1>
-              <span class="fancy capitalize">Round {{ room.history.length + 1 }}</span>
+              <span class="fancy capitalize">Round {{ Math.floor(((room.history.length) / room.players.length)) + 1 }}</span>
               <!-- Navigation -->
               <span class="buttons are-small">
                 <button class="button is-dark is-inverted is-outlined" @click="alertIsShowing=true">Invite</button>
@@ -371,15 +371,17 @@
                   Waiting for <strong>{{ room.currentRound.clueGiver }}</strong> to pick a phrase and a clue...
                 </h2>
                 <br/>
+                <strong> How the game works: </strong> 
+                <br/><br/>
                 <div>
-                  1) <strong>{{ room.currentRound.clueGiver }}</strong> picks a random phrase, and writes a clue
-                  <br/> 2) Other players each throw in a decoy phrases best matching the clue
-                  <br/> 3) All players (except <strong>{{ room.currentRound.clueGiver }}</strong>) try to guess the real phrase amongst the decoys
-                  <br/><br/>You earn points if you can: 
-                  <br/><br/>* Correctly guess <strong>{{ room.currentRound.clueGiver }}</strong>'s phrase among other players' decoys
-                  <br/>* Trick other players into picking your decoy. The more players you trick, the more points you earn.
-                  <br/><br/>You also earn points if everyone guesses correctly, or if noone does!
-                  <br/>
+                  1) <strong>{{ room.currentRound.clueGiver }}</strong> picks a random phrase, and writes a clue related to the phrase
+                  <br/> 2) Every other player writes a decoy phrase they think also matches the clue
+                  <br/> 3) Every other player tries to guess <strong>{{ room.currentRound.clueGiver }}</strong>'s real phrase among the decoys
+                  <br/><br/>You earn points if: 
+                  <br/><br/>* You correctly guess <strong>{{ room.currentRound.clueGiver }}</strong>'s phrase among other players' decoys
+                  <br/>* Other players pick your decoy-- the more players you trick, the more points
+                  <br/>* Bonus points if no one correctly guessed <strong>{{ room.currentRound.clueGiver }}</strong>'s phrase (their clue was too generic, or the decoy(s) were all too good!)
+                  <br/><br/>Players take turns as the clue giver in order. The game ends after every player has been clue giver 5 times, and the player with most points wins!
                 </div>
               </div>
             </div>
@@ -391,7 +393,7 @@
             <div class="box">
               <div v-if="room.currentRound.clueGiver != player.name">
                 <h2 class="fancy has-text-centered" role="alert">
-                  Create a decoy phrase best matching <strong>{{ room.currentRound.clueGiver }}</strong>'s clue:
+                  Pick a decoy phrase best matching <strong>{{ room.currentRound.clueGiver }}</strong>'s clue:
                   <br /><br />
                   <button
                     class="button is-rounded"
@@ -408,6 +410,8 @@
               </div>
               <div v-else>
                 <h2 class="fancy" role="alert">Waiting for other players to toss in decoys based on your clue...</h2>
+                <br/>
+                <div class="has-text-centered"> <strong>{{ room.currentRound.clue }}</strong> </div>
                 <h2 class="fancy has-text-centered" role="alert">
                   <span
                     class="tag is-rounded is-primary is-light"

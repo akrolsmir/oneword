@@ -10,15 +10,16 @@ import {
   listenForLogin,
 } from './firebase-network.js';
 
-const NO_VOTE = '?';
-
 const vueApp = new Vue({
   el: '#vue',
   data: {
-    user: {}, //stores authentication metadata (whether user is signed in or guest)
-    numItemsPerPlayer: 7, // customizable
+    //stores authentication metadata (whether user is signed in or guest)
+    user: {},
+    // customizable
+    numItemsPerPlayer: 7,
+    // bare bones room, to be overwritten from db if needed
     room: {
-      // bare bones room, to be overwritten from db if needed
+      // get name from search params, or create a new one.
       name:
         new URL(window.location.href).searchParams.get('room') || randomWord('adjectives') + '-' + randomWord('nouns'),
       currentRound: {},
@@ -27,41 +28,25 @@ const vueApp = new Vue({
     player: {
       name: new URL(window.location.href).searchParams.get('player') || '',
       wordlist: [],
+      // currentRoom is not used at the moment
       currentRoom: new URL(window.location.href).searchParams.get('room'),
     },
     alertIsShowing: false,
     newMod: '',
     wordsSaved: false,
   },
-  created() {
-    this.generatePlayerWordlist();
-  },
-  // Should this code be in mounted?
+  // created() {
+  // },
   mounted() {
+    // currently not used since public rooms are currently not shown
     //this.allRooms = (await listRooms()).filter((room) => room.players.length > 0);
-    // const parsedUrl = new URL(window.location.href);
-    // const roomName = parsedUrl.searchParams.get('room');
-    // const playerName = parsedUrl.searchParams.get('player');
-    // if (playerName) {
-    //   this.player.name = playerName;
-    // }
-    // if (roomName) {
-    //   this.room.name = roomName;
-    //   this.player.currentRoom = roomName;
-    // }
   },
   watch: {
+    // Timer currently not yet implemented for wordit
     async 'room.currentRound.state'(state) {
       this.$emit('reset-timer');
     },
   },
-  // computed: {
-  //   // player's local view of overall score tally
-  //   playerScoreboard: function () {
-  //     // `this` points to the vm instance
-  //     return this.message.split('').reverse().join('');
-  //   },
-  // },
   methods: {
     // Somewhat copied from One Word's index.html. TODO: Dedupe?
     async enterRoom() {
@@ -69,7 +54,6 @@ const vueApp = new Vue({
         this.$refs.navbar.logIn();
         return;
       }
-
       // Sanitize room name
       this.room.name = this.room.name
         .trim()
@@ -166,6 +150,12 @@ const vueApp = new Vue({
       await this.saveWordToAllWordsInRoom(w);
     },
     generatePlayerWordlist() {
+      const allWordsThisRound = this.room.currentRound.allWords;
+      console.log(allWordsThisRound);
+      // If the user refreshed their page, we preserve the word they had
+      if (allWordsThisRound && allWordsThisRound[this.player.name]) {
+        this.player.wordlist.push(allWordsThisRound[this.player.name]);
+      }
       while (this.player.wordlist.length < this.numItemsPerPlayer) {
         this.player.wordlist.push(randomWord('adjectives') + '-' + randomWord('nouns'));
       }
@@ -240,6 +230,9 @@ const vueApp = new Vue({
         this.room.players.push(this.player.name);
         await this.saveRoom('playerData', 'players');
       }
+
+      // generate playerWordlist so wordlist keeps some state after page refresh.
+      this.generatePlayerWordlist();
     },
     goHome() {
       unlistenRoom();
