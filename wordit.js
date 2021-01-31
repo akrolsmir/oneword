@@ -178,6 +178,12 @@ const vueApp = new Vue({
       await setRoom(this.room);
     },
     async submitClue() {
+      if (_.keys(this.room.currentRound.allWords).length === 0) {
+        return alert('Pick a phrase for your clue!');
+      }
+      if (this.room.currentRound.clue === '') {
+        return alert('Write a clue for your phrase!');
+      }
       //-- move block below to nextStage()
       const indexToRemove = this.player.wordlist.indexOf(this.room.currentRound.word);
       if (indexToRemove > -1) {
