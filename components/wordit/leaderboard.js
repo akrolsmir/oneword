@@ -12,11 +12,11 @@ Vue.component('leaderboard', {
       // Tallypoints only counts rounds that have been pushed to history
       const leaderBoard = {};
       //initiate leaderBoard at 0 for every current player
-      _.forEach(this.players, (player) => {
+      this.players.forEach((player) => {
         leaderBoard[player] = 0;
       });
       // Each player's client computes point totals for everyone independently
-      _.forEach(this.history, (round) => {
+      this.history.forEach((round) => {
         // If all players found the clueGiver's phrase
         if (_.every(_.values(round.votes), (guess) => guess === round.word)) {
           // all players from that round who are still in the room
@@ -70,22 +70,8 @@ Vue.component('leaderboard', {
           });
         }
       });
-      // sort the leaderBoard highest score first; inefficient sort since index not numeric.
-      const result = {};
-      for (var i = 0; i < this.players.length; i++) {
-        // Find the top scorer and delete from leaderBoard
-        var topPlayer;
-        var topScore = 0;
-        _.forEach(leaderBoard, function (score, player) {
-          if (score >= topScore) {
-            topScore = score;
-            topPlayer = player;
-          }
-        });
-        result[topPlayer] = topScore;
-        delete leaderBoard[topPlayer];
-      }
-      return result;
+      // sort the leaderBoard highest score first
+      return Object.entries(leaderBoard).sort(([_p1, s1], [_p2, s2]) => s2 - s1);
     },
   },
   mounted() {},
@@ -95,8 +81,10 @@ Vue.component('leaderboard', {
       <h1>Leaderboard</h1>
     </div>
     <br/>
-    <template v-for="(points, player) in tallyPoints">
-      <div class="has-text-centered" role="alert"><strong>{{ player }}</strong>: {{ points }} points</div>
+    <template v-for="(playerpoints, _index) in tallyPoints">
+      <div class="has-text-centered" role="alert">
+        <strong>{{ playerpoints[0] }}</strong>: {{ playerpoints[1] }} points
+      </div>
     </template>
   </div>
 `,

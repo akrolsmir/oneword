@@ -425,13 +425,13 @@
                     </button>
                   </div>
                 </div>
-                <div class="has-text-centered">                
+                <div class="has-text-centered">
                   Your decoy phrase:
-                  <label class="label" for="guess-input">
-                    <span v-if="player.decoyAdj || player.decoyNoun">
-                      "{{ player.decoyAdj }}-{{ player.decoyNoun }}"
-                    </span>
-                  </label>
+                  <span v-if="player.decoyAdj || player.decoyNoun">
+                    <strong>"{{ player.decoyAdj }}-{{ player.decoyNoun }}"</strong>
+                  </span>
+                  <br/>
+                  <br/>
                   <button class="button" @click="submitDecoy">Submit</button>
                 </div>
                 <h2 class="fancy has-text-centered" role="alert">Your clue from {{ room.currentRound.clueGiver }} is: <strong>{{ room.currentRound.clue }}</strong> </h2>
