@@ -282,8 +282,8 @@
                   :name="player"
                   :user="room.playerData && room.playerData[player]"
                   :index="i"
-                  :submitted="(_.keys(room.currentRound.allWords).includes(player) && player != room.currentRound.clueGiver) || (player == room.currentRound.clueGiver && !_.keys(room.currentRound.allWords).includes(player))"
-                  :guessing="_.keys(room.currentRound.votes).includes(player) || (player == room.currentRound.clueGiver && _.keys(room.currentRound.allWords).includes(player))"
+                  :submitted="(Object.keys(room.currentRound.allWords).includes(player) && player != room.currentRound.clueGiver) || (player == room.currentRound.clueGiver && !Object.keys(room.currentRound.allWords).includes(player))"
+                  :guessing="Object.keys(room.currentRound.votes).includes(player) || (player == room.currentRound.clueGiver && Object.keys(room.currentRound.allWords).includes(player))"
                   :mod="isMod"
                   @kick="kickPlayer(player)"
                 ></nametag>
@@ -462,9 +462,9 @@
                 <h2 class="fancy has-text-centered" role="alert">
                   <button
                     class="button is-rounded"
-                    v-for="word in _.values(room.currentRound.allWords).sort()"
+                    v-for="word in Object.values(room.currentRound.allWords).sort()"
                     :disabled="true"
-                    :class="{ 'is-success': _.values(room.currentRound.votes).includes(word) }"
+                    :class="{ 'is-success': Object.values(room.currentRound.votes).includes(word) }"
                   >
                     {{ word }}
                   </button>
@@ -477,7 +477,7 @@
                   <button
                     class="button is-rounded"
                     @click="submitVote(word)"
-                    v-for="word in _.values(room.currentRound.allWords).sort()"
+                    v-for="word in Object.values(room.currentRound.allWords).sort()"
                     :disabled="room.currentRound.allWords[player.name] == word"
                     :class="{ 'is-success': room.currentRound.votes[player.name] == word }"
                   >
@@ -551,7 +551,6 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert@2.1.2/dist/sweetalert.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/blueimp-md5@2.13.0/js/md5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pluralize@8.0.0/pluralize.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.20/lodash.min.js"></script>
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-analytics.js"></script>

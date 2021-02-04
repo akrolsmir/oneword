@@ -83,7 +83,7 @@ const vueApp = new Vue({
          * prepend adjectives until it is unique
          */
         // while (
-        //   _.keys(room.players).includes(this.player.name) &&
+        //   Object.keys(room.players).includes(this.player.name) &&
         //   (this.user.guest || this.user.email != room.playerData[this.player.name].email)
         // ) {
         //   this.player.name = capitalize(randomWord('adjectives')) + ' ' + this.player.name;
@@ -151,12 +151,12 @@ const vueApp = new Vue({
       const update = {};
       update[`currentRound.allWords.${this.player.name}`] = w;
       await updateRoom(this.room, update);
-      if (_.keys(this.room.currentRound.allWords).length == this.room.players.length) {
+      if (Object.keys(this.room.currentRound.allWords).length == this.room.players.length) {
         await updateRoom(this.room, { 'currentRound.state': 'GUESSING' });
       }
     },
     async submitClue() {
-      if (_.keys(this.room.currentRound.allWords).length === 0) {
+      if (Object.keys(this.room.currentRound.allWords).length === 0) {
         return alert('Pick a phrase for your clue!');
       }
       if (this.room.currentRound.clue === '') {
@@ -186,7 +186,7 @@ const vueApp = new Vue({
       update[`currentRound.votes.${this.player.name}`] = vote;
       await updateRoom(this.room, update);
       // Total votes are players.length - 1 since clueGiver can't vote.
-      if (_.keys(this.room.currentRound.votes).length >= this.room.players.length - 1) {
+      if (Object.keys(this.room.currentRound.votes).length >= this.room.players.length - 1) {
         this.room.currentRound.state = 'DONE';
         this.room.history.push(this.room.currentRound);
         await setRoom(this.room);
