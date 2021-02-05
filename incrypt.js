@@ -1,5 +1,6 @@
 import './components/timer.js';
 import { nouns, compounds, verbs, adjectives } from './many-words.js';
+import { getIn } from './utils.js';
 import {
   setRoom,
   updateRoom,
@@ -421,15 +422,6 @@ function unpush(array, value) {
 
 function other(team) {
   return team === 'redTeam' ? 'blueTeam' : 'redTeam';
-}
-
-// Extracts a node from an object tree by its path, like "redTeam.players"
-function getIn(object, path) {
-  let node = object;
-  for (const part of path.split('.')) {
-    node = node[part];
-  }
-  return node;
 }
 
 // Keys are just arrays of ints
