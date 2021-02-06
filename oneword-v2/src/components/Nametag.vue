@@ -1,0 +1,103 @@
+<template>
+  <div class="control">
+    <div class="tags has-addons">
+      <div
+        class="tag is-white"
+        :class="{
+          'is-primary is-light': submitted && !guessing,
+          'is-info': guessing,
+          'has-text-weight-semibold': submitted,
+        }"
+        v-bind="attr"
+        style="z-index: 1"
+      >
+        <img
+          v-if="user && user.email && user.supporter"
+          style="
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+            margin-left: -10.5px;
+          "
+          class="mr-1"
+          :src="avatarUrl"
+          alt=""
+          height="28"
+          width="28"
+        />
+        {{ name }}
+      </div>
+      <template v-if="index == 0">
+        <div class="tag is-dark">Mod</div>
+      </template>
+      <a
+        v-else-if="mod"
+        class="tag is-delete is-danger is-light"
+        role="button"
+        :title="'Kick ' + name"
+        href="#"
+        @click.prevent="kick()"
+      ></a>
+    </div>
+  </div>
+</template>
+
+<script>
+import { md5 } from '../vendor/md5.js'
+
+export default {
+  props: {
+    name: String,
+    user: Object, // email and sponsor status
+    submitted: Boolean,
+    index: Number,
+    guessing: Boolean,
+    mod: Boolean,
+  },
+  methods: {
+    kick() {
+      this.$emit('kick')
+    },
+  },
+  computed: {
+    avatarUrl() {
+      return `https://www.gravatar.com/avatar/${md5(this.user.email)}?size=48`
+    },
+    attr() {
+      if (!this.user || this.user.guest) {
+        return { title: 'Guest' }
+      }
+      if (this.user.supporter == 'BASE') {
+        return {
+          title: 'Supporter',
+          style: 'box-shadow: 0 0 0 2px gold',
+        }
+      }
+      if (this.user.supporter == 'SPONSOR') {
+        return {
+          title: 'Sponsor',
+          style: 'box-shadow: 0 0 0 2px #b181e4',
+        }
+      }
+      if (this.user.supporter == 'ADMIN') {
+        if (this.user.email === 'pang.alice@gmail.com') {
+          return {
+            title: 'Designer',
+            style: {
+              boxShadow:
+                '-1px 1px 3px #2d26ff, 1px 1px 3px #2d26ff, -1px -1px 3px #ff217a, 1px -1px 3px #ff217a',
+            },
+          }
+        }
+        return {
+          title: 'Developer',
+          style: {
+            outline: '1px dashed #33ff00',
+            boxShadow: '0 0 0 2px #0a0a0a',
+          },
+        }
+      }
+      return { title: 'Member' }
+    },
+  },
+}
+</script>

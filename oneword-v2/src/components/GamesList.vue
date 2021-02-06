@@ -64,7 +64,10 @@
     <h2 class="fancy">Sponsors</h2>
     We're grateful to be <a href="./supporter.html">sponsored by</a>:
     <div class="m-2">
-      <!-- <nametag name="Tory N." :user="{ email: 'telarian@gmail.com', supporter: 'SPONSOR' }"></nametag> -->
+      <Nametag
+        name="Tory N."
+        :user="{ email: 'telarian@gmail.com', supporter: 'SPONSOR' }"
+      />
     </div>
     Thanks for supporting One Word!
   </div>
@@ -72,10 +75,14 @@
 </template>
 
 <script>
+import Nametag from './Nametag.vue'
 import { formatDistanceToNow } from 'date-fns'
 import { listRooms } from '../firebase/network'
 
 export default {
+  components: {
+    Nametag,
+  },
   data() {
     return {
       allRooms: [],
