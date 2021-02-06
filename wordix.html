@@ -2,7 +2,7 @@
 <meta charset="utf-8" />
 
 <head>
-  <title>Wordit</title>
+  <title>Wordix</title>
   <link
     href="https://fonts.googleapis.com/css?family=Fjalla+One|Merienda+One|Righteous|Sriracha&display=swap"
     rel="stylesheet"
@@ -86,7 +86,7 @@
       <div class="modal-content">
         <div class="notification">
           <label class="is-block mb-2">Invite your friends to play!</label>
-          <sharelink :link="'https://oneword.games/wordit.html?room=' + room.name"></sharelink>
+          <sharelink :link="'https://oneword.games/wordix.html?room=' + room.name"></sharelink>
           <button class="delete" aria-label="close" @click="alertIsShowing=false"></button>
         </div>
       </div>
@@ -107,7 +107,7 @@
           </div>
           <!-- // Commented out b/c rendering lags too much -->
           <!-- <div v-if="player.name">Hi {{ player.name }}!</div> -->
-          <div class="fancy big">Welcome to Word It!</div>
+          <div class="fancy big">Welcome to Wordix!</div>
           This is an online game inspired by
           <strong><a target="_blank" rel="noopener noreferrer" href="https://amazon.com/dp/2914849656">Dixit</a></strong>, a picture-based
           board game but modified so you can play a version with just words. <br />
@@ -562,10 +562,10 @@
 <script type="module" src="components/nametag.js"></script>
 <script type="module" src="components/scoreboard.js"></script>
 <script type="module" src="components/sharelink.js"></script>
-<script type="module" src="components/wordit/navbarshawn.js"></script>
-<script type="module" src="components/wordit/leaderboard.js"></script>
-<script type="module" src="wordit.js"></script>
+<script type="module" src="components/wordix/navbarshawn.js"></script>
+<script type="module" src="components/wordix/leaderboard.js"></script>
+<script type="module" src="wordix.js"></script>
 
 <script>
-  window.COLLECTION = 'wordit-shawn';
+  window.COLLECTION = 'wordix-shawn';
 </script>

@@ -50,7 +50,7 @@ const vueApp = new Vue({
     //this.allRooms = (await listRooms()).filter((room) => room.players.length > 0);
   },
   watch: {
-    // Timer currently not yet implemented for wordit
+    // Timer currently not yet implemented for wordix
     'room.currentRound.state'(state) {
       console.log('state change: ' + state);
       this.$emit('reset-timer');
