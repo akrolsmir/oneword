@@ -99,7 +99,7 @@ Vue.component('leaderboard', {
 });
 
 function invert(obj) {
-  var inverted_obj = {};
+  let inverted_obj = {};
   Object.keys(obj).forEach((key) => {
     inverted_obj[obj[key]] = key;
   });

@@ -143,6 +143,27 @@ const vueApp = new Vue({
       };
       await setRoom(this.room);
     },
+    isClueSubmitDisabled() {
+      if (!this.room.players.includes(this.player.name)) {
+        return true;
+      }
+      if (Object.keys(this.room.currentRound.allWords).length === 0) {
+        return true;
+      }
+      if (this.room.currentRound.clue === '') {
+        return true;
+      }
+      return false;
+    },
+    isDecoySubmitDisabled() {
+      if (!this.player.decoyAdj) {
+        return true;
+      }
+      if (!this.player.decoyNoun) {
+        return true;
+      }
+      return false;
+    },
     async cluerSelectsWord(w) {
       await updateRoom(this.room, { 'currentRound.word': w });
       await this.saveWordToAllWordsInRoom(w);
@@ -156,12 +177,6 @@ const vueApp = new Vue({
       }
     },
     async submitClue() {
-      if (Object.keys(this.room.currentRound.allWords).length === 0) {
-        return alert('Pick a phrase for your clue!');
-      }
-      if (this.room.currentRound.clue === '') {
-        return alert('Write a clue for your phrase!');
-      }
       const indexToRemove = this.player.wordList.indexOf(this.room.currentRound.word);
       if (indexToRemove > -1) {
         this.player.wordList.splice(indexToRemove, 1);
@@ -172,12 +187,6 @@ const vueApp = new Vue({
       await setRoom(this.room);
     },
     async submitDecoy() {
-      if (!this.player.decoyAdj) {
-        return alert('Pick the adjective for your decoy phrase!');
-      }
-      if (!this.player.decoyNoun) {
-        return alert('Pick the noun for your decoy phrase!');
-      }
       this.saveWordToAllWordsInRoom(this.player.decoyAdj + '-' + this.player.decoyNoun);
     },
     // vote is the word the guesser picked

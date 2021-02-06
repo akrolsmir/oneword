@@ -355,7 +355,8 @@
                       />
                     </div>
                     <div class="control">
-                      <button class="button" @click="submitClue" :disabled="!room.players.includes(player.name)">
+                      <!-- TODO: add tool tip to show why button is disabled https://wikiki.github.io/elements/tooltip/ -->
+                      <button class="button" @click="submitClue" :disabled="isClueSubmitDisabled()">
                         Submit
                       </button>
                     </div>
@@ -432,7 +433,7 @@
                   </span>
                   <br/>
                   <br/>
-                  <button class="button" @click="submitDecoy">Submit</button>
+                  <button class="button" @click="submitDecoy" :disabled="isDecoySubmitDisabled()">Submit</button>
                 </div>
                 <h2 class="fancy has-text-centered" role="alert">Your clue from {{ room.currentRound.clueGiver }} is: <strong>{{ room.currentRound.clue }}</strong> </h2>
               </div>
