@@ -1,13 +1,19 @@
 {
   "name": "oneword-v2",
-  "version": "0.0.0",
+  "version": "2.0.0",
   "scripts": {
+    "start": "vite",
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.0.5"
+    "bulma": "^0.9.1",
+    "dayjs": "^1.10.4",
+    "firebase": "^8.2.4",
+    "firebaseui": "^4.7.1",
+    "vue": "^3.0.5",
+    "vue-router": "4"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^1.1.4",
