@@ -10,6 +10,7 @@
   <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
   <link rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     html {
@@ -101,34 +102,33 @@
 <body class="has-navbar-fixed-top">
   <div id="vue">
     <navbar ref="navbar" v-model="user"></navbar>
-    <!-- Share Link Notification -->
-    <div class="modal" :class="{'is-active': showShareModal}">
-      <div class="modal-background" @click="showShareModal=false"></div>
-      <div class="modal-content">
+    <div v-cloak id="modals">
+      <!-- Share Link Notification -->
+      <animated-modal :visible="showShareModal" @background-click="showShareModal=false">
         <div class="notification">
           <label class="is-block mb-2">Invite your friends to play!</label>
           <sharelink :link="'https://oneword.games/?room=' + room.name"></sharelink>
           <button class="delete" aria-label="close" @click="showShareModal=false"></button>
         </div>
-      </div>
-    </div>
-    <!-- Private Room Notification -->
-    <div class="modal" :class="{'is-active': showPrivateModal}">
-      <div class="modal-background" @click="showPrivateModal=false"></div>
-      <div class="modal-card">
-        <header class="modal-card-head">
-          <p class="modal-card-title">Private room</p>
-          <button class="delete" aria-label="close" @click="showPrivateModal=false"></button>
-        </header>
-        <section class="modal-card-body">
-          This room is private. To join, ask your teammates for the room name or link.<br /><br />
+      </animated-modal>
 
-          To make your own private room, become a supporter!<br />
-        </section>
-        <footer class="modal-card-foot">
-          <button class="button is-warning" @click="referSupporter('private_room_modal')">Become a supporter</button>
-        </footer>
-      </div>
+      <!-- Private Room Notification -->
+      <animated-modal :visible="showPrivateModal" @background-click="showPrivateModal=false">
+        <div class="modal-card">
+          <header class="modal-card-head">
+            <p class="modal-card-title">This room is private 🔒</p>
+            <button class="delete" aria-label="close" @click="showPrivateModal=false"></button>
+          </header>
+          <section class="modal-card-body">
+            To join, ask your teammates for the room name or link.<br /><br />
+
+            To make your own private room, become a supporter!<br />
+          </section>
+          <footer class="modal-card-foot">
+            <button class="button is-warning" @click="referSupporter('private_room_modal')">Become a supporter</button>
+          </footer>
+        </div>
+      </animated-modal>
     </div>
 
     <div class="columns is-centered">
@@ -530,6 +530,7 @@
 <script type="module" src="components/sharelink.js"></script>
 <script type="module" src="components/link-footer.js"></script>
 <script type="module" src="components/chatbox.js"></script>
+<script type="module" src="components/animated-modal.js"></script>
 <script type="module">
   import { nouns, compounds, verbs, adjectives } from './many-words.js';
   import {
