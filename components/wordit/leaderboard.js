@@ -18,7 +18,7 @@ Vue.component('leaderboard', {
       // Each player's client computes point totals for everyone independently
       this.history.forEach((round) => {
         // If all players found the clueGiver's phrase
-        if (Object.values(round.votes).find((guess) => guess === round.word)) {
+        if (Object.values(round.votes).every((guess) => guess === round.word)) {
           // all players from that round who are still in the room
           Object.keys(leaderBoard).forEach((player) => {
             // EXCEPT clueGiver gets 2pts automatically
