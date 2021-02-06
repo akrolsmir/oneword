@@ -103,7 +103,7 @@
   <div id="vue">
     <navbar ref="navbar" v-model="user"></navbar>
     <div v-cloak id="modals">
-      <!-- Share Link Notification -->
+      <!-- Share Link Modal -->
       <animated-modal :visible="showShareModal" @background-click="showShareModal=false">
         <div class="notification">
           <label class="is-block mb-2">Invite your friends to play!</label>
@@ -112,22 +112,13 @@
         </div>
       </animated-modal>
 
-      <!-- Private Room Notification -->
-      <animated-modal :visible="showPrivateModal" @background-click="showPrivateModal=false">
-        <div class="modal-card">
-          <header class="modal-card-head">
-            <p class="modal-card-title">This room is private 🔒</p>
-            <button class="delete" aria-label="close" @click="showPrivateModal=false"></button>
-          </header>
-          <section class="modal-card-body">
-            To join, ask your teammates for the room name or link.<br /><br />
-
-            To make your own private room, become a supporter!<br />
-          </section>
-          <footer class="modal-card-foot">
-            <button class="button is-warning" @click="referSupporter('private_room_modal')">Become a supporter</button>
-          </footer>
-        </div>
+      <!-- Standard Modals -->
+      <animated-modal
+        :visible="showStandardModal"
+        :content="standardModal"
+        @background-click="showStandardModal=false"
+        @cancel="showStandardModal=false"
+      >
       </animated-modal>
     </div>
 
@@ -167,7 +158,7 @@
         </p>
         <h2 class="fancy">Private Rooms</h2>
         <p v-for="privateRoom in privateRooms">
-          <a href="#" @click.prevent="showPrivateModal = true">
+          <a href="#" @click.prevent="showPrivateModal">
             <b>{{ "Private room" }} with {{ privateRoom.players[0] }}</b>
           </a>
           <span v-if="privateRoom.players.length > 1"> and {{ privateRoom.players.length }} others</span>
@@ -469,7 +460,7 @@
       <!-- History -->
       <h2 v-if="room.history.length > 0" class="fancy">History</h2>
       <template v-for="(round, i) in room.history.slice().reverse()">
-        <div class="level mb-1">
+        <div class="level mb-0">
           <div class="level-left">
             <span class="level-item" style="justify-content: flex-start">
               <span
@@ -580,7 +571,8 @@
         guess: '',
       },
       showShareModal: false,
-      showPrivateModal: false,
+      showStandardModal: false,
+      standardModal: undefined,
       newMod: '',
       wordsSaved: false,
     },
@@ -817,9 +809,15 @@
         updateUserGame(this.user.id, this.room.name);
       },
       async toggleRoundCorrect() {
+        if (!['CHAMPION', 'SPONSOR', 'ADMIN'].includes(this.user.supporter)) {
+          return this.showChampionModal();
+        }
         await updateRoom(this.room, { 'currentRound.markedCorrect': !this.room.currentRound.markedCorrect });
       },
       async toggleHistoryCorrect(reverseIndex) {
+        if (!['CHAMPION', 'SPONSOR', 'ADMIN'].includes(this.user.supporter)) {
+          return this.showChampionModal();
+        }
         // History is shown in reverse order, so we re-reverse the index
         const index = this.room.history.length - 1 - reverseIndex;
         this.room.history[index].markedCorrect = !this.room.history[index].markedCorrect;
@@ -857,21 +855,60 @@
         if (this.user.supporter) {
           await this.saveRoom(...props);
         } else {
-          const result = await swal({
-            title: 'Want private rooms?',
-            text: 'Earn perks like private rooms, custom avatars, and more by becoming a supporter 😍',
-            buttons: {
-              cancel: 'Not now',
-              support: 'Okay!',
-            },
-          });
-          if (result === 'support') {
-            referSupporter('modtools');
-          }
+          this.showSupporterModal();
           // Reset UI to non-supporter defaults
           this.room.public = true;
           this.room.roundsInGame = 13;
         }
+      },
+      showPrivateModal() {
+        this.showStandardModal = true;
+        this.standardModal = {
+          title: 'This room is private 🔒',
+          text:
+            'To join, ask your teammates for the room name or link.\n\nTo make your own private room, become a supporter!',
+          buttons: {
+            okay: 'Become a supporter!',
+            cancel: 'Not now',
+          },
+          callbacks: {
+            okay: () => {
+              referSupporter('private_room_modal');
+            },
+          },
+        };
+      },
+      showSupporterModal() {
+        this.showStandardModal = true;
+        this.standardModal = {
+          title: 'Want private rooms?',
+          text: 'Earn perks like private rooms, custom avatars, and more by becoming a supporter 😍',
+          buttons: {
+            okay: 'Okay!',
+            cancel: 'Not now',
+          },
+          callbacks: {
+            okay: () => {
+              referSupporter('modtools');
+            },
+          },
+        };
+      },
+      showChampionModal() {
+        this.showStandardModal = true;
+        this.standardModal = {
+          title: 'Mark this guess as correct?',
+          text: 'Unlock this perk by becoming a One Word champion 😍',
+          buttons: {
+            okay: 'Okay!',
+            cancel: 'Not now',
+          },
+          callbacks: {
+            okay: () => {
+              referSupporter('champion_modal');
+            },
+          },
+        };
       },
       referSupporter,
       // Returns a bool indicating if the provided Room object should be muted due to not matching the
