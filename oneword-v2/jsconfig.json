@@ -1,0 +1,6 @@
+{
+  // Note: I added jsconfig.json for Vetur, but not sure it's needed...
+  // See https://vuejs.github.io/vetur/guide/FAQ.html#vetur-can-t-find-tsconfig-json-jsconfig-json-in-xxxx-xxxxxx
+  "include": ["./src/**/*"],
+  "exclude": ["node_modules"]
+}
