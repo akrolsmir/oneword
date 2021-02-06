@@ -133,7 +133,7 @@
 
     <div class="columns is-centered">
       <!-- Left pane is empty placeholder. Only shown in-game and when width > 1216px -->
-      <div class="column is-hidden-touch is-hidden-desktop-only" v-if="room.players"></div>
+      <div v-cloak class="column is-hidden-touch is-hidden-desktop-only" v-if="room.players"></div>
       <!-- Center (main) pane. TODO: Remove the below to get prettier formatting again -->
       <!-- prettier-ignore -->
       <div class="column is-two-thirds is-half-widescreen">
@@ -498,7 +498,7 @@
       <!-- End center pane -->
       </div>
       <!-- Right pane for chat -->
-      <div class="column" v-if="room.players">
+      <div v-cloak class="column" v-if="room.players">
         <!-- Spacer div to get chatbox to line up with game area -->
         <div class="mb-2">
           <div class="is-size-7 mb-1"><br /></div>
