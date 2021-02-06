@@ -44,8 +44,8 @@
       :class="{ halfOpacity: isMuteOpenRoom(openRoom) }"
       :key="openRoom.name"
     >
-      <a href="#"
-        ><b>{{ openRoom.name }}</b></a
+      <router-link :to="`/room/${openRoom.name}`">
+        <b>{{ openRoom.name }}</b></router-link
       >, with {{ openRoom.players.join(', ') }} ({{
         timeSince(openRoom.lastUpdateTime)
       }})
