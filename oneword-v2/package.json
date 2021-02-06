@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "bulma": "^0.9.1",
-    "dayjs": "^1.10.4",
+    "date-fns": "^2.17.0",
     "firebase": "^8.2.4",
     "firebaseui": "^4.7.1",
     "vue": "^3.0.5",

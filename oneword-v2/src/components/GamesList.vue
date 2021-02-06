@@ -10,18 +10,18 @@
   </div>
 
   <form v-if="user.id || user.guest" @submit.prevent="enterRoom" method="POST">
-    <label class="label">Player</label>
+    <label class="label mt-2">Player</label>
     <input
       class="input"
       type="text"
       v-model="player.name"
       placeholder="Ringo"
     />
-    <label class="label">Room</label>
+    <label class="label mt-2">Room</label>
     <input
       class="input"
       type="text"
-      v-model="room.name"
+      v-model="player.roomName"
       placeholder="apple"
       required
     /><br /><br />
@@ -30,11 +30,10 @@
   <template v-else>
     <br />
     <button class="button is-large is-success" @click="$refs.navbar.logIn()">
-      Sign in to get started</button
-    ><br />
-    <a @click="$set(user, 'guest', true)" class="is-size-7"
-      >Play without an account</a
-    >
+      Sign in to get started
+    </button>
+    <br />
+    <a @click="user.guest = true" class="is-size-7">Play without an account</a>
   </template>
 
   <br /><br />
@@ -48,7 +47,7 @@
       <a href="#"
         ><b>{{ openRoom.name }}</b></a
       >, with {{ openRoom.players.join(', ') }} ({{
-        dayjs(openRoom.lastUpdateTime).fromNow()
+        timeSince(openRoom.lastUpdateTime)
       }})
     </p>
     <h2 class="fancy">Private Rooms</h2>
@@ -59,7 +58,7 @@
       <span v-if="privateRoom.players.length > 1">
         and {{ privateRoom.players.length }} others</span
       >
-      ({{ dayjs(privateRoom.lastUpdateTime).fromNow() }})
+      ({{ timeSince(privateRoom.lastUpdateTime) }})
     </p>
     <!-- One Word Sponsors -->
     <h2 class="fancy">Sponsors</h2>
@@ -73,7 +72,8 @@
 </template>
 
 <script>
-import dayjs from 'dayjs'
+import { formatDistanceToNow } from 'date-fns'
+import { listRooms } from '../firebase/network'
 
 export default {
   data() {
@@ -81,12 +81,21 @@ export default {
       allRooms: [],
       privateRooms: [],
       user: {},
+      player: {},
+      room: {},
     }
   },
+  created() {
+    // Async load all open and private rooms
+    listRooms().then((rooms) => (this.allRooms = rooms))
+    listRooms(5, false).then((rooms) => (this.privateRooms = rooms))
+  },
   methods: {
-    dayjs,
     isMuteOpenRoom(openRoom) {
-      return false
+      return false // TODO: fix
+    },
+    timeSince(millis) {
+      return formatDistanceToNow(new Date(millis), { addSuffix: true })
     },
   },
 }
