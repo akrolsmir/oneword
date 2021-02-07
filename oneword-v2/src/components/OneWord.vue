@@ -855,3 +855,26 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.newline {
+  white-space: pre-wrap;
+}
+
+.capitalize {
+  text-transform: capitalize;
+}
+
+.comma:not(:last-child):after {
+  content: ', ';
+}
+
+#custom-word-tags {
+  overflow-x: auto;
+  max-height: 100px;
+}
+
+.halfOpacity {
+  opacity: 0.5;
+}
+</style>
