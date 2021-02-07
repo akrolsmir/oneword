@@ -45,6 +45,7 @@
 import { md5 } from '../vendor/md5.js'
 
 export default {
+  emits: ['kick'],
   props: {
     name: String,
     user: Object, // email and sponsor status
