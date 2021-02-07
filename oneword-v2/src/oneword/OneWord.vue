@@ -512,7 +512,7 @@
 </template>
 
 <script>
-import Nametag from './Nametag.vue'
+import Nametag from '../Nametag.vue'
 import {
   getRoom,
   listenRoom,
@@ -534,7 +534,7 @@ import {
   nextWord,
   nextCategory,
   capitalize,
-} from '../oneword-utils.js'
+} from './oneword-utils.js'
 
 export default {
   components: {

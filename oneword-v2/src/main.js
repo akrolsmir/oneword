@@ -5,7 +5,7 @@ import 'bulma/css/bulma.css'
 import './styles.css'
 
 import GamesList from './components/GamesList.vue'
-import OneWord from './components/OneWord.vue'
+import OneWord from './oneword/OneWord.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
