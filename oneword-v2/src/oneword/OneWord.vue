@@ -169,7 +169,7 @@
                 v-if="isMod"
                 class="field is-grouped is-grouped-multiline mx-3 my-1"
               >
-                <div class="control" v-for="category in this.CATEGORY_ORDER">
+                <div class="control" v-for="category in CATEGORY_ORDER">
                   <label class="capitalize checkbox">
                     <input
                       type="checkbox"
@@ -271,7 +271,7 @@
                     Skip Word
                   </button>
                 </span>
-                <span v-if="this.user.supporter == 'ADMIN'" class="control">
+                <span v-if="user.supporter == 'ADMIN'" class="control">
                   <button class="button is-small" @click="resetRoom">
                     Reset Room
                   </button>
@@ -286,7 +286,7 @@
                 <span class="control">
                   <span class="select is-small">
                     <select v-model="newMod">
-                      <option v-for="player in this.room.players.slice(1)">
+                      <option v-for="player in room.players.slice(1)">
                         {{ player }}
                       </option>
                     </select>
@@ -448,8 +448,8 @@
             v-if="isEnd(room)"
             :score="score(room)"
             :rounds-in-game="room.roundsInGame"
-            :name="user?.name && user.name.split(' ')[0]"
-            :supporter="!!user?.supporter"
+            :name="user.name && user.name.split(' ')[0]"
+            :supporter="!!user.supporter"
             @continue-game="newRound(false)"
           ></GameEnd>
           <button v-else class="button" @click="newRound(false)">
@@ -536,6 +536,7 @@ import {
   nextCategory,
   capitalize,
 } from './oneword-utils.js'
+import { inject } from 'vue'
 
 export default {
   components: {
@@ -544,6 +545,9 @@ export default {
     ShareLink,
     Timer,
     GameEnd,
+  },
+  setup() {
+    return { user: inject('currentUser') }
   },
   data() {
     return {
@@ -602,17 +606,6 @@ export default {
       if (this.room && this.room.players) {
         return this.player.name == this.room.players[0]
       }
-    },
-    // Returns the set of open room names that matches the current `room.name`.
-    filteredRoomNameSet() {
-      const filtered = new Set()
-      const roomNameRe = new RegExp(this.room.name, 'i')
-      for (const openRoom of this.allRooms) {
-        if (openRoom.name.match(roomNameRe)) {
-          filtered.add(openRoom.name)
-        }
-      }
-      return filtered
     },
     customWordList() {
       // If there are any commas, parse as csv; else, parse with whitespace
