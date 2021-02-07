@@ -43,10 +43,10 @@
             <a class="navbar-item"> One Word </a>
             <a class="navbar-item"> Incrypt </a>
             <a class="navbar-item">
-              <span class="tag is-success is-light mr-1">New!</span> Storytime
+              Storytime <span class="tag is-link is-light ml-1">New!</span>
             </a>
             <a class="navbar-item">
-              <span class="tag is-success is-light mr-1">New!</span> Wordix
+              Wordix <span class="tag is-link is-light ml-1">New!</span>
             </a>
             <hr class="navbar-divider" />
             <a class="navbar-item"> Suggest a new game! </a>
