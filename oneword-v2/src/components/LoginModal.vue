@@ -1,23 +1,16 @@
 <template>
-  <div class="modal" :class="{ 'is-active': visible }">
-    <div class="modal-background"></div>
-    <div class="modal-content">
-      <div class="box">
-        <h2 class="title">Sign up or log in</h2>
-        <div id="firebaseui-auth-container"></div>
-      </div>
+  <AnimatedModal :visible="visible">
+    <div class="box">
+      <h2 class="title">Sign up or log in</h2>
+      <div id="firebaseui-auth-container"></div>
     </div>
-    <button
-      class="modal-close is-large"
-      aria-label="close"
-      @click="toggleVisible"
-    ></button>
-  </div>
+  </AnimatedModal>
 </template>
 
 <script>
 import firebase from 'firebase/app'
 import * as firebaseui from 'firebaseui'
+import AnimatedModal from './AnimatedModal.vue'
 // Note: FirebaseUI CSS is messed up, probably because Bulma CSS is imported?
 // Or it's not just getting imported. Could try:
 // 1. iframing the modal
@@ -55,7 +48,9 @@ function injectFirebaseUi() {
   // within the element corresponding to the selector specified.
   ui.start('#firebaseui-auth-container', uiConfig)
 }
+
 export default {
+  components: { AnimatedModal },
   data() {
     return {
       visible: false,

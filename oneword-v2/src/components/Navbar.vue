@@ -1,5 +1,9 @@
 <template>
-  <LoginModal ref="modal" :visible="modalVisible" />
+  <LoginModal
+    ref="modal"
+    :visible="modalVisible"
+    @background-click="modalVisible = false"
+  />
 
   <nav
     class="navbar is-fixed-top"
@@ -90,7 +94,7 @@ export default {
   },
   methods: {
     logIn() {
-      this.$refs.modal.toggleVisible()
+      this.modalVisible = true
     },
     async logOut() {
       await firebaseLogout()
