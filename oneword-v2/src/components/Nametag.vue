@@ -101,3 +101,9 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.tag {
+  font-size: 0.875rem !important; /* Bulma's normal tag (0.75 rem) is too small and medium tag (1 rem) is too big */
+}
+</style>
