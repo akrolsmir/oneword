@@ -61,15 +61,14 @@ export async function listRooms(limit = 20, publicRoom = true) {
 }
 
 let unsubscribe
-export function listenRoom(vueApp) {
+export function listenRoom(id, onRoom /* callback that takes in a room */) {
   // Detach listener before listening to a new room.
   unlistenRoom()
   unsubscribe = db
     .collection(COLLECTION)
-    .doc(vueApp.room.name)
+    .doc(id)
     .onSnapshot(function (doc) {
-      // console.log('Current data: ', doc.data());
-      vueApp.room = doc.data()
+      onRoom(doc.data())
     })
 }
 
