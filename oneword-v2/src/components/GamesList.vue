@@ -24,7 +24,7 @@
   </form>
   <template v-else>
     <br />
-    <button class="button is-large is-success" @click="$refs.navbar.logIn()">
+    <button class="button is-large is-success" @click="user.signIn">
       Sign in to get started
     </button>
     <br />
