@@ -296,12 +296,13 @@
             </div>
           </div>
         </div>
-        <timer
+        <Timer
+          ref="timer"
           :length="timerLength"
           :on-finish="nextStage"
           v-if="timerLength > 0"
           :key="room.currentRound.state"
-        ></timer>
+        ></Timer>
 
         <!-- Input area (clueing) -->
         <div v-if="room.currentRound.state == 'CLUEING'">
@@ -443,14 +444,14 @@
             {{ dedupe(room.currentRound.clues) }}
           </div>
           <br />
-          <scoreboard
+          <GameEnd
             v-if="isEnd(room)"
             :score="score(room)"
             :rounds-in-game="room.roundsInGame"
-            :name="user.name && user.name.split(' ')[0]"
-            :supporter="!!user.supporter"
+            :name="user?.name && user.name.split(' ')[0]"
+            :supporter="!!user?.supporter"
             @continue-game="newRound(false)"
-          ></scoreboard>
+          ></GameEnd>
           <button v-else class="button" @click="newRound(false)">
             Next Round
           </button>
@@ -510,6 +511,9 @@
 import Nametag from '../components/Nametag.vue'
 import AnimatedModal from '../components/AnimatedModal.vue'
 import ShareLink from '../components/ShareLink.vue'
+import Timer from '../components/Timer.vue'
+import GameEnd from './GameEnd.vue'
+
 import {
   getRoom,
   listenRoom,
@@ -538,6 +542,8 @@ export default {
     Nametag,
     AnimatedModal,
     ShareLink,
+    Timer,
+    GameEnd,
   },
   data() {
     return {
@@ -566,6 +572,57 @@ export default {
   async created() {
     this.room = await getRoom({ name: this.$route.params.id })
     listenRoom(this.room.name, (room) => (this.room = room))
+  },
+  watch: {
+    'room.currentRound.state'(state) {
+      this.$refs.timer?.reset()
+      // Clean up past inputs when the round moves forward.
+      if (state == 'GUESSING') {
+        this.player.clue = ''
+      } else if (state == 'DONE') {
+        this.player.guess = ''
+      }
+    },
+  },
+  computed: {
+    timerLength() {
+      if (
+        this.room.currentRound &&
+        this.room.timers &&
+        this.room.timers.running
+      ) {
+        return this.room.timers[this.room.currentRound.state]
+      }
+      return 0
+    },
+    isMod() {
+      if (this.user?.supporter == 'ADMIN') {
+        return true
+      }
+      if (this.room && this.room.players) {
+        return this.player.name == this.room.players[0]
+      }
+    },
+    // Returns the set of open room names that matches the current `room.name`.
+    filteredRoomNameSet() {
+      const filtered = new Set()
+      const roomNameRe = new RegExp(this.room.name, 'i')
+      for (const openRoom of this.allRooms) {
+        if (openRoom.name.match(roomNameRe)) {
+          filtered.add(openRoom.name)
+        }
+      }
+      return filtered
+    },
+    customWordList() {
+      // If there are any commas, parse as csv; else, parse with whitespace
+      let words = this.room.customWords.split(',')
+      if (words.length <= 1) {
+        words = this.room.customWords.split(/\s/)
+      }
+      // Lowercase and trim out whitespace; take out empty words
+      return words.map((w) => w.toLowerCase().trim()).filter((w) => w)
+    },
   },
   methods: {
     dupes,
