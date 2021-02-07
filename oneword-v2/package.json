@@ -8,6 +8,7 @@
     "serve": "vite preview"
   },
   "dependencies": {
+    "animate.css": "^4.1.1",
     "bulma": "^0.9.1",
     "date-fns": "^2.17.0",
     "firebase": "^8.2.4",

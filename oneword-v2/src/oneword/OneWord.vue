@@ -5,31 +5,28 @@
   <div id="vue">
     <div v-cloak id="modals">
       <!-- Share Link Modal -->
-      <animated-modal
+      <AnimatedModal
         :visible="showShareModal"
         @background-click="showShareModal = false"
       >
         <div class="notification">
           <label class="is-block mb-2">Invite your friends to play!</label>
-          <sharelink
-            :link="'https://oneword.games/?room=' + room.name"
-          ></sharelink>
+          <ShareLink :link="'https://oneword.games/room/' + room.name" />
           <button
             class="delete"
             aria-label="close"
             @click="showShareModal = false"
           ></button>
         </div>
-      </animated-modal>
+      </AnimatedModal>
 
       <!-- Standard Modals -->
-      <animated-modal
+      <AnimatedModal
         :visible="showStandardModal"
         :content="standardModal"
         @background-click="showStandardModal = false"
         @cancel="showStandardModal = false"
-      >
-      </animated-modal>
+      />
     </div>
 
     <!-- Center (main) pane. -->
@@ -311,9 +308,7 @@
           <div v-if="room.players.length < 3">
             <h2 class="fancy" role="alert">Waiting for 3 players...</h2>
             <p class="mt-5 mb-2">Invite your friends to play!</p>
-            <sharelink
-              :link="'https://oneword.games/?room=' + room.name"
-            ></sharelink>
+            <ShareLink :link="'https://oneword.games/?room=' + room.name" />
           </div>
           <div v-else-if="room.currentRound.guesser == player.name">
             <h2 class="fancy" role="alert">
@@ -512,7 +507,9 @@
 </template>
 
 <script>
-import Nametag from '../Nametag.vue'
+import Nametag from '../components/Nametag.vue'
+import AnimatedModal from '../components/AnimatedModal.vue'
+import ShareLink from '../components/ShareLink.vue'
 import {
   getRoom,
   listenRoom,
@@ -539,6 +536,8 @@ import {
 export default {
   components: {
     Nametag,
+    AnimatedModal,
+    ShareLink,
   },
   data() {
     return {
@@ -557,6 +556,11 @@ export default {
         guess: '',
       },
       CATEGORY_ORDER: ['nouns', 'verbs', 'adjectives', 'compounds', 'custom'],
+      showShareModal: false,
+      showStandardModal: false,
+      standardModal: undefined,
+      newMod: '',
+      wordsSaved: false,
     }
   },
   async created() {
