@@ -11,12 +11,7 @@
 
   <form v-if="user.id || user.guest" @submit.prevent="enterRoom" method="POST">
     <label class="label mt-2">Player</label>
-    <input
-      class="input"
-      type="text"
-      v-model="player.name"
-      placeholder="Ringo"
-    />
+    <input class="input" type="text" v-model="playerName" placeholder="Ringo" />
     <label class="label mt-2">Room</label>
     <input
       class="input"
@@ -78,16 +73,19 @@
 import Nametag from './Nametag.vue'
 import { formatDistanceToNow } from 'date-fns'
 import { listRooms } from '../firebase/network'
+import { inject } from 'vue'
 
 export default {
   components: {
     Nametag,
   },
+  setup() {
+    return { user: inject('currentUser') }
+  },
   data() {
     return {
       allRooms: [],
       privateRooms: [],
-      user: {},
       player: {},
       room: {},
     }
@@ -96,6 +94,11 @@ export default {
     // Async load all open and private rooms
     listRooms().then((rooms) => (this.allRooms = rooms))
     listRooms(5, false).then((rooms) => (this.privateRooms = rooms))
+  },
+  computed: {
+    playerName() {
+      return this.user.name?.split(' ')[0] || ''
+    },
   },
   methods: {
     isMuteOpenRoom(openRoom) {

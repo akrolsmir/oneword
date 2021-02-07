@@ -131,11 +131,11 @@ const CACHED_USER_KEY = 'CACHED_USER_KEY'
  *   }
  * }
  */
-export function listenForLogin(vueApp) {
+export function listenForLogin(onUser /* callback that takes in a user */) {
   // Immediately load any persisted user object from browser cache.
   const cachedUser = localStorage.getItem(CACHED_USER_KEY)
   if (cachedUser) {
-    vueApp.user = JSON.parse(cachedUser)
+    onUser(JSON.parse(cachedUser))
   }
 
   // Then listen for any login changes (includes )
@@ -154,12 +154,8 @@ export function listenForLogin(vueApp) {
         await db.collection('users').doc(fetchedUser.id).set(fetchedUser)
         await sendWelcomeEmail(fetchedUser)
       }
-      vueApp.user = fetchedUser
-      if (!vueApp.player.name) {
-        // Only overwrite player name if none previously provided.
-        // This allows devs to use "?player=Zed" for multi-account testing.
-        vueApp.player.name = fetchedUser.name.split(' ')[0]
-      }
+      onUser(fetchedUser)
+      // TODO: Allow "?player=Zed" for multi-account testing.
 
       // Persist to local storage, to reduce login blink next time.
       // Note: Cap on localStorage size is ~5mb
