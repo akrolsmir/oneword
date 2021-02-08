@@ -61,7 +61,7 @@
 
       <div class="navbar-end">
         <div class="navbar-item">
-          <div v-if="user.name" class="buttons">
+          <div v-if="user.id" class="buttons">
             <a class="button is-primary"
               >Hello, {{ user.name.split(' ')[0] }}!</a
             >
@@ -81,17 +81,20 @@
 
 <script>
 import LoginModal from './LoginModal.vue'
-import { firebaseLogout, listenForLogin } from '../firebase/network.js'
+import { firebaseLogout } from '../firebase/network.js'
+import { inject } from 'vue'
 export default {
   components: {
     LoginModal,
   },
   data() {
     return {
-      user: {},
       modalVisible: false,
       burgerOpen: false,
     }
+  },
+  setup() {
+    return { user: inject('currentUser') }
   },
   methods: {
     logIn() {
@@ -99,11 +102,8 @@ export default {
     },
     async logOut() {
       await firebaseLogout()
-      this.user = {}
+      this.user.id = ''
     },
-  },
-  created() {
-    listenForLogin((user) => (this.user = user))
   },
 }
 </script>

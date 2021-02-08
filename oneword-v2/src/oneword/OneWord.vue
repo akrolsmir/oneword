@@ -448,7 +448,7 @@
             v-if="isEnd(room)"
             :score="score(room)"
             :rounds-in-game="room.roundsInGame"
-            :name="user.name && user.name.split(' ')[0]"
+            :name="user.displayName"
             :supporter="!!user.supporter"
             @continue-game="newRound(false)"
           ></GameEnd>
@@ -524,11 +524,9 @@ import {
 import {
   referSupporter,
   correct,
-  totalRounds,
   isEnd,
   score,
   dupes,
-  anyDupes,
   dedupe,
   nextGuesser,
   randomWord,

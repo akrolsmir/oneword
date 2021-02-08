@@ -24,10 +24,13 @@
         </footer>
       </div>
       <!-- If content is undefined, use the component slot instead -->
-      <div v-else>
-        <slot></slot>
-      </div>
+      <slot v-else></slot>
     </div>
+    <button
+      class="modal-close is-large"
+      aria-label="close"
+      @click="$emit('background-click')"
+    ></button>
   </div>
 </template>
 

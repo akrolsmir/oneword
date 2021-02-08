@@ -10,8 +10,7 @@
   </div>
 
   <form v-if="user.id || user.guest" @submit.prevent="enterRoom" method="POST">
-    <label class="label mt-2">Player</label>
-    <input class="input" type="text" v-model="playerName" placeholder="Ringo" />
+    <label class="label mt-2">Player: {{ user.displayName }}</label>
     <label class="label mt-2">Room</label>
     <input
       class="input"
@@ -27,8 +26,6 @@
     <button class="button is-large is-success" @click="user.signIn">
       Sign in to get started
     </button>
-    <br />
-    <a @click="user.guest = true" class="is-size-7">Play without an account</a>
   </template>
 
   <br /><br />
@@ -96,8 +93,16 @@ export default {
     listRooms(5, false).then((rooms) => (this.privateRooms = rooms))
   },
   computed: {
-    playerName() {
-      return this.user.name?.split(' ')[0] || ''
+    // Returns the set of open room names that matches the current `room.name`.
+    filteredRoomNameSet() {
+      const filtered = new Set()
+      const roomNameRe = new RegExp(this.player.roomName, 'i')
+      for (const openRoom of this.allRooms) {
+        if (openRoom.name.match(roomNameRe)) {
+          filtered.add(openRoom.name)
+        }
+      }
+      return filtered
     },
   },
   methods: {

@@ -1,5 +1,7 @@
 <template>
   <AnimatedModal :visible="visible">
+    <!-- Note: for some reason the card takes up 600px anyways,
+    so there's a background click deadzone to the right/left -->
     <div
       class="modal-card box"
       style="max-width: 400px"
@@ -22,7 +24,12 @@
           (Your game history will be lost!)
         </h3>
         <div class="px-6">
-          <input class="input" placeholder="Name" v-model="user.name" />
+          <input
+            class="input"
+            placeholder="Name"
+            v-model="user.name"
+            @keyup.enter="continueAsGuest"
+          />
           <div class="buttons my-3">
             <button class="button is-info is-light" @click="backToFirebase">
               Back
@@ -110,6 +117,7 @@ export default {
     },
     continueAsGuest() {
       this.user.guest = true
+      this.guestMode = false
       this.$emit('hide')
     },
   },
