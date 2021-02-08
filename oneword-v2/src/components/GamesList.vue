@@ -9,7 +9,11 @@
     But beware: duplicate hints are discarded!<br />
   </div>
 
-  <form v-if="user.id || user.guest" @submit.prevent="enterRoom" method="POST">
+  <form
+    v-if="user.id || user.guest"
+    @submit.prevent="navigateToRoom"
+    method="POST"
+  >
     <label class="label mt-2">Player: {{ user.displayName }}</label>
     <label class="label mt-2">Room</label>
     <input
@@ -67,10 +71,12 @@
 </template>
 
 <script>
-import Nametag from './Nametag.vue'
-import { formatDistanceToNow } from 'date-fns'
-import { listRooms } from '../firebase/network'
 import { inject } from 'vue'
+import { formatDistanceToNow } from 'date-fns'
+
+import Nametag from './Nametag.vue'
+import { listRooms } from '../firebase/network'
+import { sanitize } from '../text-utils'
 
 export default {
   components: {
@@ -111,6 +117,10 @@ export default {
     },
     timeSince(millis) {
       return formatDistanceToNow(new Date(millis), { addSuffix: true })
+    },
+    navigateToRoom() {
+      this.player.roomName = sanitize(this.player.roomName)
+      this.$router.push({ path: `/room/${this.player.roomName}` })
     },
   },
 }
