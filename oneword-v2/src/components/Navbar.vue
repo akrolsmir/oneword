@@ -3,6 +3,7 @@
     ref="modal"
     :visible="modalVisible"
     @background-click="modalVisible = false"
+    @hide="modalVisible = false"
   />
 
   <nav
