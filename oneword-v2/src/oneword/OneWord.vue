@@ -34,10 +34,10 @@
         <div class="message">
           <!-- Room header -->
           <div class="message-header has-text-weight-normal is-flex-wrap-wrap">
-            <h1 class="fancy big">{{ room.name }}</h1>
-            <span class="fancy capitalize"
-              >Round {{ room.history.length + 1 }}</span
-            >
+            <h1 class="fancy big">
+              Round {{ room.history.length + 1 }} of {{ totalRounds }}
+            </h1>
+            <a class="fancy" @click="showShareModal = true">{{ room.name }}</a>
           </div>
           <div>
             <div class="is-flex is-flex-wrap-wrap is-align-items-center">
@@ -616,6 +616,10 @@ export default {
       return !Object.values(this.room.people || {}).some(
         (person) => person.state === 'MOD'
       )
+    },
+    totalRounds() {
+      // Eg "Round 1 of 13"; "Round 13 of 13"; "Round 14 of 26"
+      return 13 * (Math.floor(this.room.history.length / 13) + 1)
     },
     customWordList() {
       // If there are any commas, parse as csv; else, parse with whitespace
