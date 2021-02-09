@@ -549,7 +549,7 @@ export default {
   },
   data() {
     return {
-      // TODO: Unpack "room"'s attributes into this data
+      // room contains everything that is synced to Firestore
       room: {
         // TODO: These default fillers should not be needed?
         history: [],
@@ -574,6 +574,8 @@ export default {
   async created() {
     this.room = await getRoom({ name: this.$route.params.id })
     listenRoom(this.room.name, (room) => (this.room = room))
+
+    this.enterRoom()
   },
   watch: {
     'room.currentRound.state'(state) {
@@ -622,37 +624,31 @@ export default {
     dupes,
     dedupe,
     async enterRoom() {
-      if (!this.player.name) {
-        this.$refs.navbar.logIn()
-        return
-      }
-      // Sanitize room name
-      this.room.name = this.room.name
-        .trim()
-        .toLowerCase()
-        .replace(/\s/g, '-') // whitespace
-        .replace(/[^\p{L}-]/gu, '') // not (dash or letter in any language)
+      if (!this.user.id) {
 
-      const room = await getRoom(this.room)
+        // If not logged in, show the sign-in modal
+        this.user.signIn()
 
-      if (room) {
-        // If the player's name collides with another user's,
-        // prepend adjectives until it is unique
-        while (
-          room.players.includes(this.player.name) &&
-          (this.user.guest ||
-            this.user.email != room.playerData[this.player.name].email)
-        ) {
-          this.player.name =
-            capitalize(randomWord('adjectives')) + ' ' + this.player.name
-        }
 
-        this.room = room
-        return await this.joinRoom()
+        // If success, then the user should now be ready (at least as a guest)
+        await this.joinGame()
+
+        // TODO: then join game. Sign in should be async?
       } else {
-        // Create a new room
-        listenRoom(this)
-        return await this.resetRoom()
+        this.uniquify(this.user.displayName)
+        await this.joinGame()
+        // TODO: Have to handle case when room doesn't exist
+      }
+    },
+    // TODO: only works after "people" is implemented
+    uniquify(name) {
+      this.player.name = name
+    },
+    async joinGame() {
+      if (!this.room.players.includes(this.player.name)) {
+        // Only append if player is not already in the room
+        this.room.players.push(this.player.name)
+        await this.saveRoom('players')
       }
     },
     async resetRoom() {
@@ -688,25 +684,6 @@ export default {
         },
       }
       await setRoom(this.room)
-    },
-    // Only call if room already exists.
-    async joinRoom() {
-      listenRoom(this)
-
-      // migration
-      if (!this.room.playerData) {
-        this.room.playerData = {}
-      }
-
-      const { email = '', supporter = '' } = this.user
-      this.room.playerData[this.player.name] = { email, supporter }
-
-      if (this.room.players.includes(this.player.name)) {
-        await this.saveRoom('playerData')
-      } else {
-        this.room.players.push(this.player.name)
-        await this.saveRoom('playerData', 'players')
-      }
     },
     goHome() {
       // TODO
