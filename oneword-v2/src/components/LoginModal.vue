@@ -61,19 +61,11 @@ import 'animate.css'
 function injectFirebaseUi() {
   // FirebaseUI config.
   const uiConfig = {
-    // Url to redirect to after a successful sign-in.
-    signInSuccessUrl: '/',
+    // Redirect back to the same URL after a successful sign-in.
+    signInSuccessUrl: window.location.href,
     callbacks: {
-      signInSuccess: function (user, credential, redirectUrl) {
-        if (window.opener) {
-          // The widget has been opened in a popup, so close the window
-          // and return false to not redirect the opener.
-          // TODO: close window
-          return false
-        } else {
-          // The widget has been used in redirect mode, so we redirect to the signInSuccessUrl.
-          return true
-        }
+      signInSuccessWithAuthResult: function (authResult, redirectUrl) {
+        return true // Handle the redirect automatically
       },
     },
     signInOptions: [
