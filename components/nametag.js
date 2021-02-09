@@ -6,6 +6,7 @@ Vue.component('nametag', {
     index: Number,
     guessing: Boolean,
     mod: Boolean,
+    score: Number,
   },
   data() {
     return {
@@ -49,6 +50,7 @@ Vue.component('nametag', {
   template: `
   <div class="control">
     <div class="tags has-addons">
+      <div v-if="index == 0" class="tag is-dark" title="moderator" aria-label="moderator">👑</div>
       <div 
         class="tag is-white" 
         :class="{ 'is-primary is-light': submitted && !guessing, 'is-info': guessing, 'has-text-weight-semibold': submitted }"
@@ -64,19 +66,9 @@ Vue.component('nametag', {
           height="28"
           width="28">
         {{ name }}
+        <button v-if="mod" class="delete is-small" :title="'Kick ' + name" @click.prevent="kick"></button>
       </div>
-      <template v-if="index == 0">
-        <div class="tag is-dark">
-          Mod
-        </div>
-      </template>
-      <a
-        v-else-if="mod"
-        class="tag is-delete is-danger is-light"
-        role="button"
-        :title="'Kick ' + name"
-        href="#"
-        @click.prevent="kick()"></a>
+      <div v-if="score !== undefined" class="tag is-link is-light">{{ score }}</div>
     </div>
   </div>
     `,
