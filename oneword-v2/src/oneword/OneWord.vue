@@ -1,7 +1,5 @@
 <template>
   <!-- TODO: move this entire file (and direct helpers) into src/oneword/ -->
-  <router-link to="/">Back</router-link>
-  <div>{{ $route.params.id }}</div>
   <div id="vue">
     <div v-cloak id="modals">
       <!-- Share Link Modal -->
@@ -40,35 +38,6 @@
             <span class="fancy capitalize"
               >Round {{ room.history.length + 1 }}</span
             >
-            <!-- Navigation -->
-            <span class="buttons are-small">
-              <button
-                class="button is-dark is-inverted is-outlined"
-                @click="showShareModal = true"
-              >
-                Invite
-              </button>
-              <button
-                v-if="players.includes(player.name)"
-                class="button is-dark is-inverted is-outlined"
-                @click="kickPlayer(player.name)"
-              >
-                Watch
-              </button>
-              <button
-                v-else
-                class="button is-dark is-inverted is-outlined"
-                @click="joinRoom"
-              >
-                Rejoin
-              </button>
-              <button
-                class="button is-danger is-inverted is-outlined"
-                @click="goHome()"
-              >
-                Exit
-              </button>
-            </span>
           </div>
           <div>
             <div class="is-flex is-flex-wrap-wrap is-align-items-center">
