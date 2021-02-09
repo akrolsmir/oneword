@@ -909,4 +909,8 @@ export default {
 .halfOpacity {
   opacity: 0.5;
 }
+
+.label {
+  margin-top: 1rem;
+}
 </style>
