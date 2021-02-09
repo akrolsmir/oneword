@@ -624,7 +624,7 @@ export default {
     dupes,
     dedupe,
     async enterRoom() {
-      if (!this.user.id) {
+      if (!this.user.canPlay) {
         // If not logged in, show the sign-in modal
         const onGuest = () => {
           this.uniquify(this.user.displayName)

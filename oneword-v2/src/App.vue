@@ -22,6 +22,9 @@ const currentUser = reactive({
   // Display only the first name
   displayName: computed(() => currentUser.name.split(' ')[0]),
   guest: false,
+  canPlay: computed(
+    () => currentUser.id || (currentUser.guest && currentUser.displayName)
+  ),
 })
 export default {
   components: {
