@@ -11,7 +11,7 @@
       >
         <div class="notification">
           <label class="is-block mb-2">Invite your friends to play!</label>
-          <ShareLink :link="'https://oneword.games/room/' + room.name" />
+          <ShareLink :link="currentUrl()" />
           <button
             class="delete"
             aria-label="close"
@@ -309,7 +309,7 @@
           <div v-if="room.players.length < 3">
             <h2 class="fancy" role="alert">Waiting for 3 players...</h2>
             <p class="mt-5 mb-2">Invite your friends to play!</p>
-            <ShareLink :link="'https://oneword.games/?room=' + room.name" />
+            <ShareLink :link="currentUrl()" />
           </div>
           <div v-else-if="room.currentRound.guesser == player.name">
             <h2 class="fancy" role="alert">
@@ -616,6 +616,9 @@ export default {
     },
   },
   methods: {
+    currentUrl() {
+      return window.location.href
+    },
     dupes,
     dedupe,
     async enterRoom() {
