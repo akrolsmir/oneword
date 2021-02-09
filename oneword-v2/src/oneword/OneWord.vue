@@ -429,7 +429,26 @@
             Next Round
           </button>
         </div>
-        <br /><br />
+        <br />
+
+        <!-- Notify user if they're spectating -->
+        <div
+          v-cloak
+          class="notification is-info is-light"
+          v-if="!user.canPlay || room.people[player.name].state === 'WATCHING'"
+        >
+          <span class="subtitle">You are currently spectating this game!</span>
+          <div class="buttons mt-3">
+            <button class="button is-primary" @click="enterRoom">
+              Join game
+            </button>
+            <router-link class="button is-ghost" to="/"
+              >Back to home</router-link
+            >
+          </div>
+        </div>
+
+        <br />
         <!-- History -->
         <h2 v-if="room.history.length > 0" class="fancy">History</h2>
         <template v-for="(round, i) in room.history.slice().reverse()">
