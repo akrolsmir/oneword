@@ -240,22 +240,26 @@
 
           <div class="message-body" style="border-width: 0">
             <!-- Players -->
+            <label class="label mt-0">Players</label>
             <div class="field is-grouped is-grouped-multiline">
-              <span class="mb-2 mr-2">Players:</span>
               <Nametag
-                v-for="(player, i) in players"
-                :key="player"
-                :name="player"
-                :user="room.playerData && room.playerData[player]"
-                :index="i"
+                v-for="tagged in players"
+                :key="tagged"
+                :name="tagged"
+                :user="room.playerData && room.playerData[tagged]"
                 :submitted="
-                  !!room.currentRound.clues[player] ||
-                  room.currentRound.guesser == player
+                  !!room.currentRound.clues[tagged] ||
+                  room.currentRound.guesser == tagged
                 "
-                :guessing="room.currentRound.guesser == player"
+                :guessing="room.currentRound.guesser == tagged"
                 :mod="isMod"
-                @kick="kickPlayer(player)"
+                :self="tagged === player.name"
+                :modtag="room.people[tagged].state === 'MOD'"
+                @kick="kickPlayer(tagged)"
               ></Nametag>
+            </div>
+            <div v-if="noMod">
+              <a @click="makeMod(player.name)"> (Become the mod...) </a>
             </div>
             <!-- Other Mod Tools -->
             <div v-if="isMod">
@@ -620,6 +624,11 @@ export default {
           this.room.people[this.player.name]?.state === 'MOD')
       )
     },
+    noMod() {
+      return !Object.values(this.room.people || {}).some(
+        (person) => person.state === 'MOD'
+      )
+    },
     customWordList() {
       // If there are any commas, parse as csv; else, parse with whitespace
       let words = this.room.customWords.split(',')
@@ -708,8 +717,8 @@ export default {
     },
     async makeMod(name) {
       await updateRoom(this.room, {
-        [`people.${name}.state`]: 'MOD',
         [`people.${this.player.name}.state`]: 'PLAYING',
+        [`people.${name}.state`]: 'MOD',
       })
     },
     wordForWord(category) {

@@ -26,11 +26,9 @@
         />
         {{ name }}
       </div>
-      <template v-if="index == 0">
-        <div class="tag is-dark">Mod</div>
-      </template>
+      <div v-if="modtag" class="tag is-dark">Mod</div>
       <a
-        v-else-if="mod"
+        v-if="mod || self"
         class="tag is-delete is-danger is-light"
         role="button"
         :title="'Kick ' + name"
@@ -50,9 +48,10 @@ export default {
     name: String,
     user: Object, // email and sponsor status
     submitted: Boolean,
-    index: Number,
     guessing: Boolean,
-    mod: Boolean,
+    self: Boolean, // Whether the tag is for the current player
+    mod: Boolean, // Whether the logged-in user is a mod
+    modtag: Boolean, // Whether to append a mod tag to this tag
   },
   methods: {
     kick() {
