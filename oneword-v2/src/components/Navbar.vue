@@ -2,6 +2,7 @@
   <LoginModal
     ref="modal"
     :visible="modalVisible"
+    :on-guest-callback="onGuestCallback"
     @background-click="modalVisible = false"
     @hide="modalVisible = false"
   />
@@ -91,14 +92,16 @@ export default {
     return {
       modalVisible: false,
       burgerOpen: false,
+      onGuestCallback: Function,
     }
   },
   setup() {
     return { user: inject('currentUser') }
   },
   methods: {
-    logIn() {
+    logIn(onGuestCallback = undefined) {
       this.modalVisible = true
+      this.onGuestCallback = onGuestCallback
     },
     async logOut() {
       await firebaseLogout()

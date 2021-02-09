@@ -625,15 +625,12 @@ export default {
     dedupe,
     async enterRoom() {
       if (!this.user.id) {
-
         // If not logged in, show the sign-in modal
-        this.user.signIn()
-
-
-        // If success, then the user should now be ready (at least as a guest)
-        await this.joinGame()
-
-        // TODO: then join game. Sign in should be async?
+        const onGuest = () => {
+          this.uniquify(this.user.displayName)
+          this.joinGame()
+        }
+        this.user.signIn(onGuest)
       } else {
         this.uniquify(this.user.displayName)
         await this.joinGame()

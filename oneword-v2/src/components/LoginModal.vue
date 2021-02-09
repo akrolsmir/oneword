@@ -86,7 +86,8 @@ export default {
   components: { AnimatedModal },
   emits: ['hide'],
   props: {
-    visible: false,
+    visible: Boolean,
+    onGuestCallback: Function,
   },
   data() {
     return {
@@ -110,6 +111,8 @@ export default {
     continueAsGuest() {
       this.user.guest = true
       this.guestMode = false
+      // If onGuestCallback is not provided, it'll be sth like a MouseEvent
+      this.onGuestCallback instanceof Function && this.onGuestCallback()
       this.$emit('hide')
     },
   },
