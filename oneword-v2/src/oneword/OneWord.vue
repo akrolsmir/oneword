@@ -575,6 +575,12 @@ export default {
     this.room = await getRoom({ name: this.$route.params.id })
     listenRoom(this.room.name, (room) => (this.room = room))
 
+    // For dev velocity, accept https://oneword.games/room/rome?player=Spartacus
+    if (this.$route.query.player && !this.user.id) {
+      this.user.guest = true
+      this.user.name = this.$route.query.player
+    }
+
     this.enterRoom()
   },
   watch: {
@@ -594,7 +600,8 @@ export default {
         .filter(([_name, person]) => person.state !== 'WATCHING')
         .map(([name, _person]) => name)
       // Backfill with room.players; TODO remove after 2021-04-09
-      return [...new Set(fromPeople.concat(this.room.players || []))]
+      const deduped = [...new Set(fromPeople.concat(this.room.players || []))]
+      return deduped.sort()
     },
     timerLength() {
       if (
@@ -625,7 +632,8 @@ export default {
   },
   methods: {
     currentUrl() {
-      return window.location.href
+      // Ignore query params, since they may be used for guest login
+      return window.location.href.split('?')[0]
     },
     dupes,
     dedupe,
