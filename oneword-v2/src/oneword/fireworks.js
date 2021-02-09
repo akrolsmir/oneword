@@ -3,7 +3,6 @@
 // Fireworks effect shamelessly stolen from:
 // https://www.html5canvastutorials.com/advanced/html5-canvas-fireworks-effect/
 export function startFireworks(correct) {
-  console.log('fireworks', correct)
   // VARIABLEZ
   // play with them
   var c = document.querySelector('#fireworks'),
