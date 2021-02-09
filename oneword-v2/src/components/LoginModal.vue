@@ -14,9 +14,7 @@
       <div class="has-text-centered" v-show="!guestMode">
         <h2 class="fancy title mb-1">Sign in to get started!</h2>
         <div id="firebaseui-auth-container"></div>
-        <a class="is-size-7" @click="guestMode = true"
-          >Or play without an account</a
-        >
+        <a class="is-size-7" @click="toGuestMode">Or play without an account</a>
       </div>
       <div v-show="guestMode">
         <h2 class="fancy title has-text-centered">Play without an account</h2>
@@ -25,6 +23,7 @@
         </h3>
         <div class="px-6">
           <input
+            ref="inputGuestName"
             class="input"
             placeholder="Name"
             v-model="user.name"
@@ -104,6 +103,11 @@ export default {
   },
   methods: {
     injectFirebaseUi,
+    toGuestMode() {
+      this.guestMode = true
+      // Wait for mount, then focus the input
+      this.$nextTick(() => this.$refs.inputGuestName.focus())
+    },
     backToFirebase() {
       injectFirebaseUi()
       this.guestMode = false
