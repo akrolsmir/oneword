@@ -215,6 +215,7 @@
               :submitted="!!room.currentRound.responses[player] || room.currentRound.chooser == player"
               :guessing="room.currentRound.chooser == player"
               :mod="isMod"
+              :score="scores[player]"
               @kick="kickPlayer(player)"
             ></nametag>
           </div>
@@ -364,9 +365,6 @@
                 <p>Players who've voted: {{ voted.join(', ') }}</p>
               </div>
             </template>
-            <!-- Score -->
-            <h2 class="fancy">Scores</h2>
-            <div v-for="player in room.players">{{ player }}: {{ scores[player] }}</div>
           </div>
         </div>
       </template>
