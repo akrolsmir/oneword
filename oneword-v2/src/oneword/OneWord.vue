@@ -49,7 +49,7 @@
                 Invite
               </button>
               <button
-                v-if="room.players.includes(player.name)"
+                v-if="players.includes(player.name)"
                 class="button is-dark is-inverted is-outlined"
                 @click="kickPlayer(player.name)"
               >
@@ -243,7 +243,7 @@
             <div class="field is-grouped is-grouped-multiline">
               <span class="mb-2 mr-2">Players:</span>
               <Nametag
-                v-for="(player, i) in room.players"
+                v-for="(player, i) in players"
                 :key="player"
                 :name="player"
                 :user="room.playerData && room.playerData[player]"
@@ -286,7 +286,7 @@
                 <span class="control">
                   <span class="select is-small">
                     <select v-model="newMod">
-                      <option v-for="player in room.players.slice(1)">
+                      <option v-for="player in players">
                         {{ player }}
                       </option>
                     </select>
@@ -306,7 +306,7 @@
 
         <!-- Input area (clueing) -->
         <div v-if="room.currentRound.state == 'CLUEING'">
-          <div v-if="room.players.length < 3">
+          <div v-if="players.length < 3">
             <h2 class="fancy" role="alert">Waiting for 3 players...</h2>
             <p class="mt-5 mb-2">Invite your friends to play!</p>
             <ShareLink :link="currentUrl()" />
@@ -336,7 +336,7 @@
                     :class="{
                       'is-primary': room.currentRound.clues[player.name],
                     }"
-                    :disabled="!room.players.includes(player.name)"
+                    :disabled="!players.includes(player.name)"
                   />
                 </div>
                 <div class="control">
@@ -344,7 +344,7 @@
                     class="button"
                     @click="submitClue"
                     :disabled="
-                      !room.players.includes(player.name) ||
+                      !players.includes(player.name) ||
                       dupes(player.clue, room.currentRound.word)
                     "
                     :class="{
@@ -589,6 +589,13 @@ export default {
     },
   },
   computed: {
+    players() {
+      const fromPeople = Object.entries(this.room.people || {})
+        .filter(([_name, person]) => person.state !== 'WATCHING')
+        .map(([name, _person]) => name)
+      // Backfill with room.players; TODO remove after 2021-04-09
+      return [...new Set(fromPeople.concat(this.room.players || []))]
+    },
     timerLength() {
       if (
         this.room.currentRound &&
@@ -600,12 +607,11 @@ export default {
       return 0
     },
     isMod() {
-      if (this.user?.supporter == 'ADMIN') {
-        return true
-      }
-      if (this.room && this.room.players) {
-        return this.player.name == this.room.players[0]
-      }
+      return (
+        this.user?.supporter === 'ADMIN' ||
+        (this.room.people &&
+          this.room.people[this.player.name]?.state === 'MOD')
+      )
     },
     customWordList() {
       // If there are any commas, parse as csv; else, parse with whitespace
@@ -642,16 +648,17 @@ export default {
       this.player.name = name
     },
     async joinGame() {
-      if (!this.room.players.includes(this.player.name)) {
-        // Only append if player is not already in the room
-        this.room.players.push(this.player.name)
-        await this.saveRoom('players')
+      // Assumes player.name as already been uniquify'd
+      this.room.people[this.player.name] = {
+        id: this.user.id || '',
+        supporter: this.user.supporter || '',
+        state: 'PLAYING',
       }
+      await this.saveRoom('people')
     },
     async resetRoom() {
       this.room = {
         name: this.room.name,
-        players: [this.player.name],
         currentRound: {
           state: 'CLUEING',
           guesser: this.player.name,
@@ -673,10 +680,11 @@ export default {
           custom: false,
         },
         customWords: '',
-        playerData: {
+        people: {
           [this.player.name]: {
-            email: this.user.email || '',
+            id: this.user.id || '',
             supporter: this.user.supporter || '',
+            state: 'MOD', // or 'PLAYING' or 'WATCHING'
           },
         },
       }
@@ -688,22 +696,13 @@ export default {
       // this.room = { name: '' }
     },
     async kickPlayer(name) {
-      if (this.room.players.includes(name)) {
-        const index = this.room.players.indexOf(name)
-        this.room.players.splice(index, 1)
-        await this.saveRoom('players')
-      }
+      await updateRoom(this.room, { [`people.${name}.state`]: 'WATCHING' })
     },
     async makeMod(name) {
-      const index = this.room.players.indexOf(name)
-      if (index >= 0) {
-        // swap players[0] and players[index]
-        ;[this.room.players[0], this.room.players[index]] = [
-          this.room.players[index],
-          this.room.players[0],
-        ]
-        await this.saveRoom('players')
-      }
+      await updateRoom(this.room, {
+        [`people.${name}.state`]: 'MOD',
+        [`people.${this.player.name}.state`]: 'PLAYING',
+      })
     },
     wordForWord(category) {
       return (
@@ -730,7 +729,7 @@ export default {
       await updateRoom(this.room, update)
 
       // If all clues are in, move to guessing
-      const doneCluing = this.room.players.every(
+      const doneCluing = this.players.every(
         (p) =>
           this.room.currentRound.clues[p] || p == this.room.currentRound.guesser
       )
@@ -787,7 +786,7 @@ export default {
         state: 'CLUEING',
         guesser: sameGuesser
           ? this.room.currentRound.guesser
-          : nextGuesser(this.room.currentRound.guesser, this.room.players),
+          : nextGuesser(this.room.currentRound.guesser, this.players),
         guess: '',
         word: nextWord(this.room.history, category, this.customWordList),
         clues: {},
