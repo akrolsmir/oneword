@@ -35,3 +35,26 @@ Running the code:
 
 - `yarn start` to spin up a local server
   - When you save a file, the app will automatically reload!
+
+## Best practices for working with Vue + Firestore
+
+- Most important: keep your Firestore data structure simple and elegant.
+  App logic and visuals are easy to change; backfilling data is annoying.
+- Prefer local computed properties over putting more things into the Firestore room.
+- When possible, your Firestore pushes should to be idempotent
+  (ie can be called multiple times with the same effect), and free of race conditions
+  (ie one client should not overwrite another's changes).
+  - This is most important in frequent actions (eg submitting words); less important
+    in rarer actions (eg joining rooms)
+- Instead of pushing an array to Firestore, consider pushing an object.
+  (Then make a computed array, eg with `Object.keys(foo)`). This prevents race
+  conditions if multiple clients update the same array
+
+## Other tips
+
+- Constantly invest in faster dev velocity!
+  - Build mod tools for yourself
+  - If anything iteration cycle seems to take long, bother Austin about it
+- Code should be as readable as possible
+  - Self-documenting if possible, then comments
+  - It's easier to read less code
