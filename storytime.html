@@ -38,8 +38,9 @@
       font-size: 100%;
     }
 
-    body {
-      margin: 48px auto;
+    body,
+    .status-panel {
+      margin: 0 auto;
       width: 760px;
       max-width: 95vw;
     }
@@ -54,11 +55,6 @@
 
     .tag {
       font-size: 0.875rem !important;
-    }
-
-    .history {
-      max-height: 612px;
-      background-color: white;
     }
 
     .carousel .carousel-items {
@@ -78,7 +74,7 @@
 
 <body class="has-navbar-fixed-top">
   <div id="vue">
-    <navbar ref="navbar" v-model="user"></navbar>
+    <navbar ref="navbar" v-model="user" style="height: 56px"></navbar>
     <div class="modal" :class="{'is-active': alertIsShowing}">
       <div class="modal-background" @click="alertIsShowing=false"></div>
       <div class="modal-content">
@@ -90,7 +86,7 @@
       </div>
     </div>
     <!-- Home page -->
-    <div v-if="!room.players" class="container mx-4">
+    <div v-if="!room.players" class="container mx-4 my-6">
       You and your friends find yourself in a text adventure! Each turn, one of your friends will decide what their
       character does, then you and your friends will continue the story. <br />
       After that, you all vote for who wrote it the best - or in other words, you choose your friends' adventure!
@@ -118,11 +114,11 @@
       </template>
     </div>
     <!-- In game -->
-    <div v-cloak v-else class="container mx-4">
-      <div class="message">
+    <div v-cloak v-else class="container">
+      <div class="message" style="position: fixed; top: 56px; left: 0; right: 0; z-index: 2">
         <!-- Room header -->
         <div class="message-header has-text-weight-normal is-flex-wrap-wrap">
-          <h1 class="fancy">Room: {{ room.name }}</h1>
+          <h1 class="fancy mt-1">Room: {{ room.name }}</h1>
 
           <!-- Navigation -->
           <span class="buttons are-small">
@@ -199,6 +195,31 @@
                 </template>
                 <span v-else class="mx-1">No timers</span>
               </template>
+
+              <!-- Other Mod Tools -->
+              <template v-if="isMod">
+                <div class="field has-addons is-inline-flex mb-0 mx-1">
+                  <span class="control">
+                    <button class="button is-small" @click="nextStage">Next Stage</button>
+                  </span>
+
+                  <span v-if="this.user.supporter == 'ADMIN'" class="control">
+                    <button class="button is-small" @click="resetRoom">Reset Room</button>
+                  </span>
+                </div>
+                <div class="field has-addons is-inline-flex mx-1">
+                  <span class="control">
+                    <button class="button is-small" @click="makeMod(newMod)">Transfer Mod</button>
+                  </span>
+                  <span class="control">
+                    <span class="select is-small">
+                      <select v-model="newMod">
+                        <option v-for="player in this.room.players.slice(1)">{{ player }}</option>
+                      </select>
+                    </span>
+                  </span>
+                </div>
+              </template>
             </span>
           </div>
         </div>
@@ -219,36 +240,18 @@
               @kick="kickPlayer(player)"
             ></nametag>
           </div>
-          <!-- Other Mod Tools -->
-          <div v-if="isMod">
-            <div class="label">Room Controls</div>
-            <div class="field has-addons is-inline-flex mb-0">
-              <span class="control">
-                <button class="button is-small" @click="nextStage">Next Stage</button>
-              </span>
-
-              <span v-if="this.user.supporter == 'ADMIN'" class="control">
-                <button class="button is-small" @click="resetRoom">Reset Room</button>
-              </span>
-            </div>
-            <div class="field has-addons is-inline-flex">
-              <span class="control">
-                <button class="button is-small" @click="makeMod(newMod)">Transfer Mod</button>
-              </span>
-              <span class="control">
-                <span class="select is-small">
-                  <select v-model="newMod">
-                    <option v-for="player in this.room.players.slice(1)">{{ player }}</option>
-                  </select>
-                </span>
-              </span>
-            </div>
-          </div>
         </div>
       </div>
 
-      <scroll-to-bottom ref="history" class="history block">
-        <history-segment v-for="(round, i) in room.history" :key="i" :round="round" :scores="score(round)" />
+      <scroll-to-bottom ref="history" class="block mx-4">
+        <div style="height: 220px"></div>
+        <history-segment
+          v-for="(round, i) in room.history"
+          :key="i"
+          :round="round"
+          :scores="score(round)"
+        ></history-segment>
+        <div style="height: 280px"></div>
       </scroll-to-bottom>
 
       <div v-if="room.players.length < 4">
@@ -272,22 +275,14 @@
         </div>
         <br />
       </div>
-
       <template v-else>
-        <timer
-          :length="timerLength"
-          :on-finish="nextStage"
-          v-if="timerLength > 0"
-          :key="room.currentRound.state"
-        ></timer>
-
-        <div class="card">
-          <div class="card-content">
-            <h2 class="fancy mb-4" aria-live="polite">{{ prettyStatus }}</h2>
+        <div class="card status-panel" style="position: fixed; bottom: 0; z-index: 2">
+          <div class="card-content" style="background: #d3d3d3">
+            <h2 class="fancy mt-0 is-size-5" aria-live="polite">{{ prettyStatus }}</h2>
             <!-- Prompt -->
             <template v-if="room.currentRound.state == 'PROMPT'">
               <template v-if="isChooser">
-                <div class="field has-addons">
+                <div class="field has-addons mt-2">
                   <div class="control is-expanded">
                     <input
                       class="input is-large"
@@ -304,13 +299,13 @@
             </template>
             <!-- Response -->
             <template v-else-if="room.currentRound.state == 'RESPONSE'">
-              <div class="is-size-4 mb-2">{{ room.currentRound.chooser }}&gt; {{ room.currentRound.prompt }}</div>
+              <div class="is-size-5 mb-2">{{ room.currentRound.chooser }}&gt; {{ room.currentRound.prompt }}</div>
               <div class="field">
                 <div class="control is-expanded">
                   <textarea
-                    class="textarea"
+                    class="textarea has-fixed-size"
                     id="responseInput"
-                    rows="4"
+                    rows="3"
                     v-model="player.response"
                     :class="{'is-primary': room.currentRound.responses[player.name]}"
                     :disabled="!room.players.includes(player.name)"
@@ -320,9 +315,10 @@
               <div class="level">
                 <div class="level-left">
                   <div>
-                    Your Bonus Words:
+                    Your bonus words:
                     <span
                       v-for="word in prettySuggestions"
+                      class="ml-1"
                       :class="{'has-text-weight-medium has-text-primary': player.response.toLowerCase().includes(word)}"
                     >
                       {{ word }}
@@ -365,6 +361,13 @@
                 <p>Players who've voted: {{ voted.join(', ') }}</p>
               </div>
             </template>
+
+            <timer
+              :length="timerLength"
+              :on-finish="nextStage"
+              v-if="timerLength > 0"
+              :key="room.currentRound.state"
+            ></timer>
           </div>
         </div>
       </template>

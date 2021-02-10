@@ -27,7 +27,7 @@ Vue.component('history-segment', {
     },
   },
   template: `
-  <div style="background-color: #f5f5f5;" class="py-3 px-5 mb-1">
+  <div style="background-color: white;" class="py-3 px-5 mb-1">
     <span class="is-size-5">{{ round.chooser }}&gt; {{ round.prompt }}</span>
     <b-carousel :autoplay="false" :indicator-inside="false" indicator-style="is-dots" iconPack="fa">
       <b-carousel-item v-for="(player, i) in players " :key="i" :style="{ backgroundColor: i==0 ? 'default' : '#f9ced7', borderRadius: '4px' }">
