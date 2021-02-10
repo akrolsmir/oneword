@@ -127,3 +127,12 @@ export function nextCategory(categories) {
 export function capitalize(str) {
   return str ? str[0].toLocaleUpperCase() + str.substring(1) : ''
 }
+
+export function listPlayers(room) {
+  const fromPeople = Object.entries(room.people || {})
+    .filter(([_name, person]) => person.state !== 'WATCHING')
+    .map(([name, _person]) => name)
+  // Backfill with room.players; TODO remove after 2021-04-09
+  const deduped = [...new Set(fromPeople.concat(room.players || []))]
+  return deduped.sort()
+}

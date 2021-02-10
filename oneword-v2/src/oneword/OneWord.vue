@@ -497,6 +497,7 @@ import {
   nextWord,
   nextCategory,
   capitalize,
+  listPlayers,
 } from './oneword-utils.js'
 import { inject } from 'vue'
 
@@ -573,12 +574,7 @@ export default {
   },
   computed: {
     players() {
-      const fromPeople = Object.entries(this.room.people || {})
-        .filter(([_name, person]) => person.state !== 'WATCHING')
-        .map(([name, _person]) => name)
-      // Backfill with room.players; TODO remove after 2021-04-09
-      const deduped = [...new Set(fromPeople.concat(this.room.players || []))]
-      return deduped.sort()
+      return listPlayers(this.room)
     },
     timerLength() {
       if (

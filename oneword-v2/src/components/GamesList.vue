@@ -42,17 +42,17 @@
     >
       <router-link :to="`/room/${openRoom.name}`">
         <b>{{ openRoom.name }}</b></router-link
-      >, with {{ openRoom.players.join(', ') }} ({{
+      >, with {{ listPlayers(openRoom).join(', ') }} ({{
         timeSince(openRoom.lastUpdateTime)
       }})
     </p>
     <h2 class="fancy">Private Rooms</h2>
     <p v-for="privateRoom in privateRooms" :key="privateRoom.name">
       <a href="#" @click.prevent="showPrivateModal">
-        <b>{{ 'Private room' }} with {{ privateRoom.players[0] }}</b>
+        <b>{{ 'Private room' }} with {{ listPlayers(privateRoom)[0] }}</b>
       </a>
-      <span v-if="privateRoom.players.length > 1">
-        and {{ privateRoom.players.length }} others</span
+      <span v-if="listPlayers(privateRoom).length > 1">
+        and {{ listPlayers(privateRoom).length }} others</span
       >
       ({{ timeSince(privateRoom.lastUpdateTime) }})
     </p>
@@ -77,6 +77,7 @@ import { formatDistanceToNow } from 'date-fns'
 import Nametag from './Nametag.vue'
 import { listRooms } from '../firebase/network'
 import { sanitize } from '../text-utils'
+import { listPlayers } from '../oneword/oneword-utils'
 
 export default {
   components: {
@@ -94,9 +95,12 @@ export default {
     }
   },
   created() {
+    const nonempty = (room) => listPlayers(room).length > 0
     // Async load all open and private rooms
-    listRooms().then((rooms) => (this.allRooms = rooms))
-    listRooms(5, false).then((rooms) => (this.privateRooms = rooms))
+    listRooms().then((rooms) => (this.allRooms = rooms.filter(nonempty)))
+    listRooms(5, false).then(
+      (rooms) => (this.privateRooms = rooms.filter(nonempty))
+    )
   },
   computed: {
     // Returns the set of open room names that matches the current `room.name`.
@@ -112,6 +116,7 @@ export default {
     },
   },
   methods: {
+    listPlayers,
     isMuteOpenRoom(openRoom) {
       return false // TODO: fix
     },
