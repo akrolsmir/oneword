@@ -56,7 +56,7 @@
             <img
               class="border"
               width="377px"
-              src="../assets/spot-bad.png"
+              src="/images/spot-bad.png"
               alt="An example game round, where Amey guessed 'speckled' but the word was 'spot'."
             />
           </div>
@@ -67,7 +67,7 @@
             <img
               class="border"
               width="377px"
-              src="../assets/spot-good.png"
+              src="/images/spot-good.png"
               alt="The same game round, but now 'speckled' is marked as correct."
             />
           </div>
@@ -78,7 +78,7 @@
       <div class="promo-img">
         <img
           class="border"
-          src="../assets/themed-lists.png"
+          src="/images/themed-lists.png"
           alt="Some different word lists to play with, like Countries and Pokemon."
         />
       </div>
@@ -107,7 +107,7 @@
         <img
           class="border"
           width="299px"
-          src="../assets/sponsors.png"
+          src="/images/sponsors.png"
           alt="Frontpage listing of our sponsors"
         />
       </div>
