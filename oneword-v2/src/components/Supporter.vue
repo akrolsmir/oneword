@@ -184,8 +184,12 @@
 
       <br />
       <h2>Ready to support One Word?</h2>
-      As always, if you have any questions, or need support, get in touch at
-      <a href="mailto:austin@oneword.games">austin@oneword.games</a>.<br />
+      You can cancel your support at any time -- and if you're unhappy for any
+      reason, let us know and we'll provide a full refund.<br /><br />
+
+      As always, if you have any questions, or need help, get in touch at
+      <a href="mailto:austin@oneword.games">austin@oneword.games</a
+      >.<br /><br />
       Thanks, and happy cluing!<br />
     </div>
   </article>
@@ -197,7 +201,8 @@
       <div class="plan-header">Supporter</div>
       <div class="plan-price">
         <span class="plan-price-amount"
-          ><span class="plan-price-currency">$</span>2.99</span
+          ><span class="plan-price-currency">$</span
+          >{{ planValues['supporter'] }}</span
         >/month
       </div>
       <div class="plan-items">
@@ -222,13 +227,14 @@
       <div class="plan-header">Champion</div>
       <div class="plan-price">
         <span class="plan-price-amount"
-          ><span class="plan-price-currency">$</span>4.99</span
+          ><span class="plan-price-currency">$</span
+          >{{ planValues['champion'] }}</span
         >/month
       </div>
       <div class="plan-items">
-        <div class="plan-item"><b>Frontpage Sponsor credit!</b></div>
-        <div class="plan-item"><b>Private rooms</b></div>
-        <div class="plan-item"><b>Custom user avatar</b></div>
+        <div class="plan-item"><b>Themed word lists!</b></div>
+        <div class="plan-item"><b>Mark guesses as correct!</b></div>
+        <div class="plan-item">Private rooms!</div>
         <div class="plan-item">Priority support</div>
         <div class="plan-item">Ad-free experience</div>
         <div class="plan-item">-</div>
@@ -244,14 +250,15 @@
       <div class="plan-header">Sponsor</div>
       <div class="plan-price">
         <span class="plan-price-amount"
-          ><span class="plan-price-currency">$</span>9.99</span
+          ><span class="plan-price-currency">$</span
+          >{{ planValues['sponsor'] }}</span
         >/month
       </div>
       <div class="plan-items">
-        <div class="plan-item"><b>Promote your own game!</b></div>
         <div class="plan-item"><b>Frontpage Sponsor credit!</b></div>
+        <div class="plan-item"><b>Custom cosmetics!</b></div>
+        <div class="plan-item">Themed word lists</div>
         <div class="plan-item">Private rooms</div>
-        <div class="plan-item">Custom user avatar</div>
         <div class="plan-item">Priority support</div>
         <div class="plan-item">Ad-free experience</div>
       </div>
@@ -270,11 +277,15 @@ import { loadStripe } from '@stripe/stripe-js'
 import { firebaseLogEvent } from '../firebase/network'
 
 export default {
+  data() {
+    return {
+      planValues: { supporter: 3, champion: 6, sponsor: 10 },
+    }
+  },
   methods: {
     async checkout(planName) {
-      const planValues = { supporter: 2.99, champion: 4.99, sponsor: 9.99 }
       firebaseLogEvent('purchase', {
-        value: planValues[planName],
+        value: this.planValues[planName],
         currency: 'USD',
       })
 
