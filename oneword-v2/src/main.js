@@ -6,6 +6,7 @@ import './styles.css'
 
 import GamesList from './components/GamesList.vue'
 import Profile from './components/Profile.vue'
+import About from './components/About.vue'
 import OneWord from './oneword/OneWord.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
@@ -13,6 +14,7 @@ const routes = [
   { path: '/', component: GamesList },
   { path: '/room/:id', component: OneWord },
   { path: '/profile', component: Profile },
+  { path: '/about', component: About },
 ]
 
 const router = createRouter({
