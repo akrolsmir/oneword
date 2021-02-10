@@ -58,10 +58,13 @@ import AnimatedModal from './AnimatedModal.vue'
 import 'animate.css'
 
 function injectFirebaseUi() {
+  const successUrl = new URL(window.location.href)
+  successUrl.searchParams.set('authed', '1')
+
   // FirebaseUI config.
   const uiConfig = {
     // Redirect back to the same URL after a successful sign-in.
-    signInSuccessUrl: window.location.href,
+    signInSuccessUrl: successUrl.toString(),
     callbacks: {
       signInSuccessWithAuthResult: function (authResult, redirectUrl) {
         return true // Handle the redirect automatically

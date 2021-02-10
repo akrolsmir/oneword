@@ -154,7 +154,6 @@ export function listenForLogin(onUser /* callback that takes in a user */) {
         await sendWelcomeEmail(fetchedUser)
       }
       onUser(fetchedUser)
-      // TODO: Allow "?player=Zed" for multi-account testing.
 
       // Persist to local storage, to reduce login blink next time.
       // Note: Cap on localStorage size is ~5mb

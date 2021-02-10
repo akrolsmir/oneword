@@ -31,7 +31,10 @@ export default {
     Navbar,
   },
   setup() {
-    listenForLogin((user) => Object.assign(currentUser, user))
+    listenForLogin((user) => {
+      Object.assign(currentUser, user)
+      user.guest = false
+    })
 
     // Best practice would be to make currentUser readonly, and export a update function.
     provide('currentUser', currentUser)

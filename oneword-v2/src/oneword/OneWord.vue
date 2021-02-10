@@ -420,11 +420,13 @@
   <div
     v-cloak
     class="notification is-info is-light"
-    v-if="!user.canPlay || room.people[player.name].state === 'WATCHING'"
+    v-if="!user.canPlay || room.people[player.name]?.state === 'WATCHING'"
   >
     <span class="subtitle">You are currently spectating this game!</span>
     <div class="buttons mt-3">
-      <button class="button is-primary" @click="enterRoom">Join game</button>
+      <button class="button is-primary" @click="enterRoom">
+        <strong>Join game</strong>
+      </button>
       <router-link class="button is-ghost" to="/">Back to home</router-link>
     </div>
   </div>
@@ -477,6 +479,7 @@ import GameEnd from './GameEnd.vue'
 
 import {
   getRoom,
+  listenForLogin,
   listenRoom,
   setRoom,
   updateRoom,
@@ -518,6 +521,7 @@ export default {
         timers: {},
         categories: {},
         currentRound: {},
+        people: {},
       },
       player: {
         name: 'Anon',
@@ -540,6 +544,18 @@ export default {
     if (this.$route.query.player && !this.user.id) {
       this.user.guest = true
       this.user.name = this.$route.query.player
+    }
+
+    // If returning from Firebase sign in ('?authed=1'), skip the login modal
+    if (this.$route.query.authed) {
+      // Remove the 'authed=1' from the URL for cleanliness
+      const query = { ...this.$route.query }
+      delete query.authed
+      this.$router.replace(query)
+
+      // Then sign them in after the Firebase callback returns
+      listenForLogin((_user) => this.enterRoom())
+      return
     }
 
     this.enterRoom()
