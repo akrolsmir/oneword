@@ -22,6 +22,7 @@
           Email: <a href="mailto:austin@oneword.games">austin@oneword.games</a>
         </p>
         <br /><br />
+
         <div class="field">
           <Nametag
             name="Sinclair Chen"
@@ -44,6 +45,7 @@
           <a href="https://sipec.github.io">sipec.github.io</a>.
         </p>
         <br /><br />
+
         <div class="field">
           <Nametag
             name="Michael Liu"
@@ -60,6 +62,7 @@
           <a href="mailto:michael@oneword.games">michael@oneword.games</a>
         </p>
         <br /><br />
+
         <div class="field">
           <Nametag
             name="Alice Pang"
@@ -74,14 +77,31 @@
         <p>
           Email: <a href="mailto:alice@oneword.games">alice@oneword.games</a>
         </p>
+        <br /><br />
+
+        <div class="field">
+          <Nametag
+            name="Shawn Xie"
+            :user="{ email: 'shawn.y.xie@gmail.com', supporter: 'ADMIN' }"
+          />
+        </div>
+        <p>
+          I'm Shawn. I turned Austin into a morning person with our 8am jogs
+          through Golden Gate Park; meanwhile, he roped me into building
+          <router-link to="/pairwise">Pairwise</router-link>.
+        </p>
+        <br />
+        <p>
+          Email: <a href="mailto:shawn@oneword.games">shawn@oneword.games</a>
+        </p>
         <br /><br /><br />
 
         <div class="content">
           With additional thanks to:
           <ul>
             <li>
-              Alex Lien, Bryant Chang, Shawn Xie, and the rest of our Sat 5pm
-              playtest group~
+              Alex Lien, Bryant Chang, and the rest of our Sat 5pm playtest
+              group~
             </li>
             <li>Harrison Tu for accessibility playtesting and feedback</li>
             <li>
