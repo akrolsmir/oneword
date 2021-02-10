@@ -76,7 +76,7 @@ import { formatDistanceToNow } from 'date-fns'
 
 import Nametag from './Nametag.vue'
 import { listRooms } from '../firebase/network'
-import { sanitize } from '../text-utils'
+import { sanitize, timeSince } from '../utils'
 import { listPlayers } from '../oneword/oneword-utils'
 
 export default {
@@ -116,12 +116,10 @@ export default {
     },
   },
   methods: {
+    timeSince,
     listPlayers,
     isMuteOpenRoom(openRoom) {
       return false // TODO: fix
-    },
-    timeSince(millis) {
-      return formatDistanceToNow(new Date(millis), { addSuffix: true })
     },
     navigateToRoom() {
       this.player.roomName = sanitize(this.player.roomName)
