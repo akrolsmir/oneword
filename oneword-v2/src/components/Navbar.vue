@@ -63,8 +63,8 @@
       <div class="navbar-end">
         <div class="navbar-item">
           <div v-if="user.id" class="buttons">
-            <a class="button is-primary"
-              >Hello, {{ user.name.split(' ')[0] }}!</a
+            <router-link to="/profile" class="button is-primary"
+              >Hello, {{ user.name.split(' ')[0] }}!</router-link
             >
             <a class="button is-light" @click="logOut">Log out</a>
           </div>
