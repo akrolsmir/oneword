@@ -168,6 +168,10 @@ export async function firebaseLogout() {
   localStorage.removeItem(CACHED_USER_KEY)
 }
 
+export function firebaseLogEvent(name, event) {
+  firebase.analytics().logEvent(name, event)
+}
+
 /**
  * `email` should be formatted like: {
     from: 'Austin - 20 Chars <akrolsmir@gmail.com>'

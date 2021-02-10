@@ -266,25 +266,31 @@
 
 <script>
 import 'bulma-pricingtable/dist/css/bulma-pricingtable.min.css'
+import { loadStripe } from '@stripe/stripe-js'
+import { firebaseLogEvent } from '../firebase/network'
 
 export default {
   methods: {
-    checkout(planName) {
+    async checkout(planName) {
       const planValues = { supporter: 2.99, champion: 4.99, sponsor: 9.99 }
-      firebase.analytics().logEvent('purchase', {
+      firebaseLogEvent('purchase', {
         value: planValues[planName],
         currency: 'USD',
       })
 
       // Test APIs
-      // var stripe = Stripe('pk_test_TBbJ3UlK3uxu5fIiaFa1fEgq00F66fSFTg');
+      // const stripe = await loadStripe(
+      //   'pk_test_TBbJ3UlK3uxu5fIiaFa1fEgq00F66fSFTg'
+      // )
       // const plans = {
       //   supporter: 'plan_H44e4fQHCaUePD',
       //   sponsor: 'plan_H44fh9HqtqTb9B',
       // }
 
       // Prod APIs
-      var stripe = Stripe('pk_live_V662ekSpUVB7NK0YRz6mZRrg00VtBZqQ6k')
+      const stripe = await loadStripe(
+        'pk_live_V662ekSpUVB7NK0YRz6mZRrg00VtBZqQ6k'
+      )
       const plans = {
         supporter: 'plan_H3ICnHNAVRYziM',
         champion: 'price_1I9JRXCGj90UZkiJNKLtWiVe',
@@ -301,14 +307,14 @@ export default {
           // a successful payment.
           // Instead use one of the strategies described in
           // https://stripe.com/docs/payments/checkout/fulfillment
-          successUrl: window.location.origin + `/thanks.html?type=${planName}`,
-          cancelUrl: window.location.origin + '/supporter.html',
+          successUrl: window.location.origin + `/thanks?type=${planName}`,
+          cancelUrl: window.location.origin + '/supporter',
         })
         .then(function (result) {
           if (result.error) {
             // If `redirectToCheckout` fails due to a browser or network
             // error, display the localized error message to your customer.
-            var displayError = document.getElementById('error-message')
+            const displayError = document.getElementById('error-message')
             displayError.textContent = result.error.message
           }
         })
@@ -316,14 +322,6 @@ export default {
   },
 }
 </script>
-
-<style>
-body {
-  margin: 48px auto;
-  width: 800px;
-  max-width: 95vw;
-}
-</style>
 
 <style scoped>
 h1,
@@ -353,13 +351,15 @@ h2 {
   justify-content: center;
 }
 
-.message {
-  width: 720px;
-}
-
 .caption {
   margin: 6px;
   text-align: center;
   font-style: italic;
+}
+
+/* Make pricing table exceed the 600px column, and also center it. */
+.pricing-table {
+  width: 1000px;
+  margin-left: -200px;
 }
 </style>

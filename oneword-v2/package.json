@@ -8,6 +8,7 @@
     "serve": "vite preview"
   },
   "dependencies": {
+    "@stripe/stripe-js": "^1.12.1",
     "animate.css": "^4.1.1",
     "bulma": "^0.9.1",
     "bulma-pricingtable": "^0.2.0",
@@ -15,7 +16,6 @@
     "firebase": "^8.2.4",
     "firebaseui": "^4.7.1",
     "pluralize": "^8.0.0",
-    "stripe": "^8.135.0",
     "vue": "^3.0.5",
     "vue-router": "4"
   },
