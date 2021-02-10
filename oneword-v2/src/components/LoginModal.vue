@@ -59,17 +59,15 @@ import 'animate.css'
 
 function injectFirebaseUi() {
   const successUrl = new URL(window.location.href)
-  successUrl.searchParams.set('authed', '1')
+  if (successUrl.pathname !== '/') {
+    // Add `?authed=1` if signing in from any page but the homepage
+    successUrl.searchParams.set('authed', '1')
+  }
 
   // FirebaseUI config.
   const uiConfig = {
     // Redirect back to the same URL after a successful sign-in.
     signInSuccessUrl: successUrl.toString(),
-    callbacks: {
-      signInSuccessWithAuthResult: function (authResult, redirectUrl) {
-        return true // Handle the redirect automatically
-      },
-    },
     signInOptions: [
       firebase.auth.GoogleAuthProvider.PROVIDER_ID,
       firebase.auth.EmailAuthProvider.PROVIDER_ID,
