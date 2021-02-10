@@ -37,14 +37,18 @@
       <h3 class="subtitle">One Word</h3>
       <p v-for="game in onewordGames">
         <b
-          ><a :href="url(game)">{{ game.roomId }}</a></b
+          ><router-link :to="`/room/${game.roomId}`">{{
+            game.roomId
+          }}</router-link></b
         >, {{ timeSince(game.lastUpdateTime) }}
       </p>
       <br />
       <h3 class="subtitle">Incrypt</h3>
       <p v-for="game in incryptGames">
         <b
-          ><a :href="url(game)">{{ game.roomId }}</a></b
+          ><router-link :to="`/incrypt/${game.roomId}`">{{
+            game.roomId
+          }}</router-link></b
         >, {{ timeSince(game.lastUpdateTime) }}
       </p>
     </div>
@@ -86,7 +90,7 @@ export default {
       return this.gamesByTime.filter((game) => game.roomDb === 'rooms')
     },
     incryptGames() {
-      return this.gamesByTime.filter((game) => game.roomDb === 'rooms')
+      return this.gamesByTime.filter((game) => game.roomDb === 'incrypt')
     },
   },
 }
