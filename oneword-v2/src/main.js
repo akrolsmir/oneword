@@ -8,6 +8,7 @@ import GamesList from './components/GamesList.vue'
 import Profile from './components/Profile.vue'
 import About from './components/About.vue'
 import Supporter from './components/Supporter.vue'
+import Thanks from './components/Thanks.vue'
 import OneWord from './oneword/OneWord.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
@@ -17,6 +18,7 @@ const routes = [
   { path: '/profile', component: Profile },
   { path: '/about', component: About },
   { path: '/supporter', component: Supporter },
+  { path: '/thanks', component: Thanks },
 ]
 
 const router = createRouter({
