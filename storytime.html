@@ -238,7 +238,7 @@
               :user="room.playerData && room.playerData[player]"
               :index="i"
               :submitted="hasSubmitted(player)"
-              :guessing="room.currentRound.chooser == player"
+              :guessing="room.currentRound.stage == 'CHOOSING' && room.currentRound.chooser == player"
               :mod="isMod"
               :score="scores[player]"
               @kick="kickPlayer(player)"
