@@ -29,7 +29,7 @@ export default {
   props: {
     amazon: {
       type: String,
-      defualt: 'https://amzn.to/3bbSpZn',
+      default: 'https://amzn.to/3bbSpZn',
     },
   },
 }
