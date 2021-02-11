@@ -31,7 +31,7 @@ Vue.component('history-segment', {
       <div class="tile is-ancestor mt-4">
         <div class="tile is-parent">
           <div class="tile is-child is-10 pr-5">
-            <history-paragraph :response='round.responses[player]' style="white-space: pre-wrap"/>
+            <history-paragraph :response='round.responses[player]' class="spacy"/>
           </div>
           <div class="tile is-child">
             <div>{{ player }}</div>

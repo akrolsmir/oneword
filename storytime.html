@@ -45,6 +45,10 @@
       max-width: 95vw;
     }
 
+    .spacy {
+      white-space: pre-wrap;
+    }
+
     .label {
       margin-top: 20px;
     }
@@ -233,7 +237,7 @@
               :name="player"
               :user="room.playerData && room.playerData[player]"
               :index="i"
-              :submitted="!!room.currentRound.responses[player] || room.currentRound.chooser == player"
+              :submitted="hasSubmitted(player)"
               :guessing="room.currentRound.chooser == player"
               :mod="isMod"
               :score="scores[player]"
@@ -343,23 +347,12 @@
             </template>
             <!-- Choosing -->
             <template v-else-if="room.currentRound.state == 'CHOOSING'">
-              <strong class="is-size-3">&gt; {{ room.currentRound.prompt }}</strong>
-              <div class="content">
-                <ol>
-                  <li v-for="(response, p) in room.currentRound.responses">
-                    {{ response.story }}
-                    <a
-                      v-if="p != player.name && !voted.includes(player.name)"
-                      href="#"
-                      @click.prevent="chooseResponse(p)"
-                    >
-                      Vote
-                    </a>
-                    <template v-else-if="response.votes.includes(player.name)"> (Voted)</template>
-                  </li>
-                </ol>
-                <p>Players who've voted: {{ voted.join(', ') }}</p>
-              </div>
+              <div class="is-size-5 mb-2">{{ room.currentRound.chooser }}&gt; {{ room.currentRound.prompt }}</div>
+              <b-field v-for="(response, p) in room.currentRound.responses">
+                <b-radio v-model="vote" native-name="vote" :native-value="p">
+                  <div class="spacy">{{ response.story }}</div>
+                </b-radio>
+              </b-field>
             </template>
 
             <timer
@@ -451,6 +444,7 @@
       newMod: '',
       prompts,
       prompt: 0,
+      vote: '',
     },
     async mounted() {
       this.allRooms = (await listRooms()).filter((room) => room.players.length > 0);
@@ -472,9 +466,16 @@
           this.replaceSuggestions(this.player.response);
           this.player.response = '';
         }
+        // reset vote
+        if (state == 'PROMPT') {
+          this.vote = '';
+        }
       },
       'room.history'(history) {
         this.$refs.history.stickToBottom();
+      },
+      vote(vote) {
+        this.chooseResponse();
       },
     },
     computed: {
@@ -658,8 +659,16 @@
         }
         await updateRoom(this.room, update);
       },
-      async chooseResponse(player) {
-        this.room.currentRound.responses[player].votes.push(this.player.name);
+      async chooseResponse() {
+        // unvote if voted already
+        Object.values(this.room.currentRound.responses).forEach((r) => {
+          let i = r.votes.indexOf(this.player.name);
+          if (i >= 0) {
+            this.$delete(r.votes, i);
+          }
+        });
+        // vote
+        this.room.currentRound.responses[this.vote]?.votes?.push(this.player.name);
         await this.saveRoom('currentRound');
         // if all votes are in, go to next round
         if (this.room.players.every((p) => this.voted.includes(p))) {
@@ -676,6 +685,12 @@
             const [name, resp] = entry;
             return [name, resp.votes.length * (5 + resp.words.length) + (resp.votes.length === maxVotes) * 5];
           })
+        );
+      },
+      hasSubmitted(player) {
+        return (
+          (this.room.currentRound.state == 'RESPONSE' && !!this.room.currentRound.responses[player]) ||
+          (this.room.currentRound.state == 'CHOOSING' && this.voted.includes(player))
         );
       },
       async nextStage() {
