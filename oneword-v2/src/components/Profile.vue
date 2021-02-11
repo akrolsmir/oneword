@@ -74,6 +74,7 @@ export default {
     title,
     async logout() {
       await firebaseLogout()
+      this.user.id = ''
     },
     timeSince,
   },
