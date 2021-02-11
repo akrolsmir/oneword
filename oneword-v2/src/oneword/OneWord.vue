@@ -212,7 +212,7 @@
           :guessing="room.currentRound.guesser == tagged"
           :mod="isMod"
           :self="tagged === player.name"
-          :modtag="room.people[tagged].state === 'MOD'"
+          :modtag="room.people && room.people[tagged]?.state === 'MOD'"
           @kick="kickPlayer(tagged)"
         ></Nametag>
       </div>
@@ -538,16 +538,29 @@ export default {
     }
   },
   async created() {
-    this.room = await getRoom({ name: this.$route.params.id })
-    listenRoom(this.room.name, (room) => (this.room = room))
-
     // For dev velocity, accept https://oneword.games/room/rome?player=Spartacus
     if (this.$route.query.player && !this.user.id) {
       this.user.guest = true
       this.user.name = this.$route.query.player
     }
 
-    // If returning from Firebase sign in ('?authed=1'), skip the login modal
+    this.room.name = this.$route.params.id
+    const fetchedRoom = await getRoom(this.room)
+
+    if (!fetchedRoom) {
+      // 1. If the room doesn't exist, create it, then return
+      this.player.name =
+        this.user.displayName || `${randomWord('adjectives')}-anon`
+      await this.resetRoom()
+      listenRoom(this.room.name, (room) => (this.room = room))
+      return
+    } else {
+      // 2. Set this room's contents, and proceed to enter the room
+      this.room = fetchedRoom
+      listenRoom(this.room.name, (room) => (this.room = room))
+    }
+
+    // 3. If returning from Firebase sign in ('?authed=1'), skip the login modal
     if (this.$route.query.authed) {
       // Remove the 'authed=1' from the URL for cleanliness
       const query = { ...this.$route.query }
@@ -559,6 +572,7 @@ export default {
       return
     }
 
+    // 4. Enter the room, prompting for login if needed
     this.enterRoom()
   },
   watch: {
@@ -630,7 +644,6 @@ export default {
       } else {
         this.uniquify(this.user.displayName)
         await this.joinGame()
-        // TODO: Have to handle case when room doesn't exist
       }
     },
     // TODO: only works after "people" is implemented
@@ -638,6 +651,10 @@ export default {
       this.player.name = name
     },
     async joinGame() {
+      // Remove this and all other room.people == undefined checks after 2021-04-09
+      if (!this.room.people) {
+        this.room.people = {}
+      }
       // Assumes player.name as already been uniquify'd
       this.room.people[this.player.name] = {
         id: this.user.id || '',
@@ -670,6 +687,7 @@ export default {
           custom: false,
         },
         customWords: '',
+        players: [], // For v1 compat support of dev rooms; remove after 2021-04-09
         people: {
           [this.player.name]: {
             id: this.user.id || '',
@@ -679,11 +697,6 @@ export default {
         },
       }
       await setRoom(this.room)
-    },
-    goHome() {
-      // TODO
-      // unlistenRoom()
-      // this.room = { name: '' }
     },
     async kickPlayer(name) {
       await updateRoom(this.room, { [`people.${name}.state`]: 'WATCHING' })
