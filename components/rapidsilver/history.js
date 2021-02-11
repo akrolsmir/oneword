@@ -19,31 +19,32 @@ Vue.component('history-segment', {
         .map((entry) => entry[0]);
     },
   },
-  methods: {
-    prettyPointBreakdown(response, win = false) {
-      return `${response.words.length ? `(${response.words.length} words + 5)` : '5 points/vote'} × ${
-        response.votes.length
-      } votes${win ? ' + 5 for best writing' : ''}`;
-    },
-  },
   template: `
-  <div style="background-color: white;" class="py-3 px-5 mb-1">
-    <span class="is-size-5">{{ round.chooser }}&gt; {{ round.prompt }}</span>
-    <b-carousel :autoplay="false" :indicator-inside="false" indicator-style="is-dots" iconPack="fa">
-      <b-carousel-item v-for="(player, i) in players " :key="i" :style="{ backgroundColor: i==0 ? 'default' : '#f9ced7', borderRadius: '4px' }">
-        <div style="height: 6rem; overflow: auto">
-          <history-paragraph :response='round.responses[player]' />
-        </div>  
-        <div>
-          {{ player }}
-          &mdash;
-          <b-tooltip :label="round.responses[player].votes.join(', ')" position="is-bottom">
-            {{ round.responses[player].votes.length }} votes
-          </b-tooltip>
-          <b-tooltip :label="prettyPointBreakdown(round.responses[player], i==0)" position="is-bottom">
-            (+{{ scores[player] }} points)
-          </b-tooltip>
+  <div style="background-color: white; border-radius: 8px; overflow: hidden" class="pt-3 mb-2">
+    <span class="px-5 is-size-5">{{ round.chooser }}&gt; {{ round.prompt }}</span>
+    <b-carousel :autoplay="false" indicator-style="is-dots" indicator-position="is-top" iconPack="fa" style="min-height: initial">
+      <b-carousel-item
+        v-for="(player, i) in players " :key="i"
+        :style="{ backgroundColor: i==0 ? 'default' : '#f9ced7' }"
+        class="px-5 pb-3"
+      >
+      <div class="tile is-ancestor mt-4">
+        <div class="tile is-parent">
+          <div class="tile is-child is-10 pr-5">
+            <history-paragraph :response='round.responses[player]' style="white-space: pre-wrap"/>
+          </div>
+          <div class="tile is-child">
+            <div>{{ player }}</div>
+            <div>
+              <b-tooltip :label="round.responses[player].votes.join(', ')" position="is-left">
+                {{ round.responses[player].votes.length }} votes
+              </b-tooltip>
+            </div>
+            <div>{{ round.responses[player].words.length}} words</div>
+            <div>{{ scores[player] }} points</div>
+          </div>
         </div>
+      </div>
       </b-carousel-item>
     </b-carousel>
   </div>
