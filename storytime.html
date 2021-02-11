@@ -311,7 +311,7 @@
                     id="responseInput"
                     rows="3"
                     v-model="player.response"
-                    :class="{'is-primary': room.currentRound.responses[player.name]}"
+                    :class="{'is-success: room.currentRound.responses[player.name]}"
                     :disabled="!room.players.includes(player.name)"
                   ></textarea>
                 </div>
@@ -337,9 +337,10 @@
                     <button
                       class="button"
                       @click="submitResponse"
+                      :class="{ 'is-success': room.currentRound.responses[player.name] }"
                       :disabled="!room.players.includes(player.name) || charCount > 280"
                     >
-                      Submit
+                      {{ room.currentRound.responses[player.name] ? 'Submitted' : 'Submit' }}
                     </button>
                   </div>
                 </div>
