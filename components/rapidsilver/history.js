@@ -11,10 +11,10 @@ Vue.component('history-segment', {
     players() {
       return Object.entries(this.round.responses)
         .sort(
-          (a, b) =>
-            this.scores[b[0]] - this.scores[a[0]] ||
-            b[1].words.length - a[1].words.length ||
-            a[1].story.length - b[1].story.length
+          ([player1, response1], [player2, response2]) =>
+            this.scores[player2] - this.scores[player1] ||
+            response2.words.length - response1.words.length ||
+            response1.story.length - response2.story.length
         )
         .map((entry) => entry[0]);
     },
