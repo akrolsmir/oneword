@@ -52,10 +52,17 @@
               Storytime <span class="tag is-link is-light ml-1">New!</span>
             </a>
             <a class="navbar-item">
-              Wordix <span class="tag is-link is-light ml-1">New!</span>
+              Pairwise <span class="tag is-link is-light ml-1">New!</span>
             </a>
             <hr class="navbar-divider" />
-            <a class="navbar-item"> Suggest a new game! </a>
+            <a
+              class="navbar-item"
+              href="https://boredgames.gg"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              All online board games
+            </a>
           </div>
         </div>
       </div>
@@ -63,10 +70,18 @@
       <div class="navbar-end">
         <div class="navbar-item">
           <div v-if="user.id" class="buttons">
-            <router-link to="/profile" class="button is-primary"
-              >Hello, {{ user.name.split(' ')[0] }}!</router-link
+            <router-link to="/profile" class="button is-white"
+              >Signed in as {{ user.name.split(' ')[0] }}!</router-link
             >
-            <a class="button is-light" @click="logOut">Log out</a>
+            <router-link
+              to="/supporter"
+              class="button is-warning"
+              @click="referPremium"
+            >
+              <strong>{{
+                user.supporter ? 'Supporter' : 'Become a supporter!'
+              }}</strong>
+            </router-link>
           </div>
           <div v-else class="buttons">
             <a class="button is-primary" @click="logIn">
@@ -82,7 +97,7 @@
 
 <script>
 import LoginModal from './LoginModal.vue'
-import { firebaseLogout } from '../firebase/network.js'
+import { firebaseLogEvent, firebaseLogout } from '../firebase/network.js'
 import { inject } from 'vue'
 export default {
   components: {
@@ -106,6 +121,11 @@ export default {
     async logOut() {
       await firebaseLogout()
       this.user.id = ''
+    },
+    referPremium() {
+      firebaseLogEvent('view_promotion', {
+        source: 'navbar',
+      })
     },
   },
 }
