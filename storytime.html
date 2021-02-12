@@ -249,11 +249,16 @@
           <!-- Players -->
           <div class="field is-grouped is-grouped-multiline">
             <span class="mb-2 mr-2">Players:</span>
+            <!-- 
+              TODO: After v2, Replace index attribute with a boolean that tells whether the named player is the mod,
+              and rename the mod attribute to isKickable to prevent confusion.
+            -->
             <nametag
-              v-for="(player, i) in room.players"
+              v-for="(player, i) in playersInScoreOrder"
+              :key="player"
               :name="player"
               :user="room.playerData && room.playerData[player]"
-              :index="i"
+              :index="player == room.players[0] ? 0 : 1"
               :submitted="hasSubmitted(player)"
               :guessing="room.currentRound.stage == 'CHOOSING' && room.currentRound.chooser == player"
               :mod="isMod"
@@ -536,6 +541,9 @@
           this.suggestions['adjectives'][1],
           this.suggestions['nouns'][2],
         ];
+      },
+      playersInScoreOrder() {
+        return [...this.room.players].sort((a, b) => this.scores[b] - this.scores[a]);
       },
       charCount() {
         return this.player.response.length;
