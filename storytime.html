@@ -45,6 +45,13 @@
       max-width: 95vw;
     }
 
+    .status-panel {
+      border-radius: 16px;
+      position: fixed;
+      bottom: 0;
+      z-index: 2;
+    }
+
     .room-box {
       margin: 0 auto;
       max-width: 1000px;
@@ -290,8 +297,8 @@
         <br />
       </div>
       <template v-else>
-        <div class="card status-panel" style="position: fixed; bottom: 0; z-index: 2">
-          <div class="card-content" style="background: #d3d3d3">
+        <div class="card status-panel">
+          <div class="card-content">
             <h2 class="fancy mt-0 is-size-5" aria-live="polite">{{ prettyStatus }}</h2>
             <!-- Prompt -->
             <template v-if="room.currentRound.state == 'PROMPT'">

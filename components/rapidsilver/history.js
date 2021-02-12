@@ -20,7 +20,7 @@ Vue.component('history-segment', {
     },
   },
   template: `
-  <div style="background-color: white; border-radius: 8px; overflow: hidden" class="pt-3 mb-2">
+  <div style="background-color: #ffffff42; border-radius: 8px; overflow: hidden" class="pt-3 mb-2">
     <span class="px-5 is-size-5">{{ round.chooser }}&gt; {{ round.prompt }}</span>
     <b-carousel :autoplay="false" indicator-style="is-dots" indicator-position="is-top" iconPack="fa" style="min-height: initial">
       <b-carousel-item
