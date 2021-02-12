@@ -101,7 +101,7 @@
       <div class="modal-content">
         <div class="notification">
           <label class="is-block mb-2">Invite your friends to play!</label>
-          <sharelink :link="'https://oneword.games/?room=' + room.name"></sharelink>
+          <sharelink :link="'https://oneword.games/storytime.html/?room=' + room.name"></sharelink>
           <button class="delete" aria-label="close" @click="alertIsShowing=false"></button>
         </div>
       </div>
@@ -283,7 +283,7 @@
       <div v-if="room.players.length < 4">
         <h2 class="fancy" role="alert">Waiting for 4 players...</h2>
         <p class="mt-5 mb-2">Invite your friends to play!</p>
-        <sharelink :link="'https://oneword.games/rapidsilver.html?room=' + room.name"></sharelink>
+        <sharelink :link="'https://oneword.games/storytime.html/?room=' + room.name"></sharelink>
         <div class="card my-4">
           <div class="card-header">
             <h2 class="card-header-title">Optional: Choose a starting prompt</h2>
