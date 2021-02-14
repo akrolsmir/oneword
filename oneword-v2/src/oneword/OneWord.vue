@@ -872,14 +872,6 @@ export default {
       }
     },
     referSupporter,
-    // Returns a bool indicating if the provided Room object should be muted due to not matching the
-    // currently entered Room field. Will always return false if no open rooms match the current room name.
-    isMuteOpenRoom: function (openRoom) {
-      return (
-        this.filteredRoomNameSet.size != 0 &&
-        !this.filteredRoomNameSet.has(openRoom.name)
-      )
-    },
     correct,
     isEnd,
     score,
@@ -903,10 +895,6 @@ export default {
 #custom-word-tags {
   overflow-x: auto;
   max-height: 100px;
-}
-
-.halfOpacity {
-  opacity: 0.5;
 }
 
 .label {

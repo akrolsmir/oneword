@@ -118,8 +118,13 @@ export default {
   methods: {
     timeSince,
     listPlayers,
-    isMuteOpenRoom(openRoom) {
-      return false // TODO: fix
+    // Returns a bool indicating if the provided Room object should be muted due to not matching the
+    // currently entered Room field. Will always return false if no open rooms match the current room name.
+    isMuteOpenRoom: function (openRoom) {
+      return (
+        this.filteredRoomNameSet.size != 0 &&
+        !this.filteredRoomNameSet.has(openRoom.name)
+      )
     },
     navigateToRoom() {
       this.player.roomName = sanitize(this.player.roomName)
@@ -128,3 +133,8 @@ export default {
   },
 }
 </script>
+<style scoped>
+.halfOpacity {
+  opacity: 0.5;
+}
+</style>
