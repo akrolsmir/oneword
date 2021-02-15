@@ -2,6 +2,14 @@
   <div class="control">
     <div class="tags has-addons">
       <div
+        v-if="modtag"
+        class="tag is-dark"
+        title="moderator"
+        aria-label="moderator"
+      >
+        👑
+      </div>
+      <div
         class="tag is-white"
         :class="{
           'is-primary is-light': submitted && !guessing,
@@ -25,16 +33,16 @@
           width="28"
         />
         {{ name }}
+        <button
+          v-if="mod"
+          class="delete is-small"
+          :title="'Kick ' + name"
+          @click="kick"
+        ></button>
       </div>
-      <div v-if="modtag" class="tag is-dark">Mod</div>
-      <a
-        v-if="mod || self"
-        class="tag is-delete is-danger is-light"
-        role="button"
-        :title="'Kick ' + name"
-        href="#"
-        @click.prevent="kick()"
-      ></a>
+      <div v-if="score !== undefined" class="tag is-link is-light">
+        {{ score }}
+      </div>
     </div>
   </div>
 </template>
@@ -52,6 +60,7 @@ export default {
     self: Boolean, // Whether the tag is for the current player
     mod: Boolean, // Whether the logged-in user is a mod
     modtag: Boolean, // Whether to append a mod tag to this tag
+    score: Number,
   },
   methods: {
     kick() {
