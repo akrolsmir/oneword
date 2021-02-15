@@ -47,7 +47,7 @@ export default {
       this.startMs = performance.now()
     },
   },
-  beforeDestroy() {
+  beforeUnmount() {
     // Timer was removed from the DOM.
     this.destroyed = true
   },
