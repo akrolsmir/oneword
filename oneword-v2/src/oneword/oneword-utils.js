@@ -71,12 +71,14 @@ export function dedupe(clues, showCollisions = true) {
   const deduped = Object.entries(cluesToPlayers)
     .filter(([clue, cluers]) => cluers.length == 1)
     .map(([clue, cluers]) => `${cluers[0]} - ${clue}`)
+    .sort()
   const conflicts = Object.entries(cluesToPlayers)
     .filter(([clue, cluers]) => cluers.length > 1)
     .map(
       ([clue, cluers]) =>
         cluers.join(' & ') + (showCollisions ? ` - ${clue}` : '')
     )
+    .sort()
   let result = showCollisions ? '' : '(Uh, good luck.)'
   if (deduped.length > 0) {
     result = `${deduped.join('\n')}`
