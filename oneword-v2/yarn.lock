@@ -1091,6 +1091,11 @@ vue-router@4:
   resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-4.0.3.tgz#8b26050c88b2dec7e27a88835f71046b365823ec"
   integrity sha512-AD1OjtVPyQHTSpoRsEGfPpxRQwhAhxcacOYO3zJ3KNkYP/r09mileSp6kdMQKhZWP2cFsPR3E2M3PZguSN5/ww==
 
+vue3-carousel@^0.1.11:
+  version "0.1.11"
+  resolved "https://registry.yarnpkg.com/vue3-carousel/-/vue3-carousel-0.1.11.tgz#8c670d750dd8c230ec7bee2ff9661b56d4f23c1c"
+  integrity sha512-XwFYSYxOXCi7yoJAY8J9YKMCpej4vlgar3DFVCF2F/Vcp0ooPHaaMVqyWyX1PhdO9VJi2KCr5HdesLGg/8Sxww==
+
 vue@^3.0.5:
   version "3.0.5"
   resolved "https://registry.yarnpkg.com/vue/-/vue-3.0.5.tgz#de1b82eba24abfe71e0970fc9b8d4b2babdc3fe1"

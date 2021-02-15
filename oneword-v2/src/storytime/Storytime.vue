@@ -221,23 +221,24 @@
       <div class="card-header">
         <h2 class="card-header-title">Optional: Choose a starting prompt</h2>
       </div>
-      <div class="card-content">
-        TODO Carousel goes here:
-        <!-- <BCarousel v-model="prompt" :autoplay="false" icon-pack="fas">
-          <BCarouselItem v-for="(prompt, i) in prompts" :key="i">
-            <div style="height: 160px">{{ prompt }}</div>
-          </BCarouselItem>
-        </BCarousel> -->
-      </div>
-      <div class="card-footer">
-        <a
-          href="#"
-          class="card-footer-item"
-          @click.prevent="chooseStartingPrompt"
-        >
-          Choose
-        </a>
-      </div>
+      <Carousel :items-to-show="1">
+        <Slide v-for="(prompt, i) in prompts" :key="prompt">
+          <div class="card-content">
+            <div class="has-text-left p-4 m-4">{{ prompt }}</div>
+            <button
+              class="button is-info px-6"
+              @click="chooseStartingPrompt(i)"
+            >
+              Choose
+            </button>
+          </div>
+        </Slide>
+
+        <template #addons>
+          <Navigation />
+          <Pagination />
+        </template>
+      </Carousel>
     </div>
     <br />
   </div>
@@ -366,8 +367,9 @@ import ShareLink from '../components/ShareLink.vue'
 import Timer from '../components/Timer.vue'
 import History from './components/History.vue'
 import ScrollBottom from './components/ScrollBottom.vue'
-import BCarousel from './components/buefy/Carousel.vue'
-import BCarouselItem from './components/buefy/CarouselItem.vue'
+
+import 'vue3-carousel/dist/carousel.css'
+import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
 
 import {
   getRoom,
@@ -413,8 +415,10 @@ export default {
     Timer,
     History,
     ScrollBottom,
-    BCarousel,
-    BCarouselItem,
+    Carousel,
+    Slide,
+    Pagination,
+    Navigation,
   },
   setup() {
     return { user: inject('currentUser') }
@@ -801,13 +805,13 @@ export default {
         })
       }
     },
-    async chooseStartingPrompt() {
+    async chooseStartingPrompt(index) {
       this.room.history = [
         {
           chooser: 'Premise',
           responses: {
             ' ': {
-              story: this.prompts[this.prompt],
+              story: this.prompts[index],
               words: [],
               votes: [],
             },
