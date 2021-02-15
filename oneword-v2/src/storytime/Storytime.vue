@@ -1,365 +1,370 @@
 <template>
-  <div v-cloak id="modals">
-    <!-- Share Link Modal -->
-    <AnimatedModal
-      :visible="showShareModal"
-      @background-click="showShareModal = false"
-    >
-      <div class="notification">
-        <label class="is-block mb-2">Invite your friends to play!</label>
-        <ShareLink :link="currentUrl()" />
-        <button
-          class="delete"
-          aria-label="close"
-          @click="showShareModal = false"
-        ></button>
-      </div>
-    </AnimatedModal>
+  <BigColumn :width="760" class="background">
+    <div v-cloak id="modals">
+      <!-- Share Link Modal -->
+      <AnimatedModal
+        :visible="showShareModal"
+        @background-click="showShareModal = false"
+      >
+        <div class="notification">
+          <label class="is-block mb-2">Invite your friends to play!</label>
+          <ShareLink :link="currentUrl()" />
+          <button
+            class="delete"
+            aria-label="close"
+            @click="showShareModal = false"
+          ></button>
+        </div>
+      </AnimatedModal>
 
-    <!-- Standard Modals -->
-    <AnimatedModal
-      :visible="showStandardModal"
-      :content="standardModal"
-      @background-click="showStandardModal = false"
-      @cancel="showStandardModal = false"
-    />
-  </div>
-
-  <div class="message room-box">
-    <!-- Room header -->
-    <div class="message-header has-text-weight-normal is-flex-wrap-wrap">
-      <h1 class="fancy mt-1">Room: {{ room.name }}</h1>
-
-      <!-- Navigation -->
-      <span class="buttons are-small">
-        <button
-          class="button is-dark is-inverted is-outlined"
-          @click="showShareModal = true"
-        >
-          Invite
-        </button>
-        <button
-          v-if="room.players?.includes(player.name)"
-          class="button is-dark is-inverted is-outlined"
-          @click="kickPlayer(player.name)"
-        >
-          Watch
-        </button>
-        <button
-          v-else
-          class="button is-dark is-inverted is-outlined"
-          @click="joinGame"
-        >
-          Rejoin
-        </button>
-        <router-link
-          class="button is-danger is-inverted is-outlined"
-          to="/storytime/"
-          @click="kickPlayer(player.name)"
-        >
-          Exit
-        </router-link>
-      </span>
+      <!-- Standard Modals -->
+      <AnimatedModal
+        :visible="showStandardModal"
+        :content="standardModal"
+        @background-click="showStandardModal = false"
+        @cancel="showStandardModal = false"
+      />
     </div>
-    <div>
-      <div class="is-flex is-flex-wrap-wrap is-align-items-center">
-        <!-- Supporter Settings -->
-        <span
-          title="Supporter settings"
-          class="py-1 pl-1 pr-4"
-          style="
-            background: #ffef99;
-            clip-path: polygon(0 0, 0 100%, 93% 100%, 100% 0);
-          "
-        >
-          <div class="mx-1" v-if="isMod">
-            <span class="select is-small">
-              <select v-model="room.public" @change="upsell('public')">
-                <option :value="true">Public</option>
-                <option :value="false">Private</option>
-              </select>
-            </span>
-          </div>
-          <template v-else>
-            <span class="mx-2">
-              {{ room.public ? 'Public' : 'Private' }} Room
-            </span>
-          </template>
-        </span>
 
-        <!-- Timers -->
-        <span class="ml-1 mr-2 my-1 is-flex is-align-items-center">
-          <template v-if="isMod">
-            <label for="writing-timer" class="is-size-7 mx-1 is-flex-grow-1">
-              Writing:
-            </label>
-            <input
-              class="input is-small"
-              style="flex: 1 2 48px"
-              id="writing-timer"
-              type="number"
-              min="1"
-              max="99"
-              placeholder="&infin;"
-              v-model.number="room.timers.RESPONSE"
-              :disabled="room.timers.running"
-            />
-            <label for="choosing-timer" class="is-size-7 mx-1 is-flex-grow-1">
-              Choosing:
-            </label>
-            <input
-              class="input is-small"
-              style="flex: 1 2 48px"
-              id="choosing-timer"
-              type="number"
-              min="1"
-              max="99"
-              placeholder="&infin;"
-              v-model.number="room.timers.CHOOSING"
-              :disabled="room.timers.running"
-            />
-            <button
-              class="button is-small mx-1 is-flex-grow-1"
-              @click="toggleTimers"
-            >
-              {{ room.timers.running ? 'Stop' : 'Start' }} Timers
-            </button>
-          </template>
-          <template v-else>
-            <template v-if="room.timers?.running">
-              <span v-if="room.timers.RESPONSE" class="mx-2">
-                Writing: {{ room.timers.RESPONSE }}s
+    <div class="message room-box">
+      <!-- Room header -->
+      <div class="message-header has-text-weight-normal is-flex-wrap-wrap">
+        <h1 class="fancy mt-1">Room: {{ room.name }}</h1>
+
+        <!-- Navigation -->
+        <span class="buttons are-small">
+          <button
+            class="button is-dark is-inverted is-outlined"
+            @click="showShareModal = true"
+          >
+            Invite
+          </button>
+          <button
+            v-if="room.players?.includes(player.name)"
+            class="button is-dark is-inverted is-outlined"
+            @click="kickPlayer(player.name)"
+          >
+            Watch
+          </button>
+          <button
+            v-else
+            class="button is-dark is-inverted is-outlined"
+            @click="joinGame"
+          >
+            Rejoin
+          </button>
+          <router-link
+            class="button is-danger is-inverted is-outlined"
+            to="/storytime/"
+            @click="kickPlayer(player.name)"
+          >
+            Exit
+          </router-link>
+        </span>
+      </div>
+      <div>
+        <div class="is-flex is-flex-wrap-wrap is-align-items-center">
+          <!-- Supporter Settings -->
+          <span
+            title="Supporter settings"
+            class="py-1 pl-1 pr-4"
+            style="
+              background: #ffef99;
+              clip-path: polygon(0 0, 0 100%, 93% 100%, 100% 0);
+            "
+          >
+            <div class="mx-1" v-if="isMod">
+              <span class="select is-small">
+                <select v-model="room.public" @change="upsell('public')">
+                  <option :value="true">Public</option>
+                  <option :value="false">Private</option>
+                </select>
               </span>
-              <span v-if="room.timers.CHOOSING" class="mx-2">
-                Choosing: {{ room.timers.CHOOSING }}s
+            </div>
+            <template v-else>
+              <span class="mx-2">
+                {{ room.public ? 'Public' : 'Private' }} Room
               </span>
             </template>
-            <span v-else class="mx-1">No timers</span>
-          </template>
+          </span>
 
-          <!-- Other Mod Tools -->
-          <template v-if="isMod">
-            <div class="field has-addons is-inline-flex mb-0 mx-1">
-              <span class="control">
-                <button class="button is-small" @click="nextStage">
-                  Next Stage
-                </button>
-              </span>
-
-              <span v-if="user.supporter == 'ADMIN'" class="control">
-                <button class="button is-small" @click="resetRoom">
-                  Reset Room
-                </button>
-              </span>
-            </div>
-            <div class="field has-addons is-inline-flex mx-1">
-              <span class="control">
-                <button class="button is-small" @click="makeMod(newMod)">
-                  Transfer Mod
-                </button>
-              </span>
-              <span class="control">
-                <span class="select is-small">
-                  <select v-model="newMod">
-                    <option
-                      v-for="player in room.players.slice(1)"
-                      :key="player"
-                    >
-                      {{ player }}
-                    </option>
-                  </select>
-                </span>
-              </span>
-            </div>
-          </template>
-        </span>
-      </div>
-    </div>
-
-    <div class="message-body" style="border-width: 0">
-      <!-- Players -->
-      <div class="field is-grouped is-grouped-multiline">
-        <span class="mb-2 mr-2">Players:</span>
-        <Nametag
-          v-for="player in playersInScoreOrder"
-          :key="player"
-          :name="player"
-          :user="room.playerData && room.playerData[player]"
-          :submitted="hasSubmitted(player)"
-          :guessing="
-            room.currentRound.stage == 'CHOOSING' &&
-            room.currentRound.chooser == player
-          "
-          :mod="isMod"
-          :modtag="player === room.players[0]"
-          :score="scores[player]"
-          @kick="kickPlayer(player)"
-        ></Nametag>
-      </div>
-    </div>
-  </div>
-
-  <ScrollBottom ref="history" class="block mx-4">
-    <div style="height: 220px"></div>
-    <History
-      v-for="(round, i) in room.history"
-      :key="i"
-      :round="round"
-      :scores="score(round)"
-    />
-    <div style="height: 280px"></div>
-  </ScrollBottom>
-
-  <div v-if="room.players.length < 3">
-    <h2 class="fancy" role="alert">Waiting for 3 players...</h2>
-    <p class="mt-5 mb-2">Invite your friends to play!</p>
-    <ShareLink
-      :link="'https://oneword.games/storytime.html/?room=' + room.name"
-    />
-    <div class="card my-4">
-      <div class="card-header">
-        <h2 class="card-header-title">Optional: Choose a starting prompt</h2>
-      </div>
-      <Carousel :items-to-show="1">
-        <Slide v-for="(prompt, i) in prompts" :key="prompt">
-          <div class="card-content">
-            <div class="has-text-left p-4 m-4">{{ prompt }}</div>
-            <button
-              class="button is-info px-6"
-              @click="chooseStartingPrompt(i)"
-            >
-              Choose
-            </button>
-          </div>
-        </Slide>
-
-        <template #addons>
-          <Navigation />
-          <Pagination />
-        </template>
-      </Carousel>
-    </div>
-    <br />
-  </div>
-  <template v-else>
-    <div class="card status-panel">
-      <div class="card-content">
-        <h2 class="fancy mt-0 is-size-5" aria-live="polite">
-          {{ prettyStatus }}
-        </h2>
-        <!-- Prompt -->
-        <template v-if="room.currentRound.state == 'PROMPT'">
-          <template v-if="isChooser">
-            <div class="field has-addons mt-2">
-              <div class="control is-expanded">
-                <input
-                  class="input is-large"
-                  @keyup.enter="submitPrompt"
-                  v-model="room.currentRound.prompt"
-                  :placeholder="randomWord('verbs') + ' ' + randomWord('nouns')"
-                />
-              </div>
-              <div class="control">
-                <button class="button is-large" @click="submitPrompt">
-                  Submit
-                </button>
-              </div>
-            </div>
-          </template>
-        </template>
-        <!-- Response -->
-        <template v-else-if="room.currentRound.state == 'RESPONSE'">
-          <div class="is-size-5 mb-2">
-            {{ room.currentRound.chooser }}&gt;
-            {{ room.currentRound.prompt }}
-          </div>
-          <div class="field">
-            <div class="control is-expanded">
-              <textarea
-                class="textarea has-fixed-size"
-                id="responseInput"
-                rows="3"
-                v-model="player.response"
-                :class="{
-                  'is-success': room.currentRound.responses[player.name],
-                }"
-                :disabled="!room.players.includes(player.name)"
-              ></textarea>
-            </div>
-          </div>
-          <div class="level">
-            <div class="level-left">
-              <div>
-                Your bonus words:
-                <span
-                  v-for="(word, i) in prettySuggestions"
-                  :key="i"
-                  class="ml-1"
-                  :class="{
-                    'has-text-weight-medium has-text-primary': player.response
-                      .toLowerCase()
-                      .includes(word),
-                  }"
-                >
-                  {{ word }}
-                </span>
-              </div>
-            </div>
-            <div class="level-right">
-              <span
-                class="level-item help"
-                :class="{ 'has-text-danger': charCount > 280 }"
+          <!-- Timers -->
+          <span class="ml-1 mr-2 my-1 is-flex is-align-items-center">
+            <template v-if="isMod">
+              <label for="writing-timer" class="is-size-7 mx-1 is-flex-grow-1">
+                Writing:
+              </label>
+              <input
+                class="input is-small"
+                style="flex: 1 2 48px"
+                id="writing-timer"
+                type="number"
+                min="1"
+                max="99"
+                placeholder="&infin;"
+                v-model.number="room.timers.RESPONSE"
+                :disabled="room.timers.running"
+              />
+              <label for="choosing-timer" class="is-size-7 mx-1 is-flex-grow-1">
+                Choosing:
+              </label>
+              <input
+                class="input is-small"
+                style="flex: 1 2 48px"
+                id="choosing-timer"
+                type="number"
+                min="1"
+                max="99"
+                placeholder="&infin;"
+                v-model.number="room.timers.CHOOSING"
+                :disabled="room.timers.running"
+              />
+              <button
+                class="button is-small mx-1 is-flex-grow-1"
+                @click="toggleTimers"
               >
-                {{ charCount }} / 280
-              </span>
-              <div class="level-item">
-                <button
-                  class="button"
-                  @click="submitResponse"
+                {{ room.timers.running ? 'Stop' : 'Start' }} Timers
+              </button>
+            </template>
+            <template v-else>
+              <template v-if="room.timers?.running">
+                <span v-if="room.timers.RESPONSE" class="mx-2">
+                  Writing: {{ room.timers.RESPONSE }}s
+                </span>
+                <span v-if="room.timers.CHOOSING" class="mx-2">
+                  Choosing: {{ room.timers.CHOOSING }}s
+                </span>
+              </template>
+              <span v-else class="mx-1">No timers</span>
+            </template>
+
+            <!-- Other Mod Tools -->
+            <template v-if="isMod">
+              <div class="field has-addons is-inline-flex mb-0 mx-1">
+                <span class="control">
+                  <button class="button is-small" @click="nextStage">
+                    Next Stage
+                  </button>
+                </span>
+
+                <span v-if="user.supporter == 'ADMIN'" class="control">
+                  <button class="button is-small" @click="resetRoom">
+                    Reset Room
+                  </button>
+                </span>
+              </div>
+              <div class="field has-addons is-inline-flex mx-1">
+                <span class="control">
+                  <button class="button is-small" @click="makeMod(newMod)">
+                    Transfer Mod
+                  </button>
+                </span>
+                <span class="control">
+                  <span class="select is-small">
+                    <select v-model="newMod">
+                      <option
+                        v-for="player in room.players.slice(1)"
+                        :key="player"
+                      >
+                        {{ player }}
+                      </option>
+                    </select>
+                  </span>
+                </span>
+              </div>
+            </template>
+          </span>
+        </div>
+      </div>
+
+      <div class="message-body" style="border-width: 0">
+        <!-- Players -->
+        <div class="field is-grouped is-grouped-multiline">
+          <span class="mb-2 mr-2">Players:</span>
+          <Nametag
+            v-for="player in playersInScoreOrder"
+            :key="player"
+            :name="player"
+            :user="room.playerData && room.playerData[player]"
+            :submitted="hasSubmitted(player)"
+            :guessing="
+              room.currentRound.stage == 'CHOOSING' &&
+              room.currentRound.chooser == player
+            "
+            :mod="isMod"
+            :modtag="player === room.players[0]"
+            :score="scores[player]"
+            @kick="kickPlayer(player)"
+          ></Nametag>
+        </div>
+      </div>
+    </div>
+
+    <ScrollBottom ref="history" class="block mx-4">
+      <div style="height: 220px"></div>
+      <History
+        v-for="(round, i) in room.history"
+        :key="i"
+        :round="round"
+        :scores="score(round)"
+      />
+      <div style="height: 280px"></div>
+    </ScrollBottom>
+
+    <div v-if="room.players.length < 3">
+      <h2 class="fancy" role="alert">Waiting for 3 players...</h2>
+      <p class="mt-5 mb-2">Invite your friends to play!</p>
+      <ShareLink
+        :link="'https://oneword.games/storytime.html/?room=' + room.name"
+      />
+      <div class="card my-4">
+        <div class="card-header">
+          <h2 class="card-header-title">Optional: Choose a starting prompt</h2>
+        </div>
+        <Carousel :items-to-show="1">
+          <Slide v-for="(prompt, i) in prompts" :key="prompt">
+            <div class="card-content">
+              <div class="has-text-left p-4 m-4">{{ prompt }}</div>
+              <button
+                class="button is-info px-6"
+                @click="chooseStartingPrompt(i)"
+              >
+                Choose
+              </button>
+            </div>
+          </Slide>
+
+          <template #addons>
+            <Navigation />
+            <Pagination />
+          </template>
+        </Carousel>
+      </div>
+      <br />
+    </div>
+    <template v-else>
+      <div class="card status-panel">
+        <div class="card-content">
+          <h2 class="fancy mt-0 is-size-5" aria-live="polite">
+            {{ prettyStatus }}
+          </h2>
+          <!-- Prompt -->
+          <template v-if="room.currentRound.state == 'PROMPT'">
+            <template v-if="isChooser">
+              <div class="field has-addons mt-2">
+                <div class="control is-expanded">
+                  <input
+                    class="input is-large"
+                    @keyup.enter="submitPrompt"
+                    v-model="room.currentRound.prompt"
+                    :placeholder="
+                      randomWord('verbs') + ' ' + randomWord('nouns')
+                    "
+                  />
+                </div>
+                <div class="control">
+                  <button class="button is-large" @click="submitPrompt">
+                    Submit
+                  </button>
+                </div>
+              </div>
+            </template>
+          </template>
+          <!-- Response -->
+          <template v-else-if="room.currentRound.state == 'RESPONSE'">
+            <div class="is-size-5 mb-2">
+              {{ room.currentRound.chooser }}&gt;
+              {{ room.currentRound.prompt }}
+            </div>
+            <div class="field">
+              <div class="control is-expanded">
+                <textarea
+                  class="textarea has-fixed-size"
+                  id="responseInput"
+                  rows="3"
+                  v-model="player.response"
                   :class="{
                     'is-success': room.currentRound.responses[player.name],
                   }"
-                  :disabled="
-                    !room.players.includes(player.name) || charCount > 280
-                  "
-                >
-                  {{
-                    room.currentRound.responses[player.name]
-                      ? 'Submitted'
-                      : 'Submit'
-                  }}
-                </button>
+                  :disabled="!room.players.includes(player.name)"
+                ></textarea>
               </div>
             </div>
-          </div>
-        </template>
-        <!-- Choosing -->
-        <template v-else-if="room.currentRound.state == 'CHOOSING'">
-          <div class="is-size-5 mb-2">
-            {{ room.currentRound.chooser }}&gt;
-            {{ room.currentRound.prompt }}
-          </div>
-          TODO voting goes here
-          <!-- TODO: fix
+            <div class="level">
+              <div class="level-left">
+                <div>
+                  Your bonus words:
+                  <span
+                    v-for="(word, i) in prettySuggestions"
+                    :key="i"
+                    class="ml-1"
+                    :class="{
+                      'has-text-weight-medium has-text-primary': player.response
+                        .toLowerCase()
+                        .includes(word),
+                    }"
+                  >
+                    {{ word }}
+                  </span>
+                </div>
+              </div>
+              <div class="level-right">
+                <span
+                  class="level-item help"
+                  :class="{ 'has-text-danger': charCount > 280 }"
+                >
+                  {{ charCount }} / 280
+                </span>
+                <div class="level-item">
+                  <button
+                    class="button"
+                    @click="submitResponse"
+                    :class="{
+                      'is-success': room.currentRound.responses[player.name],
+                    }"
+                    :disabled="
+                      !room.players.includes(player.name) || charCount > 280
+                    "
+                  >
+                    {{
+                      room.currentRound.responses[player.name]
+                        ? 'Submitted'
+                        : 'Submit'
+                    }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </template>
+          <!-- Choosing -->
+          <template v-else-if="room.currentRound.state == 'CHOOSING'">
+            <div class="is-size-5 mb-2">
+              {{ room.currentRound.chooser }}&gt;
+              {{ room.currentRound.prompt }}
+            </div>
+            TODO voting goes here
+            <!-- TODO: fix
              <b-field v-for="(response, p) in room.currentRound.responses">
             <b-radio v-model="vote" native-name="vote" :native-value="p">
               <div class="spacy">{{ response.story }}</div>
             </b-radio>
           </b-field> -->
-        </template>
+          </template>
 
-        <Timer
-          ref="timer"
-          :length="timerLength"
-          :on-finish="nextStage"
-          v-if="timerLength > 0"
-        ></Timer>
+          <Timer
+            ref="timer"
+            :length="timerLength"
+            :on-finish="nextStage"
+            v-if="timerLength > 0"
+          ></Timer>
+        </div>
       </div>
-    </div>
-  </template>
+    </template>
+  </BigColumn>
 </template>
 
 <script>
+import BigColumn from '../components/BigColumn.vue'
 import Nametag from '../components/Nametag.vue'
 import AnimatedModal from '../components/AnimatedModal.vue'
 import ShareLink from '../components/ShareLink.vue'
@@ -408,6 +413,7 @@ import prompts from './prompts.js'
 
 export default {
   components: {
+    BigColumn,
     Nametag,
     AnimatedModal,
     ShareLink,
@@ -826,19 +832,14 @@ export default {
 </script>
 
 <style scoped>
-/* html {
-  margin: 0;
-  height: 100%;
+.background {
   background-color: #d6c6a2;
   background-image: linear-gradient(
     to right,
     rgb(245, 216, 178),
     rgb(181, 181, 255)
   );
-  position: relative;
-  overflow: auto;
-} */
-
+}
 .fancy {
   font-family: 'Merienda One', cursive;
   margin-top: 16px;

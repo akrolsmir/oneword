@@ -1,13 +1,11 @@
 <template>
   <Navbar ref="navbar" />
   <router-view />
-  <LinkFooter />
 </template>
 
 <script>
 import { provide, reactive, computed } from 'vue'
 import Navbar from './components/Navbar.vue'
-import LinkFooter from './components/LinkFooter.vue'
 import { listenForLogin } from './firebase/network'
 
 const currentUser = reactive({
@@ -31,7 +29,6 @@ const currentUser = reactive({
 export default {
   components: {
     Navbar,
-    LinkFooter,
   },
   setup() {
     listenForLogin((user) => {

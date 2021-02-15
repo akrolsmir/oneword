@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <BigColumn>
     <h1 class="title">About Us</h1>
     <article class="message container">
       <div class="message-body" style="border: none">
@@ -124,14 +124,16 @@
       As always, feel free to contact us if you have any questions or need
       support.
     </div>
-  </div>
+  </BigColumn>
 </template>
 
 <script>
+import BigColumn from '../components/BigColumn.vue'
 import Nametag from '../components/Nametag.vue'
 
 export default {
   components: {
+    BigColumn,
     Nametag,
   },
 }
