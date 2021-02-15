@@ -8,11 +8,11 @@
         v-for="(player, i) in players.filter((p) => round.responses[p])"
         :key="i"
         :style="{ backgroundColor: i == 0 ? 'default' : '#f9ced7' }"
-        class="px-5 pb-3"
+        class="px-2 pb-3"
       >
         <div class="tile is-ancestor mt-4">
           <div class="tile is-parent">
-            <div class="tile is-child is-10 pr-5">
+            <div class="tile is-child is-10 pr-5 has-text-left">
               <HistorySection
                 :response="round.responses[player]"
                 class="spacy"
@@ -86,5 +86,9 @@ export default {
 
 .carousel {
   overflow: visible;
+}
+
+.is-ancestor {
+  max-width: 600px;
 }
 </style>

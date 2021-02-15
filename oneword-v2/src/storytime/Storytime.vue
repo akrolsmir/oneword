@@ -858,7 +858,6 @@ export default {
 body,
 .status-panel {
   margin: 0 auto;
-  width: 760px;
   max-width: 95vw;
 }
 
@@ -871,7 +870,7 @@ body,
 
 .room-box {
   margin: 0 auto;
-  max-width: 1000px;
+  max-width: 800px;
   position: fixed;
   top: 56px;
   left: 0;
