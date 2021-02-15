@@ -423,6 +423,7 @@ export default {
     room: {
       // name: randomWord('adjectives') + '-' + randomWord('nouns'),
       history: [],
+      players: [],
     },
     player: {
       name: '',
@@ -771,23 +772,6 @@ export default {
         // Reset UI to non-supporter defaults
         this.room.public = true
         this.room.roundsInGame = 13
-      }
-    },
-    showPrivateModal() {
-      this.showStandardModal = true
-      this.standardModal = {
-        title: 'This room is private 🔒',
-        text:
-          'To join, ask your teammates for the room name or link.\n\nTo make your own private room, become a supporter!',
-        buttons: {
-          okay: 'Become a supporter!',
-          cancel: 'Not now',
-        },
-        callbacks: {
-          okay: () => {
-            referSupporter('private_room_modal')
-          },
-        },
       }
     },
     showSupporterModal() {
