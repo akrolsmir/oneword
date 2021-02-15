@@ -1,6 +1,7 @@
 <template>
   <div style="display: flex; position: relative">
-    <div style="overflow: auto; flex-grow: 1" ref="feed" @scroll="onScroll">
+    <!-- Note: Changed "overflow: auto" to "visible" for Vue3 Carousel buttons, so maybe broken... -->
+    <div style="overflow: visible; flex-grow: 1" ref="feed" @scroll="onScroll">
       <slot></slot>
     </div>
     <div v-if="!atBottom" class="scroll-button has-text-centered">

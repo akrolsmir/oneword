@@ -201,13 +201,12 @@
 
   <ScrollBottom ref="history" class="block mx-4">
     <div style="height: 220px"></div>
-    TODO: history
-    <!-- <History
+    <History
       v-for="(round, i) in room.history"
       :key="i"
       :round="round"
       :scores="score(round)"
-    /> -->
+    />
     <div style="height: 280px"></div>
   </ScrollBottom>
 

@@ -3,15 +3,8 @@
     <span class="px-5 is-size-5">
       {{ round.chooser }}&gt; {{ round.prompt }}
     </span>
-    TODO Carousel goes here
-    <BCarousel
-      :autoplay="false"
-      indicator-style="is-dots"
-      indicator-position="is-top"
-      iconPack="fa"
-      style="min-height: initial"
-    >
-      <BCarouselItem
+    <Carousel :items-to-show="1">
+      <Slide
         v-for="(player, i) in players.filter((p) => round.responses[p])"
         :key="i"
         :style="{ backgroundColor: i == 0 ? 'default' : '#f9ced7' }"
@@ -40,20 +33,27 @@
             </div>
           </div>
         </div>
-      </BCarouselItem>
-    </BCarousel>
+      </Slide>
+
+      <template #addons>
+        <Navigation />
+        <Pagination />
+      </template>
+    </Carousel>
   </div>
 </template>
 <script>
 import HistorySection from './HistorySection.vue'
-import BCarousel from './buefy/Carousel.vue'
-import BCarouselItem from './buefy/CarouselItem.vue'
+import 'vue3-carousel/dist/carousel.css'
+import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
 
 export default {
   components: {
     HistorySection,
-    BCarousel,
-    BCarouselItem,
+    Carousel,
+    Slide,
+    Pagination,
+    Navigation,
   },
   props: {
     round: Object,
@@ -81,6 +81,10 @@ export default {
 .main {
   background-color: #ffffff42;
   border-radius: 8px;
-  overflow: hidden;
+  overflow: visible;
+}
+
+.carousel {
+  overflow: visible;
 }
 </style>
