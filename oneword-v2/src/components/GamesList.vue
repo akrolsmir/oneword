@@ -59,7 +59,6 @@ import { listPlayers } from '../oneword/oneword-utils'
 
 export default {
   props: {
-    database: String,
     roomDirectory: String,
   },
   setup() {
@@ -74,7 +73,6 @@ export default {
     }
   },
   created() {
-    window.COLLECTION = this.database
     const nonempty = (room) => listPlayers(room).length > 0
     // Async load all open and private rooms
     listRooms().then((rooms) => (this.allRooms = rooms.filter(nonempty)))

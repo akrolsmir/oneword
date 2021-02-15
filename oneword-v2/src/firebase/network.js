@@ -29,8 +29,13 @@ if (!firebase.apps.length) {
   }
 }
 
+// Extracts the right room database to use. based on current URL
+// TODO: This is pretty hardcoded to URL; prefer a more robust approach
 function roomDb() {
-  return window.COLLECTION || 'rooms'
+  if (window.location.href.includes('/storytime')) {
+    return 'silver'
+  }
+  return 'rooms'
 }
 
 const db = firebase.firestore()

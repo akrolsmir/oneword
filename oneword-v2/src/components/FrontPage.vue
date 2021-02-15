@@ -9,7 +9,7 @@
     In each of the 13 rounds, come up with a one-word hint for the guesser...<br />
     But beware: duplicate hints are discarded!<br />
   </div>
-  <GamesList database="rooms" roomDirectory="/room/" />
+  <GamesList roomDirectory="/room/" />
   <Sponsors />
   <br /><br />
 </template>
