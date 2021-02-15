@@ -1,0 +1,29 @@
+{
+  "name": "oneword-v2",
+  "version": "2.0.0",
+  "scripts": {
+    "start": "vite",
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "dependencies": {
+    "@stripe/stripe-js": "^1.12.1",
+    "animate.css": "^4.1.1",
+    "bulma": "^0.9.1",
+    "bulma-pricingtable": "^0.2.0",
+    "date-fns": "^2.17.0",
+    "firebase": "^8.2.4",
+    "firebaseui": "^4.7.1",
+    "fontawesome": "^5.6.3",
+    "pluralize": "^8.0.0",
+    "vue": "^3.0.5",
+    "vue-router": "4",
+    "vue3-carousel": "^0.1.11"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^1.1.4",
+    "@vue/compiler-sfc": "^3.0.5",
+    "vite": "^2.0.0-beta.65"
+  }
+}
