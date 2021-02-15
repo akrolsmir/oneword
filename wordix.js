@@ -42,13 +42,14 @@ const vueApp = new Vue({
     alertIsShowing: false,
     newMod: '',
     wordsSaved: false,
+    showGameRules: false,
   },
-  // created() {
-  // },
-  mounted() {
+  created() {
     // currently not used since public rooms are currently not shown
+    // migrated from mounted(), no DOM manipulation in this method, so put in created()
     //this.allRooms = (await listRooms()).filter((room) => room.players.length > 0);
   },
+  mounted() {},
   watch: {
     // Timer currently not yet implemented for wordix
     'room.currentRound.state'(state) {
