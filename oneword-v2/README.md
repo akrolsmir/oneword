@@ -1,17 +1,42 @@
-## Migration from One Word
+# Migrating from One Word v1
 
-- Install yarn, then:
-  ```
-  cd oneword-v2
-  yarn # installs all dependencies
-  ```
-- Install VSCode extensions:
+v2 is an investment into dev velocity and best practices, adding:
+
+- yarn for JS package management
+- Vite for hot reloading, single file Vue components, bundling
+- Vue3 for new language features
+
+## Installing
+
+1. Install [Node.js and npm](https://nodejs.org/en/)
+2. Install yarn:
+
+```
+npm install --global yarn
+```
+
+3. Run these commands:
+
+```
+cd oneword-v2
+yarn # installs all JS dependencies
+```
+
+4. [Get the Vue3 devtools](https://chrome.google.com/webstore/detail/vuejs-devtools/ljjemllljcmogpfapbkkighbhhppjdbg?hl=en) (and disable the Vue2 ones)
+
+## Developing
+
+- `yarn dev` to spin up a local server at http://localhost:3000
+
+### Productivity tips
+
+- When you save a file, the app should automatically reload!
+  - Note: Hot reload seems broken in Vue3 Carousel
+- You can instantly join as guest by adding `?player=Holo` at the end of a room url.
+  Useful for keeping 3 tabs open, for testing multiplayer interactions!
+- Install these VSCode extensions:
 
   - `Vetur` for Vue syntax highlighting
-  - `Debugger for Chrome` for breakpoint debugging from inside VSCode
-    - Then from the menu, `Run` > `Add configuration` > `Chrome (preview)`
-      ![](https://i.imgur.com/uFJa9xS.png)
-    - [In-depth setup instructions](https://www.freecodecamp.org/news/how-to-set-up-the-debugger-for-chrome-extension-in-visual-studio-code-c0b3e5937c01/)
   - `Prettier` for format-on-save
 
     - Then open VSCode `Preferences: Open Settings (JSON)`, and add
@@ -31,12 +56,12 @@
 
     - [In-depth setup instructions](https://www.robinwieruch.de/how-to-use-prettier-vscode)
 
-Running the code:
+  - **Optional** `Debugger for Chrome` for breakpoint debugging from inside VSCode
+    - Then from the menu, `Run` > `Add configuration` > `Chrome (preview)`
+      ![](https://i.imgur.com/uFJa9xS.png)
+    - [In-depth setup instructions](https://www.freecodecamp.org/news/how-to-set-up-the-debugger-for-chrome-extension-in-visual-studio-code-c0b3e5937c01/)
 
-- `yarn start` to spin up a local server
-  - When you save a file, the app will automatically reload!
-
-## Best practices for working with Vue + Firestore
+### Best practices for working with Vue + Firestore
 
 - Most important: keep your Firestore data structure simple and elegant.
   App logic and visuals are easy to change; backfilling data is annoying.
@@ -50,7 +75,7 @@ Running the code:
   (Then make a computed array, eg with `Object.keys(foo)`). This prevents race
   conditions if multiple clients update the same array
 
-## Other tips
+### Other tips
 
 - Constantly invest in faster dev velocity!
   - Build mod tools for yourself
@@ -58,3 +83,7 @@ Running the code:
 - Code should be as readable as possible
   - Self-documenting if possible, then comments
   - It's easier to read less code
+
+## Releasing
+
+TODO Describe pushing to the right branch so Netlify will pick up changes
