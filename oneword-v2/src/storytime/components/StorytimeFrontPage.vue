@@ -6,7 +6,7 @@
     After that, you all vote for who wrote it the best - or in other words, you
     choose your friends' adventure!
   </div>
-  <GamesList roomDirectory="/storytime/room/" />
+  <GamesList roomDirectory="/storytime/" />
   <Sponsors />
   <br /><br />
 </template>

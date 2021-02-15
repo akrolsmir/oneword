@@ -22,7 +22,7 @@ const routes = [
   { path: '/supporter', component: Supporter },
   { path: '/thanks', component: Thanks },
   { path: '/storytime/', component: StorytimeFrontPage },
-  { path: '/storytime/room/:id', component: Storytime },
+  { path: '/storytime/:id', component: Storytime },
 ]
 
 const router = createRouter({
