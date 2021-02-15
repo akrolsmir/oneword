@@ -210,8 +210,8 @@
     <div style="height: 280px"></div>
   </ScrollBottom>
 
-  <div v-if="room.players.length < 4">
-    <h2 class="fancy" role="alert">Waiting for 4 players...</h2>
+  <div v-if="room.players.length < 3">
+    <h2 class="fancy" role="alert">Waiting for 3 players...</h2>
     <p class="mt-5 mb-2">Invite your friends to play!</p>
     <ShareLink
       :link="'https://oneword.games/storytime.html/?room=' + room.name"
