@@ -46,11 +46,11 @@
           <a class="navbar-link"> All Games </a>
 
           <div class="navbar-dropdown">
-            <a class="navbar-item"> One Word </a>
+            <router-link class="navbar-item" to="/"> One Word </router-link>
             <a class="navbar-item"> Incrypt </a>
-            <a class="navbar-item">
+            <router-link class="navbar-item" to="/storytime/">
               Storytime <span class="tag is-link is-light ml-1">New!</span>
-            </a>
+            </router-link>
             <a class="navbar-item">
               Pairwise <span class="tag is-link is-light ml-1">New!</span>
             </a>

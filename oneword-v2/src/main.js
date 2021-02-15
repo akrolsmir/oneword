@@ -1,24 +1,29 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 
+import 'buefy/dist/buefy.css'
 import 'bulma/css/bulma.css'
 import './styles.css'
 
-import GamesList from './components/GamesList.vue'
+import FrontPage from './components/FrontPage.vue'
 import Profile from './components/Profile.vue'
 import About from './components/About.vue'
 import Supporter from './components/Supporter.vue'
 import Thanks from './components/Thanks.vue'
 import OneWord from './oneword/OneWord.vue'
+import StorytimeFrontPage from './storytime/components/StorytimeFrontPage.vue'
+import Storytime from './storytime/Storytime.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
-  { path: '/', component: GamesList },
+  { path: '/', component: FrontPage },
   { path: '/room/:id', component: OneWord },
   { path: '/profile', component: Profile },
   { path: '/about', component: About },
   { path: '/supporter', component: Supporter },
   { path: '/thanks', component: Thanks },
+  { path: '/storytime/', component: StorytimeFrontPage },
+  { path: '/storytime/room/:id', component: Storytime },
 ]
 
 const router = createRouter({

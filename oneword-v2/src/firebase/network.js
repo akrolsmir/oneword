@@ -29,26 +29,28 @@ if (!firebase.apps.length) {
   }
 }
 
-const COLLECTION = window.COLLECTION || 'rooms'
+function roomDb() {
+  return window.COLLECTION || 'rooms'
+}
 
 const db = firebase.firestore()
 export async function setRoom(room) {
-  await db.collection(COLLECTION).doc(room.name).set(room)
+  await db.collection(roomDb()).doc(room.name).set(room)
 }
 
 export async function updateRoom(room, update) {
-  await db.collection(COLLECTION).doc(room.name).update(update)
+  await db.collection(roomDb()).doc(room.name).update(update)
 }
 
 export async function getRoom(room) {
-  const doc = await db.collection(COLLECTION).doc(room.name).get()
+  const doc = await db.collection(roomDb()).doc(room.name).get()
   return doc.data()
 }
 
 export async function listRooms(limit = 20, publicRoom = true) {
   const db = firebase.firestore()
   const docs = await db
-    .collection(COLLECTION)
+    .collection(roomDb())
     .where('public', '==', publicRoom)
     .orderBy('lastUpdateTime', 'desc')
     // TODO: limit to last 7 days instead.
@@ -65,7 +67,7 @@ export function listenRoom(id, onRoom /* callback that takes in a room */) {
   // Detach listener before listening to a new room.
   unlistenRoom()
   unsubscribe = db
-    .collection(COLLECTION)
+    .collection(roomDb())
     .doc(id)
     .onSnapshot(function (doc) {
       onRoom(doc.data())
@@ -95,14 +97,14 @@ export async function updateUserGame(userId, roomId) {
     return
   }
   const timestamp = Date.now()
-  const gameId = `${COLLECTION}:${roomId}`
+  const gameId = `${roomDb()}:${roomId}`
   await db
     .collection('users')
     .doc(userId)
     .update({
       lastUpdateTime: timestamp,
       [`games.${gameId}`]: {
-        roomDb: COLLECTION,
+        roomDb: roomDb(),
         roomId,
         lastUpdateTime: timestamp,
       },

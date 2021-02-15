@@ -1,14 +1,4 @@
 <template>
-  <div>
-    <div class="fancy big">Welcome!</div>
-    This is an online game based on
-    <a target="_blank" rel="noopener noreferrer" href="https://amzn.to/2xV5lUm"
-      >Just One</a
-    >, a co-op word game for 3+ players.<br />
-    In each of the 13 rounds, come up with a one-word hint for the guesser...<br />
-    But beware: duplicate hints are discarded!<br />
-  </div>
-
   <form
     v-if="user.id || user.guest"
     @submit.prevent="navigateToRoom"
@@ -22,7 +12,8 @@
       v-model="player.roomName"
       placeholder="apple"
       required
-    /><br /><br />
+    />
+    <br /><br />
     <input class="button" type="submit" value="Enter Room" />
   </form>
   <template v-else>
@@ -40,7 +31,7 @@
       :class="{ halfOpacity: isMuteOpenRoom(openRoom) }"
       :key="openRoom.name"
     >
-      <router-link :to="`/room/${openRoom.name}`">
+      <router-link :to="`${roomDirectory}${openRoom.name}`">
         <b>{{ openRoom.name }}</b></router-link
       >, with {{ listPlayers(openRoom).join(', ') }} ({{
         timeSince(openRoom.lastUpdateTime)
@@ -56,32 +47,20 @@
       >
       ({{ timeSince(privateRoom.lastUpdateTime) }})
     </p>
-    <!-- One Word Sponsors -->
-    <h2 class="fancy">Sponsors</h2>
-    We're grateful to be <a href="./supporter.html">sponsored by</a>:
-    <div class="m-2">
-      <Nametag
-        name="Tory N."
-        :user="{ email: 'telarian@gmail.com', supporter: 'SPONSOR' }"
-      />
-    </div>
-    Thanks for supporting One Word!
   </div>
-  <br /><br />
 </template>
 
 <script>
 import { inject } from 'vue'
-import { formatDistanceToNow } from 'date-fns'
 
-import Nametag from './Nametag.vue'
 import { listRooms } from '../firebase/network'
 import { sanitize, timeSince } from '../utils'
 import { listPlayers } from '../oneword/oneword-utils'
 
 export default {
-  components: {
-    Nametag,
+  props: {
+    database: String,
+    roomDirectory: String,
   },
   setup() {
     return { user: inject('currentUser') }
@@ -95,6 +74,7 @@ export default {
     }
   },
   created() {
+    window.COLLECTION = this.database
     const nonempty = (room) => listPlayers(room).length > 0
     // Async load all open and private rooms
     listRooms().then((rooms) => (this.allRooms = rooms.filter(nonempty)))
@@ -128,7 +108,9 @@ export default {
     },
     navigateToRoom() {
       this.player.roomName = sanitize(this.player.roomName)
-      this.$router.push({ path: `/room/${this.player.roomName}` })
+      this.$router.push({
+        path: `${this.roomDirectory}${this.player.roomName}`,
+      })
     },
   },
 }
