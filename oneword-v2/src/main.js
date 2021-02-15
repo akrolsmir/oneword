@@ -1,7 +1,6 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 
-import 'buefy/dist/buefy.css'
 import 'bulma/css/bulma.css'
 import './styles.css'
 
