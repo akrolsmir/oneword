@@ -3,14 +3,13 @@
     <span class="px-5 is-size-5">
       {{ round.chooser }}&gt; {{ round.prompt }}
     </span>
-    <Carousel :items-to-show="1">
+    <Carousel :items-to-show="1" wrap-around>
       <Slide
         v-for="(player, i) in players.filter((p) => round.responses[p])"
         :key="i"
         :style="{ backgroundColor: i == 0 ? 'default' : '#f9ced7' }"
-        class="px-2 pb-3"
       >
-        <div class="tile is-ancestor mt-4">
+        <div class="tile is-ancestor px-5 py-1">
           <div class="tile is-parent">
             <div class="tile is-child is-10 pr-5 has-text-left">
               <HistorySection
@@ -20,13 +19,8 @@
             </div>
             <div class="tile is-child">
               <div>{{ player }}</div>
-              <div>
-                <!-- <Tooltip
-                  :label="round.responses[player].votes.join(', ')"
-                  position="is-left"
-                >
-                  {{ round.responses[player].votes.length }} votes
-                </Tooltip> -->
+              <div :title="round.responses[player].votes.join(', ')">
+                {{ round.responses[player].votes.length }} votes
               </div>
               <div>{{ round.responses[player].words.length }} words</div>
               <div>{{ scores[player] }} points</div>
@@ -81,14 +75,5 @@ export default {
 .main {
   background-color: #ffffff42;
   border-radius: 8px;
-  overflow: visible;
-}
-
-.carousel {
-  overflow: visible;
-}
-
-.is-ancestor {
-  max-width: 600px;
 }
 </style>

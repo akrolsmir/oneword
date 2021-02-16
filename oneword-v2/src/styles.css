@@ -21,13 +21,3 @@ html {
   margin-top: 0;
   font-size: 100%;
 }
-
-body {
-  margin: 48px auto;
-  width: 600px;
-  max-width: 95vw;
-  /* Always keep footer at the bottom: https://stackoverflow.com/a/52779563/1222351 */
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
