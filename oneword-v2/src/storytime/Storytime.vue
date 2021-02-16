@@ -221,9 +221,9 @@
         <div class="card-header">
           <h2 class="card-header-title">Optional: Choose a starting prompt</h2>
         </div>
-        <Carousel :items-to-show="1">
-          <Slide v-for="(prompt, i) in prompts" :key="prompt">
-            <div class="card-content">
+        <div class="card-content">
+          <Carousel :items-to-show="1" wrap-around>
+            <Slide v-for="(prompt, i) in prompts" :key="prompt">
               <div class="has-text-left p-4 m-4">{{ prompt }}</div>
               <button
                 class="button is-info px-6"
@@ -231,14 +231,14 @@
               >
                 Choose
               </button>
-            </div>
-          </Slide>
+            </Slide>
 
-          <template #addons>
-            <Navigation />
-            <Pagination />
-          </template>
-        </Carousel>
+            <template #addons>
+              <Navigation />
+              <Pagination />
+            </template>
+          </Carousel>
+        </div>
       </div>
       <br />
     </div>
@@ -448,7 +448,6 @@ export default {
     standardModal: undefined,
     newMod: '',
     prompts,
-    prompt: 0,
     vote: '',
   }),
   async created() {
@@ -840,29 +839,11 @@ export default {
     rgb(181, 181, 255)
   );
 }
-.fancy {
-  font-family: 'Merienda One', cursive;
-  margin-top: 16px;
-  font-size: 24px;
-}
 
-.fancy.big {
-  margin-top: 0;
-  font-size: 40px;
-}
-
-.fancy.normal {
-  margin-top: 0;
-  font-size: 100%;
-}
-
-body,
 .status-panel {
   margin: 0 auto;
+  width: 760px;
   max-width: 95vw;
-}
-
-.status-panel {
   border-radius: 16px;
   position: fixed;
   bottom: 0;
@@ -871,7 +852,7 @@ body,
 
 .room-box {
   margin: 0 auto;
-  max-width: 800px;
+  max-width: 1000px;
   position: fixed;
   top: 56px;
   left: 0;
@@ -893,9 +874,5 @@ body,
 
 .tag {
   font-size: 0.875rem !important;
-}
-
-.carousel .carousel-items {
-  overflow: visible; /*needed for tooltips*/
 }
 </style>
