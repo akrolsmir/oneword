@@ -291,15 +291,15 @@
               </div>
             </div>
             <div class="level">
-              <div class="level-left">
-                <div>
-                  Your bonus words:
+              <div class="level-left" style="flex-shrink: 1">
+                <span class="mr-2">Your bonus words:</span>
+                <div class="tags">
                   <span
                     v-for="(word, i) in prettySuggestions"
                     :key="i"
-                    class="ml-1"
+                    class="tag"
                     :class="{
-                      'has-text-weight-medium has-text-primary': player.response
+                      'is-success': player.response
                         .toLowerCase()
                         .includes(word),
                     }"
