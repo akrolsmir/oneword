@@ -6,6 +6,7 @@ Vue.component('leaderboard', {
     history: Array,
     state: String,
     players: Array,
+    total: Number,
   },
   computed: {
     tallyPoints: function () {
@@ -78,8 +79,17 @@ Vue.component('leaderboard', {
           });
         }
       });
-      // sort the leaderBoard highest score first
-      return Object.entries(leaderBoard).sort(([_p1, s1], [_p2, s2]) => s2 - s1);
+      // sort the leaderBoard highest score first, then return
+      const sortedLeaderboard = Object.entries(leaderBoard).sort(
+        ([_i1, playerScore1], [_i2, playerScore2]) => playerScore2[1] - playerScore1[1]
+      );
+      for (const [_index, playerScore] of Object.entries(sortedLeaderboard)) {
+        if (playerScore[1] >= this.total) {
+          this.$emit('gameover', playerScore);
+          break;
+        }
+      }
+      return sortedLeaderboard;
     },
   },
   mounted() {},

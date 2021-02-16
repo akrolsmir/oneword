@@ -40,6 +40,9 @@ const vueApp = new Vue({
       decoyNounList: [],
     },
     alertIsShowing: false,
+    // game over if a player has over 25 pts
+    gameOver: false,
+    gameOverPoints: 25,
     newMod: '',
     wordsSaved: false,
     showGameRules: false,
@@ -58,6 +61,11 @@ const vueApp = new Vue({
       if (state === 'TOSS_IN_DECOYS') {
         this.player.decoyAdjList = this.generateDecoyWordList('adjectives');
         this.player.decoyNounList = this.generateDecoyWordList('nouns');
+      }
+      // reset decoys
+      if (state === 'GUESSING') {
+        this.player.decoyAdj = '';
+        this.player.decoyNoun = '';
       }
     },
   },
@@ -122,9 +130,11 @@ const vueApp = new Vue({
           // category will be either default or a theme
           category: 'nouns',
         },
+        gameOver: false,
+        gameWinner: '',
+        winnerPoints: 0,
         history: [],
         public: true,
-        roundsInGame: 13,
         lastUpdateTime: Date.now(),
         timers: { PICKING: '', GUESSING: '', DONE: '', running: false },
         categories: {
@@ -188,7 +198,7 @@ const vueApp = new Vue({
       await setRoom(this.room);
     },
     async submitDecoy() {
-      this.saveWordToAllWordsInRoom(this.player.decoyAdj + '-' + this.player.decoyNoun);
+      await this.saveWordToAllWordsInRoom(this.player.decoyAdj + '-' + this.player.decoyNoun);
     },
     // vote is the word the guesser picked
     async submitVote(vote) {
@@ -253,6 +263,11 @@ const vueApp = new Vue({
       unlistenRoom();
       this.room = { name: '' };
     },
+    handleGameOver(playerScore) {
+      this.gameOver = true;
+      this.gameWinner = playerScore[0];
+      this.winnerPoints = playerScore[1];
+    },
     async kickPlayer(name) {
       if (this.room.players.includes(name)) {
         const index = this.room.players.indexOf(name);
@@ -316,7 +331,6 @@ const vueApp = new Vue({
         }
         // Reset UI to non-supporter defaults
         this.room.public = true;
-        this.room.roundsInGame = 13;
       }
     },
     moment,

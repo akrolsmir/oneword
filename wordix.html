@@ -91,7 +91,7 @@
     }
   </style>
 
-  <meta name="description" content="Pick a theme, trick your friends, find the word!" />
+  <meta name="description" content="Pick a phrase, trick your friends, find the pair!" />
 
   <!-- Dolphin favicon courtesy of Twemoji -->
   <link rel="icon" href="https://twemoji.maxcdn.com/v/13.0.1/72x72/1f990.png" />
@@ -115,7 +115,13 @@
     <div class="columns is-centered">
       <!-- Left pane is for leader board. Only shown in-game and when width > 1216px -->
       <div class="column">
-        <leaderboard :state="room.currentRound.state" :history="room.history" :players="room.players"></leaderboard>
+        <leaderboard
+          :state="room.currentRound.state"
+          :history="room.history"
+          :players="room.players"
+          :total="gameOverPoints"
+          v-on:gameover="handleGameOver"
+        ></leaderboard>
       </div>
       <!-- Center (main) pane. TODO: Remove the below to get prettier formatting again -->
       <!-- prettier-ignore -->
@@ -168,7 +174,7 @@
             <!-- Room header -->
             <div class="message-header has-text-weight-normal is-flex-wrap-wrap">
               <h1 class="fancy big">{{ room.name }}</h1>
-              <span class="fancy capitalize">Round {{ Math.floor(((room.history.length) / room.players.length)) + 1 }}</span>
+              <span class="fancy capitalize">Round {{ room.history.length + 1 }}</span>
               <!-- Navigation -->
               <span class="buttons are-small">
                 <button class="button is-dark is-inverted is-outlined" @click="alertIsShowing=true">Invite</button>
@@ -520,13 +526,15 @@
               </h2>
               <br />
             </div>
-            <button class="button" @click="newRound(false)">Next</button>
-            <br /><br />
             <div class="box">
               <div v-for="(vote, player) in room.currentRound.votes">
                 <strong> {{ player }} </strong> guessed "{{ vote }}"!
               </div>
             </div>
+            <div v-if="gameOver" class="box">
+              And that's it! <strong> {{ gameWinner }} </strong> won with "{{ winnerPoints }} points"!
+            </div>
+            <button v-else class="button" @click="newRound(false)">Next</button>
           </div>
           <br /><br />
           <!-- History TO ADD LATER -->
