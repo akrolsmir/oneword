@@ -342,13 +342,22 @@
               {{ room.currentRound.chooser }}&gt;
               {{ room.currentRound.prompt }}
             </div>
-            TODO voting goes here
-            <!-- TODO: fix
-             <b-field v-for="(response, p) in room.currentRound.responses">
-            <b-radio v-model="vote" native-name="vote" :native-value="p">
-              <div class="spacy">{{ response.story }}</div>
-            </b-radio>
-          </b-field> -->
+            <div
+              class="control"
+              v-for="(response, p) in room.currentRound.responses"
+              :key="p"
+            >
+              <label class="spacy">
+                <input
+                  class="radio"
+                  type="radio"
+                  name="vote"
+                  :value="p"
+                  v-model="vote"
+                />
+                {{ response.story }}
+              </label>
+            </div>
           </template>
 
           <Timer
@@ -692,7 +701,7 @@ export default {
       Object.values(this.room.currentRound.responses).forEach((r) => {
         let i = r.votes.indexOf(this.player.name)
         if (i >= 0) {
-          this.$delete(r.votes, i)
+          r.votes.splice(i, 1)
         }
       })
       // vote
@@ -804,7 +813,7 @@ export default {
       for (let category of ['verbs', 'nouns', 'adjectives']) {
         this.suggestions[category].forEach((word, i) => {
           if (response.toLowerCase().includes(word)) {
-            this.$set(this.suggestions[category], i, randomWord(category))
+            this.suggestions[category][i] = randomWord(category)
           }
         })
       }
