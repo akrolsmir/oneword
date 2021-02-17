@@ -1065,6 +1065,10 @@ export default {
 </script>
 
 <style scoped>
+.background {
+  background-color: #d8d4d5;
+}
+
 h1,
 h2,
 h3 {
