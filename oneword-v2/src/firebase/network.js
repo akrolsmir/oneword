@@ -32,8 +32,11 @@ if (!firebase.apps.length) {
 // Extracts the right room database to use. based on current URL
 // TODO: This is pretty hardcoded to URL; prefer a more robust approach
 function roomDb() {
-  if (window.location.href.includes('/storytime')) {
+  if (window.location.pathname.startsWith('/storytime')) {
     return 'silver'
+  }
+  if (window.location.pathname.startsWith('/incrypt')) {
+    return 'incrypt'
   }
   return 'rooms'
 }
