@@ -140,14 +140,24 @@
       },
       // Exports all users to a CSV, for bulk import into Mailjet.
       exportUsers() {
-        const csv = this.users
+        const usersString = this.users
           .map(
             (u) =>
-              [u.email, ...splitName(u.name), moment(u.createdDate).format('MM/DD/YYYY'), u.supporter || ''].join('\t')
+              [
+                u.email,
+                ...splitName(u.name),
+                moment(u.createdDate).format('YYYY/MM/DD'),
+                u.onewordGames,
+                u.supporter || '',
+              ].join('\t')
             // Tab-separated to escape commas
           )
           .join('\n');
+        // Add a CSV header and trailing newline
+        const csv = `email\tfirstname\tlastname\tcreateddate\toneword_plays\tsupporter\n${usersString}\n`;
         writeToFile('users.csv', csv);
+        // Note: Maybe try YYYY-MM-DD next time for Mailjet auto-import?
+        // Note: Also try sticking in lastUpdateTime for recency info
       },
     },
     async mounted() {
