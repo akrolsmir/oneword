@@ -128,13 +128,13 @@
         <span v-else>Debrief</span>
 
         <!-- Show the timer. -->
-        <timer
+        <Timer
           class="mt-2"
           :length="room.timerLength"
           :on-finish="nextState"
           v-if="room.timerLength > 0 && room.state !== 'DONE'"
           :key="room.state"
-        ></timer>
+        />
       </div>
     </div>
 
@@ -617,16 +617,18 @@
 
 <script>
 import BigColumn from '../components/BigColumn.vue'
+import KeywordCards from './KeywordCards.vue'
+import ShareLink from '../components/ShareLink.vue'
+import Timer from '../components/Timer.vue'
+
 import {
   unpush,
   other,
   keysEqual,
-  shuffleArray,
   randomWords,
   randomKey,
   nextSpy,
   finishedVoting,
-  arrayContentsEqual,
   intercepted,
   dropped,
   checkGuesses,
@@ -636,16 +638,12 @@ import {
   setRoom,
   updateRoom,
   getRoom,
-  listRooms,
   listenRoom,
-  unlistenRoom,
   listenForLogin,
   updateUserGame,
 } from '../firebase/network.js'
 import { randomWord } from '../oneword/oneword-utils'
 import { getIn, sanitize } from '../utils'
-import KeywordCards from './KeywordCards.vue'
-import ShareLink from '../components/ShareLink.vue'
 import { inject } from 'vue'
 
 // TODO: This is kind of weird; intercepts should be worth less than drops?
@@ -713,6 +711,7 @@ export default {
     BigColumn,
     KeywordCards,
     ShareLink,
+    Timer,
   },
   setup() {
     return { user: inject('currentUser') }
