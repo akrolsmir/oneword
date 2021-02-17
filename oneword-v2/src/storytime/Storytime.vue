@@ -8,7 +8,7 @@
       >
         <div class="notification">
           <label class="is-block mb-2">Invite your friends to play!</label>
-          <ShareLink :link="currentUrl()" />
+          <ShareLink />
           <button
             class="delete"
             aria-label="close"
@@ -214,9 +214,7 @@
     <div v-if="room.players.length < 3">
       <h2 class="fancy" role="alert">Waiting for 3 players...</h2>
       <p class="mt-5 mb-2">Invite your friends to play!</p>
-      <ShareLink
-        :link="'https://oneword.games/storytime.html/?room=' + room.name"
-      />
+      <ShareLink />
       <div class="card my-4">
         <div class="card-header">
           <h2 class="card-header-title">Optional: Choose a starting prompt</h2>
@@ -583,10 +581,6 @@ export default {
     },
   },
   methods: {
-    currentUrl() {
-      // Ignore query params, since they may be used for guest login
-      return window.location.href.split('?')[0]
-    },
     randomWord,
     async enterRoom() {
       if (!this.user.canPlay) {

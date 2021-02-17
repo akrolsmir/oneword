@@ -8,7 +8,7 @@
       >
         <div class="notification">
           <label class="is-block mb-2">Invite your friends to play!</label>
-          <ShareLink :link="currentUrl()" />
+          <ShareLink />
           <button
             class="delete"
             aria-label="close"
@@ -277,7 +277,7 @@
       <div v-if="players.length < 3">
         <h2 class="fancy" role="alert">Waiting for 3 players...</h2>
         <p class="mt-5 mb-2">Invite your friends to play!</p>
-        <ShareLink :link="currentUrl()" />
+        <ShareLink />
       </div>
       <div v-else-if="room.currentRound.guesser == player.name">
         <h2 class="fancy" role="alert">
@@ -639,10 +639,6 @@ export default {
     },
   },
   methods: {
-    currentUrl() {
-      // Ignore query params, since they may be used for guest login
-      return window.location.href.split('?')[0]
-    },
     dupes,
     dedupe,
     async enterRoom() {

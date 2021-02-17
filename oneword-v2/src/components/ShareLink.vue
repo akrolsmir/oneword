@@ -6,7 +6,7 @@
         :class="isCopied ? 'is-success' : 'is-info'"
         style="transition: all 0.5s ease"
         type="text"
-        :value="link"
+        :value="link || currentUrl()"
         @focus="$event.target.select()"
         ref="input"
         readonly
@@ -26,7 +26,7 @@
 </template>
 
 <script>
-function noQueryUrl() {
+function currentUrl() {
   // Ignore query params, since they may be used for guest login
   return window.location.href.split('?')[0]
 }
@@ -36,12 +36,10 @@ export default {
     isCopied: false,
   }),
   props: {
-    link: {
-      type: String,
-      default: noQueryUrl(),
-    },
+    link: String,
   },
   methods: {
+    currentUrl,
     copy() {
       this.$refs.input.select()
       document.execCommand('copy')
