@@ -32,9 +32,7 @@
           from their team!<br />
           <br /><br />
           <label class="is-block mb-2">Invite your friends to spectate!</label>
-          <sharelink
-            :link="'https://oneword.games/incrypt?room=' + room.name"
-          ></sharelink>
+          <ShareLink />
           <button
             class="delete"
             aria-label="close"
@@ -101,9 +99,7 @@
         <br /><br />
       </div>
       <div class="mb-2">Invite your friends to play!</div>
-      <sharelink
-        :link="'https://oneword.games/incrypt?room=' + room.name"
-      ></sharelink>
+      <ShareLink />
     </div>
 
     <div v-if="room.state !== 'NOT_STARTED'" class="mb-2">
@@ -651,6 +647,7 @@ import {
 import { randomWord } from '../oneword/oneword-utils'
 import { sanitize } from '../utils'
 import KeywordCards from './KeywordCards.vue'
+import ShareLink from '../components/ShareLink.vue'
 
 // TODO: This is kind of weird; intercepts should be worth less than drops?
 const POINTS_PER_INTERCEPT = 10
@@ -716,6 +713,7 @@ export default {
   components: {
     BigColumn,
     KeywordCards,
+    ShareLink,
   },
   data() {
     return {
@@ -729,6 +727,9 @@ export default {
       room: {
         name: randomWord('adjectives') + '-' + randomWord('nouns'),
         people: {},
+        redTeam: {},
+        blueTeam: {},
+        history: [],
       },
       user: {},
       showRules: false,

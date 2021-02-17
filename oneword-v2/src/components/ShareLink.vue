@@ -26,12 +26,20 @@
 </template>
 
 <script>
+function noQueryUrl() {
+  // Ignore query params, since they may be used for guest login
+  return window.location.href.split('?')[0]
+}
+
 export default {
   data: () => ({
     isCopied: false,
   }),
   props: {
-    link: String,
+    link: {
+      type: String,
+      default: noQueryUrl(),
+    },
   },
   methods: {
     copy() {
