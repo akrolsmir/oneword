@@ -401,11 +401,11 @@
           <h2>Final round</h2>
           <b>Guess {{ otherTeam.name }} team's words!</b><br />
 
-          <keyword-cards
+          <KeywordCards
             :room="room"
             :team="other(myTeamId)"
             :my-team-id="myTeamId"
-          ></keyword-cards>
+          />
 
           <!-- Allow guessing of the other team's words -->
           <div class="words columns">
@@ -448,7 +448,7 @@
             dropped messages<br />
             <br />
 
-            <keyword-cards :room="room" :team="team"></keyword-cards>
+            <KeywordCards :room="room" :team="team" />
             <!-- Show the words, clues, and guesses. TODO: Dedupe with below -->
             <br /><br />
           </template>
@@ -509,11 +509,11 @@
 
     <!-- Show the words and all clues/guesses so far -->
     <div v-if="room.state !== 'NOT_STARTED'" class="mb-6">
-      <keyword-cards
+      <KeywordCards
         :room="room"
         :team="previewTeamId"
         :my-team-id="myTeamId"
-      ></keyword-cards>
+      ></KeywordCards>
 
       <!-- Allow guessing of the other team's words -->
       <div v-if="previewTeamId !== myTeamId" class="words columns">
@@ -650,6 +650,7 @@ import {
 } from '../firebase/network.js'
 import { randomWord } from '../oneword/oneword-utils'
 import { sanitize } from '../utils'
+import KeywordCards from './KeywordCards.vue'
 
 // TODO: This is kind of weird; intercepts should be worth less than drops?
 const POINTS_PER_INTERCEPT = 10
@@ -714,6 +715,7 @@ Room: {
 export default {
   components: {
     BigColumn,
+    KeywordCards,
   },
   data() {
     return {
@@ -1060,3 +1062,50 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+h1,
+h2,
+h3 {
+  font-family: 'Merienda One', cursive;
+}
+
+h1 {
+  font-size: 40px;
+}
+
+h2 {
+  margin-top: 16px;
+  font-size: 24px;
+}
+
+/* Override with a red color, when Red Team roster is selected */
+.tabs.is-toggle li#redTeam.is-active a {
+  background-color: crimson;
+  border-color: crimson;
+}
+
+/* Narrow the gap between words */
+.words.columns {
+  margin: -0.25rem;
+}
+
+.words.columns > .column {
+  padding: 0.25rem;
+}
+
+.words.notification {
+  padding: 1rem 1.25rem 1rem 1.25rem;
+}
+
+.column-divider {
+  display: block;
+  width: 1px;
+  background: #dbdbdb;
+  margin: 0.5rem 0 1rem 0;
+}
+
+.table {
+  background-color: #fff6;
+}
+</style>
