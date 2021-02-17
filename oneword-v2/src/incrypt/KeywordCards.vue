@@ -46,3 +46,34 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+/* TODO: Dedupe styles with Incrypt.vue */
+h1,
+h2,
+h3 {
+  font-family: 'Merienda One', cursive;
+}
+
+h1 {
+  font-size: 40px;
+}
+
+h2 {
+  margin-top: 16px;
+  font-size: 24px;
+}
+
+/* Narrow the gap between words */
+.words.columns {
+  margin: -0.25rem;
+}
+
+.words.columns > .column {
+  padding: 0.25rem;
+}
+
+.words.notification {
+  padding: 1rem 1.25rem 1rem 1.25rem;
+}
+</style>
