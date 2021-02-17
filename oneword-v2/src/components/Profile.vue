@@ -1,5 +1,5 @@
 <template>
-  <div id="profile">
+  <BigColumn>
     <section class="hero is-info is-bold">
       <div class="hero-body">
         <div class="container">
@@ -15,7 +15,10 @@
       </div>
     </section>
     <br />
-    <button v-if="this.user.id" class="button" @click="logout">Sign out</button>
+    <div v-if="this.user.id" class="buttons">
+      <button class="button" @click="logout">Sign out</button>
+      <!-- TODO: Change name button? -->
+    </div>
     <br />
     <br />
 
@@ -52,19 +55,21 @@
         >, {{ timeSince(game.lastUpdateTime) }}
       </p>
     </div>
-  </div>
+  </BigColumn>
 </template>
 
 <script>
 import { inject } from 'vue'
 import { firebaseLogout } from '../firebase/network.js'
 import { timeSince } from '../utils.js'
+import BigColumn from './BigColumn.vue'
 
 import Nametag from './Nametag.vue'
 
 export default {
   components: {
     Nametag,
+    BigColumn,
   },
   setup() {
     return { user: inject('currentUser') }
