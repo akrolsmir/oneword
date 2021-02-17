@@ -28,7 +28,7 @@
     <h2 class="fancy">Open Rooms</h2>
     <p
       v-for="openRoom in allRooms"
-      :class="{ halfOpacity: isMuteOpenRoom(openRoom) }"
+      :class="{ halfOpacity: !isActive(openRoom) }"
       :key="openRoom.name"
     >
       <router-link :to="`${roomDirectory}${openRoom.name}`">
@@ -57,9 +57,19 @@ import { listRooms } from '../firebase/network'
 import { sanitize, timeSince } from '../utils'
 import { listPlayers } from '../oneword/oneword-utils'
 
+function recentRoom(room) {
+  const ONE_HOUR_IN_MS = 60 * 60 * 1000
+  return Date.now() - room.lastUpdateTime <= ONE_HOUR_IN_MS
+}
+
 export default {
   props: {
     roomDirectory: String,
+    // Used to determine which rooms look good to go into
+    activeFunc: {
+      type: Function,
+      default: recentRoom,
+    },
   },
   setup() {
     return { user: inject('currentUser') }
@@ -96,13 +106,18 @@ export default {
   methods: {
     timeSince,
     listPlayers,
-    // Returns a bool indicating if the provided Room object should be muted due to not matching the
-    // currently entered Room field. Will always return false if no open rooms match the current room name.
-    isMuteOpenRoom: function (openRoom) {
-      return (
+    // Returns a bool indicating if the provided Room object should be full opacity.
+    // 1. If some but not all rooms match the filter, match those
+    // 2. Otherwise, match "active" rooms, as defined by the prop `activeFunc`
+    isActive: function (openRoom) {
+      if (
         this.filteredRoomNameSet.size != 0 &&
-        !this.filteredRoomNameSet.has(openRoom.name)
-      )
+        this.filteredRoomNameSet.size != this.allRooms.length
+      ) {
+        return this.filteredRoomNameSet.has(openRoom.name)
+      } else {
+        return this.activeFunc(openRoom)
+      }
     },
     navigateToRoom() {
       this.player.roomName = sanitize(this.player.roomName)
