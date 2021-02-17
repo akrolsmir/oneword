@@ -1,5 +1,5 @@
 <template>
-  <BigColumn class="background">
+  <BigColumn>
     <div>
       You and your friends find yourself in a text adventure! Each turn, one of
       your friends will decide what their character does, then you and your

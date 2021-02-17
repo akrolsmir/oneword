@@ -1,5 +1,5 @@
 <template>
-  <BigColumn class="background">
+  <BigColumn>
     <div v-cloak id="modals">
       <!-- Share Link Modal -->
       <AnimatedModal
