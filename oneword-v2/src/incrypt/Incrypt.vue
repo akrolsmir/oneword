@@ -159,15 +159,14 @@
             <br /><br />
             <b>{{ digit }} - {{ myTeam.words[digit - 1] }}</b>
             <ul>
-              <li
-                v-for="(entry, e) in room.history"
-                v-if="entry[myTeamId].round.key.includes(digit)"
-              >
-                {{
-                  entry[myTeamId].round.encode[
-                    entry[myTeamId].round.key.indexOf(digit)
-                  ]
-                }}
+              <li v-for="(entry, e) in room.history">
+                <div v-if="entry[myTeamId].round.key.includes(digit)">
+                  {{
+                    entry[myTeamId].round.encode[
+                      entry[myTeamId].round.key.indexOf(digit)
+                    ]
+                  }}
+                </div>
               </li>
             </ul>
           </div>
@@ -248,15 +247,14 @@
           <div class="column" v-for="(word, i) in otherTeam.words">
             <b>Keyword {{ i + 1 }}</b>
             <ul>
-              <li
-                v-for="(entry, e) in room.history"
-                v-if="entry[other(myTeamId)].round.key.includes(i + 1)"
-              >
-                {{
-                  entry[other(myTeamId)].round.encode[
-                    entry[other(myTeamId)].round.key.indexOf(i + 1)
-                  ]
-                }}
+              <li v-for="(entry, e) in room.history">
+                <div v-if="entry[other(myTeamId)].round.key.includes(i + 1)">
+                  {{
+                    entry[other(myTeamId)].round.encode[
+                      entry[other(myTeamId)].round.key.indexOf(i + 1)
+                    ]
+                  }}
+                </div>
               </li>
             </ul>
           </div>
@@ -645,9 +643,10 @@ import {
   updateUserGame,
 } from '../firebase/network.js'
 import { randomWord } from '../oneword/oneword-utils'
-import { sanitize } from '../utils'
+import { getIn, sanitize } from '../utils'
 import KeywordCards from './KeywordCards.vue'
 import ShareLink from '../components/ShareLink.vue'
+import { inject } from 'vue'
 
 // TODO: This is kind of weird; intercepts should be worth less than drops?
 const POINTS_PER_INTERCEPT = 10
@@ -715,6 +714,9 @@ export default {
     KeywordCards,
     ShareLink,
   },
+  setup() {
+    return { user: inject('currentUser') }
+  },
   data() {
     return {
       player: {
@@ -741,8 +743,42 @@ export default {
     }
   },
   async created() {
-    // TODO: Unhardcode
-    await this.enterRoom()
+    // For dev velocity, accept https://oneword.games/room/rome?player=Spartacus
+    if (this.$route.query.player && !this.user.id) {
+      this.user.guest = true
+      this.user.name = this.$route.query.player
+    }
+
+    this.room.name = this.$route.params.id
+    const fetchedRoom = await getRoom(this.room)
+
+    if (!fetchedRoom) {
+      // 1. If the room doesn't exist, create it, then return
+      this.player.name =
+        this.user.displayName || `${randomWord('adjectives')}-anon`
+      await this.resetRoom()
+      listenRoom(this.room.name, (room) => (this.room = room))
+      return
+    } else {
+      // 2. Set this room's contents, and proceed to enter the room
+      this.room = fetchedRoom
+      listenRoom(this.room.name, (room) => (this.room = room))
+    }
+
+    // 3. If returning from Firebase sign in ('?authed=1'), skip the login modal
+    if (this.$route.query.authed) {
+      // Remove the 'authed=1' from the URL for cleanliness
+      const query = { ...this.$route.query }
+      delete query.authed
+      this.$router.replace(query)
+
+      // Then sign them in after the Firebase callback returns
+      listenForLogin((_user) => this.enterRoom())
+      return
+    }
+
+    // 4. Enter the room, prompting for login if needed
+    this.enterRoom()
   },
   watch: {
     'room.state'(state) {
@@ -767,9 +803,24 @@ export default {
   },
   methods: {
     async enterRoom() {
-      const fetchedRoom = await getRoom({ name: 'sincere-friend' })
-      this.room = fetchedRoom
-      listenRoom(this.room.name, (room) => (this.room = room))
+      if (!this.user.canPlay) {
+        // If not logged in, show the sign-in modal
+        const onGuest = () => {
+          this.uniquify(this.user.displayName)
+          this.joinGame()
+        }
+        this.user.signIn(onGuest)
+      } else {
+        this.uniquify(this.user.displayName)
+        await this.joinGame()
+      }
+    },
+    uniquify(name) {
+      this.player.name = name
+      // TODO actually make unique
+    },
+    async joinGame() {
+      // Unused in Incrypt, since players manually join a team
     },
     async resetRoom() {
       this.room = {
