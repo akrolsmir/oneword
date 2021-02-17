@@ -13,6 +13,7 @@ import OneWord from './oneword/OneWord.vue'
 import StorytimeFrontPage from './storytime/components/StorytimeFrontPage.vue'
 import Storytime from './storytime/Storytime.vue'
 import IncryptFrontPage from './incrypt/IncryptFrontPage.vue'
+import Incrypt from './incrypt/Incrypt.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
@@ -25,6 +26,7 @@ const routes = [
   { path: '/storytime', component: StorytimeFrontPage },
   { path: '/storytime/:id', component: Storytime },
   { path: '/incrypt', component: IncryptFrontPage },
+  { path: '/incrypt/:id', component: Incrypt },
 ]
 
 const router = createRouter({
