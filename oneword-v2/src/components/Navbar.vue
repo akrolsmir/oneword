@@ -47,8 +47,10 @@
 
           <div class="navbar-dropdown">
             <router-link class="navbar-item" to="/"> One Word </router-link>
-            <a class="navbar-item"> Incrypt </a>
-            <router-link class="navbar-item" to="/storytime/">
+            <router-link class="navbar-item" to="/incrypt">
+              Incrypt
+            </router-link>
+            <router-link class="navbar-item" to="/storytime">
               Storytime <span class="tag is-link is-light ml-1">New!</span>
             </router-link>
             <a class="navbar-item">

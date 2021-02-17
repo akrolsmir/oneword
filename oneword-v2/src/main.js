@@ -12,6 +12,7 @@ import Thanks from './components/Thanks.vue'
 import OneWord from './oneword/OneWord.vue'
 import StorytimeFrontPage from './storytime/components/StorytimeFrontPage.vue'
 import Storytime from './storytime/Storytime.vue'
+import IncryptFrontPage from './incrypt/IncryptFrontPage.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
@@ -21,8 +22,9 @@ const routes = [
   { path: '/about', component: About },
   { path: '/supporter', component: Supporter },
   { path: '/thanks', component: Thanks },
-  { path: '/storytime/', component: StorytimeFrontPage },
+  { path: '/storytime', component: StorytimeFrontPage },
   { path: '/storytime/:id', component: Storytime },
+  { path: '/incrypt', component: IncryptFrontPage },
 ]
 
 const router = createRouter({
