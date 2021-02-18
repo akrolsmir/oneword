@@ -106,7 +106,7 @@
       <div class="modal-content">
         <div class="notification">
           <label class="is-block mb-2">Invite your friends to play!</label>
-          <sharelink :link="'https://oneword.games/pairwise.html?room=' + room.name"></sharelink>
+          <sharelink :link="'https://oneword.games/pairwise?room=' + room.name"></sharelink>
           <button class="delete" aria-label="close" @click="alertIsShowing=false"></button>
         </div>
       </div>
@@ -348,7 +348,7 @@
             <div v-if="room.players.length < 3">
               <h2 class="fancy" role="alert">Waiting for 3 players...</h2>
               <p class="mt-5 mb-2">Invite your friends to play!</p>
-              <sharelink :link="'https://oneword.games/?room=' + room.name"></sharelink>
+              <sharelink :link="'https://oneword.games/pairwise?room=' + room.name"></sharelink>
             </div>
             <!-- TODO consider adding limit of 10 players so games aren't too big? -->
             <!-- If there are enough players to play -->
@@ -404,11 +404,6 @@
                 <strong>1)</strong> Wait for <strong>{{ room.currentRound.clueGiver }}</strong> to pick a random pair of words (i.e. a phrase), and write some text (i.e. the clue) that relates to the phrase
                 <br/> <strong>2)</strong> Based on the clue, everyone else constructs a decoy phrase they think best matches the clue
                 <br/> <strong>3)</strong> Once all decoys are submitted, players try to guess <strong>{{ room.currentRound.clueGiver }}</strong>'s real phrase among the decoys
-                <br/><br/>You earn points if:
-                <br/><br/>* You correctly guess <strong>{{ room.currentRound.clueGiver }}</strong>'s phrase among other players' decoys
-                <br/>* You trick other players with your decoy-- the more players you trick, the more points you earn
-                <br/>* Bonus points if <strong>{{ room.currentRound.clueGiver }}</strong>'s clue was too obivous (everyone guessed it) or too off the wall (nobody guessed it)
-                <br/><br/>Players take turns giving clues in order. The game ends when the first player reaches 30 points!
               </div>
             </div>
           </div>
@@ -458,7 +453,7 @@
                   </span>
                   <br/>
                   <br/>
-                  <button class="button" @click="submitDecoy" :class="{ 'is-success': room.currentRound.allWords[player.name]   }" :disabled="isDecoySubmitDisabled()">Submit</button>
+                  <button class="button" @click="submitDecoy" :class="{ 'is-success': room.currentRound.allWords[player.name] }" :disabled="isDecoySubmitDisabled()">{{ room.currentRound.allWords[player.name] ? 'Submitted!' : 'Submit' }}</button>
                 </div>
                 <h2 class="fancy has-text-centered" role="alert">Your clue from {{ room.currentRound.clueGiver }} is: <strong>{{ room.currentRound.clue }}</strong> </h2>
               </div>
@@ -533,6 +528,7 @@
             </div>
             <div v-if="gameOver" class="box">
               And that's it! <strong> {{ gameWinner }} </strong> won with "{{ winnerPoints }} points"!
+              <!-- <button class="button" @click="newRound(false)">Play Again</button> -->
             </div>
             <button v-else class="button" @click="newRound(false)">Next</button>
           </div>
