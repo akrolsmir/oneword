@@ -43,17 +43,7 @@ Vue.component('leaderboard', {
             }
             // Incorrect guesses awards 1 point to whoever threw the decoy that earned the guess
             else {
-              // Invert makes the mapping {word -> player} from allWords
-              const wordToPlayer = invert(round.allWords);
-              const playersVote = round.votes[player];
-              if (playersVote && wordToPlayer[playersVote]) {
-                // also give a point to whoever threw the decoy earned this player's guess
-                const goodDecoyTosser = wordToPlayer[playersVote];
-                if (leaderBoard[goodDecoyTosser]) {
-                  // check goodDecoyTosser exists, they might have left the game.
-                  leaderBoard[goodDecoyTosser] += 1;
-                }
-              }
+              awardPointsToDecoyWriter(round, player, leaderBoard);
             }
           });
         }
@@ -65,17 +55,7 @@ Vue.component('leaderboard', {
             if (round.votes[player]) {
               leaderBoard[player] += 2;
             }
-            // Invert makes the mapping {word -> player} from allWords
-            const wordToPlayer = invert(round.allWords);
-            const playersVote = round.votes[player];
-            if (playersVote && wordToPlayer[playersVote]) {
-              // also give a point to whoever threw the decoy earned this player's guess
-              const goodDecoyTosser = wordToPlayer[playersVote];
-              if (leaderBoard[goodDecoyTosser]) {
-                // check goodDecoyTosser exists, they might have left the game.
-                leaderBoard[goodDecoyTosser] += 1;
-              }
-            }
+            awardPointsToDecoyWriter(round, player, leaderBoard);
           });
         }
       });
@@ -104,6 +84,16 @@ Vue.component('leaderboard', {
         <strong>{{ playerScore[0] }}</strong>: {{ playerScore[1] }} points
       </div>
     </template>
+    <br/>
+    <div class="fancy has-text-centered">
+      <h1>Scoring Rules</h1>
+    </div>
+    <br/>
+    <div class="has-text-centered">
+      <p>If nobody or everybody guesses the correct word pair, the clue giver scores 0 and all others score 2 </p> <br/>
+      <p>If some but not all players guess the correct word pair, the clue giver scores 3 and so does everyone who guessed correctly </p> <br/>
+      <p>Incorrect guesses each award 1 point to whoever threw the decoy pair that earned the guess </p>
+    </div>
   </div>
 `,
 });
@@ -114,4 +104,18 @@ function invert(obj) {
     inverted_obj[obj[key]] = key;
   });
   return inverted_obj;
+}
+
+function awardPointsToDecoyWriter(round, player, leaderBoard) {
+  // Invert makes the mapping {word -> player} from allWords
+  const wordToPlayer = invert(round.allWords);
+  const playersVote = round.votes[player];
+  if (playersVote && wordToPlayer[playersVote]) {
+    // also give a point to whoever threw the decoy earned this player's guess
+    const goodDecoyTosser = wordToPlayer[playersVote];
+    if (leaderBoard[goodDecoyTosser]) {
+      // check goodDecoyTosser exists, they might have left the game.
+      leaderBoard[goodDecoyTosser] += 1;
+    }
+  }
 }
