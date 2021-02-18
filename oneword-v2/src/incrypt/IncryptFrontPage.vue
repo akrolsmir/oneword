@@ -13,7 +13,7 @@
       Too complex? Your own team won't get the message 🤦‍♀️<br />
       Too simple? The other team will intercept it! 👻<br />
     </div>
-    <GamesList roomDirectory="/incrypt/" />
+    <GamesList roomDirectory="/incrypt/" :activeFunc="notStarted" />
     <Sponsors />
     <br /><br />
   </BigColumn>
@@ -29,6 +29,11 @@ export default {
     BigColumn,
     GamesList,
     Sponsors,
+  },
+  methods: {
+    notStarted(room) {
+      return room.state === 'NOT_STARTED'
+    },
   },
 }
 </script>
