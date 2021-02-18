@@ -2,7 +2,7 @@
 <meta charset="utf-8" />
 
 <head>
-  <title>Wordix</title>
+  <title>pairwise</title>
   <link
     href="https://fonts.googleapis.com/css?family=Fjalla+One|Merienda+One|Righteous|Sriracha&display=swap"
     rel="stylesheet"
@@ -106,7 +106,7 @@
       <div class="modal-content">
         <div class="notification">
           <label class="is-block mb-2">Invite your friends to play!</label>
-          <sharelink :link="'https://oneword.games/wordix.html?room=' + room.name"></sharelink>
+          <sharelink :link="'https://oneword.games/pairwise.html?room=' + room.name"></sharelink>
           <button class="delete" aria-label="close" @click="alertIsShowing=false"></button>
         </div>
       </div>
@@ -133,7 +133,7 @@
           </div>
           <!-- // Commented out b/c rendering lags too much -->
           <!-- <div v-if="player.name">Hi {{ player.name }}!</div> -->
-          <div class="fancy big">Welcome to Wordix!</div>
+          <div class="fancy big">Welcome to pairwise!</div>
           This is an online game inspired by
           <strong><a target="_blank" rel="noopener noreferrer" href="https://amazon.com/dp/2914849656">Dixit</a></strong>, a picture-based
           board game but modified so you can play a version with just words. <br />
@@ -345,8 +345,8 @@
 
           <!-- Input area (CLUER_PICKING) -->
           <div v-if="room.currentRound.state == 'CLUER_PICKING'">
-            <div v-if="room.players.length < 4">
-              <h2 class="fancy" role="alert">Waiting for 4 players...</h2>
+            <div v-if="room.players.length < 3">
+              <h2 class="fancy" role="alert">Waiting for 3 players...</h2>
               <p class="mt-5 mb-2">Invite your friends to play!</p>
               <sharelink :link="'https://oneword.games/?room=' + room.name"></sharelink>
             </div>
@@ -408,7 +408,7 @@
                 <br/><br/>* You correctly guess <strong>{{ room.currentRound.clueGiver }}</strong>'s phrase among other players' decoys
                 <br/>* You trick other players with your decoy-- the more players you trick, the more points you earn
                 <br/>* Bonus points if <strong>{{ room.currentRound.clueGiver }}</strong>'s clue was too obivous (everyone guessed it) or too off the wall (nobody guessed it)
-                <br/><br/>Players take turns giving clues in order. The game ends when the first player reaches 100 points!
+                <br/><br/>Players take turns giving clues in order. The game ends when the first player reaches 30 points!
               </div>
             </div>
           </div>
@@ -591,9 +591,9 @@
 <script type="module" src="components/nametag.js"></script>
 <script type="module" src="components/scoreboard.js"></script>
 <script type="module" src="components/sharelink.js"></script>
-<script type="module" src="components/wordix/navbarshawn.js"></script>
-<script type="module" src="components/wordix/leaderboard.js"></script>
-<script type="module" src="wordix.js"></script>
+<script type="module" src="components/pairwise/navbarshawn.js"></script>
+<script type="module" src="components/pairwise/leaderboard.js"></script>
+<script type="module" src="pairwise.js"></script>
 
 <script>
   window.COLLECTION = 'wordit-shawn';

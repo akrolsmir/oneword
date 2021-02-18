@@ -9,8 +9,8 @@ Vue.component('leaderboard', {
     total: Number,
   },
   computed: {
-    tallyPoints: function () {
-      // Tallypoints only counts rounds that have been pushed to history
+    tallyScores: function () {
+      // tallyScores only counts rounds that have been pushed to history
       const leaderBoard = {};
       //initiate leaderBoard at 0 for every current player
       this.players.forEach((player) => {
@@ -80,16 +80,16 @@ Vue.component('leaderboard', {
         }
       });
       // sort the leaderBoard highest score first, then return
-      const sortedLeaderboard = Object.entries(leaderBoard).sort(
-        ([_i1, playerScore1], [_i2, playerScore2]) => playerScore2[1] - playerScore1[1]
+      const sortedPlayerScores = Object.entries(leaderBoard).sort(
+        (playerScore1, playerScore2) => playerScore2[1] - playerScore1[1]
       );
-      for (const [_index, playerScore] of Object.entries(sortedLeaderboard)) {
+      sortedPlayerScores.some((playerScore) => {
         if (playerScore[1] >= this.total) {
           this.$emit('gameover', playerScore);
-          break;
         }
-      }
-      return sortedLeaderboard;
+        return playerScore[1] >= this.total;
+      });
+      return sortedPlayerScores;
     },
   },
   mounted() {},
@@ -99,9 +99,9 @@ Vue.component('leaderboard', {
       <h1>Leaderboard</h1>
     </div>
     <br/>
-    <template v-for="(playerpoints, _index) in tallyPoints">
+    <template v-for="playerScore in tallyScores">
       <div class="has-text-centered" role="alert">
-        <strong>{{ playerpoints[0] }}</strong>: {{ playerpoints[1] }} points
+        <strong>{{ playerScore[0] }}</strong>: {{ playerScore[1] }} points
       </div>
     </template>
   </div>

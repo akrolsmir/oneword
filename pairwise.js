@@ -40,9 +40,9 @@ const vueApp = new Vue({
       decoyNounList: [],
     },
     alertIsShowing: false,
-    // game over if a player has over 25 pts
+    // game over if a player has over 30 pts (same as dixit)
     gameOver: false,
-    gameOverPoints: 25,
+    gameOverPoints: 30,
     newMod: '',
     wordsSaved: false,
     showGameRules: false,
@@ -54,7 +54,7 @@ const vueApp = new Vue({
   },
   mounted() {},
   watch: {
-    // Timer currently not yet implemented for wordix
+    // Timer currently not yet implemented for pairwise
     'room.currentRound.state'(state) {
       console.log('state change: ' + state);
       this.$emit('reset-timer');
