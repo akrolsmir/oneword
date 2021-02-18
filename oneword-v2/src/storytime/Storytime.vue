@@ -689,6 +689,9 @@ export default {
         update['currentRound.state'] = 'CHOOSING'
       }
       await updateRoom(this.room, update)
+
+      // Store this for user profiles, but don't await for the result
+      updateUserGame(this.user.id, this.room.name)
     },
     async chooseResponse() {
       // unvote if voted already

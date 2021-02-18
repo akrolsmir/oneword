@@ -37,23 +37,20 @@
 
     <h2 class="title">Your Games</h2>
     <div class="box">
-      <h3 class="subtitle">One Word</h3>
-      <p v-for="game in onewordGames">
-        <b
-          ><router-link :to="`/room/${game.roomId}`">{{
-            game.roomId
-          }}</router-link></b
-        >, {{ timeSince(game.lastUpdateTime) }}
-      </p>
-      <br />
-      <h3 class="subtitle">Incrypt</h3>
-      <p v-for="game in incryptGames">
-        <b
-          ><router-link :to="`/incrypt/${game.roomId}`">{{
-            game.roomId
-          }}</router-link></b
-        >, {{ timeSince(game.lastUpdateTime) }}
-      </p>
+      <template v-for="(gameTitle, db) in DB_TO_GAMES">
+        <h3 class="subtitle">{{ gameTitle }}</h3>
+        <div v-if="listGames(db).length === 0">
+          You haven't played {{ gameTitle }} yet...
+        </div>
+        <p v-else v-for="game in listGames(db)">
+          <b
+            ><router-link :to="`/${db}/${game.roomId}`">{{
+              game.roomId
+            }}</router-link></b
+          >, {{ timeSince(game.lastUpdateTime) }}
+        </p>
+        <br />
+      </template>
     </div>
   </BigColumn>
 </template>
@@ -66,11 +63,18 @@ import BigColumn from './BigColumn.vue'
 
 import Nametag from './Nametag.vue'
 
+const DB_TO_GAMES = {
+  rooms: 'One Word',
+  incrypt: 'Incrypt',
+  silver: 'Storytime',
+}
+
 export default {
   components: {
     Nametag,
     BigColumn,
   },
+  data: () => ({ DB_TO_GAMES }),
   setup() {
     return { user: inject('currentUser') }
   },
@@ -82,6 +86,9 @@ export default {
       this.user.id = ''
     },
     timeSince,
+    listGames(db) {
+      return this.gamesByTime.filter((game) => game.roomDb === db)
+    },
   },
   computed: {
     displayName() {
@@ -91,12 +98,6 @@ export default {
       return Object.values(this.user.games || {}).sort(
         (a, b) => b.lastUpdateTime - a.lastUpdateTime
       )
-    },
-    onewordGames() {
-      return this.gamesByTime.filter((game) => game.roomDb === 'rooms')
-    },
-    incryptGames() {
-      return this.gamesByTime.filter((game) => game.roomDb === 'incrypt')
     },
   },
 }
