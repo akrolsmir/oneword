@@ -26,7 +26,7 @@ Vue.component('navbar', {
       firebase.analytics().logEvent('view_amazon', {
         source: 'navbar',
       });
-      window.open('https://amzn.to/3bbSpZn', '_blank');
+      window.open('https://amazon.com/dp/2914849656', '_blank');
     },
     referPremium() {
       firebase.analytics().logEvent('view_promotion', {
@@ -51,7 +51,7 @@ Vue.component('navbar', {
   style="font-weight: 500">
   <div class="navbar-brand">
     <a class="navbar-item" href="./">
-      <span style="font-family: 'Merienda One', cursive; font-size: 24px; color:  #4a4a4a" >Wordix!</span>
+      <span style="font-family: 'Merienda One', cursive; font-size: 24px; color:  #4a4a4a" >Pairwise!</span>
     </a>
     <a role="button" class="navbar-burger burger" :class= "{'is-active': burgerOpen}" aria-label="menu"
         data-target="navbuttons" @click="burgerOpen = !burgerOpen;">
@@ -63,7 +63,7 @@ Vue.component('navbar', {
   </div>
   <div id="navbuttons" class="navbar-menu" :class = "{'is-active': burgerOpen}">
     <div class="navbar-start">
-      <a class="navbar-item" @click="referIncrypt">
+      <a class="navbar-item">
         Game under development :P
       </a>
     </div>

@@ -2,7 +2,7 @@
 <meta charset="utf-8" />
 
 <head>
-  <title>pairwise</title>
+  <title>Pairwise</title>
   <link
     href="https://fonts.googleapis.com/css?family=Fjalla+One|Merienda+One|Righteous|Sriracha&display=swap"
     rel="stylesheet"
@@ -133,11 +133,11 @@
           </div>
           <!-- // Commented out b/c rendering lags too much -->
           <!-- <div v-if="player.name">Hi {{ player.name }}!</div> -->
-          <div class="fancy big">Welcome to pairwise!</div>
-          This is an online game inspired by
-          <strong><a target="_blank" rel="noopener noreferrer" href="https://amazon.com/dp/2914849656">Dixit</a></strong>, a picture-based
-          board game but modified so you can play a version with just words. <br />
-          Pick a theme, trick your friends, find the word! <br />
+          <div class="fancy big">Welcome to Pairwise!</div>
+          This is an online word game inspired by
+          <strong><a target="_blank" rel="noopener noreferrer" href="https://amazon.com/dp/2914849656">Dixit</a></strong>, originally a picture-based
+          board game. <br />
+          Write a clue, trick your friends, find the pair! <br />
           But beware: If your clue is either too obvious or too off the wall, your friends will get ahead!<br />
           <form v-if="user.id || user.guest" @submit.prevent="enterRoom" method="POST">
             <label class="label">Player</label>
