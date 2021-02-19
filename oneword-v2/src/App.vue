@@ -4,9 +4,44 @@
 </template>
 
 <script>
-import { provide, reactive, computed } from 'vue'
+import { provide, reactive, computed, ref } from 'vue'
 import Navbar from './components/Navbar.vue'
 import { listenForLogin } from './firebase/network'
+
+function useRoom() {
+  // const room = ref({});
+  const room = reactive({
+    name: '',
+    state: '',
+    round: {},
+    history: [],
+    people: {},
+  })
+
+  function loadFrom(r) {
+    Object.assign(room, r)
+  }
+
+  // 1: client directly updates room, then calls push
+  async function push(...props) {
+    await updateRoom(
+      room,
+      Object.fromEntries(props.map((prop) => [prop, getIn(this.room, prop)]))
+    )
+  }
+
+  // OR 2: This does the updating and push
+  async function update(path, toUpdate) {}
+
+  // OR 3: Skip local update, always just push
+
+  // Could even try to batch updates together to save roundtrips???!
+  // (maybe Firestore handles this; maybe 2 pushes are okay)
+
+  // resetRoom must be overriden?
+  // enterRoom may be overriden? (or just a boolean of "whether to skip")
+  //
+}
 
 const currentUser = reactive({
   // If user.id is not filled in, then user is not logged in

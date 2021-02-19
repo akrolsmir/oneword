@@ -549,6 +549,38 @@ export default {
       wordsSaved: false,
     }
   },
+  /**
+  VueApp Dependencies:
+  - room
+  - user
+  - player.name => should kill this, and just use "user"
+  - enterRoom()
+  - resetRoom()
+  - $route, $router
+  could have useUser(), useRoom()
+  * User logic is always the same
+  * User entering room logic is mostly similar
+    * exception: Incrypt has joining, not auto-entering
+  * Room structure varies wildly
+    * Some best practices though: state, round, history, people
+    * Should be consolidated: who is mod, private rooms
+  * Worry: too much consolidation = harder to break out of the box???
+    * Eg if we were creating Incrypt from scratch
+    * Hypothetical: how about Kingdom Royale? Maybe more like Incrypt,
+      can't join existing game    
+    * Incrypt: has room.redTeam, room.blueTeam
+      * How would that sync in Firestore, if using Composition API?
+      * 0. Today: complicated helper functions that take in players(team)
+      * 1. ref that has a loadFrom() and exportTo()?
+          * exportTo could take care of figuring out how to push,
+          * takes the place of saveRoom(...) today
+          * How to do loadFrom? oh, it's a listenRoom() callback. Hm...
+      * 2. ref that has matching fields, then computed fields too? 
+        * Already have this problem with currentUser 
+          although we don't push that to Firestore
+      * 3. Combining 1 & 2 sounds kinda good now
+*/
+  // * Room logic is
   async created() {
     // For dev velocity, accept https://oneword.games/room/rome?player=Spartacus
     if (this.$route.query.player && !this.user.id) {
