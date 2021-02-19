@@ -5,9 +5,8 @@
     <div class="modal-content">
       <div class="notification">
         <label class="is-block mb-2">Invite your friends to play!</label>
-        <sharelink
-          :link="'https://oneword.games/pairwise?room=' + room.name"
-        ></sharelink>
+        <ShareLink />
+
         <button
           class="delete"
           aria-label="close"
@@ -20,13 +19,13 @@
   <div class="columns is-centered">
     <!-- Left pane is for leader board. Only shown in-game and when width > 1216px -->
     <div class="column">
-      <leaderboard
+      <Leaderboard
         :state="room.currentRound.state"
         :history="room.history"
         :players="room.players"
         :total="gameOverPoints"
         v-on:gameover="handleGameOver"
-      ></leaderboard>
+      />
     </div>
     <!-- Center (main) pane. -->
     <div class="column is-two-thirds is-half-widescreen">
@@ -112,7 +111,7 @@
             <div class="field is-grouped is-grouped-multiline">
               <span class="mb-2 mr-2">Players:</span>
               <!-- TODO: refactor submitted/guessing into functions. This is currently a hack -->
-              <nametag
+              <Nametag
                 v-for="(player, i) in room.players"
                 :name="player"
                 :user="room.playerData && room.playerData[player]"
@@ -130,7 +129,7 @@
                 "
                 :mod="isMod"
                 @kick="kickPlayer(player)"
-              ></nametag>
+              />
             </div>
             <!-- Not sure if this works... -->
             <!-- Other Mod Tools -->
@@ -166,9 +165,7 @@
           <div v-if="room.players.length < 3">
             <h2 class="fancy" role="alert">Waiting for 3 players...</h2>
             <p class="mt-5 mb-2">Invite your friends to play!</p>
-            <sharelink
-              :link="'https://oneword.games/pairwise?room=' + room.name"
-            ></sharelink>
+            <ShareLink />
           </div>
           <!-- TODO consider adding limit of 10 players so games aren't too big? -->
           <!-- If there are enough players to play -->
@@ -465,18 +462,29 @@
 </template>
 
 <script>
+import Nametag from '../components/Nametag.vue'
+import ShareLink from '../components/ShareLink.vue'
+import Leaderboard from './Leaderboard.vue'
+
 import { nouns, compounds, verbs, adjectives } from '../many-words.js'
 import {
   setRoom,
   updateRoom,
   getRoom,
-  listRooms,
   listenRoom,
   unlistenRoom,
-  listenForLogin,
 } from '../firebase/network.js'
+import { inject } from 'vue'
 
 export default {
+  components: {
+    Nametag,
+    ShareLink,
+    Leaderboard,
+  },
+  setup() {
+    return { user: inject('currentUser') }
+  },
   data() {
     return {
       //stores authentication metadata (whether user is signed in or guest)
