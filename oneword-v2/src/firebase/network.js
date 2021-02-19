@@ -38,6 +38,9 @@ function roomDb() {
   if (window.location.pathname.startsWith('/incrypt')) {
     return 'incrypt'
   }
+  if (window.location.pathname.startsWith('/pairwise')) {
+    return 'wordit-shawn'
+  }
   return 'rooms'
 }
 
