@@ -26,7 +26,7 @@
           :history="room.history"
           :players="room.players"
           :total="gameOverPoints"
-          v-on:gameover="handleGameOver"
+          @gameover="handleGameOver"
         />
       </div>
       <!-- Center (main) pane. -->
@@ -167,7 +167,7 @@
               </button>
               <div
                 class="content"
-                v-bind:style="{
+                :style="{
                   'max-height': !showGameRules ? '0px' : 'inherit',
                   padding: !showGameRules ? '0px' : '18px',
                 }"
@@ -662,10 +662,6 @@ export default {
       }
       return wordList
     },
-    goHome() {
-      unlistenRoom()
-      this.room = { name: '' }
-    },
     handleGameOver(playerScore) {
       this.gameOver = true
       this.gameWinner = playerScore[0]
@@ -675,17 +671,6 @@ export default {
       if (this.room.players.includes(name)) {
         const index = this.room.players.indexOf(name)
         this.room.players.splice(index, 1)
-        await this.saveRoom('players')
-      }
-    },
-    async makeMod(name) {
-      const index = this.room.players.indexOf(name)
-      if (index >= 0) {
-        // swap players[0] and players[index]
-        ;[this.room.players[0], this.room.players[index]] = [
-          this.room.players[index],
-          this.room.players[0],
-        ]
         await this.saveRoom('players')
       }
     },
