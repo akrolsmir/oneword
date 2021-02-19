@@ -376,7 +376,6 @@ import Nametag from '../components/Nametag.vue'
 import ShareLink from '../components/ShareLink.vue'
 import Leaderboard from './Leaderboard.vue'
 
-import { nouns, compounds, verbs, adjectives } from '../many-words.js'
 import {
   setRoom,
   updateRoom,
@@ -385,6 +384,8 @@ import {
   unlistenRoom,
 } from '../firebase/network.js'
 import { inject } from 'vue'
+import { getIn } from '../utils.js'
+import { randomWord } from '../oneword/oneword-utils'
 
 export default {
   components: {
@@ -723,26 +724,6 @@ export default {
       this.room.timers.running = !this.room.timers.running
       await this.saveRoom('timers')
     },
-    async upsell(...props) {
-      if (this.user.supporter) {
-        await this.saveRoom(...props)
-      } else {
-        const result = await swal({
-          title: 'Want private rooms?',
-          text:
-            'Earn perks like private rooms, custom avatars, and more by becoming a supporter 😍',
-          buttons: {
-            cancel: 'Not now',
-            support: 'Okay!',
-          },
-        })
-        if (result === 'support') {
-          referSupporter('modtools')
-        }
-        // Reset UI to non-supporter defaults
-        this.room.public = true
-      }
-    },
   },
   computed: {
     timerLength() {
@@ -766,28 +747,11 @@ export default {
   },
 }
 
-// Extracts a node from an object tree by its path, like "redTeam.players"
-function getIn(object, path) {
-  let node = object
-  for (const part of path.split('.')) {
-    node = node[part]
-  }
-  return node
-}
-
 function nextClueGiver(lastGuesser, players) {
   // players is a map from name->points; we just need the names
   const nextIndex =
     (players.indexOf(lastGuesser) + 1 + players.length) % players.length
   return players[nextIndex]
-}
-
-// Random word for a category, copied from index.html
-function randomWord(category = 'nouns', customWords = '') {
-  const custom = customWords.split(/\s/)
-  const categories = { nouns, compounds, verbs, adjectives, custom }
-  const words = categories[category]
-  return words[Math.floor(Math.random() * words.length)]
 }
 </script>
 
