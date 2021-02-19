@@ -1,91 +1,95 @@
 <template>
-  <!-- Notification -->
-  <div class="modal" :class="{ 'is-active': alertIsShowing }">
-    <div class="modal-background" @click="alertIsShowing = false"></div>
-    <div class="modal-content">
-      <div class="notification">
-        <label class="is-block mb-2">Invite your friends to play!</label>
-        <ShareLink />
+  <BigColumn :width="1200" class="background">
+    <!-- Notification -->
+    <div class="modal" :class="{ 'is-active': alertIsShowing }">
+      <div class="modal-background" @click="alertIsShowing = false"></div>
+      <div class="modal-content">
+        <div class="notification">
+          <label class="is-block mb-2">Invite your friends to play!</label>
+          <ShareLink />
 
-        <button
-          class="delete"
-          aria-label="close"
-          @click="alertIsShowing = false"
-        ></button>
+          <button
+            class="delete"
+            aria-label="close"
+            @click="alertIsShowing = false"
+          ></button>
+        </div>
       </div>
     </div>
-  </div>
-  <!-- Column-based layout for leader board, Main UI, and Chat box -->
-  <div class="columns is-centered">
-    <!-- Left pane is for leader board. Only shown in-game and when width > 1216px -->
-    <div class="column">
-      <Leaderboard
-        :state="room.currentRound.state"
-        :history="room.history"
-        :players="room.players"
-        :total="gameOverPoints"
-        v-on:gameover="handleGameOver"
-      />
-    </div>
-    <!-- Center (main) pane. -->
-    <div class="column is-two-thirds is-half-widescreen">
-      <!-- In game -->
-      <div v-cloak class="container mx-4">
-        <div class="message">
-          <!-- Room header -->
-          <div class="message-header has-text-weight-normal is-flex-wrap-wrap">
-            <h1 class="fancy big">{{ room.name }}</h1>
-            <span class="fancy capitalize"
-              >Round {{ room.history.length + 1 }}</span
+
+    <!-- Column-based layout for leader board, Main UI, and Chat box -->
+    <div class="columns is-centered">
+      <!-- Left pane is for leader board. Only shown in-game and when width > 1216px -->
+      <div class="column">
+        <Leaderboard
+          :state="room.currentRound.state"
+          :history="room.history"
+          :players="room.players"
+          :total="gameOverPoints"
+          v-on:gameover="handleGameOver"
+        />
+      </div>
+      <!-- Center (main) pane. -->
+      <div class="column is-two-thirds is-half-widescreen">
+        <!-- In game -->
+        <div v-cloak class="container mx-4">
+          <div class="message">
+            <!-- Room header -->
+            <div
+              class="message-header has-text-weight-normal is-flex-wrap-wrap"
             >
-            <!-- Navigation -->
-            <span class="buttons are-small">
-              <button
-                class="button is-dark is-inverted is-outlined"
-                @click="alertIsShowing = true"
+              <h1 class="fancy big">{{ room.name }}</h1>
+              <span class="fancy capitalize"
+                >Round {{ room.history.length + 1 }}</span
               >
-                Invite
-              </button>
-              <button
-                v-if="room.players.includes(player.name)"
-                class="button is-dark is-inverted is-outlined"
-                @click="kickPlayer(player.name)"
-              >
-                Watch
-              </button>
-              <button
-                v-else
-                class="button is-dark is-inverted is-outlined"
-                @click="joinRoom"
-              >
-                Rejoin
-              </button>
-            </span>
-          </div>
-          <div>
-            <div class="is-flex is-flex-wrap-wrap is-align-items-center">
-              <!-- Categories -->
-              <span
-                v-if="isMod"
-                class="field is-grouped is-grouped-multiline mx-3 my-1"
-              >
-                <!-- <div class="control" v-for="category in this.CATEGORY_ORDER">
+              <!-- Navigation -->
+              <span class="buttons are-small">
+                <button
+                  class="button is-dark is-inverted is-outlined"
+                  @click="alertIsShowing = true"
+                >
+                  Invite
+                </button>
+                <button
+                  v-if="room.players.includes(player.name)"
+                  class="button is-dark is-inverted is-outlined"
+                  @click="kickPlayer(player.name)"
+                >
+                  Watch
+                </button>
+                <button
+                  v-else
+                  class="button is-dark is-inverted is-outlined"
+                  @click="joinRoom"
+                >
+                  Rejoin
+                </button>
+              </span>
+            </div>
+            <div>
+              <div class="is-flex is-flex-wrap-wrap is-align-items-center">
+                <!-- Categories -->
+                <span
+                  v-if="isMod"
+                  class="field is-grouped is-grouped-multiline mx-3 my-1"
+                >
+                  <!-- <div class="control" v-for="category in this.CATEGORY_ORDER">
                     <label class="capitalize checkbox">
                       <input type="checkbox" v-model="room.categories[category]" @change="saveRoom('categories')" />
                       {{ category }}
                     </label>
                   </div> -->
-              </span>
-              <span class="mx-3" v-else>
-                <!-- <template v-for="(category, i) in this.CATEGORY_ORDER.filter(c => room.categories[c])">
+                </span>
+                <span class="mx-3" v-else>
+                  <!-- <template v-for="(category, i) in this.CATEGORY_ORDER.filter(c => room.categories[c])">
                     <span class="comma" :class="{'has-text-weight-bold': room.currentRound.category == category}">
                       {{ category }}</span
                     >
                   </template> -->
-              </span>
-            </div>
-            <!-- Custom word editor (mod only) -->
-            <!-- <div v-if="isMod && room.categories['custom']" class="is-flex is-justify-content-center">
+                </span>
+              </div>
+              <!-- Custom word editor (mod only) -->
+              <!-- <div v-if="isMod && room.categories['custom']" class="is-flex is-justify-content-center">
                 <div class="field mb-2" style="width: 500px; max-width: 90%">
                   <div class="control">
                     <textarea
@@ -104,36 +108,36 @@
                   </div>
                 </div>
               </div> -->
-          </div>
-
-          <div class="message-body" style="border-width: 0">
-            <!-- Players -->
-            <div class="field is-grouped is-grouped-multiline">
-              <span class="mb-2 mr-2">Players:</span>
-              <!-- TODO: refactor submitted/guessing into functions. This is currently a hack -->
-              <Nametag
-                v-for="(player, i) in room.players"
-                :name="player"
-                :user="room.playerData && room.playerData[player]"
-                :index="i"
-                :submitted="
-                  (Object.keys(room.currentRound.allWords).includes(player) &&
-                    player != room.currentRound.clueGiver) ||
-                  (player == room.currentRound.clueGiver &&
-                    !Object.keys(room.currentRound.allWords).includes(player))
-                "
-                :guessing="
-                  Object.keys(room.currentRound.votes).includes(player) ||
-                  (player == room.currentRound.clueGiver &&
-                    Object.keys(room.currentRound.allWords).includes(player))
-                "
-                :mod="isMod"
-                @kick="kickPlayer(player)"
-              />
             </div>
-            <!-- Not sure if this works... -->
-            <!-- Other Mod Tools -->
-            <!-- <div v-if="isMod">
+
+            <div class="message-body" style="border-width: 0">
+              <!-- Players -->
+              <div class="field is-grouped is-grouped-multiline">
+                <span class="mb-2 mr-2">Players:</span>
+                <!-- TODO: refactor submitted/guessing into functions. This is currently a hack -->
+                <Nametag
+                  v-for="(player, i) in room.players"
+                  :name="player"
+                  :user="room.playerData && room.playerData[player]"
+                  :index="i"
+                  :submitted="
+                    (Object.keys(room.currentRound.allWords).includes(player) &&
+                      player != room.currentRound.clueGiver) ||
+                    (player == room.currentRound.clueGiver &&
+                      !Object.keys(room.currentRound.allWords).includes(player))
+                  "
+                  :guessing="
+                    Object.keys(room.currentRound.votes).includes(player) ||
+                    (player == room.currentRound.clueGiver &&
+                      Object.keys(room.currentRound.allWords).includes(player))
+                  "
+                  :mod="isMod"
+                  @kick="kickPlayer(player)"
+                />
+              </div>
+              <!-- Not sure if this works... -->
+              <!-- Other Mod Tools -->
+              <!-- <div v-if="isMod">
                 <div class="label">Room Controls</div>
                 <div class="field has-addons is-inline-flex mb-0">
                   <span class="control">
@@ -156,274 +160,278 @@
                   </span>
                 </div>
               </div> -->
+            </div>
           </div>
-        </div>
-        <!-- <timer :length="timerLength" :on-finish="nextStage" v-if="timerLength > 0" :key="room.currentRound.state"></timer> -->
+          <!-- <timer :length="timerLength" :on-finish="nextStage" v-if="timerLength > 0" :key="room.currentRound.state"></timer> -->
 
-        <!-- Input area (CLUER_PICKING) -->
-        <div v-if="room.currentRound.state == 'CLUER_PICKING'">
-          <div v-if="room.players.length < 3">
-            <h2 class="fancy" role="alert">Waiting for 3 players...</h2>
-            <p class="mt-5 mb-2">Invite your friends to play!</p>
-            <ShareLink />
+          <!-- Input area (CLUER_PICKING) -->
+          <div v-if="room.currentRound.state == 'CLUER_PICKING'">
+            <div v-if="room.players.length < 3">
+              <h2 class="fancy" role="alert">Waiting for 3 players...</h2>
+              <p class="mt-5 mb-2">Invite your friends to play!</p>
+              <ShareLink />
+            </div>
+            <!-- TODO consider adding limit of 10 players so games aren't too big? -->
+            <!-- If there are enough players to play -->
+            <div v-else>
+              <!-- Current player's turn to pick a word and give clues -->
+              <div v-if="room.currentRound.clueGiver == player.name">
+                <div class="box">
+                  <h2 class="fancy has-text-centered" role="alert">
+                    Pick a phrase among the following, and write a clue that
+                    describes it in the clue box!
+                    <br /><br />
+                    <button
+                      class="button is-rounded"
+                      @click="cluerSelectsWord(word)"
+                      v-for="(word, i) in player.wordList"
+                      :class="{ 'is-info': room.currentRound.word == word }"
+                    >
+                      {{ word }}
+                    </button>
+                  </h2>
+                  <label class="label" for="hintInput">Your clue</label>
+                  <div class="field has-addons">
+                    <div class="control is-expanded">
+                      <input
+                        class="input"
+                        id="hintInput"
+                        type="text"
+                        v-model="room.currentRound.clue"
+                        @keyup.enter="submitClue"
+                        :class="{ 'is-primary': true }"
+                      />
+                    </div>
+                    <div class="control">
+                      <!-- TODO: add tool tip to show why button is disabled https://wikiki.github.io/elements/tooltip/ -->
+                      <button
+                        class="button"
+                        @click="submitClue"
+                        :disabled="isClueSubmitDisabled()"
+                      >
+                        Submit
+                      </button>
+                    </div>
+                  </div>
+                  <!-- <div class="notification is-danger" role="alert" v-if="hasSpecialCharacters(room.currentRound.clue)">
+                    Are you sure this is a real word?
+                  </div> -->
+                </div>
+              </div>
+              <!-- Not current player's turn -->
+              <div v-else>
+                <h2 class="fancy" role="alert">
+                  Waiting for
+                  <strong>{{ room.currentRound.clueGiver }}</strong> to pick a
+                  phrase and a clue...
+                </h2>
+                <br />
+              </div>
+              <button
+                class="collapsible"
+                @click="showGameRules = !showGameRules"
+              >
+                How the game works
+              </button>
+              <div
+                class="content"
+                v-bind:style="{
+                  'max-height': !showGameRules ? '0px' : 'inherit',
+                  padding: !showGameRules ? '0px' : '18px',
+                }"
+              >
+                <strong>1)</strong> Wait for
+                <strong>{{ room.currentRound.clueGiver }}</strong> to pick a
+                random pair of words (i.e. a phrase), and write some text (i.e.
+                the clue) that relates to the phrase <br />
+                <strong>2)</strong> Based on the clue, everyone else constructs
+                a decoy phrase they think best matches the clue <br />
+                <strong>3)</strong> Once all decoys are submitted, players try
+                to guess <strong>{{ room.currentRound.clueGiver }}</strong
+                >'s real phrase among the decoys
+              </div>
+            </div>
           </div>
-          <!-- TODO consider adding limit of 10 players so games aren't too big? -->
-          <!-- If there are enough players to play -->
-          <div v-else>
-            <!-- Current player's turn to pick a word and give clues -->
-            <div v-if="room.currentRound.clueGiver == player.name">
-              <div class="box">
+
+          <!-- Input area (toossing in decoys) -->
+          <div v-if="room.currentRound.state == 'TOSS_IN_DECOYS'">
+            <!-- All except the clueGiver guesses which word is the real one, based on the clue giver's clues. -->
+            <div class="box">
+              <div v-if="room.currentRound.clueGiver != player.name">
                 <h2 class="fancy has-text-centered" role="alert">
-                  Pick a phrase among the following, and write a clue that
-                  describes it in the clue box!
-                  <br /><br />
+                  Pick one option from each word category to construct a decoy
+                  phrase best matching
+                  <strong>{{ room.currentRound.clueGiver }}</strong
+                  >'s clue. <br /><br />
+                </h2>
+                <div class="columns">
+                  <!-- Left pane is for leader board. Only shown in-game and when width > 1216px -->
+                  <div class="column has-text-centered">
+                    <strong> Adjectives </strong>
+                    <br /><br />
+                    <button
+                      class="button is-rounded"
+                      @click="player.decoyAdj = word"
+                      v-for="(word, i) in player.decoyAdjList"
+                      :class="{ 'is-success': player.decoyAdj === word }"
+                    >
+                      {{ word }}
+                    </button>
+                  </div>
+                  <!-- Center (main) pane. TODO: Remove the below to get prettier formatting again -->
+
+                  <div class="column has-text-centered">
+                    <strong> Nouns </strong>
+                    <br /><br />
+                    <button
+                      class="button is-rounded"
+                      @click="player.decoyNoun = word"
+                      v-for="(word, i) in player.decoyNounList"
+                      :class="{ 'is-success': player.decoyNoun === word }"
+                    >
+                      {{ word }}
+                    </button>
+                  </div>
+                </div>
+                <div class="has-text-centered">
+                  Your decoy phrase:
+                  <span v-if="player.decoyAdj || player.decoyNoun">
+                    <strong
+                      >"{{ player.decoyAdj }}-{{ player.decoyNoun }}"</strong
+                    >
+                  </span>
+                  <br />
+                  <br />
+                  <button
+                    class="button"
+                    @click="submitDecoy"
+                    :class="{
+                      'is-success': room.currentRound.allWords[player.name],
+                    }"
+                    :disabled="isDecoySubmitDisabled()"
+                  >
+                    {{
+                      room.currentRound.allWords[player.name]
+                        ? 'Submitted!'
+                        : 'Submit'
+                    }}
+                  </button>
+                </div>
+                <h2 class="fancy has-text-centered" role="alert">
+                  Your clue from {{ room.currentRound.clueGiver }} is:
+                  <strong>{{ room.currentRound.clue }}</strong>
+                </h2>
+              </div>
+              <div v-else>
+                <h2 class="fancy" role="alert">
+                  Waiting for other players to toss in decoys based on your
+                  clue...
+                </h2>
+                <br />
+                <div class="has-text-centered">
+                  <strong>{{ room.currentRound.clue }}</strong>
+                </div>
+                <h2 class="fancy has-text-centered" role="alert">
+                  <span
+                    class="tag is-rounded is-primary is-light"
+                    v-for="(word, decoyTosser) in room.currentRound.allWords"
+                  >
+                    <template v-if="decoyTosser != player.name">
+                      {{ decoyTosser }} tossed in "{{ word }}"!
+                    </template>
+                    <template v-else>You chose the word "{{ word }}"</template>
+                  </span>
+                </h2>
+              </div>
+            </div>
+          </div>
+
+          <!-- Input area (guessing) -->
+          <div v-if="room.currentRound.state == 'GUESSING'">
+            <!-- All except the clueGiver guesses which word is the real one, based on the clue giver's clues. -->
+            <div class="box">
+              <div v-if="room.currentRound.clueGiver == player.name">
+                <h2 class="fancy has-text-centered" role="alert">
                   <button
                     class="button is-rounded"
-                    @click="cluerSelectsWord(word)"
-                    v-for="(word, i) in player.wordList"
-                    :class="{ 'is-info': room.currentRound.word == word }"
+                    v-for="word in Object.values(
+                      room.currentRound.allWords
+                    ).sort()"
+                    :disabled="true"
+                    :class="{
+                      'is-success': Object.values(
+                        room.currentRound.votes
+                      ).includes(word),
+                    }"
                   >
                     {{ word }}
                   </button>
                 </h2>
-                <label class="label" for="hintInput">Your clue</label>
-                <div class="field has-addons">
-                  <div class="control is-expanded">
-                    <input
-                      class="input"
-                      id="hintInput"
-                      type="text"
-                      v-model="room.currentRound.clue"
-                      @keyup.enter="submitClue"
-                      :class="{ 'is-primary': true }"
-                    />
-                  </div>
-                  <div class="control">
-                    <!-- TODO: add tool tip to show why button is disabled https://wikiki.github.io/elements/tooltip/ -->
-                    <button
-                      class="button"
-                      @click="submitClue"
-                      :disabled="isClueSubmitDisabled()"
-                    >
-                      Submit
-                    </button>
-                  </div>
+                <div class="fancy has-text-centered newline">
+                  Waiting for other players to guess...
                 </div>
-                <!-- <div class="notification is-danger" role="alert" v-if="hasSpecialCharacters(room.currentRound.clue)">
-                    Are you sure this is a real word?
-                  </div> -->
+                <div class="has-text-centered">
+                  You aren't allowed to guess your own word, sorry!
+                </div>
               </div>
-            </div>
-            <!-- Not current player's turn -->
-            <div v-else>
-              <h2 class="fancy" role="alert">
-                Waiting for
-                <strong>{{ room.currentRound.clueGiver }}</strong> to pick a
-                phrase and a clue...
-              </h2>
-              <br />
-            </div>
-            <button class="collapsible" @click="showGameRules = !showGameRules">
-              How the game works
-            </button>
-            <div
-              class="content"
-              v-bind:style="{
-                'max-height': !showGameRules ? '0px' : 'inherit',
-                padding: !showGameRules ? '0px' : '18px',
-              }"
-            >
-              <strong>1)</strong> Wait for
-              <strong>{{ room.currentRound.clueGiver }}</strong> to pick a
-              random pair of words (i.e. a phrase), and write some text (i.e.
-              the clue) that relates to the phrase <br />
-              <strong>2)</strong> Based on the clue, everyone else constructs a
-              decoy phrase they think best matches the clue <br />
-              <strong>3)</strong> Once all decoys are submitted, players try to
-              guess <strong>{{ room.currentRound.clueGiver }}</strong
-              >'s real phrase among the decoys
-            </div>
-          </div>
-        </div>
-
-        <!-- Input area (toossing in decoys) -->
-        <div v-if="room.currentRound.state == 'TOSS_IN_DECOYS'">
-          <!-- All except the clueGiver guesses which word is the real one, based on the clue giver's clues. -->
-          <div class="box">
-            <div v-if="room.currentRound.clueGiver != player.name">
-              <h2 class="fancy has-text-centered" role="alert">
-                Pick one option from each word category to construct a decoy
-                phrase best matching
-                <strong>{{ room.currentRound.clueGiver }}</strong
-                >'s clue. <br /><br />
-              </h2>
-              <div class="columns">
-                <!-- Left pane is for leader board. Only shown in-game and when width > 1216px -->
-                <div class="column has-text-centered">
-                  <strong> Adjectives </strong>
+              <div v-else>
+                <h2 class="fancy has-text-centered" role="alert">
+                  Can you find the right word from
+                  {{ room.currentRound.clueGiver }} among the decoys.. ?
                   <br /><br />
                   <button
                     class="button is-rounded"
-                    @click="player.decoyAdj = word"
-                    v-for="(word, i) in player.decoyAdjList"
-                    :class="{ 'is-success': player.decoyAdj === word }"
+                    @click="submitVote(word)"
+                    v-for="word in Object.values(
+                      room.currentRound.allWords
+                    ).sort()"
+                    :disabled="room.currentRound.allWords[player.name] == word"
+                    :class="{
+                      'is-success':
+                        room.currentRound.votes[player.name] == word,
+                    }"
                   >
                     {{ word }}
                   </button>
-                </div>
-                <!-- Center (main) pane. TODO: Remove the below to get prettier formatting again -->
-
-                <div class="column has-text-centered">
-                  <strong> Nouns </strong>
-                  <br /><br />
-                  <button
-                    class="button is-rounded"
-                    @click="player.decoyNoun = word"
-                    v-for="(word, i) in player.decoyNounList"
-                    :class="{ 'is-success': player.decoyNoun === word }"
-                  >
-                    {{ word }}
-                  </button>
+                </h2>
+                <h2 class="fancy has-text-centered">
+                  Your clue from {{ room.currentRound.clueGiver }}:
+                </h2>
+                <div class="fancy has-text-centered newline">
+                  {{ room.currentRound.clue }}
                 </div>
               </div>
-              <div class="has-text-centered">
-                Your decoy phrase:
-                <span v-if="player.decoyAdj || player.decoyNoun">
-                  <strong
-                    >"{{ player.decoyAdj }}-{{ player.decoyNoun }}"</strong
-                  >
-                </span>
-                <br />
-                <br />
-                <button
-                  class="button"
-                  @click="submitDecoy"
-                  :class="{
-                    'is-success': room.currentRound.allWords[player.name],
-                  }"
-                  :disabled="isDecoySubmitDisabled()"
-                >
-                  {{
-                    room.currentRound.allWords[player.name]
-                      ? 'Submitted!'
-                      : 'Submit'
-                  }}
-                </button>
-              </div>
-              <h2 class="fancy has-text-centered" role="alert">
-                Your clue from {{ room.currentRound.clueGiver }} is:
-                <strong>{{ room.currentRound.clue }}</strong>
-              </h2>
             </div>
-            <div v-else>
-              <h2 class="fancy" role="alert">
-                Waiting for other players to toss in decoys based on your
-                clue...
+          </div>
+
+          <!-- Input area (done) -->
+          <div v-if="room.currentRound.state == 'DONE'">
+            <div class="box">
+              <h2 class="fancy has-text-centered" role="alert">
+                The phrase from
+                <strong>{{ room.currentRound.clueGiver }}</strong> was "{{
+                  room.currentRound.word
+                }}"!
               </h2>
               <br />
-              <div class="has-text-centered">
-                <strong>{{ room.currentRound.clue }}</strong>
-              </div>
-              <h2 class="fancy has-text-centered" role="alert">
-                <span
-                  class="tag is-rounded is-primary is-light"
-                  v-for="(word, decoyTosser) in room.currentRound.allWords"
-                >
-                  <template v-if="decoyTosser != player.name">
-                    {{ decoyTosser }} tossed in "{{ word }}"!
-                  </template>
-                  <template v-else>You chose the word "{{ word }}"</template>
-                </span>
-              </h2>
             </div>
-          </div>
-        </div>
-
-        <!-- Input area (guessing) -->
-        <div v-if="room.currentRound.state == 'GUESSING'">
-          <!-- All except the clueGiver guesses which word is the real one, based on the clue giver's clues. -->
-          <div class="box">
-            <div v-if="room.currentRound.clueGiver == player.name">
-              <h2 class="fancy has-text-centered" role="alert">
-                <button
-                  class="button is-rounded"
-                  v-for="word in Object.values(
-                    room.currentRound.allWords
-                  ).sort()"
-                  :disabled="true"
-                  :class="{
-                    'is-success': Object.values(
-                      room.currentRound.votes
-                    ).includes(word),
-                  }"
-                >
-                  {{ word }}
-                </button>
-              </h2>
-              <div class="fancy has-text-centered newline">
-                Waiting for other players to guess...
-              </div>
-              <div class="has-text-centered">
-                You aren't allowed to guess your own word, sorry!
+            <div class="box">
+              <div v-for="(vote, player) in room.currentRound.votes">
+                <strong> {{ player }} </strong> guessed "{{ vote }}"!
               </div>
             </div>
-            <div v-else>
-              <h2 class="fancy has-text-centered" role="alert">
-                Can you find the right word from
-                {{ room.currentRound.clueGiver }} among the decoys.. ?
-                <br /><br />
-                <button
-                  class="button is-rounded"
-                  @click="submitVote(word)"
-                  v-for="word in Object.values(
-                    room.currentRound.allWords
-                  ).sort()"
-                  :disabled="room.currentRound.allWords[player.name] == word"
-                  :class="{
-                    'is-success': room.currentRound.votes[player.name] == word,
-                  }"
-                >
-                  {{ word }}
-                </button>
-              </h2>
-              <h2 class="fancy has-text-centered">
-                Your clue from {{ room.currentRound.clueGiver }}:
-              </h2>
-              <div class="fancy has-text-centered newline">
-                {{ room.currentRound.clue }}
-              </div>
+            <div v-if="gameOver" class="box">
+              And that's it! <strong> {{ gameWinner }} </strong> won with "{{
+                winnerPoints
+              }}
+              points"!
+              <!-- <button class="button" @click="newRound(false)">Play Again</button> -->
             </div>
+            <button v-else class="button" @click="newRound(false)">Next</button>
           </div>
-        </div>
-
-        <!-- Input area (done) -->
-        <div v-if="room.currentRound.state == 'DONE'">
-          <div class="box">
-            <h2 class="fancy has-text-centered" role="alert">
-              The phrase from
-              <strong>{{ room.currentRound.clueGiver }}</strong> was "{{
-                room.currentRound.word
-              }}"!
-            </h2>
-            <br />
-          </div>
-          <div class="box">
-            <div v-for="(vote, player) in room.currentRound.votes">
-              <strong> {{ player }} </strong> guessed "{{ vote }}"!
-            </div>
-          </div>
-          <div v-if="gameOver" class="box">
-            And that's it! <strong> {{ gameWinner }} </strong> won with "{{
-              winnerPoints
-            }}
-            points"!
-            <!-- <button class="button" @click="newRound(false)">Play Again</button> -->
-          </div>
-          <button v-else class="button" @click="newRound(false)">Next</button>
-        </div>
-        <br /><br />
-        <!-- History TO ADD LATER -->
-        <!-- <h2 v-if="room.history.length > 0" class="fancy">History</h2>
+          <br /><br />
+          <!-- History TO ADD LATER -->
+          <!-- <h2 v-if="room.history.length > 0" class="fancy">History</h2>
           <template v-for="(round, i) in room.history.slice().reverse()">
             <div class="level">
               <div class="level-left">
@@ -447,21 +455,23 @@
             <p class="newline">{{ dedupe(round.clues) }}</p>
             <br />
           </template> -->
+        </div>
       </div>
-    </div>
-    <!-- Right pane for chat (to be implemented) -->
-    <div class="column is-hidden-touch is-hidden-desktop-only">
-      <!-- Spacer div to get chatbox to line up with game area -->
-      <!-- <div class="mb-2">
+      <!-- Right pane for chat (to be implemented) -->
+      <div class="column is-hidden-touch is-hidden-desktop-only">
+        <!-- Spacer div to get chatbox to line up with game area -->
+        <!-- <div class="mb-2">
           <div class="is-size-7 mb-1"><br /></div>
           <div><br /></div>
         </div>
         <chatbox v-model="room.chatlog" :name="player.name" :room-id="room.name"></chatbox> -->
+      </div>
     </div>
-  </div>
+  </BigColumn>
 </template>
 
 <script>
+import BigColumn from '../components/BigColumn.vue'
 import Nametag from '../components/Nametag.vue'
 import ShareLink from '../components/ShareLink.vue'
 import Leaderboard from './Leaderboard.vue'
@@ -478,6 +488,7 @@ import { inject } from 'vue'
 
 export default {
   components: {
+    BigColumn,
     Nametag,
     ShareLink,
     Leaderboard,
@@ -883,3 +894,9 @@ function randomWord(category = 'nouns', customWords = '') {
   return words[Math.floor(Math.random() * words.length)]
 }
 </script>
+
+<style scoped>
+.background {
+  background-color: #fcd6d8;
+}
+</style>
