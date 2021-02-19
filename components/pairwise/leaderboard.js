@@ -114,7 +114,7 @@ function awardPointsToDecoyWriter(round, player, leaderBoard) {
   if (playersVote && wordToPlayer[playersVote]) {
     // also give a point to whoever threw the decoy earned this player's guess
     const goodDecoyTosser = wordToPlayer[playersVote];
-    if (leaderBoard[goodDecoyTosser]) {
+    if (Number.isInteger(leaderBoard[goodDecoyTosser])) {
       // check goodDecoyTosser exists, they might have left the game.
       leaderBoard[goodDecoyTosser] += 1;
     }

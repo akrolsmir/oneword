@@ -562,12 +562,7 @@
       </div>
       <!-- Right pane for chat (to be implemented) -->
       <div class="column is-hidden-touch is-hidden-desktop-only">
-        <!-- Spacer div to get chatbox to line up with game area -->
-        <!-- <div class="mb-2">
-          <div class="is-size-7 mb-1"><br /></div>
-          <div><br /></div>
-        </div>
-        <chatbox v-model="room.chatlog" :name="player.name" :room-id="room.name"></chatbox> -->
+        <pointhistory :state="room.currentRound.state" :history="room.history" :players="room.players"></pointhistory>
       </div>
     </div>
   </div>
@@ -589,6 +584,7 @@
 <script type="module" src="components/sharelink.js"></script>
 <script type="module" src="components/pairwise/navbarshawn.js"></script>
 <script type="module" src="components/pairwise/leaderboard.js"></script>
+<script type="module" src="components/pairwise/history.js"></script>
 <script type="module" src="pairwise.js"></script>
 
 <script>
