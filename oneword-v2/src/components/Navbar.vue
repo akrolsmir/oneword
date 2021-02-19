@@ -53,9 +53,9 @@
             <router-link class="navbar-item" to="/storytime">
               Storytime <span class="tag is-link is-light ml-1">New!</span>
             </router-link>
-            <a class="navbar-item">
+            <router-link class="navbar-item" to="/pairwise">
               Pairwise <span class="tag is-link is-light ml-1">New!</span>
-            </a>
+            </router-link>
             <hr class="navbar-divider" />
             <a
               class="navbar-item"
