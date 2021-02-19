@@ -60,7 +60,7 @@
                 <button
                   v-else
                   class="button is-dark is-inverted is-outlined"
-                  @click="joinRoom"
+                  @click="joinGame"
                 >
                   Rejoin
                 </button>
@@ -382,6 +382,7 @@ import {
   getRoom,
   listenRoom,
   unlistenRoom,
+  listenForLogin,
 } from '../firebase/network.js'
 import { inject } from 'vue'
 import { getIn } from '../utils.js'
@@ -436,9 +437,38 @@ export default {
       showGameRules: false,
     }
   },
-  created() {
-    // Hardcoded to 'orange-calculator' for now
-    listenRoom('orange-calculator', (room) => (this.room = room))
+  async created() {
+    // For dev velocity, accept https://oneword.games/room/rome?player=Spartacus
+    if (this.$route.query.player && !this.user.id) {
+      this.user.guest = true
+      this.user.name = this.$route.query.player
+    }
+    this.room.name = this.$route.params.id
+    const fetchedRoom = await getRoom(this.room)
+    if (!fetchedRoom) {
+      // 1. If the room doesn't exist, create it, then return
+      this.player.name =
+        this.user.displayName || `${randomWord('adjectives')}-anon`
+      await this.resetRoom()
+      listenRoom(this.room.name, (room) => (this.room = room))
+      return
+    } else {
+      // 2. Set this room's contents, and proceed to enter the room
+      this.room = fetchedRoom
+      listenRoom(this.room.name, (room) => (this.room = room))
+    }
+    // 3. If returning from Firebase sign in ('?authed=1'), skip the login modal
+    if (this.$route.query.authed) {
+      // Remove the 'authed=1' from the URL for cleanliness
+      const query = { ...this.$route.query }
+      delete query.authed
+      this.$router.replace(query)
+      // Then sign them in after the Firebase callback returns
+      listenForLogin((_user) => this.enterRoom())
+      return
+    }
+    // 4. Enter the room, prompting for login if needed
+    this.enterRoom()
   },
   watch: {
     // Timer currently not yet implemented for pairwise
@@ -457,41 +487,22 @@ export default {
     },
   },
   methods: {
-    // Somewhat copied from One Word's index.html. TODO: Dedupe?
     async enterRoom() {
-      if (!this.player.name) {
-        this.$refs.navbar.logIn()
-        return
-      }
-      // Sanitize room name
-      this.room.name = this.room.name
-        .trim()
-        .toLowerCase()
-        .replace(/\s/g, '-') // whitespace
-        .replace(/[^\p{L}-]/gu, '') // not (dash or letter in any language)
-
-      const room = await getRoom(this.room)
-
-      if (room) {
-        /*
-         * TODO(shawnx): UNCOMMENT THIS BEFORE COMMIT
-         * If the player's name collides with another user's,
-         * prepend adjectives until it is unique
-         */
-        // while (
-        //   Object.keys(room.players).includes(this.player.name) &&
-        //   (this.user.guest || this.user.email != room.playerData[this.player.name].email)
-        // ) {
-        //   this.player.name = capitalize(randomWord('adjectives')) + ' ' + this.player.name;
-        // }
-        this.room = room
-        return await this.joinRoom()
+      if (!this.user.canPlay) {
+        // If not logged in, show the sign-in modal
+        const onGuest = () => {
+          this.uniquify(this.user.displayName)
+          this.joinGame()
+        }
+        this.user.signIn(onGuest)
       } else {
-        // Create a new room
-        listenRoom(this)
-        this.generatePlayerWordList()
-        return await this.resetRoom()
+        this.uniquify(this.user.displayName)
+        await this.joinGame()
       }
+    },
+    uniquify(name) {
+      this.player.name = name
+      // TODO actually make unique
     },
     async resetRoom() {
       this.room = {
@@ -620,15 +631,7 @@ export default {
         return await this.newRound()
       }
     },
-    // Only call if room already exists.
-    async joinRoom() {
-      listenRoom(this)
-
-      // migration
-      if (!this.room.playerData) {
-        this.room.playerData = {}
-      }
-
+    async joinGame() {
       const { email = '', supporter = '' } = this.user
       this.room.playerData[this.player.name] = { email, supporter }
 
