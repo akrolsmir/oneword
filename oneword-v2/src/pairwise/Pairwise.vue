@@ -473,7 +473,6 @@ export default {
   watch: {
     // Timer currently not yet implemented for pairwise
     'room.currentRound.state'(state) {
-      console.log('state change: ' + state)
       this.$emit('reset-timer')
       if (state === 'TOSS_IN_DECOYS') {
         this.player.decoyAdjList = this.generateDecoyWordList('adjectives')
@@ -761,5 +760,26 @@ function nextClueGiver(lastGuesser, players) {
 <style scoped>
 .background {
   background-color: #fcd6d8;
+}
+
+/* TODO replace w/ bulma-collapsible extension  */
+.collapsible {
+  margin-top: 1rem;
+  background-color: #f59fa4;
+  color: white;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+}
+
+/* TODO replace w/ bulma-collapsible extension  */
+.content {
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+  background-color: #f1f1f1;
 }
 </style>
