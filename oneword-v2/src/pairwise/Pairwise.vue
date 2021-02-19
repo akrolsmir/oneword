@@ -66,49 +66,6 @@
                 </button>
               </span>
             </div>
-            <div>
-              <div class="is-flex is-flex-wrap-wrap is-align-items-center">
-                <!-- Categories -->
-                <span
-                  v-if="isMod"
-                  class="field is-grouped is-grouped-multiline mx-3 my-1"
-                >
-                  <!-- <div class="control" v-for="category in this.CATEGORY_ORDER">
-                    <label class="capitalize checkbox">
-                      <input type="checkbox" v-model="room.categories[category]" @change="saveRoom('categories')" />
-                      {{ category }}
-                    </label>
-                  </div> -->
-                </span>
-                <span class="mx-3" v-else>
-                  <!-- <template v-for="(category, i) in this.CATEGORY_ORDER.filter(c => room.categories[c])">
-                    <span class="comma" :class="{'has-text-weight-bold': room.currentRound.category == category}">
-                      {{ category }}</span
-                    >
-                  </template> -->
-                </span>
-              </div>
-              <!-- Custom word editor (mod only) -->
-              <!-- <div v-if="isMod && room.categories['custom']" class="is-flex is-justify-content-center">
-                <div class="field mb-2" style="width: 500px; max-width: 90%">
-                  <div class="control">
-                    <textarea
-                      class="textarea is-small mb-2"
-                      :class="{'is-primary': wordsSaved}"
-                      placeholder="Input your own word list"
-                      v-model="room.customWords"
-                      @input="wordsSaved = false"
-                    ></textarea>
-                  </div>
-                  <div class="control">
-                    <button v-if="wordsSaved" class="button is-small" disabled>Saved</button>
-                    <button v-else class="button is-small" @click="wordsSaved = true; saveRoom('customWords');">
-                      Save
-                    </button>
-                  </div>
-                </div>
-              </div> -->
-            </div>
 
             <div class="message-body" style="border-width: 0">
               <!-- Players -->
@@ -135,31 +92,6 @@
                   @kick="kickPlayer(player)"
                 />
               </div>
-              <!-- Not sure if this works... -->
-              <!-- Other Mod Tools -->
-              <!-- <div v-if="isMod">
-                <div class="label">Room Controls</div>
-                <div class="field has-addons is-inline-flex mb-0">
-                  <span class="control">
-                    <button class="button is-small" @click="nextStage">Next Stage</button>
-                  </span>
-                  <span class="control">
-                    <button class="button is-small" @click="newRound(true)">Skip Word</button>
-                  </span>
-                </div>
-                <div class="field has-addons is-inline-flex">
-                  <span class="control">
-                    <button class="button is-small" @click="makeMod(newMod)">Transfer Mod</button>
-                  </span>
-                  <span class="control">
-                    <span class="select is-small">
-                      <select v-model="newMod">
-                        <option v-for="player in this.room.players.slice(1)">{{ player }}</option>
-                      </select>
-                    </span>
-                  </span>
-                </div>
-              </div> -->
             </div>
           </div>
           <!-- <timer :length="timerLength" :on-finish="nextStage" v-if="timerLength > 0" :key="room.currentRound.state"></timer> -->
@@ -278,7 +210,6 @@
                       {{ word }}
                     </button>
                   </div>
-                  <!-- Center (main) pane. TODO: Remove the below to get prettier formatting again -->
 
                   <div class="column has-text-centered">
                     <strong> Nouns </strong>
@@ -431,41 +362,10 @@
           </div>
           <br /><br />
           <!-- History TO ADD LATER -->
-          <!-- <h2 v-if="room.history.length > 0" class="fancy">History</h2>
-          <template v-for="(round, i) in room.history.slice().reverse()">
-            <div class="level">
-              <div class="level-left">
-                <span class="level-item" style="justify-content: flex-start">
-                  <span
-                    class="icon"
-                    :class="correct(round) ? 'has-text-success' : 'has-text-danger'"
-                    :aria-label="correct(round) ? 'correct' : 'incorrect'"
-                  >
-                    {{ correct(round) ? '✔' : '✖' }}
-                  </span>
-                  <span class="fancy normal">{{ room.history.length - i }}. {{ round.word }} ({{ round.category }})</span>
-                </span>
-                <p class="level-item" style="justify-content: flex-start">
-                  {{ round.guesser }} guessed "<b :class="correct(round) ? 'has-text-success' : 'has-text-danger'"
-                    >{{ round.guess }}</b
-                  >"
-                </p>
-              </div>
-            </div>
-            <p class="newline">{{ dedupe(round.clues) }}</p>
-            <br />
-          </template> -->
         </div>
       </div>
       <!-- Right pane for chat (to be implemented) -->
-      <div class="column is-hidden-touch is-hidden-desktop-only">
-        <!-- Spacer div to get chatbox to line up with game area -->
-        <!-- <div class="mb-2">
-          <div class="is-size-7 mb-1"><br /></div>
-          <div><br /></div>
-        </div>
-        <chatbox v-model="room.chatlog" :name="player.name" :room-id="room.name"></chatbox> -->
-      </div>
+      <div class="column is-hidden-touch is-hidden-desktop-only"></div>
     </div>
   </BigColumn>
 </template>
@@ -864,10 +764,6 @@ export default {
       }
     },
   },
-}
-
-function capitalize(str) {
-  return str ? str[0].toLocaleUpperCase() + str.substring(1) : ''
 }
 
 // Extracts a node from an object tree by its path, like "redTeam.players"
