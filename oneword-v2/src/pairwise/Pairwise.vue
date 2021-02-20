@@ -550,6 +550,7 @@ export default {
         },
       }
       await setRoom(this.room)
+      await this.joinGame()
     },
     isClueSubmitDisabled() {
       if (!this.room.players.includes(this.player.name)) {
