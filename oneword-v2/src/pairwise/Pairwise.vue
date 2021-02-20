@@ -383,6 +383,7 @@ import {
   listenRoom,
   unlistenRoom,
   listenForLogin,
+  updateUserGame,
 } from '../firebase/network.js'
 import { inject } from 'vue'
 import { getIn } from '../utils.js'
@@ -601,11 +602,17 @@ export default {
       this.room.currentRound.state = 'TOSS_IN_DECOYS'
       // room.currentRound.clue should already be updated due to bi-di binding
       await setRoom(this.room)
+
+      // Store this for user profiles, but don't await for the result
+      updateUserGame(this.user.id, this.room.name)
     },
     async submitDecoy() {
       await this.saveWordToAllWordsInRoom(
         this.player.decoyAdj + '-' + this.player.decoyNoun
       )
+
+      // Store this for user profiles, but don't await for the result
+      updateUserGame(this.user.id, this.room.name)
     },
     // vote is the word the guesser picked
     async submitVote(vote) {

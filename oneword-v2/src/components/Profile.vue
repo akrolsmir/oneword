@@ -44,7 +44,7 @@
         </div>
         <p v-else v-for="game in listGames(db)">
           <b
-            ><router-link :to="`/${db}/${game.roomId}`">{{
+            ><router-link :to="`/${DB_TO_PATH[db]}/${game.roomId}`">{{
               game.roomId
             }}</router-link></b
           >, {{ timeSince(game.lastUpdateTime) }}
@@ -67,6 +67,14 @@ const DB_TO_GAMES = {
   rooms: 'One Word',
   incrypt: 'Incrypt',
   silver: 'Storytime',
+  pairwise: 'Pairwise',
+}
+
+const DB_TO_PATH = {
+  rooms: 'room',
+  incrypt: 'incrypt',
+  silver: 'storytime',
+  pairwise: 'pairwise',
 }
 
 export default {
@@ -74,13 +82,11 @@ export default {
     Nametag,
     BigColumn,
   },
-  data: () => ({ DB_TO_GAMES }),
+  data: () => ({ DB_TO_GAMES, DB_TO_PATH }),
   setup() {
     return { user: inject('currentUser') }
   },
   methods: {
-    url,
-    title,
     async logout() {
       await firebaseLogout()
       this.user.id = ''
@@ -100,19 +106,5 @@ export default {
       )
     },
   },
-}
-
-function title(game) {
-  return {
-    rooms: 'One Word',
-    incrypt: 'Incrypt',
-  }[game.roomDb]
-}
-
-function url(game) {
-  return {
-    rooms: `https://oneword.games?room=${game.roomId}`,
-    incrypt: `https://oneword.games/incrypt?room=${game.roomId}`,
-  }[game.roomDb]
 }
 </script>

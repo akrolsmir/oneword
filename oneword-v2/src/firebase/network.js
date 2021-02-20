@@ -39,7 +39,7 @@ function roomDb() {
     return 'incrypt'
   }
   if (window.location.pathname.startsWith('/pairwise')) {
-    return 'wordit-shawn'
+    return 'pairwise'
   }
   return 'rooms'
 }
@@ -102,6 +102,7 @@ export async function updateUser(userId, user) {
   await db.collection('users').doc(userId).update(user)
 }
 
+/** Record when the user last did an action in this room. */
 export async function updateUserGame(userId, roomId) {
   if (!userId) {
     // Do nothing for anonymous users
