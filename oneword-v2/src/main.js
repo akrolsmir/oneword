@@ -14,6 +14,8 @@ import StorytimeFrontPage from './storytime/components/StorytimeFrontPage.vue'
 import Storytime from './storytime/Storytime.vue'
 import IncryptFrontPage from './incrypt/IncryptFrontPage.vue'
 import Incrypt from './incrypt/Incrypt.vue'
+import PairwiseFrontPage from './pairwise/PairwiseFrontPage.vue'
+import Pairwise from './pairwise/Pairwise.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
@@ -27,6 +29,8 @@ const routes = [
   { path: '/storytime/:id', component: Storytime },
   { path: '/incrypt', component: IncryptFrontPage },
   { path: '/incrypt/:id', component: Incrypt },
+  { path: '/pairwise', component: PairwiseFrontPage },
+  { path: '/pairwise/:id', component: Pairwise },
 ]
 
 const router = createRouter({
