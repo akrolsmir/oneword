@@ -20,14 +20,8 @@
     <!-- Column-based layout for leader board, Main UI, and Chat box -->
     <div class="columns is-centered">
       <!-- Left pane is for leader board. Only shown in-game and when width > 1216px -->
-      <div class="column">
-        <Leaderboard
-          :state="room.currentRound.state"
-          :history="room.history"
-          :players="room.players"
-          :total="gameOverPoints"
-          @gameover="handleGameOver"
-        />
+      <div class="column is-hidden-touch">
+        <ScoreRules :state="room.currentRound.state" />
       </div>
       <!-- Center (main) pane. -->
       <div class="column is-two-thirds is-half-widescreen">
@@ -73,23 +67,33 @@
                 <span class="mb-2 mr-2">Players:</span>
                 <!-- TODO: refactor submitted/guessing into functions. This is currently a hack -->
                 <Nametag
-                  v-for="(player, i) in room.players"
-                  :name="player"
-                  :user="room.playerData && room.playerData[player]"
-                  :index="i"
+                  v-for="(playerScore, ind) in tallyScores.playerScores"
+                  :key="playerScore[0]"
+                  :name="playerScore[0]"
+                  :user="room.playerData && room.playerData[playerScore[0]]"
+                  :index="ind"
                   :submitted="
-                    (Object.keys(room.currentRound.allWords).includes(player) &&
-                      player != room.currentRound.clueGiver) ||
-                    (player == room.currentRound.clueGiver &&
-                      !Object.keys(room.currentRound.allWords).includes(player))
+                    (Object.keys(room.currentRound.allWords).includes(
+                      playerScore[0]
+                    ) &&
+                      playerScore[0] != room.currentRound.clueGiver) ||
+                    (playerScore[0] == room.currentRound.clueGiver &&
+                      !Object.keys(room.currentRound.allWords).includes(
+                        playerScore[0]
+                      ))
                   "
                   :guessing="
-                    Object.keys(room.currentRound.votes).includes(player) ||
+                    Object.keys(room.currentRound.votes).includes(
+                      playerScore[0]
+                    ) ||
                     (player == room.currentRound.clueGiver &&
-                      Object.keys(room.currentRound.allWords).includes(player))
+                      Object.keys(room.currentRound.allWords).includes(
+                        playerScore[0]
+                      ))
                   "
                   :mod="isMod"
-                  @kick="kickPlayer(player)"
+                  :score="playerScore[1]"
+                  @kick="kickPlayer(playerScore[0])"
                 />
               </div>
             </div>
@@ -116,7 +120,8 @@
                     <button
                       class="button is-rounded"
                       @click="cluerSelectsWord(word)"
-                      v-for="(word, i) in player.wordList"
+                      v-for="word in player.wordList"
+                      :key="word"
                       :class="{ 'is-info': room.currentRound.word == word }"
                     >
                       {{ word }}
@@ -204,7 +209,8 @@
                     <button
                       class="button is-rounded"
                       @click="player.decoyAdj = word"
-                      v-for="(word, i) in player.decoyAdjList"
+                      v-for="word in player.decoyAdjList"
+                      :key="word"
                       :class="{ 'is-success': player.decoyAdj === word }"
                     >
                       {{ word }}
@@ -217,7 +223,8 @@
                     <button
                       class="button is-rounded"
                       @click="player.decoyNoun = word"
-                      v-for="(word, i) in player.decoyNounList"
+                      v-for="word in player.decoyNounList"
+                      :key="word"
                       :class="{ 'is-success': player.decoyNoun === word }"
                     >
                       {{ word }}
@@ -266,6 +273,7 @@
                   <span
                     class="tag is-rounded is-primary is-light"
                     v-for="(word, decoyTosser) in room.currentRound.allWords"
+                    :key="word"
                   >
                     <template v-if="decoyTosser != player.name">
                       {{ decoyTosser }} tossed in "{{ word }}"!
@@ -289,6 +297,7 @@
                       room.currentRound.allWords
                     ).sort()"
                     :disabled="true"
+                    :key="word"
                     :class="{
                       'is-success': Object.values(
                         room.currentRound.votes
@@ -316,6 +325,7 @@
                     v-for="word in Object.values(
                       room.currentRound.allWords
                     ).sort()"
+                    :key="word"
                     :disabled="room.currentRound.allWords[player.name] == word"
                     :class="{
                       'is-success':
@@ -347,7 +357,10 @@
               <br />
             </div>
             <div class="box">
-              <div v-for="(vote, player) in room.currentRound.votes">
+              <div
+                v-for="(vote, player) in room.currentRound.votes"
+                :key="player"
+              >
                 <strong> {{ player }} </strong> guessed "{{ vote }}"!
               </div>
             </div>
@@ -363,9 +376,25 @@
           <br /><br />
           <!-- History TO ADD LATER -->
         </div>
+        <!-- Duplicate history column when screen is narrow -->
+        <div class="is-hidden-desktop">
+          <History
+            :scoreHistories="tallyScores.scoreHistories"
+            :state="room.currentRound.state"
+          ></History>
+        </div>
+        <!-- Duplicate score rules column when screen is narrow -->
+        <div class="is-hidden-desktop">
+          <ScoreRules :state="room.currentRound.state" />
+        </div>
       </div>
       <!-- Right pane for chat (to be implemented) -->
-      <div class="column is-hidden-touch is-hidden-desktop-only"></div>
+      <div class="column is-hidden-touch">
+        <History
+          :scoreHistories="tallyScores.scoreHistories"
+          :state="room.currentRound.state"
+        ></History>
+      </div>
     </div>
   </BigColumn>
 </template>
@@ -374,7 +403,8 @@
 import BigColumn from '../components/BigColumn.vue'
 import Nametag from '../components/Nametag.vue'
 import ShareLink from '../components/ShareLink.vue'
-import Leaderboard from './Leaderboard.vue'
+import ScoreRules from './ScoreRules.vue'
+import History from './History.vue'
 
 import {
   setRoom,
@@ -394,7 +424,8 @@ export default {
     BigColumn,
     Nametag,
     ShareLink,
-    Leaderboard,
+    ScoreRules,
+    History,
   },
   setup() {
     return { user: inject('currentUser') }
@@ -679,7 +710,10 @@ export default {
       if (this.room.players.includes(name)) {
         const index = this.room.players.indexOf(name)
         this.room.players.splice(index, 1)
-        await this.saveRoom('players')
+        if (this.room.currentRound.clueGiver === name) {
+          this.room.currentRound.clueGiver = this.room.players[0]
+        }
+        await this.saveRoom('currentRound.clueGiver', 'players')
       }
     },
     async newRound(sameGuesser = false) {
@@ -739,7 +773,144 @@ export default {
         return this.player.name == this.room.players[0]
       }
     },
+    // tallyScores only counts rounds that have been pushed to history
+    tallyScores() {
+      const leaderBoard = {}
+      const scoreHistories = []
+      //initiate leaderBoard at 0 for every current player
+      this.room.players.forEach((player) => {
+        leaderBoard[player] = 0
+      })
+      // Each player's client computes point totals for everyone independently
+      this.room.history.forEach((round) => {
+        const historyThisRound = []
+        // If all players found the clueGiver's phrase
+        if (Object.values(round.votes).every((guess) => guess === round.word)) {
+          historyThisRound.push(
+            `Wow, everyone guessed ` +
+              round.clueGiver +
+              `'s actual pair '` +
+              round.word +
+              `'!`
+          )
+          // all players from that round who are still in the room
+          Object.keys(leaderBoard).forEach((player) => {
+            // EXCEPT clueGiver gets 2pts automatically
+            if (player !== round.clueGiver && round.votes[player]) {
+              // player entry is guaranteed to exist, b/c forEach is against leaderboard
+              leaderBoard[player] += 2
+              historyThisRound.push(player + ' scores 2 free points')
+            }
+          })
+          historyThisRound.push('And ' + round.clueGiver + ' gets no points :c')
+        }
+        // If some players found the clueGiver's word combo but not all
+        else if (Object.values(round.votes).includes(round.word)) {
+          historyThisRound.push(
+            round.clueGiver + `'s actual phrase was '` + round.word + `'!`
+          )
+          // Award 3 pts to every guesser still in the game who guessed correctly
+          Object.keys(leaderBoard).forEach((player) => {
+            // Note that clueGiver does not vote
+            if (round.votes[player] === round.word) {
+              leaderBoard[player] += 3
+              historyThisRound.push(player + ' guessed right! +3 points')
+            }
+            // Incorrect guesses awards 1 point to whoever threw the decoy that earned the guess
+            else {
+              awardPointsToDecoyWriter(
+                round,
+                player,
+                leaderBoard,
+                historyThisRound
+              )
+            }
+          })
+          // And finally clueGiver gets 3 points if they're still in the game
+          if (Number.isInteger(leaderBoard[round.clueGiver])) {
+            leaderBoard[round.clueGiver] += 3
+            historyThisRound.push(
+              'And ' + round.clueGiver + ` also gets 3 points!`
+            )
+          }
+        }
+        // nobody guessed the word
+        else {
+          historyThisRound.push(
+            'Nobody guess correctly! So ' +
+              round.clueGiver +
+              ' gets 0 points :c'
+          )
+          // ClueGiver gets 0 points but all other players of that round get 2pts automatically
+          Object.keys(leaderBoard).forEach((player) => {
+            // player only gets points if they voted that round.
+            if (round.votes[player] && player !== round.clueGiver) {
+              leaderBoard[player] += 2
+              historyThisRound.push(player + ' scores 2 free points')
+            }
+            awardPointsToDecoyWriter(
+              round,
+              player,
+              leaderBoard,
+              historyThisRound
+            )
+          })
+        }
+        scoreHistories.push(historyThisRound)
+      })
+      // sort the leaderBoard highest score first, then return
+      const sortedPlayerScores = Object.entries(leaderBoard).sort(
+        (playerScore1, playerScore2) => playerScore2[1] - playerScore1[1]
+      )
+      // emit "gameover" signal if game over
+      sortedPlayerScores.some((playerScore) => {
+        if (playerScore[1] >= this.total) {
+          this.$emit('gameover', playerScore)
+        }
+        return playerScore[1] >= this.total
+      })
+      return {
+        playerScores: sortedPlayerScores,
+        scoreHistories: scoreHistories,
+      }
+    },
   },
+}
+
+function awardPointsToDecoyWriter(
+  round,
+  player,
+  leaderBoard,
+  historyThisRound
+) {
+  // Invert makes the mapping {word -> player} from allWords
+  const wordToPlayer = invert(round.allWords)
+  const playersVote = round.votes[player]
+  if (playersVote && wordToPlayer[playersVote]) {
+    // also give a point to whoever threw the decoy earned this player's guess
+    const goodDecoyTosser = wordToPlayer[playersVote]
+    if (Number.isInteger(leaderBoard[goodDecoyTosser])) {
+      // check goodDecoyTosser exists, they might have left the game.
+      leaderBoard[goodDecoyTosser] += 1
+      historyThisRound.push(
+        goodDecoyTosser +
+          ` tricked ` +
+          player +
+          ` with '` +
+          playersVote +
+          `', +1 for ` +
+          goodDecoyTosser
+      )
+    }
+  }
+}
+
+function invert(obj) {
+  let inverted_obj = {}
+  Object.keys(obj).forEach((key) => {
+    inverted_obj[obj[key]] = key
+  })
+  return inverted_obj
 }
 
 function nextClueGiver(lastGuesser, players) {
