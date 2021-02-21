@@ -336,6 +336,7 @@
               class="control"
               v-for="(response, p) in room.currentRound.responses"
               :key="p"
+              v-once
             >
               <label class="spacy">
                 <input
