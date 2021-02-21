@@ -1,17 +1,6 @@
 <template>
   <div v-if="state" class="box">
     <div class="fancy has-text-centered">
-      <h1>Leaderboard</h1>
-    </div>
-    <br />
-    <template v-for="playerScore in tallyScores">
-      <div class="has-text-centered" role="alert">
-        <strong>{{ playerScore[0] }}</strong
-        >: {{ playerScore[1] }} points
-      </div>
-    </template>
-    <br />
-    <div class="fancy has-text-centered">
       <h1>Scoring Rules</h1>
     </div>
     <br />
