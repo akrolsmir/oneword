@@ -20,14 +20,8 @@
     <!-- Column-based layout for leader board, Main UI, and Chat box -->
     <div class="columns is-centered">
       <!-- Left pane is for leader board. Only shown in-game and when width > 1216px -->
-      <div class="column">
-        <Leaderboard
-          :state="room.currentRound.state"
-          :history="room.history"
-          :players="room.players"
-          :total="gameOverPoints"
-          @gameover="handleGameOver"
-        />
+      <div class="column is-hidden-touch">
+        <ScoreRules :state="room.currentRound.state" />
       </div>
       <!-- Center (main) pane. -->
       <div class="column is-two-thirds is-half-widescreen">
@@ -73,11 +67,11 @@
                 <span class="mb-2 mr-2">Players:</span>
                 <!-- TODO: refactor submitted/guessing into functions. This is currently a hack -->
                 <Nametag
-                  v-for="(playerScore, i) in tallyScores.playerScores"
+                  v-for="(playerScore, ind) in tallyScores.playerScores"
                   :key="playerScore[0]"
                   :name="playerScore[0]"
                   :user="room.playerData && room.playerData[playerScore[0]]"
-                  :index="i"
+                  :index="ind"
                   :submitted="
                     (Object.keys(room.currentRound.allWords).includes(
                       playerScore[0]
@@ -382,9 +376,20 @@
           <br /><br />
           <!-- History TO ADD LATER -->
         </div>
+        <!-- Duplicate history column when screen is narrow -->
+        <div class="is-hidden-desktop">
+          <History
+            :scoreHistories="tallyScores.scoreHistories"
+            :state="room.currentRound.state"
+          ></History>
+        </div>
+        <!-- Duplicate score rules column when screen is narrow -->
+        <div class="is-hidden-desktop">
+          <ScoreRules :state="room.currentRound.state" />
+        </div>
       </div>
       <!-- Right pane for chat (to be implemented) -->
-      <div class="column is-hidden-touch is-hidden-desktop-only">
+      <div class="column is-hidden-touch">
         <History
           :scoreHistories="tallyScores.scoreHistories"
           :state="room.currentRound.state"
@@ -398,7 +403,7 @@
 import BigColumn from '../components/BigColumn.vue'
 import Nametag from '../components/Nametag.vue'
 import ShareLink from '../components/ShareLink.vue'
-import Leaderboard from './Leaderboard.vue'
+import ScoreRules from './ScoreRules.vue'
 import History from './History.vue'
 
 import {
@@ -419,7 +424,7 @@ export default {
     BigColumn,
     Nametag,
     ShareLink,
-    Leaderboard,
+    ScoreRules,
     History,
   },
   setup() {
@@ -705,7 +710,10 @@ export default {
       if (this.room.players.includes(name)) {
         const index = this.room.players.indexOf(name)
         this.room.players.splice(index, 1)
-        await this.saveRoom('players')
+        if (this.room.currentRound.clueGiver === name) {
+          this.room.currentRound.clueGiver = this.room.players[0]
+        }
+        await this.saveRoom('currentRound.clueGiver', 'players')
       }
     },
     async newRound(sameGuesser = false) {
@@ -822,7 +830,7 @@ export default {
           if (Number.isInteger(leaderBoard[round.clueGiver])) {
             leaderBoard[round.clueGiver] += 3
             historyThisRound.push(
-              'And ' + round.clueGiver + `also gets 3 points!`
+              'And ' + round.clueGiver + ` also gets 3 points!`
             )
           }
         }
@@ -854,12 +862,12 @@ export default {
       const sortedPlayerScores = Object.entries(leaderBoard).sort(
         (playerScore1, playerScore2) => playerScore2[1] - playerScore1[1]
       )
+      // emit "gameover" signal if game over
       sortedPlayerScores.some((playerScore) => {
         if (playerScore[1] >= this.total) {
           this.$emit('gameover', playerScore)
-          return true
         }
-        return false
+        return playerScore[1] >= this.total
       })
       return {
         playerScores: sortedPlayerScores,
