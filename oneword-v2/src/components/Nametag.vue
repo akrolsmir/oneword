@@ -34,7 +34,7 @@
         />
         {{ name }}
         <button
-          v-if="mod"
+          v-if="mod || self"
           class="delete is-small"
           :title="'Kick ' + name"
           @click="kick"
