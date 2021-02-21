@@ -35,6 +35,9 @@ function roomDb() {
   if (window.location.href.includes('/storytime')) {
     return 'silver'
   }
+  if (window.location.href.includes('/list')) {
+    return 'listography'
+  }
   return 'rooms'
 }
 
