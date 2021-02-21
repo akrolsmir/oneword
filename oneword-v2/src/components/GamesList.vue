@@ -9,7 +9,7 @@
     <input
       class="input"
       type="text"
-      v-model="player.roomName"
+      v-model="roomName"
       placeholder="apple"
       required
     />
@@ -55,7 +55,7 @@ import { inject } from 'vue'
 
 import { listRooms } from '../firebase/network'
 import { sanitize, timeSince } from '../utils'
-import { listPlayers } from '../oneword/oneword-utils'
+import { listPlayers, randomWord } from '../oneword/oneword-utils'
 
 function recentRoom(room) {
   const ONE_HOUR_IN_MS = 60 * 60 * 1000
@@ -78,7 +78,7 @@ export default {
     return {
       allRooms: [],
       privateRooms: [],
-      player: {},
+      roomName: `${randomWord('adjectives')}-${randomWord('nouns')}`,
       room: {},
     }
   },
@@ -94,7 +94,7 @@ export default {
     // Returns the set of open room names that matches the current `room.name`.
     filteredRoomNameSet() {
       const filtered = new Set()
-      const roomNameRe = new RegExp(this.player.roomName, 'i')
+      const roomNameRe = new RegExp(this.roomName, 'i')
       for (const openRoom of this.allRooms) {
         if (openRoom.name.match(roomNameRe)) {
           filtered.add(openRoom.name)
@@ -120,9 +120,9 @@ export default {
       }
     },
     navigateToRoom() {
-      this.player.roomName = sanitize(this.player.roomName)
+      this.roomName = sanitize(this.roomName)
       this.$router.push({
-        path: `${this.roomDirectory}${this.player.roomName}`,
+        path: `${this.roomDirectory}${this.roomName}`,
       })
     },
   },
