@@ -16,14 +16,6 @@
           ></button>
         </div>
       </AnimatedModal>
-
-      <!-- Standard Modals -->
-      <AnimatedModal
-        :visible="showStandardModal"
-        :content="standardModal"
-        @background-click="showStandardModal = false"
-        @cancel="showStandardModal = false"
-      />
     </div>
 
     <div class="message room-box">
@@ -451,8 +443,6 @@ export default {
       adjectives: [randomWord('adjectives'), randomWord('adjectives')],
     },
     showShareModal: false,
-    showStandardModal: false,
-    standardModal: undefined,
     newMod: '',
     prompts,
     vote: '',
@@ -789,8 +779,7 @@ export default {
       }
     },
     showSupporterModal() {
-      this.showStandardModal = true
-      this.standardModal = {
+      this.$showModal({
         title: 'Want private rooms?',
         text:
           'Earn perks like private rooms, custom avatars, and more by becoming a supporter 😍',
@@ -800,10 +789,11 @@ export default {
         },
         callbacks: {
           okay: () => {
+            console.log('okay')
             referSupporter('modtools')
           },
         },
-      }
+      })
     },
     // generate new suggestions to replace used words
     replaceSuggestions(response) {

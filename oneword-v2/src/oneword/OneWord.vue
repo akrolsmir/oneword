@@ -535,8 +535,6 @@ export default {
       },
       CATEGORY_ORDER: ['nouns', 'verbs', 'adjectives', 'compounds', 'custom'],
       showShareModal: false,
-      showStandardModal: false,
-      standardModal: undefined,
       newMod: '',
       wordsSaved: false,
     }
