@@ -283,7 +283,7 @@
 
 <script>
 import 'bulma-pricingtable/dist/css/bulma-pricingtable.min.css'
-import { loadStripe } from '@stripe/stripe-js'
+import { loadStripe } from '@stripe/stripe-js/pure'
 import { firebaseLogEvent } from '../firebase/network'
 import BigColumn from './BigColumn.vue'
 
