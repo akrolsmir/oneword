@@ -657,6 +657,20 @@ export default {
     // TODO: only works after "people" is implemented
     uniquify(name) {
       this.player.name = name
+      // If the player's name collides with another user's (aka different id,
+      // or player is a guest), prepend adjectives until name is unique
+      while (
+        this.players.includes(this.player.name) &&
+        (this.user.id != this.room.people[this.player.name].id ||
+          this.user.guest)
+      ) {
+        this.player.name =
+          capitalize(randomWord('adjectives')) + ' ' + this.player.name
+      }
+      // Let the player know if they were renamed
+      if (this.player.name !== name) {
+        this.showUniquifiedModal()
+      }
     },
     async joinGame() {
       // Remove this and all other room.people == undefined checks after 2021-04-09
@@ -877,6 +891,14 @@ export default {
             referSupporter('champion_modal')
           },
         },
+      }
+    },
+    showUniquifiedModal() {
+      const oldName = this.player.name.split(' ').pop()
+      this.showStandardModal = true
+      this.standardModal = {
+        title: `You are now "${this.player.name}"!`,
+        text: `Another "${oldName}" was already in this room...`,
       }
     },
     referSupporter,

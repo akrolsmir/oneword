@@ -15,11 +15,15 @@
           {{ content.text }}
         </section>
         <footer class="modal-card-foot px-6">
-          <button class="button is-warning" @click="content.callbacks.okay">
-            {{ content.buttons.okay }}
+          <button
+            class="button is-warning"
+            v-if="content.buttons?.okay"
+            @click="content.callbacks?.okay"
+          >
+            {{ content.buttons?.okay }}
           </button>
           <button class="button" @click="$emit('cancel')">
-            {{ content.buttons.cancel }}
+            {{ content.buttons?.cancel || 'Close' }}
           </button>
         </footer>
       </div>
