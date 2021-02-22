@@ -1,8 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 
-import 'bulma/css/bulma.css'
-import './styles.css'
+import './styles.scss'
 
 import FrontPage from './components/FrontPage.vue'
 import Profile from './components/Profile.vue'
