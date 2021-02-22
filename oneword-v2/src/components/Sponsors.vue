@@ -1,7 +1,8 @@
 <template>
   <div>
     <h2 class="fancy">Sponsors</h2>
-    We're grateful to be <a href="./supporter.html">sponsored by</a>:
+    We're grateful to be
+    <router-link to="/supporter">sponsored by</router-link>:
     <div class="m-2">
       <Nametag
         name="Tory N."
