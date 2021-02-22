@@ -45,5 +45,6 @@ const router = createRouter({
   },
 })
 
-export const app = createApp(App)
-app.use(router).mount('#app')
+export const app = createApp(App).use(router)
+const rootComponent = app.mount('#app')
+app.config.globalProperties.$showModal = rootComponent.showModal

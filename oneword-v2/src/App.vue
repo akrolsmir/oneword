@@ -1,10 +1,18 @@
 <template>
+  <!-- Standard Modals -->
+  <AnimatedModal
+    :visible="showStandardModal"
+    :content="standardModal"
+    @background-click="showStandardModal = false"
+    @cancel="showStandardModal = false"
+  />
   <Navbar ref="navbar" />
   <router-view />
 </template>
 
 <script>
 import { provide, reactive, computed } from 'vue'
+import AnimatedModal from './components/AnimatedModal.vue'
 import Navbar from './components/Navbar.vue'
 import { listenForLogin } from './firebase/network'
 
@@ -28,7 +36,17 @@ const currentUser = reactive({
 })
 export default {
   components: {
+    AnimatedModal,
     Navbar,
+  },
+  data() {
+    return { showStandardModal: false, standardModal: {} }
+  },
+  methods: {
+    showModal(modalConfig) {
+      this.showStandardModal = true
+      this.standardModal = modalConfig
+    },
   },
   setup() {
     listenForLogin((user) => {

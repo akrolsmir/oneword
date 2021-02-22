@@ -52,10 +52,13 @@
 
 <script>
 import { inject } from 'vue'
-
 import { listRooms } from '../firebase/network'
 import { sanitize, timeSince } from '../utils'
-import { listPlayers, randomWord } from '../oneword/oneword-utils'
+import {
+  listPlayers,
+  randomWord,
+  referSupporter,
+} from '../oneword/oneword-utils'
 
 function recentRoom(room) {
   const ONE_HOUR_IN_MS = 60 * 60 * 1000
@@ -123,6 +126,22 @@ export default {
       this.roomName = sanitize(this.roomName)
       this.$router.push({
         path: `${this.roomDirectory}${this.roomName}`,
+      })
+    },
+    showPrivateModal() {
+      this.$showModal({
+        title: 'This room is private 🔒',
+        text:
+          'To join, ask your teammates for the room name or link.\n\nTo make your own private room, become a supporter!',
+        buttons: {
+          okay: 'Become a supporter!',
+          cancel: 'Not now',
+        },
+        callbacks: {
+          okay: () => {
+            referSupporter('private_room_modal')
+          },
+        },
       })
     },
   },

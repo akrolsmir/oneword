@@ -16,14 +16,6 @@
           ></button>
         </div>
       </AnimatedModal>
-
-      <!-- Standard Modals -->
-      <AnimatedModal
-        :visible="showStandardModal"
-        :content="standardModal"
-        @background-click="showStandardModal = false"
-        @cancel="showStandardModal = false"
-      />
     </div>
 
     <!-- Room header -->
@@ -843,26 +835,8 @@ export default {
         this.room.roundsInGame = 13
       }
     },
-    showPrivateModal() {
-      this.showStandardModal = true
-      this.standardModal = {
-        title: 'This room is private 🔒',
-        text:
-          'To join, ask your teammates for the room name or link.\n\nTo make your own private room, become a supporter!',
-        buttons: {
-          okay: 'Become a supporter!',
-          cancel: 'Not now',
-        },
-        callbacks: {
-          okay: () => {
-            referSupporter('private_room_modal')
-          },
-        },
-      }
-    },
     showSupporterModal() {
-      this.showStandardModal = true
-      this.standardModal = {
+      this.$showModal({
         title: 'Want private rooms?',
         text:
           'Earn perks like private rooms, custom avatars, and more by becoming a supporter 😍',
@@ -872,14 +846,14 @@ export default {
         },
         callbacks: {
           okay: () => {
+            console.log('okay')
             referSupporter('modtools')
           },
         },
-      }
+      })
     },
     showChampionModal() {
-      this.showStandardModal = true
-      this.standardModal = {
+      this.$showModal({
         title: 'Mark this guess as correct?',
         text: 'Unlock this perk by becoming a One Word champion 😍',
         buttons: {
@@ -891,15 +865,14 @@ export default {
             referSupporter('champion_modal')
           },
         },
-      }
+      })
     },
     showUniquifiedModal() {
       const oldName = this.player.name.split(' ').pop()
-      this.showStandardModal = true
-      this.standardModal = {
+      this.$showModal({
         title: `You are now "${this.player.name}"!`,
         text: `Another "${oldName}" was already in this room...`,
-      }
+      })
     },
     referSupporter,
     correct,

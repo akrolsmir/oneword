@@ -6,7 +6,7 @@ export function referSupporter(source) {
   // firebase.analytics().logEvent('view_promotion', {
   //   source: source,
   // })
-  window.open('./supporter.html', '_blank')
+  window.open('/supporter', '_blank')
 }
 
 // Returns whether a round's guess is correct.
