@@ -109,8 +109,7 @@ This is useful for testing the site for performance, in Chrome Devtool's Lightho
 
 ```
 $ yarn build
-$ cd dist/
-$ python -m http.server 8008
+$ yarn serve
 ```
 
-Then go to http://localhost:8008 and [run Lighthouse](https://developers.google.com/web/tools/lighthouse#devtools)!
+Then go to http://localhost:5000 and [run Lighthouse](https://developers.google.com/web/tools/lighthouse#devtools)!
