@@ -544,24 +544,24 @@
               Round {{ room.history.length - p }}: {{ room[team].name }} team
             </h3>
             <table class="table is-fullwidth">
-              <tbody>
-                <thead>
-                  <th>🔏 {{ past[team].round.spy }}</th>
-                  <td v-for="(encoded, e) in past[team].round.encode">
-                    {{ encoded }}
-                  </td>
-                </thead>
+              <thead>
+                <th>🔏 {{ past[team].round.spy }}</th>
+                <th v-for="(encoded, e) in past[team].round.encode">
+                  {{ encoded }}
+                </th>
+              </thead>
 
+              <tbody>
                 <tr v-for="(vote, voter) in past[team].round.interceptVotes">
-                  <th>{{ team === 'redTeam' ? '🔵' : '🔴' }} {{ voter }}</th>
+                  <td>{{ team === 'redTeam' ? '🔵' : '🔴' }} {{ voter }}</td>
                   <td v-for="v in vote">{{ v }}</td>
                 </tr>
                 <tr v-for="(vote, voter) in past[team].round.decodeVotes">
-                  <th>{{ team === 'redTeam' ? '🔴' : '🔵' }} {{ voter }}</th>
+                  <td>{{ team === 'redTeam' ? '🔴' : '🔵' }} {{ voter }}</td>
                   <td v-for="v in vote">{{ v }}</td>
                 </tr>
                 <tr>
-                  <th>✔️</th>
+                  <td>✔️</td>
                   <td v-for="k in past[team].round.key">{{ k }}</td>
                 </tr>
               </tbody>
