@@ -2,7 +2,9 @@
   <div>
     <h2 class="fancy">Sponsors</h2>
     We're grateful to be
-    <router-link to="/supporter">sponsored by</router-link>:
+    <a href="./supporter" @click.prevent="referSupporter('sponsors')">
+      sponsored by</a
+    >:
     <div class="m-2">
       <Nametag
         name="Tory N."
@@ -13,11 +15,15 @@
   </div>
 </template>
 <script>
+import { referSupporter } from '../firebase/network'
 import Nametag from './Nametag.vue'
 
 export default {
   components: {
     Nametag,
+  },
+  methods: {
+    referSupporter,
   },
 }
 </script>
