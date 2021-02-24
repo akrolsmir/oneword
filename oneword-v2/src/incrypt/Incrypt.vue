@@ -1,5 +1,13 @@
 <template>
-  <BigColumn>
+  <BigColumn :showPanes="true">
+    <template #right-pane>
+      <Chatbox
+        v-model="room.chatlog"
+        :name="player.name"
+        :room-id="room.name"
+      />
+    </template>
+
     <!-- Rules Notification -->
     <div class="modal" :class="{ 'is-active': showRules }">
       <div class="modal-background" @click="showRules = false"></div>
@@ -620,6 +628,7 @@ import BigColumn from '../components/BigColumn.vue'
 import KeywordCards from './KeywordCards.vue'
 import ShareLink from '../components/ShareLink.vue'
 import Timer from '../components/Timer.vue'
+import Chatbox from '../components/Chatbox.vue'
 
 import {
   unpush,
@@ -712,6 +721,7 @@ export default {
     KeywordCards,
     ShareLink,
     Timer,
+    Chatbox,
   },
   setup() {
     return { user: inject('currentUser') }

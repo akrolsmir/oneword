@@ -1,12 +1,13 @@
 <template>
   <div :class="{ box: !hidden }" style="overflow-wrap: break-word">
     <p>
-      <b>Room Chat</b> &nbsp;
-      <a @click="hidden = !hidden"
-        >({{ hidden ? `${sortedLogs.length} messages hidden` : 'hide' }})</a
-      >
+      <span class="fancy">Room Chat</span> &nbsp;
+      <a v-if="!hidden" @click="hidden = true">(hide)</a>
     </p>
-    <div v-if="!hidden">
+    <a v-if="hidden" @click="hidden = false"
+      >{{ sortedLogs.length }} messages hidden</a
+    >
+    <div v-else>
       <div
         style="
           height: 50vh;
@@ -48,6 +49,8 @@
 </template>
 
 <script>
+import { updateRoom } from '../firebase/network'
+
 export default {
   props: {
     modelValue: {

@@ -1,5 +1,13 @@
 <template>
-  <BigColumn>
+  <BigColumn :showPanes="true">
+    <template #right-pane>
+      <Chatbox
+        v-model="room.chatlog"
+        :name="player.name"
+        :room-id="room.name"
+      />
+    </template>
+
     <div v-cloak id="modals">
       <!-- Share Link Modal -->
       <AnimatedModal
@@ -478,6 +486,7 @@ import Nametag from '../components/Nametag.vue'
 import AnimatedModal from '../components/AnimatedModal.vue'
 import ShareLink from '../components/ShareLink.vue'
 import Timer from '../components/Timer.vue'
+import Chatbox from '../components/Chatbox.vue'
 import GameEnd from './GameEnd.vue'
 
 import {
@@ -512,6 +521,7 @@ export default {
     ShareLink,
     Timer,
     GameEnd,
+    Chatbox,
   },
   setup() {
     return { user: inject('currentUser') }
