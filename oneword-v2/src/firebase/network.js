@@ -29,6 +29,13 @@ if (!firebase.apps.length) {
   }
 }
 
+export function referSupporter(source) {
+  firebase.analytics().logEvent('view_promotion', {
+    source: source,
+  })
+  window.open('/supporter', '_blank')
+}
+
 // Extracts the right room database to use. based on current URL
 // TODO: This is pretty hardcoded to URL; prefer a more robust approach
 function roomDb() {

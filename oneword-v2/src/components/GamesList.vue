@@ -52,13 +52,9 @@
 
 <script>
 import { inject } from 'vue'
-import { listRooms } from '../firebase/network'
+import { listRooms, referSupporter } from '../firebase/network'
 import { sanitize, timeSince } from '../utils'
-import {
-  listPlayers,
-  randomWord,
-  referSupporter,
-} from '../oneword/oneword-utils'
+import { listPlayers, randomWord } from '../oneword/oneword-utils'
 
 function recentRoom(room) {
   const ONE_HOUR_IN_MS = 60 * 60 * 1000

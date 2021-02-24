@@ -379,15 +379,14 @@ import {
   listenForLogin,
   listenRoom,
   setRoom,
+  referSupporter,
   updateRoom,
   updateUserGame,
 } from '../firebase/network'
 import {
-  referSupporter,
   nextGuesser,
   randomWord,
   capitalize,
-  listPlayers,
 } from '../oneword/oneword-utils.js'
 import { inject } from 'vue'
 import prompts from './prompts.js'
@@ -789,7 +788,6 @@ export default {
         },
         callbacks: {
           okay: () => {
-            console.log('okay')
             referSupporter('modtools')
           },
         },

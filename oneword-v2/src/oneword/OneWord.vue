@@ -496,9 +496,9 @@ import {
   setRoom,
   updateRoom,
   updateUserGame,
+  referSupporter,
 } from '../firebase/network'
 import {
-  referSupporter,
   correct,
   isEnd,
   score,
@@ -854,7 +854,6 @@ export default {
         },
         callbacks: {
           okay: () => {
-            console.log('okay')
             referSupporter('modtools')
           },
         },
@@ -882,7 +881,6 @@ export default {
         text: `Another "${oldName}" was already in this room...`,
       })
     },
-    referSupporter,
     correct,
     isEnd,
     score,

@@ -1,14 +1,6 @@
 import { nouns, compounds, verbs, adjectives } from '../many-words.js'
 import pluralize from 'pluralize'
 
-export function referSupporter(source) {
-  // TODO: Reinstate analytics
-  // firebase.analytics().logEvent('view_promotion', {
-  //   source: source,
-  // })
-  window.open('/supporter', '_blank')
-}
-
 // Returns whether a round's guess is correct.
 export function correct(round) {
   const guessMatches =
