@@ -28,6 +28,7 @@
           "
           class="mr-1"
           :src="avatarUrl"
+          loading="lazy"
           alt=""
           height="28"
           width="28"
