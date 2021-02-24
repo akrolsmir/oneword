@@ -14,11 +14,7 @@
   >
     <div class="navbar-brand">
       <router-link class="navbar-item" to="/">
-        <img
-          src="https://oneword.games/images/oneword-logo.png"
-          width="80"
-          style="max-height: none"
-        />
+        <img src="/oneword-logo.png" width="80" style="max-height: none" />
       </router-link>
 
       <a
@@ -63,7 +59,7 @@
               target="_blank"
               rel="noopener noreferrer"
             >
-              All online board games
+              Discover other games...
             </a>
           </div>
         </div>
