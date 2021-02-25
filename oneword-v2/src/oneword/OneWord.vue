@@ -504,12 +504,12 @@ import {
   dupes,
   dedupe,
   nextGuesser,
-  randomWord,
   nextWord,
   nextCategory,
   capitalize,
   listPlayers,
 } from './oneword-utils.js'
+import { randomWord } from '../utils.js'
 import { inject } from 'vue'
 
 export default {

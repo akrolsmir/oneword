@@ -92,18 +92,6 @@ export function nextGuesser(lastGuesser, players) {
   return players[nextIndex]
 }
 
-export function randomWord(category = 'nouns', customWordList = []) {
-  const categories = {
-    nouns,
-    compounds,
-    verbs,
-    adjectives,
-    custom: customWordList,
-  }
-  const words = categories[category]
-  return words[Math.floor(Math.random() * words.length)].toLowerCase()
-}
-
 export function nextWord(history, category = 'nouns', customWordList = []) {
   let word
   let loops = 0

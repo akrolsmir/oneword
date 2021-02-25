@@ -416,8 +416,7 @@ import {
   updateUserGame,
 } from '../firebase/network.js'
 import { inject } from 'vue'
-import { getIn } from '../utils.js'
-import { randomWord } from '../oneword/oneword-utils'
+import { getIn, randomWord } from '../utils.js'
 
 export default {
   components: {

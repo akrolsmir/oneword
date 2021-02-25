@@ -651,8 +651,7 @@ import {
   listenForLogin,
   updateUserGame,
 } from '../firebase/network.js'
-import { randomWord } from '../oneword/oneword-utils'
-import { getIn, sanitize } from '../utils'
+import { getIn, randomWord } from '../utils'
 import { inject } from 'vue'
 
 // TODO: This is kind of weird; intercepts should be worth less than drops?

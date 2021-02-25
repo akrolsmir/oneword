@@ -383,11 +383,8 @@ import {
   updateRoom,
   updateUserGame,
 } from '../firebase/network'
-import {
-  nextGuesser,
-  randomWord,
-  capitalize,
-} from '../oneword/oneword-utils.js'
+import { nextGuesser, capitalize } from '../oneword/oneword-utils.js'
+import { randomWord } from '../utils.js'
 import { inject } from 'vue'
 import prompts from './prompts.js'
 
