@@ -204,13 +204,12 @@
 
       <div class="message-body" style="border-width: 0">
         <!-- Players -->
-        <label class="label mt-0">Players</label>
         <div class="field is-grouped is-grouped-multiline">
           <Nametag
             v-for="tagged in players"
             :key="tagged"
             :name="tagged"
-            :user="room.playerData && room.playerData[tagged]"
+            :user="room.people && room.people[tagged]"
             :submitted="
               !!room.currentRound.clues[tagged] ||
               room.currentRound.guesser == tagged
