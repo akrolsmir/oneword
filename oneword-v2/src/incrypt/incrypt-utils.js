@@ -1,4 +1,4 @@
-import { nouns } from '../many-words.js'
+import { nouns } from '../words/many-words.js'
 import { sanitize } from '../utils.js'
 
 export function unpush(array, value) {

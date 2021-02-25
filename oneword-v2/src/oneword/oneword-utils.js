@@ -1,4 +1,4 @@
-import { nouns, compounds, verbs, adjectives } from '../many-words.js'
+import { nouns, compounds, verbs, adjectives } from '../words/many-words.js'
 import pluralize from 'pluralize'
 
 // Returns whether a round's guess is correct.
