@@ -139,7 +139,7 @@
                   </button>
                 </span>
 
-                <span v-if="user.supporter == 'ADMIN'" class="control">
+                <span v-if="user.isAdmin" class="control">
                   <button class="button is-small" @click="resetRoom">
                     Reset Room
                   </button>
@@ -510,7 +510,7 @@ export default {
     },
     isMod() {
       return (
-        this.user?.supporter === 'ADMIN' ||
+        this.user?.isAdmin ||
         (this?.room.players && this.room.players[0] == this.player.name)
       )
     },
@@ -623,7 +623,7 @@ export default {
         playerData: {
           [this.player.name]: {
             email: this.user.email || '',
-            supporter: this.user.supporter || '',
+            supporter: this.user.isSupporter || '',
           },
         },
       }
@@ -765,7 +765,7 @@ export default {
       )
     },
     async upsell(...props) {
-      if (this.user.supporter) {
+      if (this.user.isSupporter) {
         await this.saveRoom(...props)
       } else {
         this.showSupporterModal()

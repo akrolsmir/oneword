@@ -576,7 +576,7 @@ export default {
         playerData: {
           [this.player.name]: {
             email: this.user.email || '',
-            supporter: this.user.supporter || '',
+            supporter: this.user.isSupporter || '',
           },
         },
       }
@@ -765,7 +765,7 @@ export default {
       return 0
     },
     isMod() {
-      if (this.user.supporter == 'ADMIN') {
+      if (this.user.isAdmin) {
         return true
       }
       if (this.room && this.room.players) {

@@ -7,7 +7,7 @@
             Hey there, {{ displayName }}.
             {{ user.id ? '' : 'Care to sign in?' }}
           </h1>
-          <h2 class="subtitle" v-if="user.supporter">
+          <h2 class="subtitle" v-if="user.isSupporter">
             Thanks for being a supporter!
           </h2>
           <h2 class="subtitle" v-else>Thanks for playing!</h2>
@@ -25,7 +25,7 @@
     <h2 class="title">Your Avatar</h2>
     <Nametag :user="user" :name="displayName" />
     <br />
-    <p v-if="user.supporter">
+    <p v-if="user.isSupporter">
       You can change your avatar on
       <a href="https://en.gravatar.com/">Gravatar</a>.
     </p>
