@@ -133,7 +133,7 @@
             v-if="isMod"
             class="field is-grouped is-grouped-multiline mx-3 my-1"
           >
-            <div class="control" v-for="category in CATEGORY_ORDER">
+            <div class="control" v-for="category in BASIC_LISTS">
               <label class="capitalize checkbox">
                 <input
                   type="checkbox"
@@ -146,11 +146,7 @@
           </span>
           <span class="mx-3" v-else>
             <!-- TODO: categories should be an array (although, race conditions...?) -->
-            <template
-              v-for="category in CATEGORY_ORDER.filter(
-                (c) => room.categories[c]
-              )"
-            >
+            <template v-for="category in enabledCategories">
               <span
                 class="comma"
                 :class="{
@@ -505,11 +501,16 @@ import {
   dedupe,
   nextGuesser,
   nextWord,
-  nextCategory,
   capitalize,
   listPlayers,
 } from './oneword-utils.js'
-import { randomWord } from '../utils.js'
+import {
+  randomWord,
+  pickRandom,
+  defaultCategories,
+  BASIC_LISTS,
+  THEMED_LISTS,
+} from '../utils.js'
 import { inject } from 'vue'
 
 export default {
@@ -542,7 +543,8 @@ export default {
         clue: '',
         guess: '',
       },
-      CATEGORY_ORDER: ['nouns', 'verbs', 'adjectives', 'compounds', 'custom'],
+      BASIC_LISTS,
+      THEMED_LISTS,
       showShareModal: false,
       newMod: '',
       wordsSaved: false,
@@ -636,6 +638,11 @@ export default {
       // Lowercase and trim out whitespace; take out empty words
       return words.map((w) => w.toLowerCase().trim()).filter((w) => w)
     },
+    enabledCategories() {
+      return Object.keys(this.room.categories).filter(
+        (c) => this.room.categories[c]
+      )
+    },
   },
   methods: {
     dupes,
@@ -700,13 +707,7 @@ export default {
         roundsInGame: 13,
         lastUpdateTime: Date.now(),
         timers: { CLUEING: '', GUESSING: '', DONE: '', running: false },
-        categories: {
-          nouns: true,
-          verbs: false,
-          adjectives: false,
-          compounds: false,
-          custom: false,
-        },
+        categories: defaultCategories(),
         customWords: '',
         players: [], // For v1 compat support of dev rooms; remove after 2021-04-09
         people: {
@@ -805,7 +806,7 @@ export default {
     },
     async newRound(sameGuesser = false) {
       this.room.history.push(this.room.currentRound)
-      const category = nextCategory(this.room.categories)
+      const category = pickRandom(this.enabledCategories)
       this.room.currentRound = {
         state: 'CLUEING',
         guesser: sameGuesser

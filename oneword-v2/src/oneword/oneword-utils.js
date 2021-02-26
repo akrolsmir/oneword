@@ -1,10 +1,5 @@
-import {
-  nouns,
-  compounds,
-  verbs,
-  adjectives,
-} from '../words/parts-of-speech.js'
 import pluralize from 'pluralize'
+import { randomWord } from '../utils.js'
 
 // Returns whether a round's guess is correct.
 export function correct(round) {
@@ -104,11 +99,6 @@ export function nextWord(history, category = 'nouns', customWordList = []) {
     word = randomWord(category, customWordList)
   } while (history.map((round) => round.word).includes(word))
   return word
-}
-
-export function nextCategory(categories) {
-  const enabled = Object.keys(categories).filter((c) => categories[c])
-  return enabled[Math.floor(Math.random() * enabled.length)]
 }
 
 export function capitalize(str) {
