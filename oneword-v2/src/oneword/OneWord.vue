@@ -204,14 +204,14 @@
             <a
               @click="referSupporter('themed_wordlist')"
               style="text-decoration: none"
-              ><span class="tag is-warning ml-2">For supporters!</span></a
+              ><span class="tag is-warning ml-2">For champions!</span></a
             >
           </div>
           <div class="field is-grouped is-grouped-multiline my-1">
             <div class="control" v-for="category in VIDEO_GAME_LISTS">
               <label class="capitalize checkbox">
                 <input
-                  :disabled="!user.isSupporter"
+                  :disabled="!user.isChampion"
                   type="checkbox"
                   v-model="room.categories[category]"
                   @change="saveRoom('categories')"
