@@ -211,7 +211,7 @@
             <div class="control" v-for="category in VIDEO_GAME_LISTS">
               <label class="capitalize checkbox">
                 <input
-                  :disabled="!user.supporter"
+                  :disabled="!user.isSupporter"
                   type="checkbox"
                   v-model="room.categories[category]"
                   @change="saveRoom('categories')"
@@ -236,7 +236,7 @@
                 Skip Word
               </button>
             </span>
-            <span v-if="user.supporter == 'ADMIN'" class="control">
+            <span v-if="user.isAdmin" class="control">
               <button class="button is-small" @click="resetRoom">
                 Reset Room
               </button>
@@ -434,7 +434,7 @@
         :score="score(room)"
         :rounds-in-game="room.roundsInGame"
         :name="user.displayName"
-        :supporter="!!user.supporter"
+        :supporter="user.isSupporter"
         @continue-game="newRound(false)"
       ></GameEnd>
       <button v-else class="button" @click="newRound(false)">Next Round</button>
@@ -641,7 +641,7 @@ export default {
     },
     isMod() {
       return (
-        this.user?.supporter === 'ADMIN' ||
+        this.user?.isAdmin ||
         (this.room.people &&
           this.room.people[this.player.name]?.state === 'MOD')
       )
@@ -713,7 +713,7 @@ export default {
       // Assumes player.name as already been uniquify'd
       this.room.people[this.player.name] = {
         id: this.user.id || '',
-        supporter: this.user.supporter || '',
+        supporter: this.user.isSupporter || '',
         state: 'PLAYING',
       }
       await this.saveRoom('people')
@@ -740,7 +740,7 @@ export default {
         people: {
           [this.player.name]: {
             id: this.user.id || '',
-            supporter: this.user.supporter || '',
+            supporter: this.user.isSupporter || '',
             state: 'MOD', // or 'PLAYING' or 'WATCHING'
           },
         },
@@ -804,7 +804,7 @@ export default {
       updateUserGame(this.user.id, this.room.name)
     },
     async toggleRoundCorrect() {
-      if (!['CHAMPION', 'SPONSOR', 'ADMIN'].includes(this.user.supporter)) {
+      if (!this.user.isChampion) {
         return this.showChampionModal()
       }
       await updateRoom(this.room, {
@@ -812,7 +812,7 @@ export default {
       })
     },
     async toggleHistoryCorrect(reverseIndex) {
-      if (!['CHAMPION', 'SPONSOR', 'ADMIN'].includes(this.user.supporter)) {
+      if (!this.user.isChampion) {
         return this.showChampionModal()
       }
       // History is shown in reverse order, so we re-reverse the index
@@ -853,7 +853,7 @@ export default {
       )
     },
     async upsell(...props) {
-      if (this.user.supporter) {
+      if (this.user.isSupporter) {
         await this.saveRoom(...props)
       } else {
         this.showSupporterModal()
