@@ -17,7 +17,7 @@ const firebaseConfig = {
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig)
   try {
-    firebase.analytics()
+    import('firebase/firebase-analytics').then(() => firebase.analytics())
   } catch (e) {
     console.warn('Firebase analytics not enabled (probably got blocked.)')
     // Shim for firebase.analytics().logEvent(...)
