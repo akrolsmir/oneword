@@ -28,6 +28,25 @@ yarn # installs all JS dependencies
 
 - `yarn dev` to spin up a local server at http://localhost:3000
 
+## Committing code
+
+Merging code directly into `master` is okay, but if some work you're doing is:
+
+- Risky (could break existing gameplay)
+- Uncertain (not sure if we want this)
+- Touches code that others are also modifying
+
+... then consider opening up a Pull Request instead!
+
+In Github, pull requests also create a deploy preview; perfect for getting quick feedback.
+(TODO: Include screenshot)
+
+## Deploying
+
+Just push to `master`, and the site will update automatically!
+
+# Appendix
+
 ### Productivity tips
 
 - When you save a file, the app should automatically reload!
@@ -84,6 +103,13 @@ yarn # installs all JS dependencies
   - Self-documenting if possible, then comments
   - It's easier to read less code
 
-## Releasing
+## Compiling locally
 
-TODO Describe pushing to the right branch so Netlify will pick up changes
+This is useful for testing the site for performance, in Chrome Devtool's Lighthouse.
+
+```
+$ yarn build
+$ yarn serve
+```
+
+Then go to http://localhost:5000 and [run Lighthouse](https://developers.google.com/web/tools/lighthouse#devtools)!

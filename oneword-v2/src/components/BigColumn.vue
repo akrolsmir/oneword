@@ -3,8 +3,21 @@
 
 <template>
   <div class="background">
-    <div class="main-column" :style="{ width: width + 'px' }">
-      <slot />
+    <div class="main-column" :style="{ width: mainWidth + 'px' }">
+      <div class="columns is-centered" v-if="showPanes">
+        <!-- Left pane is only shown when width > 1216px -->
+        <div class="column is-hidden-touch is-hidden-desktop-only">
+          <slot name="left-pane" />
+        </div>
+        <!-- Center (main) pane. -->
+        <div class="column is-two-thirds is-half-widescreen">
+          <slot />
+        </div>
+        <div class="column">
+          <slot name="right-pane" />
+        </div>
+      </div>
+      <slot v-else />
     </div>
     <LinkFooter></LinkFooter>
   </div>
@@ -20,6 +33,16 @@ export default {
     width: {
       type: Number,
       default: 600,
+    },
+    // If set, then we double the width to have left and right panes
+    showPanes: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  computed: {
+    mainWidth() {
+      return this.width * (this.showPanes ? 2 : 1)
     },
   },
 }

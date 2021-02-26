@@ -7,21 +7,32 @@
       @click="$emit('background-click')"
     ></div>
     <div class="modal-content animate__animated animate__pulse animate__faster">
-      <div v-if="content" class="modal-card" style="max-width: 500px">
-        <header class="modal-card-head has-text-centered">
-          <p class="modal-card-title">{{ content.title }}</p>
-        </header>
-        <section class="modal-card-body px-6" style="white-space: pre-wrap">
+      <div
+        v-if="content"
+        class="modal-card box has-text-centered p-6"
+        style="max-width: 500px"
+      >
+        <div class="title">
+          <h2>{{ content.title }}</h2>
+        </div>
+
+        <div class="mb-5">
           {{ content.text }}
-        </section>
-        <footer class="modal-card-foot px-6">
-          <button class="button is-warning" @click="content.callbacks.okay">
-            {{ content.buttons.okay }}
+        </div>
+
+        <div class="buttons">
+          <button
+            class="button is-warning"
+            v-if="content.buttons?.okay"
+            @click="okayCallback"
+          >
+            {{ content.buttons?.okay }}
           </button>
+
           <button class="button" @click="$emit('cancel')">
-            {{ content.buttons.cancel }}
+            {{ content.buttons?.cancel || 'Close' }}
           </button>
-        </footer>
+        </div>
       </div>
       <!-- If content is undefined, use the component slot instead -->
       <slot v-else></slot>
@@ -44,6 +55,11 @@ export default {
     visible: Boolean,
     /* content: { title, text, buttons: {okay: '', cancel: ''}, callbacks: {okay: ...} } */
     content: Object,
+  },
+  computed: {
+    okayCallback() {
+      return this.content.callbacks?.okay || (() => {})
+    },
   },
 }
 </script>

@@ -14,11 +14,7 @@
   >
     <div class="navbar-brand">
       <router-link class="navbar-item" to="/">
-        <img
-          src="https://oneword.games/images/oneword-logo.png"
-          width="80"
-          style="max-height: none"
-        />
+        <img src="/oneword-logo.png" width="80" style="max-height: none" />
       </router-link>
 
       <a
@@ -47,13 +43,15 @@
 
           <div class="navbar-dropdown">
             <router-link class="navbar-item" to="/"> One Word </router-link>
-            <a class="navbar-item"> Incrypt </a>
-            <router-link class="navbar-item" to="/storytime/">
+            <router-link class="navbar-item" to="/incrypt">
+              Incrypt
+            </router-link>
+            <!-- <router-link class="navbar-item" to="/storytime">
               Storytime <span class="tag is-link is-light ml-1">New!</span>
             </router-link>
-            <a class="navbar-item">
+            <router-link class="navbar-item" to="/pairwise">
               Pairwise <span class="tag is-link is-light ml-1">New!</span>
-            </a>
+            </router-link> -->
             <hr class="navbar-divider" />
             <a
               class="navbar-item"
@@ -61,7 +59,7 @@
               target="_blank"
               rel="noopener noreferrer"
             >
-              All online board games
+              Discover other games...
             </a>
           </div>
         </div>
@@ -79,7 +77,7 @@
               @click="referPremium"
             >
               <strong>{{
-                user.supporter ? 'Supporter' : 'Become a supporter!'
+                user.isSupporter ? 'Supporter' : 'Become a supporter!'
               }}</strong>
             </router-link>
           </div>

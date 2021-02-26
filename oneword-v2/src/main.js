@@ -1,8 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 
-import 'bulma/css/bulma.css'
-import './styles.css'
+import './styles.scss'
 
 import FrontPage from './components/FrontPage.vue'
 import Profile from './components/Profile.vue'
@@ -13,6 +12,10 @@ import OneWord from './oneword/OneWord.vue'
 import Listography from './listography/Listography.vue'
 import StorytimeFrontPage from './storytime/components/StorytimeFrontPage.vue'
 import Storytime from './storytime/Storytime.vue'
+import IncryptFrontPage from './incrypt/IncryptFrontPage.vue'
+import Incrypt from './incrypt/Incrypt.vue'
+import PairwiseFrontPage from './pairwise/PairwiseFrontPage.vue'
+import Pairwise from './pairwise/Pairwise.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
@@ -22,9 +25,13 @@ const routes = [
   { path: '/about', component: About },
   { path: '/supporter', component: Supporter },
   { path: '/thanks', component: Thanks },
-  { path: '/storytime/', component: StorytimeFrontPage },
+  { path: '/storytime', component: StorytimeFrontPage },
   { path: '/storytime/:id', component: Storytime },
-  { path: '/list/', component: Listography },
+  { path: '/list', component: Listography },
+  { path: '/incrypt', component: IncryptFrontPage },
+  { path: '/incrypt/:id', component: Incrypt },
+  { path: '/pairwise', component: PairwiseFrontPage },
+  { path: '/pairwise/:id', component: Pairwise },
 ]
 
 const router = createRouter({
@@ -39,5 +46,6 @@ const router = createRouter({
   },
 })
 
-export const app = createApp(App)
-app.use(router).mount('#app')
+export const app = createApp(App).use(router)
+const rootComponent = app.mount('#app')
+app.config.globalProperties.$showModal = rootComponent.showModal
