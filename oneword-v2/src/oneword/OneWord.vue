@@ -128,24 +128,76 @@
             </template>
           </span>
 
-          <!-- Categories -->
-          <span
-            v-if="isMod"
-            class="field is-grouped is-grouped-multiline mx-3 my-1"
-          >
-            <div class="control" v-for="category in BASIC_LISTS">
-              <label class="capitalize checkbox">
-                <input
-                  type="checkbox"
-                  v-model="room.categories[category]"
-                  @change="saveRoom('categories')"
-                />
-                {{ category }}
-              </label>
+          <!-- Mod Categories -->
+          <div v-if="isMod" class="mx-4">
+            <div class="label">Basic Wordlists</div>
+            <span class="field is-grouped is-grouped-multiline mx-3 my-1">
+              <div class="control" v-for="category in BASIC_LISTS">
+                <label class="capitalize checkbox">
+                  <input
+                    type="checkbox"
+                    v-model="room.categories[category]"
+                    @change="saveRoom('categories')"
+                  />
+                  {{ WORD_LISTS[category].name }}
+                </label>
+              </div>
+            </span>
+            <!-- Custom word editor -->
+            <div
+              v-if="room.categories['custom']"
+              class="is-flex is-justify-content-center"
+            >
+              <div class="field mb-2" style="width: 500px; max-width: 90%">
+                <div class="control">
+                  <textarea
+                    class="textarea is-small mb-2"
+                    :class="{ 'is-primary': wordsSaved }"
+                    placeholder='Input your own word list e.g. "sneezy, phylum, europe, sloth, guacamole, data, colossus"...'
+                    v-model="room.customWords"
+                    @input="wordsSaved = false"
+                  ></textarea>
+                  <div id="custom-word-tags" class="tags mb-1">
+                    <span
+                      class="tag is-info"
+                      v-for="word in customWordList.slice(0, 30)"
+                      >{{ word }}</span
+                    >
+                  </div>
+                </div>
+                <div class="control">
+                  <button v-if="wordsSaved" class="button is-small" disabled>
+                    Saved
+                  </button>
+                  <!-- TODO: set wordsSaved = true on @click. -->
+                  <button
+                    v-else
+                    class="button is-small"
+                    @click="saveRoom('customWords')"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
             </div>
-          </span>
+
+            <div class="label">Themed Wordlists</div>
+            <div class="field is-grouped is-grouped-multiline mx-3 my-1">
+              <div class="control" v-for="category in VIDEO_GAME_LISTS">
+                <label class="capitalize checkbox">
+                  <input
+                    type="checkbox"
+                    v-model="room.categories[category]"
+                    @change="saveRoom('categories')"
+                  />
+                  {{ WORD_LISTS[category].name }}
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Player Categories -->
           <span class="mx-3" v-else>
-            <!-- TODO: categories should be an array (although, race conditions...?) -->
             <template v-for="category in enabledCategories">
               <span
                 class="comma"
@@ -154,47 +206,10 @@
                     room.currentRound.category == category,
                 }"
               >
-                {{ category }}</span
+                {{ WORD_LISTS[category].name }}</span
               >
             </template>
           </span>
-        </div>
-        <!-- Custom word editor (mod only) -->
-        <div
-          v-if="isMod && room.categories['custom']"
-          class="is-flex is-justify-content-center"
-        >
-          <div class="field mb-2" style="width: 500px; max-width: 90%">
-            <div class="control">
-              <textarea
-                class="textarea is-small mb-2"
-                :class="{ 'is-primary': wordsSaved }"
-                placeholder='Input your own word list e.g. "sneezy, phylum, europe, sloth, guacamole, data, colossus"...'
-                v-model="room.customWords"
-                @input="wordsSaved = false"
-              ></textarea>
-              <div id="custom-word-tags" class="tags mb-1">
-                <span
-                  class="tag is-info"
-                  v-for="word in customWordList.slice(0, 30)"
-                  >{{ word }}</span
-                >
-              </div>
-            </div>
-            <div class="control">
-              <button v-if="wordsSaved" class="button is-small" disabled>
-                Saved
-              </button>
-              <!-- TODO: set wordsSaved = true on @click. -->
-              <button
-                v-else
-                class="button is-small"
-                @click="saveRoom('customWords')"
-              >
-                Save
-              </button>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -448,7 +463,7 @@
             </span>
             <span class="fancy normal"
               >{{ room.history.length - i }}. {{ round.word }} ({{
-                round.category
+                WORD_LISTS[round.category].name
               }})</span
             >
           </span>
@@ -509,7 +524,8 @@ import {
   pickRandom,
   defaultCategories,
   BASIC_LISTS,
-  THEMED_LISTS,
+  VIDEO_GAME_LISTS,
+  WORD_LISTS,
 } from '../utils.js'
 import { inject } from 'vue'
 
@@ -544,7 +560,8 @@ export default {
         guess: '',
       },
       BASIC_LISTS,
-      THEMED_LISTS,
+      VIDEO_GAME_LISTS,
+      WORD_LISTS,
       showShareModal: false,
       newMod: '',
       wordsSaved: false,
@@ -730,15 +747,7 @@ export default {
       })
     },
     wordForWord(category) {
-      return (
-        {
-          nouns: 'word',
-          verbs: 'verb',
-          adjectives: 'adjective',
-          compounds: 'compound',
-          custom: 'word',
-        }[category] || 'word'
-      )
+      return WORD_LISTS[category].inline
     },
     hasSpecialCharacters(word) {
       return /[\s~`!@#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?()\._]/g.test(word)

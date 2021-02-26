@@ -43,7 +43,7 @@ export function getIn(object, path) {
 export function randomWord(category = 'nouns', customWordList = []) {
   const words =
     category === 'custom' ? customWordList : WORD_LISTS[category].words
-  return pickRandom(words)
+  return pickRandom(words) || 'Random word generator broke =('
 }
 
 export function pickRandom(array) {
@@ -51,15 +51,29 @@ export function pickRandom(array) {
 }
 
 export const WORD_LISTS = {
-  nouns: { name: 'Nouns', words: nouns },
-  verbs: { name: 'Verbs', words: verbs },
-  adjectives: { name: 'Adjectives', words: adjectives },
-  compounds: { name: 'Compound Words', words: compounds },
-  pokemonGen1: { name: 'Pokemon Gen 1', words: pokemonGen1 },
-  lolChampions: { name: 'League of Legends Champions', words: lolChampions },
-  dotaHeroes: { name: 'Dota Heroes', words: dotaHeroes },
-  ssbCharacters: { name: 'Super Smash Bros Fighters', words: ssbCharacters },
-  countries: { name: 'Countries', words: countries },
+  nouns: { name: 'Nouns', inline: 'word', words: nouns },
+  verbs: { name: 'Verbs', inline: 'verb', words: verbs },
+  adjectives: { name: 'Adjectives', inline: 'adjective', words: adjectives },
+  compounds: { name: 'Compounds', inline: 'compound word', words: compounds },
+  pokemonGen1: {
+    name: 'Pokémon: Gen 1',
+    inline: 'Pokémon',
+    words: pokemonGen1,
+  },
+  lolChampions: {
+    name: 'LoL Champions',
+    inline: 'champion',
+    words: lolChampions,
+  },
+  dotaHeroes: { name: 'DotA Heroes', inline: 'hero', words: dotaHeroes },
+  ssbCharacters: {
+    name: 'SSB Fighters',
+    inline: 'SSB fighter',
+    words: ssbCharacters,
+  },
+  countries: { name: 'Countries', inline: 'country', words: countries },
+  // Filler so `WORD_LISTS['custom'].name` doesn't break
+  custom: { name: 'Custom', inline: 'custom word', words: [] },
 }
 
 export const BASIC_LISTS = [
@@ -70,7 +84,7 @@ export const BASIC_LISTS = [
   'countries',
   'custom',
 ]
-export const THEMED_LISTS = [
+export const VIDEO_GAME_LISTS = [
   'pokemonGen1',
   'lolChampions',
   'dotaHeroes',
