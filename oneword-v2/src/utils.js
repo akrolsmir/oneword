@@ -1,13 +1,30 @@
 import { formatDistanceToNow } from 'date-fns'
+import { nouns, verbs, adjectives, compounds } from './words/parts-of-speech'
+import {
+  pokemonGen1,
+  lolChampions,
+  dotaHeroes,
+  ssbCharacters,
+  countries,
+} from './words/themes'
+import pluralize from 'pluralize'
 
 // Turns "This is @NOT okay" to "this-is-not-okay
-// Good for URLs (TODO: try foreign chars)
+// Good for making URLs from user input (TODO: try foreign chars)
 export function sanitize(input) {
   return input
     .trim()
     .toLowerCase()
     .replace(/\s/g, '-') // whitespace
     .replace(/[^\p{L}-]/gu, '') // not (dash or letter in any language)
+}
+
+// "Dr. Mario" matches "dr mario", and "Dogs" matches "dog"
+// Good for validating whether a user's input is correct
+export function wordsMatch(word1, word2) {
+  const w1 = word1.toLowerCase().replace(/[^a-z]/g, '')
+  const w2 = word2.toLowerCase().replace(/[^a-z]/g, '')
+  return pluralize.singular(w1) === w2 || pluralize.plural(w1) === w2
 }
 
 export function timeSince(millis) {
@@ -21,4 +38,63 @@ export function getIn(object, path) {
     node = node[part]
   }
   return node
+}
+
+export function randomWord(category = 'nouns', customWordList = []) {
+  const words =
+    category === 'custom' ? customWordList : WORD_LISTS[category].words
+  return pickRandom(words) || 'Random word generator broke =('
+}
+
+export function pickRandom(array) {
+  return array[Math.floor(Math.random() * array.length)]
+}
+
+export const WORD_LISTS = {
+  nouns: { name: 'Nouns', inline: 'word', words: nouns },
+  verbs: { name: 'Verbs', inline: 'verb', words: verbs },
+  adjectives: { name: 'Adjectives', inline: 'adjective', words: adjectives },
+  compounds: { name: 'Compounds', inline: 'compound word', words: compounds },
+  pokemonGen1: {
+    name: 'Pokémon: Gen 1',
+    inline: 'Pokémon',
+    words: pokemonGen1,
+  },
+  lolChampions: {
+    name: 'LoL Champions',
+    inline: 'champion',
+    words: lolChampions,
+  },
+  dotaHeroes: { name: 'DotA Heroes', inline: 'hero', words: dotaHeroes },
+  ssbCharacters: {
+    name: 'SSB Fighters',
+    inline: 'SSB fighter',
+    words: ssbCharacters,
+  },
+  countries: { name: 'Countries', inline: 'country', words: countries },
+  // Filler so `WORD_LISTS['custom'].name` doesn't break
+  custom: { name: 'Custom', inline: 'custom word', words: [] },
+}
+
+export const BASIC_LISTS = [
+  'nouns',
+  'verbs',
+  'adjectives',
+  'compounds',
+  'countries',
+  'custom',
+]
+export const VIDEO_GAME_LISTS = [
+  'pokemonGen1',
+  'lolChampions',
+  'dotaHeroes',
+  'ssbCharacters',
+]
+
+export function defaultCategories() {
+  const categories = Object.fromEntries(
+    Object.keys(WORD_LISTS).map((name) => [name, false])
+  )
+  categories['nouns'] = true
+  return categories
 }

@@ -1,12 +1,8 @@
-import { nouns, compounds, verbs, adjectives } from '../many-words.js'
-import pluralize from 'pluralize'
+import { randomWord, wordsMatch } from '../utils.js'
 
 // Returns whether a round's guess is correct.
 export function correct(round) {
-  const guessMatches =
-    pluralize.singular(round.guess) === round.word ||
-    pluralize.plural(round.guess) == round.word
-  return guessMatches || round.markedCorrect
+  return wordsMatch(round.guess, round.word) || round.markedCorrect
 }
 export function totalRounds(room) {
   return room.roundsInGame == 'Unlimited' ? 1024 : room.roundsInGame
@@ -87,18 +83,6 @@ export function nextGuesser(lastGuesser, players) {
   return players[nextIndex]
 }
 
-export function randomWord(category = 'nouns', customWordList = []) {
-  const categories = {
-    nouns,
-    compounds,
-    verbs,
-    adjectives,
-    custom: customWordList,
-  }
-  const words = categories[category]
-  return words[Math.floor(Math.random() * words.length)].toLowerCase()
-}
-
 export function nextWord(history, category = 'nouns', customWordList = []) {
   let word
   let loops = 0
@@ -111,11 +95,6 @@ export function nextWord(history, category = 'nouns', customWordList = []) {
     word = randomWord(category, customWordList)
   } while (history.map((round) => round.word).includes(word))
   return word
-}
-
-export function nextCategory(categories) {
-  const enabled = Object.keys(categories).filter((c) => categories[c])
-  return enabled[Math.floor(Math.random() * enabled.length)]
 }
 
 export function capitalize(str) {

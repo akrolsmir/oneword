@@ -128,29 +128,9 @@
             </template>
           </span>
 
-          <!-- Categories -->
-          <span
-            v-if="isMod"
-            class="field is-grouped is-grouped-multiline mx-3 my-1"
-          >
-            <div class="control" v-for="category in CATEGORY_ORDER">
-              <label class="capitalize checkbox">
-                <input
-                  type="checkbox"
-                  v-model="room.categories[category]"
-                  @change="saveRoom('categories')"
-                />
-                {{ category }}
-              </label>
-            </div>
-          </span>
-          <span class="mx-3" v-else>
-            <!-- TODO: categories should be an array (although, race conditions...?) -->
-            <template
-              v-for="category in CATEGORY_ORDER.filter(
-                (c) => room.categories[c]
-              )"
-            >
+          <!-- Player Categories -->
+          <span class="mx-3" v-if="!isMod">
+            <template v-for="category in enabledCategories">
               <span
                 class="comma"
                 :class="{
@@ -158,76 +138,94 @@
                     room.currentRound.category == category,
                 }"
               >
-                {{ category }}</span
+                {{ WORD_LISTS[category].name }}</span
               >
             </template>
           </span>
         </div>
-        <!-- Custom word editor (mod only) -->
-        <div
-          v-if="isMod && room.categories['custom']"
-          class="is-flex is-justify-content-center"
-        >
-          <div class="field mb-2" style="width: 500px; max-width: 90%">
-            <div class="control">
-              <textarea
-                class="textarea is-small mb-2"
-                :class="{ 'is-primary': wordsSaved }"
-                placeholder='Input your own word list e.g. "sneezy, phylum, europe, sloth, guacamole, data, colossus"...'
-                v-model="room.customWords"
-                @input="wordsSaved = false"
-              ></textarea>
-              <div id="custom-word-tags" class="tags mb-1">
-                <span
-                  class="tag is-info"
-                  v-for="word in customWordList.slice(0, 30)"
-                  >{{ word }}</span
-                >
-              </div>
-            </div>
-            <div class="control">
-              <button v-if="wordsSaved" class="button is-small" disabled>
-                Saved
-              </button>
-              <!-- TODO: set wordsSaved = true on @click. -->
-              <button
-                v-else
-                class="button is-small"
-                @click="saveRoom('customWords')"
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
 
       <div class="message-body" style="border-width: 0">
-        <!-- Players -->
-        <div class="field is-grouped is-grouped-multiline">
-          <Nametag
-            v-for="tagged in players"
-            :key="tagged"
-            :name="tagged"
-            :user="room.people && room.people[tagged]"
-            :submitted="
-              !!room.currentRound.clues[tagged] ||
-              room.currentRound.guesser == tagged
-            "
-            :guessing="room.currentRound.guesser == tagged"
-            :mod="isMod"
-            :self="tagged === player.name"
-            :modtag="room.people && room.people[tagged]?.state === 'MOD'"
-            @kick="kickPlayer(tagged)"
-          ></Nametag>
+        <!-- Mod Categories -->
+        <div v-if="isMod">
+          <div class="label mt-0">Basic Wordlists</div>
+          <span class="field is-grouped is-grouped-multiline my-1">
+            <div class="control" v-for="category in BASIC_LISTS">
+              <label class="capitalize checkbox">
+                <input
+                  type="checkbox"
+                  v-model="room.categories[category]"
+                  @change="saveRoom('categories')"
+                />
+                {{ WORD_LISTS[category].name }}
+              </label>
+            </div>
+          </span>
+          <!-- Custom word editor -->
+          <div
+            v-if="room.categories['custom']"
+            class="is-flex is-justify-content-center"
+          >
+            <div class="field mb-2" style="width: 500px; max-width: 90%">
+              <div class="control">
+                <textarea
+                  class="textarea is-small mb-2"
+                  :class="{ 'is-primary': wordsSaved }"
+                  placeholder='Input your own word list e.g. "sneezy, phylum, europe, sloth, guacamole, data, colossus"...'
+                  v-model="room.customWords"
+                  @input="wordsSaved = false"
+                ></textarea>
+                <div id="custom-word-tags" class="tags mb-1">
+                  <span
+                    class="tag is-info"
+                    v-for="word in customWordList.slice(0, 30)"
+                    >{{ word }}</span
+                  >
+                </div>
+              </div>
+              <div class="control">
+                <button v-if="wordsSaved" class="button is-small" disabled>
+                  Saved
+                </button>
+                <!-- TODO: set wordsSaved = true on @click. -->
+                <button
+                  v-else
+                  class="button is-small"
+                  @click="saveRoom('customWords')"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="label">
+            Themed Wordlists
+            <a
+              @click="referSupporter('themed_wordlist')"
+              style="text-decoration: none"
+              ><span class="tag is-warning ml-2">For champions!</span></a
+            >
+          </div>
+          <div class="field is-grouped is-grouped-multiline my-1">
+            <div class="control" v-for="category in VIDEO_GAME_LISTS">
+              <label class="capitalize checkbox">
+                <input
+                  :disabled="!user.isChampion"
+                  type="checkbox"
+                  v-model="room.categories[category]"
+                  @change="saveRoom('categories')"
+                />
+                {{ WORD_LISTS[category].name }}
+              </label>
+            </div>
+          </div>
         </div>
-        <div v-if="noMod">
-          <a @click="makeMod(player.name)"> (Become the mod...) </a>
-        </div>
+
         <!-- Other Mod Tools -->
         <div v-if="isMod">
           <div class="label">Room Controls</div>
-          <div class="field has-addons is-inline-flex mb-0">
+          <div class="field has-addons is-inline-flex mb-6">
             <span class="control">
               <button class="button is-small" @click="nextStage">
                 Next Stage
@@ -238,7 +236,7 @@
                 Skip Word
               </button>
             </span>
-            <span v-if="user.supporter == 'ADMIN'" class="control">
+            <span v-if="user.isAdmin" class="control">
               <button class="button is-small" @click="resetRoom">
                 Reset Room
               </button>
@@ -260,6 +258,28 @@
               </span>
             </span>
           </div>
+        </div>
+
+        <!-- Players -->
+        <div class="field is-grouped is-grouped-multiline">
+          <Nametag
+            v-for="tagged in players"
+            :key="tagged"
+            :name="tagged"
+            :user="room.people && room.people[tagged]"
+            :submitted="
+              !!room.currentRound.clues[tagged] ||
+              room.currentRound.guesser == tagged
+            "
+            :guessing="room.currentRound.guesser == tagged"
+            :mod="isMod"
+            :self="tagged === player.name"
+            :modtag="room.people && room.people[tagged]?.state === 'MOD'"
+            @kick="kickPlayer(tagged)"
+          ></Nametag>
+        </div>
+        <div v-if="noMod">
+          <a @click="makeMod(player.name)"> (Become the mod...) </a>
         </div>
       </div>
     </div>
@@ -414,7 +434,7 @@
         :score="score(room)"
         :rounds-in-game="room.roundsInGame"
         :name="user.displayName"
-        :supporter="!!user.supporter"
+        :supporter="user.isSupporter"
         @continue-game="newRound(false)"
       ></GameEnd>
       <button v-else class="button" @click="newRound(false)">Next Round</button>
@@ -452,7 +472,7 @@
             </span>
             <span class="fancy normal"
               >{{ room.history.length - i }}. {{ round.word }} ({{
-                round.category
+                WORD_LISTS[round.category].name
               }})</span
             >
           </span>
@@ -504,12 +524,18 @@ import {
   dupes,
   dedupe,
   nextGuesser,
-  randomWord,
   nextWord,
-  nextCategory,
   capitalize,
   listPlayers,
 } from './oneword-utils.js'
+import {
+  randomWord,
+  pickRandom,
+  defaultCategories,
+  BASIC_LISTS,
+  VIDEO_GAME_LISTS,
+  WORD_LISTS,
+} from '../utils.js'
 import { inject } from 'vue'
 
 export default {
@@ -542,7 +568,9 @@ export default {
         clue: '',
         guess: '',
       },
-      CATEGORY_ORDER: ['nouns', 'verbs', 'adjectives', 'compounds', 'custom'],
+      BASIC_LISTS,
+      VIDEO_GAME_LISTS,
+      WORD_LISTS,
       showShareModal: false,
       newMod: '',
       wordsSaved: false,
@@ -613,7 +641,7 @@ export default {
     },
     isMod() {
       return (
-        this.user?.supporter === 'ADMIN' ||
+        this.user?.isAdmin ||
         (this.room.people &&
           this.room.people[this.player.name]?.state === 'MOD')
       )
@@ -636,8 +664,14 @@ export default {
       // Lowercase and trim out whitespace; take out empty words
       return words.map((w) => w.toLowerCase().trim()).filter((w) => w)
     },
+    enabledCategories() {
+      return Object.keys(this.room.categories).filter(
+        (c) => this.room.categories[c]
+      )
+    },
   },
   methods: {
+    referSupporter,
     dupes,
     dedupe,
     async enterRoom() {
@@ -679,7 +713,7 @@ export default {
       // Assumes player.name as already been uniquify'd
       this.room.people[this.player.name] = {
         id: this.user.id || '',
-        supporter: this.user.supporter || '',
+        supporter: this.user.isSupporter || '',
         state: 'PLAYING',
       }
       await this.saveRoom('people')
@@ -700,19 +734,13 @@ export default {
         roundsInGame: 13,
         lastUpdateTime: Date.now(),
         timers: { CLUEING: '', GUESSING: '', DONE: '', running: false },
-        categories: {
-          nouns: true,
-          verbs: false,
-          adjectives: false,
-          compounds: false,
-          custom: false,
-        },
+        categories: defaultCategories(),
         customWords: '',
         players: [], // For v1 compat support of dev rooms; remove after 2021-04-09
         people: {
           [this.player.name]: {
             id: this.user.id || '',
-            supporter: this.user.supporter || '',
+            supporter: this.user.isSupporter || '',
             state: 'MOD', // or 'PLAYING' or 'WATCHING'
           },
         },
@@ -729,15 +757,7 @@ export default {
       })
     },
     wordForWord(category) {
-      return (
-        {
-          nouns: 'word',
-          verbs: 'verb',
-          adjectives: 'adjective',
-          compounds: 'compound',
-          custom: 'word',
-        }[category] || 'word'
-      )
+      return WORD_LISTS[category].inline
     },
     hasSpecialCharacters(word) {
       return /[\s~`!@#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?()\._]/g.test(word)
@@ -784,7 +804,7 @@ export default {
       updateUserGame(this.user.id, this.room.name)
     },
     async toggleRoundCorrect() {
-      if (!['CHAMPION', 'SPONSOR', 'ADMIN'].includes(this.user.supporter)) {
+      if (!this.user.isChampion) {
         return this.showChampionModal()
       }
       await updateRoom(this.room, {
@@ -792,7 +812,7 @@ export default {
       })
     },
     async toggleHistoryCorrect(reverseIndex) {
-      if (!['CHAMPION', 'SPONSOR', 'ADMIN'].includes(this.user.supporter)) {
+      if (!this.user.isChampion) {
         return this.showChampionModal()
       }
       // History is shown in reverse order, so we re-reverse the index
@@ -805,7 +825,7 @@ export default {
     },
     async newRound(sameGuesser = false) {
       this.room.history.push(this.room.currentRound)
-      const category = nextCategory(this.room.categories)
+      const category = pickRandom(this.enabledCategories)
       this.room.currentRound = {
         state: 'CLUEING',
         guesser: sameGuesser
@@ -833,7 +853,7 @@ export default {
       )
     },
     async upsell(...props) {
-      if (this.user.supporter) {
+      if (this.user.isSupporter) {
         await this.saveRoom(...props)
       } else {
         this.showSupporterModal()

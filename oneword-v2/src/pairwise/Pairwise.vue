@@ -416,8 +416,7 @@ import {
   updateUserGame,
 } from '../firebase/network.js'
 import { inject } from 'vue'
-import { getIn } from '../utils.js'
-import { randomWord } from '../oneword/oneword-utils'
+import { getIn, randomWord } from '../utils.js'
 
 export default {
   components: {
@@ -577,7 +576,7 @@ export default {
         playerData: {
           [this.player.name]: {
             email: this.user.email || '',
-            supporter: this.user.supporter || '',
+            supporter: this.user.isSupporter || '',
           },
         },
       }
@@ -766,7 +765,7 @@ export default {
       return 0
     },
     isMod() {
-      if (this.user.supporter == 'ADMIN') {
+      if (this.user.isAdmin) {
         return true
       }
       if (this.room && this.room.players) {

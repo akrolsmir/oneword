@@ -77,7 +77,7 @@
               @click="referPremium"
             >
               <strong>{{
-                user.supporter ? 'Supporter' : 'Become a supporter!'
+                user.isSupporter ? 'Supporter' : 'Become a supporter!'
               }}</strong>
             </router-link>
           </div>

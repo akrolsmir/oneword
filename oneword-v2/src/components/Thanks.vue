@@ -66,7 +66,7 @@ export default {
   },
   methods: {
     async makeSupporter() {
-      if (!this.user.supporter) {
+      if (!this.user.isSupporter) {
         const typeToConstant = {
           supporter: 'BASE',
           champion: 'CHAMPION',
