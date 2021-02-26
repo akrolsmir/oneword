@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+
+<!-- Buefy isn't on Vue3 yet, so this is a Vue2 file -->
+
+<head>
+  <title>One Word Admin</title>
+  <link
+    href="https://fonts.googleapis.com/css?family=Fjalla+One|Merienda+One|Righteous|Sriracha&display=swap"
+    rel="stylesheet"
+  />
+  <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
+  <link
+    rel="stylesheet"
+    href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/buefy@0.9.3/dist/buefy.min.css"
+  />
+  <style>
+    html {
+      margin: 0;
+      height: 100%;
+      background-color: #f0e68c55;
+      position: relative;
+      overflow: auto;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: 'Merienda One', cursive;
+    }
+
+    h1 {
+      font-size: 40px;
+    }
+
+    h2 {
+      margin-top: 16px;
+      font-size: 24px;
+    }
+
+    body {
+      margin: 48px auto;
+      max-width: 1400px;
+    }
+
+    [v-cloak] {
+      display: none;
+    }
+  </style>
+
+  <meta name="description" content="Abandon hope all ye who enter here" />
+
+  <!-- Ant favicon courtesy of Twemoji -->
+  <link rel="icon" href="https://twemoji.maxcdn.com/v/13.0.1/72x72/1f41f.png" />
+</head>
+
+<body>
+  <div id="vue">
+    <h2 v-if="users.length == 0">Loading users...</h2>
+    <template>
+      <b-table narrowed :data="users" :paginated="true" :per-page="20">
+        <b-table-column field="id" label="ID" v-slot="props" searchable>
+          {{ props.row.id }}
+        </b-table-column>
+        <b-table-column field="name" label="Name" v-slot="props" searchable>
+          {{ props.row.name }}
+        </b-table-column>
+        <b-table-column field="email" label="Email" v-slot="props" searchable>
+          {{ props.row.email }}
+        </b-table-column>
+        <b-table-column
+          field="createTime"
+          label="Created"
+          v-slot="props"
+          sortable
+        >
+          {{ props.row.createdDate.toLocaleDateString() }}
+        </b-table-column>
+        <b-table-column
+          field="lastUpdateTime"
+          label="Last Game"
+          v-slot="props"
+          sortable
+        >
+          {{ props.row.updatedTime.toLocaleDateString() }}
+        </b-table-column>
+        <b-table-column
+          field="onewordGames"
+          label="One Word"
+          v-slot="props"
+          sortable
+        >
+          {{ props.row.onewordGames }}
+        </b-table-column>
+        <b-table-column
+          field="incryptGames"
+          label="Incrypt"
+          v-slot="props"
+          sortable
+        >
+          {{ props.row.incryptGames }}
+        </b-table-column>
+        <b-table-column
+          field="supporter"
+          label="Supporter"
+          v-slot="props"
+          sortable
+        >
+          <div class="field has-addons">
+            <input class="input is-small" v-model="props.row.supporter" />
+            <button
+              class="button is-small"
+              :class="{'is-success': props.row.supporter}"
+              @click="updateUser(props.row)"
+            >
+              Update
+            </button>
+          </div>
+        </b-table-column>
+      </b-table>
+      <button class="button" @click="fetchUsers">Refresh users</button>
+      <button class="button" @click="exportUsers">Export users to CSV</button>
+    </template>
+  </div>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.2/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/buefy@0.9.3/dist/buefy.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-firestore.js"></script>
+
+<!-- My code -->
+<script type="module">
+  /****************** Copied out of network.js *******************/
+  const CACHED_USER_KEY = 'CACHED_USER_KEY'
+  function listenForLogin(onUser /* callback that takes in a user */) {
+    // Immediately load any persisted user object from browser cache.
+    const cachedUser = localStorage.getItem(CACHED_USER_KEY)
+    if (cachedUser) {
+      onUser(JSON.parse(cachedUser))
+    }
+
+    // Then listen for any login changes (includes )
+    firebase.auth().onAuthStateChanged(async function (user) {
+      if (user) {
+        let fetchedUser = await getUser(user.uid)
+        if (!fetchedUser) {
+          // User just created an account; save them to our database.
+          fetchedUser = {
+            id: user.uid,
+            name: user.displayName,
+            email: user.email,
+            createTime: Date.now(),
+            lastUpdateTime: Date.now(),
+          }
+          await db.collection('users').doc(fetchedUser.id).set(fetchedUser)
+          await sendWelcomeEmail(fetchedUser)
+        }
+        onUser(fetchedUser)
+
+        // Persist to local storage, to reduce login blink next time.
+        // Note: Cap on localStorage size is ~5mb
+        localStorage.setItem(CACHED_USER_KEY, JSON.stringify(fetchedUser))
+      }
+    })
+  }
+
+  const firebaseConfig = {
+    apiKey: 'AIzaSyA2JfA8ZGxT6pKV87TwhGfUGR1kAdcPMyU',
+    authDomain: 'oneword-cf74a.firebaseapp.com',
+    databaseURL: 'https://oneword-cf74a.firebaseio.com',
+    projectId: 'oneword-cf74a',
+    storageBucket: 'oneword-cf74a.appspot.com',
+    messagingSenderId: '340753176141',
+    appId: '1:340753176141:web:d51695ab8606909dda2e04',
+    measurementId: 'G-3EQ36WVM0W',
+  }
+  // Initialize Firebase
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig)
+    try {
+      firebase.analytics()
+    } catch (e) {
+      console.warn('Firebase analytics not enabled (probably got blocked.)')
+      // Shim for firebase.analytics().logEvent(...)
+      firebase.analytics = () => ({
+        logEvent() {
+          // Do nothing
+        },
+      })
+    }
+  }
+  /****************** Copied out of network.js *******************/
+
+  const vueApp = new Vue({
+    el: '#vue',
+    data: {
+      user: {}, // Check if logged in user has admin permissions
+      player: {}, // Just because listenForLogin() expects vueApp.player.name
+      users: [],
+    },
+    methods: {
+      async fetchUsers() {
+        try {
+          this.users = await listUsers()
+          for (const user of this.users) {
+            user.createdDate = new Date(user.createTime)
+            user.updatedTime = new Date(user.lastUpdateTime)
+            user.onewordGames = countGames(user, 'rooms')
+            user.incryptGames = countGames(user, 'incrypt')
+          }
+        } catch (e) {
+          alert('No admin permissions (sign in to cache your user).')
+          console.error(e)
+        }
+      },
+      async updateUser(user) {
+        const db = firebase.firestore()
+        await db.collection('users').doc(user.id).update(user)
+        alert('Successfully updated: ' + JSON.stringify(user, null, 2))
+      },
+      // Exports all users to a CSV, for bulk import into Mailjet.
+      exportUsers() {
+        const usersString = this.users
+          .map(
+            (u) =>
+              [
+                u.email,
+                ...splitName(u.name),
+                moment(u.createdDate).format('YYYY/MM/DD'),
+                u.onewordGames,
+                u.supporter || '',
+              ].join('\t')
+            // Tab-separated to escape commas
+          )
+          .join('\n')
+        // Add a CSV header and trailing newline
+        const csv = `email\tfirstname\tlastname\tcreateddate\toneword_plays\tsupporter\n${usersString}\n`
+        writeToFile('users.csv', csv)
+        // Note: Maybe try YYYY-MM-DD next time for Mailjet auto-import?
+        // Note: Also try sticking in lastUpdateTime for recency info
+      },
+    },
+    async created() {
+      this.fetchUsers()
+      listenForLogin((user) => (this.user = user))
+    },
+  })
+
+  async function listUsers() {
+    const db = firebase.firestore()
+    const response = await db.collection('users').get()
+    return response.docs.map((doc) => doc.data())
+  }
+
+  function writeToFile(filename, contents) {
+    const link = document.createElement('a')
+    const data = new Blob([contents], { type: 'text/plain' })
+
+    link.setAttribute('download', filename)
+    link.href = window.URL.createObjectURL(data)
+    document.body.appendChild(link)
+
+    // Wait for the link to be added to the document
+    window.requestAnimationFrame(() => {
+      const event = new MouseEvent('click')
+      link.dispatchEvent(event)
+      document.body.removeChild(link)
+    })
+  }
+
+  function splitName(name) {
+    // Austin Chen => Austin, Chen
+    // Hillary => Hillary, Hillary
+    // Barack Hussein Obama => Barack, Hussein Obama
+    const index = name.indexOf(' ')
+    if (index >= 0) {
+      return [name.substring(0, index), name.substring(index + 1)]
+    }
+    return [name, name]
+  }
+
+  function countGames(user, roomDb) {
+    const gamesList = Object.values(user.games || {})
+    return gamesList.filter((game) => game.roomDb === roomDb).length
+  }
+</script>
