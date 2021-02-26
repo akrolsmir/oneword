@@ -3,6 +3,8 @@
 
 <template>
   <div id="top-content">
+    <!-- Mod tools -->
+    <button class="button" @click="room.resetRoom">Reset room</button>
     <div class="narrow card">
       <div class="type">Scores</div>
       <div style="width: 100%; text-align: center">
@@ -233,9 +235,37 @@
 </style>
 
 <script>
+import { inject } from 'vue'
 import Timer from '../components/Timer.vue'
-import { listenRoom, setRoom } from '../firebase/network.js'
+import { getRoom, listenRoom, setRoom } from '../firebase/network.js'
 import { cards } from './cards.js'
+import { useRoom } from '../components/room'
+
+function emptyRoom() {
+  return {
+    name: 'test-room',
+    state: 'START', // "START", "PREVIEW", "LISTING", CHECKING", "END"
+    winningScore: 30,
+    // players: {},
+    round: {
+      number: 0,
+      card: {
+        type: '3FOLD',
+        category: 'Types of tree',
+      },
+      entries: {
+        adrian: ['spruce', 'pine', 'elm'],
+        austin: ['birch', 'spruce', 'maple'],
+      },
+      collisions: {
+        adrian: [0, 0, 0],
+        austin: [0, 0, 0],
+      },
+    },
+    history: [],
+    invalidEntries: {},
+  }
+}
 
 export default {
   components: {
@@ -243,44 +273,57 @@ export default {
     Timer,
     // GameEnd,
   },
+  setup() {
+    const user = inject('currentUser')
+    const { room, player } = useRoom(user, emptyRoom)
+    return { user, room, player }
+  },
+  async created() {
+    // console.log('logz', this.user, this.room)
+    // For dev velocity, accept https://oneword.games/room/rome?player=Spartacus
+    if (this.$route.query.player && !this.user.id) {
+      this.user.guest = true
+      this.user.name = this.$route.query.player
+    }
+
+    this.room.name = this.$route.params.id
+    const fetchedRoom = await getRoom(this.room)
+
+    if (!fetchedRoom) {
+      // 1. If the room doesn't exist, create it, then return
+      this.player.name =
+        this.user.displayName || `${randomWord('adjectives')}-anon`
+      await this.room.resetRoom()
+      listenRoom(this.room.name, this.room.loadFrom)
+      return
+    } else {
+      // 2. Set this room's contents, and proceed to enter the room
+      this.room.loadFrom(fetchedRoom)
+      listenRoom(this.room.name, this.room.loadFrom)
+    }
+
+    // 3. If returning from Firebase sign in ('?authed=1'), skip the login modal
+    if (this.$route.query.authed) {
+      // Remove the 'authed=1' from the URL for cleanliness
+      const query = { ...this.$route.query }
+      delete query.authed
+      this.$router.replace(query)
+
+      // Then sign them in after the Firebase callback returns
+      listenForLogin((_user) => this.enterRoom())
+      return
+    }
+
+    // 4. Enter the room, prompting for login if needed
+    this.room.enterRoom()
+  },
   data() {
     return {
       infoHover: false,
-      room: {
-        name: 'test-room',
-        state: 'START', // "START", "PREVIEW", "LISTING", CHECKING", "END"
-        winningScore: 30,
-        players: [
-          {
-            name: 'adrian',
-            score: 0,
-          },
-          {
-            name: 'austin',
-            score: 0,
-          },
-        ],
-        round: {
-          number: 0,
-          card: {
-            type: '3FOLD',
-            category: 'Types of tree',
-          },
-          entries: {
-            adrian: ['spruce', 'pine', 'elm'],
-            austin: ['birch', 'spruce', 'maple'],
-          },
-          collisions: {
-            adrian: [0, 0, 0],
-            austin: [0, 0, 0],
-          },
-        },
-        history: [],
-        invalidEntries: {},
-      },
-      player: {
-        name: 'adrian',
-      },
+      // room: emptyRoom(),
+      // player: {
+      //   name: 'adrian',
+      // },
     }
   },
   watch: {
@@ -383,15 +426,16 @@ export default {
     },
   },
   methods: {
-    async resetRoom() {
-      this.room.state = 'LISTING'
-      await setRoom(this.room)
-    },
+    // async resetRoom() {
+    //   this.room.state = 'LISTING'
+    //   await setRoom(this.room)
+    // },
     nextStage() {
       this.room.state = 'CHECKING'
       this.room.history.push(this.room.round)
     },
     nextRound() {
+      // console.log('logs', this.player, this.user, this.room)
       this.room.state = 'PREVIEW'
 
       this.room.round = {}
@@ -441,9 +485,6 @@ export default {
           return 0
       }
     },
-  },
-  async created() {
-    // listenRoom("test-room", room => { this.room = room});
   },
 }
 </script>

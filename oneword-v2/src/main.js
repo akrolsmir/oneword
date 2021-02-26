@@ -27,7 +27,7 @@ const routes = [
   { path: '/thanks', component: Thanks },
   { path: '/storytime', component: StorytimeFrontPage },
   { path: '/storytime/:id', component: Storytime },
-  { path: '/list', component: Listography },
+  { path: '/list/:id', component: Listography },
   { path: '/incrypt', component: IncryptFrontPage },
   { path: '/incrypt/:id', component: Incrypt },
   { path: '/pairwise', component: PairwiseFrontPage },
