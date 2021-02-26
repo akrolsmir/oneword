@@ -1,12 +1,8 @@
-import pluralize from 'pluralize'
-import { randomWord } from '../utils.js'
+import { randomWord, wordsMatch } from '../utils.js'
 
 // Returns whether a round's guess is correct.
 export function correct(round) {
-  const guessMatches =
-    pluralize.singular(round.guess) === round.word ||
-    pluralize.plural(round.guess) == round.word
-  return guessMatches || round.markedCorrect
+  return wordsMatch(round.guess, round.word) || round.markedCorrect
 }
 export function totalRounds(room) {
   return room.roundsInGame == 'Unlimited' ? 1024 : room.roundsInGame

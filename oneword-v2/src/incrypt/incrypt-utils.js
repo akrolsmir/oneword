@@ -1,5 +1,5 @@
 import { nouns } from '../words/parts-of-speech.js'
-import { sanitize } from '../utils.js'
+import { wordsMatch } from '../utils.js'
 
 export function unpush(array, value) {
   const index = array.indexOf(value)
@@ -109,9 +109,7 @@ export function checkGuesses(guesses, words) {
   if (guesses.length !== words.length) {
     throw `Guesses and words must be same length! Got ${guesses}, ${words}`
   }
-  return guesses
-    .map((guess, i) => sanitize(guess) === sanitize(words[i]))
-    .reduce(SUM, 0)
+  return guesses.map((guess, i) => wordsMatch(guess, words[i])).reduce(SUM, 0)
 }
 
 export function generateNextRoomName(name) {

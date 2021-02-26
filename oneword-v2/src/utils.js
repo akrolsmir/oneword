@@ -7,15 +7,24 @@ import {
   ssbCharacters,
   countries,
 } from './words/themes'
+import pluralize from 'pluralize'
 
 // Turns "This is @NOT okay" to "this-is-not-okay
-// Good for URLs (TODO: try foreign chars)
+// Good for making URLs from user input (TODO: try foreign chars)
 export function sanitize(input) {
   return input
     .trim()
     .toLowerCase()
     .replace(/\s/g, '-') // whitespace
     .replace(/[^\p{L}-]/gu, '') // not (dash or letter in any language)
+}
+
+// "Dr. Mario" matches "dr mario", and "Dogs" matches "dog"
+// Good for validating whether a user's input is correct
+export function wordsMatch(word1, word2) {
+  const w1 = word1.toLowerCase().replace(/[^a-z]/g, '')
+  const w2 = word2.toLowerCase().replace(/[^a-z]/g, '')
+  return pluralize.singular(w1) === w2 || pluralize.plural(w1) === w2
 }
 
 export function timeSince(millis) {
