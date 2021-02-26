@@ -128,76 +128,8 @@
             </template>
           </span>
 
-          <!-- Mod Categories -->
-          <div v-if="isMod" class="mx-4">
-            <div class="label">Basic Wordlists</div>
-            <span class="field is-grouped is-grouped-multiline mx-3 my-1">
-              <div class="control" v-for="category in BASIC_LISTS">
-                <label class="capitalize checkbox">
-                  <input
-                    type="checkbox"
-                    v-model="room.categories[category]"
-                    @change="saveRoom('categories')"
-                  />
-                  {{ WORD_LISTS[category].name }}
-                </label>
-              </div>
-            </span>
-            <!-- Custom word editor -->
-            <div
-              v-if="room.categories['custom']"
-              class="is-flex is-justify-content-center"
-            >
-              <div class="field mb-2" style="width: 500px; max-width: 90%">
-                <div class="control">
-                  <textarea
-                    class="textarea is-small mb-2"
-                    :class="{ 'is-primary': wordsSaved }"
-                    placeholder='Input your own word list e.g. "sneezy, phylum, europe, sloth, guacamole, data, colossus"...'
-                    v-model="room.customWords"
-                    @input="wordsSaved = false"
-                  ></textarea>
-                  <div id="custom-word-tags" class="tags mb-1">
-                    <span
-                      class="tag is-info"
-                      v-for="word in customWordList.slice(0, 30)"
-                      >{{ word }}</span
-                    >
-                  </div>
-                </div>
-                <div class="control">
-                  <button v-if="wordsSaved" class="button is-small" disabled>
-                    Saved
-                  </button>
-                  <!-- TODO: set wordsSaved = true on @click. -->
-                  <button
-                    v-else
-                    class="button is-small"
-                    @click="saveRoom('customWords')"
-                  >
-                    Save
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div class="label">Themed Wordlists</div>
-            <div class="field is-grouped is-grouped-multiline mx-3 my-1">
-              <div class="control" v-for="category in VIDEO_GAME_LISTS">
-                <label class="capitalize checkbox">
-                  <input
-                    type="checkbox"
-                    v-model="room.categories[category]"
-                    @change="saveRoom('categories')"
-                  />
-                  {{ WORD_LISTS[category].name }}
-                </label>
-              </div>
-            </div>
-          </div>
-
           <!-- Player Categories -->
-          <span class="mx-3" v-else>
+          <span class="mx-3" v-if="!isMod">
             <template v-for="category in enabledCategories">
               <span
                 class="comma"
@@ -214,31 +146,86 @@
       </div>
 
       <div class="message-body" style="border-width: 0">
-        <!-- Players -->
-        <div class="field is-grouped is-grouped-multiline">
-          <Nametag
-            v-for="tagged in players"
-            :key="tagged"
-            :name="tagged"
-            :user="room.people && room.people[tagged]"
-            :submitted="
-              !!room.currentRound.clues[tagged] ||
-              room.currentRound.guesser == tagged
-            "
-            :guessing="room.currentRound.guesser == tagged"
-            :mod="isMod"
-            :self="tagged === player.name"
-            :modtag="room.people && room.people[tagged]?.state === 'MOD'"
-            @kick="kickPlayer(tagged)"
-          ></Nametag>
+        <!-- Mod Categories -->
+        <div v-if="isMod">
+          <div class="label mt-0">Basic Wordlists</div>
+          <span class="field is-grouped is-grouped-multiline my-1">
+            <div class="control" v-for="category in BASIC_LISTS">
+              <label class="capitalize checkbox">
+                <input
+                  type="checkbox"
+                  v-model="room.categories[category]"
+                  @change="saveRoom('categories')"
+                />
+                {{ WORD_LISTS[category].name }}
+              </label>
+            </div>
+          </span>
+          <!-- Custom word editor -->
+          <div
+            v-if="room.categories['custom']"
+            class="is-flex is-justify-content-center"
+          >
+            <div class="field mb-2" style="width: 500px; max-width: 90%">
+              <div class="control">
+                <textarea
+                  class="textarea is-small mb-2"
+                  :class="{ 'is-primary': wordsSaved }"
+                  placeholder='Input your own word list e.g. "sneezy, phylum, europe, sloth, guacamole, data, colossus"...'
+                  v-model="room.customWords"
+                  @input="wordsSaved = false"
+                ></textarea>
+                <div id="custom-word-tags" class="tags mb-1">
+                  <span
+                    class="tag is-info"
+                    v-for="word in customWordList.slice(0, 30)"
+                    >{{ word }}</span
+                  >
+                </div>
+              </div>
+              <div class="control">
+                <button v-if="wordsSaved" class="button is-small" disabled>
+                  Saved
+                </button>
+                <!-- TODO: set wordsSaved = true on @click. -->
+                <button
+                  v-else
+                  class="button is-small"
+                  @click="saveRoom('customWords')"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="label">
+            Themed Wordlists
+            <a
+              @click="referSupporter('themed_wordlist')"
+              style="text-decoration: none"
+              ><span class="tag is-warning ml-2">For supporters!</span></a
+            >
+          </div>
+          <div class="field is-grouped is-grouped-multiline my-1">
+            <div class="control" v-for="category in VIDEO_GAME_LISTS">
+              <label class="capitalize checkbox">
+                <input
+                  :disabled="!user.supporter"
+                  type="checkbox"
+                  v-model="room.categories[category]"
+                  @change="saveRoom('categories')"
+                />
+                {{ WORD_LISTS[category].name }}
+              </label>
+            </div>
+          </div>
         </div>
-        <div v-if="noMod">
-          <a @click="makeMod(player.name)"> (Become the mod...) </a>
-        </div>
+
         <!-- Other Mod Tools -->
         <div v-if="isMod">
           <div class="label">Room Controls</div>
-          <div class="field has-addons is-inline-flex mb-0">
+          <div class="field has-addons is-inline-flex mb-6">
             <span class="control">
               <button class="button is-small" @click="nextStage">
                 Next Stage
@@ -271,6 +258,28 @@
               </span>
             </span>
           </div>
+        </div>
+
+        <!-- Players -->
+        <div class="field is-grouped is-grouped-multiline">
+          <Nametag
+            v-for="tagged in players"
+            :key="tagged"
+            :name="tagged"
+            :user="room.people && room.people[tagged]"
+            :submitted="
+              !!room.currentRound.clues[tagged] ||
+              room.currentRound.guesser == tagged
+            "
+            :guessing="room.currentRound.guesser == tagged"
+            :mod="isMod"
+            :self="tagged === player.name"
+            :modtag="room.people && room.people[tagged]?.state === 'MOD'"
+            @kick="kickPlayer(tagged)"
+          ></Nametag>
+        </div>
+        <div v-if="noMod">
+          <a @click="makeMod(player.name)"> (Become the mod...) </a>
         </div>
       </div>
     </div>
@@ -662,6 +671,7 @@ export default {
     },
   },
   methods: {
+    referSupporter,
     dupes,
     dedupe,
     async enterRoom() {
