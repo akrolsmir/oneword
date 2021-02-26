@@ -4,7 +4,7 @@
 <template>
   <div id="top-content">
     <!-- Mod tools -->
-    <button class="button" @click="room.resetRoom">Reset room</button>
+    <button class="button" @click="resetRoom">Reset room</button>
     <div class="narrow card">
       <div class="type">Scores</div>
       <div style="width: 100%; text-align: center">
@@ -12,7 +12,7 @@
       </div>
       <br />
       <div v-for="player in room.players">
-        {{ player.name }}: {{ playerScores[player.name] }}
+        {{ player }}: {{ playerScores[player] }}
       </div>
     </div>
     <div class="narrow card round">
@@ -241,12 +241,12 @@ import { getRoom, listenRoom, setRoom } from '../firebase/network.js'
 import { cards } from './cards.js'
 import { useRoom } from '../components/room'
 
-function emptyRoom() {
+function emptyRoom(name) {
   return {
-    name: 'test-room',
+    name,
     state: 'START', // "START", "PREVIEW", "LISTING", CHECKING", "END"
     winningScore: 30,
-    // players: {},
+    people: {},
     round: {
       number: 0,
       card: {
@@ -275,8 +275,8 @@ export default {
   },
   setup() {
     const user = inject('currentUser')
-    const { room, player } = useRoom(user, emptyRoom)
-    return { user, room, player }
+    const roomHelpers = useRoom(user, emptyRoom)
+    return Object.assign(roomHelpers, { user })
   },
   async created() {
     // console.log('logz', this.user, this.room)
@@ -287,19 +287,22 @@ export default {
     }
 
     this.room.name = this.$route.params.id
+    console.log('created room', this.room)
     const fetchedRoom = await getRoom(this.room)
+    console.log('fetched room', fetchedRoom)
 
     if (!fetchedRoom) {
       // 1. If the room doesn't exist, create it, then return
       this.player.name =
         this.user.displayName || `${randomWord('adjectives')}-anon`
-      await this.room.resetRoom()
-      listenRoom(this.room.name, this.room.loadFrom)
+      console.log('resetting room....')
+      await this.resetRoom()
+      listenRoom(this.room.name, this.loadFrom)
       return
     } else {
       // 2. Set this room's contents, and proceed to enter the room
-      this.room.loadFrom(fetchedRoom)
-      listenRoom(this.room.name, this.room.loadFrom)
+      this.loadFrom(fetchedRoom)
+      listenRoom(this.room.name, this.loadFrom)
     }
 
     // 3. If returning from Firebase sign in ('?authed=1'), skip the login modal
@@ -315,7 +318,7 @@ export default {
     }
 
     // 4. Enter the room, prompting for login if needed
-    this.room.enterRoom()
+    this.enterRoom()
   },
   data() {
     return {
@@ -329,7 +332,7 @@ export default {
   watch: {
     playerScores() {
       for (let player of this.room.players) {
-        if (this.playerScores[player.name] >= this.room.winningScore) {
+        if (this.playerScores[player] >= this.room.winningScore) {
           this.endGame()
           break
         }
@@ -413,8 +416,8 @@ export default {
     playerScores() {
       let scores = {}
       for (let player of this.room.players) {
-        scores[player.name] = this.roundScores.reduce(
-          (total, scores) => total + scores[player.name],
+        scores[player] = this.roundScores.reduce(
+          (total, scores) => total + scores[player],
           0
         )
       }
