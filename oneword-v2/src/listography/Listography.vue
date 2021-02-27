@@ -237,7 +237,7 @@
 <script>
 import { inject } from 'vue'
 import Timer from '../components/Timer.vue'
-import { getRoom, listenRoom, setRoom } from '../firebase/network.js'
+import { getRoom, listenRoom } from '../firebase/network.js'
 import { cards } from './cards.js'
 import { useRoom } from '../components/room'
 
@@ -248,6 +248,7 @@ function emptyRoom(name) {
     winningScore: 30,
     people: {},
     round: {
+      /** Example:
       number: 0,
       card: {
         type: '3FOLD',
@@ -261,6 +262,7 @@ function emptyRoom(name) {
         adrian: [0, 0, 0],
         austin: [0, 0, 0],
       },
+      */
     },
     history: [],
     invalidEntries: {},
@@ -323,10 +325,6 @@ export default {
   data() {
     return {
       infoHover: false,
-      // room: emptyRoom(),
-      // player: {
-      //   name: 'adrian',
-      // },
     }
   },
   watch: {
@@ -429,16 +427,11 @@ export default {
     },
   },
   methods: {
-    // async resetRoom() {
-    //   this.room.state = 'LISTING'
-    //   await setRoom(this.room)
-    // },
     nextStage() {
       this.room.state = 'CHECKING'
       this.room.history.push(this.room.round)
     },
     nextRound() {
-      // console.log('logs', this.player, this.user, this.room)
       this.room.state = 'PREVIEW'
 
       this.room.round = {}
@@ -452,7 +445,7 @@ export default {
       this.room.round.entries = {}
       this.room.round.number = this.room.history.length
       for (let player of this.room.players) {
-        this.room.round.entries[player.name] = []
+        this.room.round.entries[player] = []
       }
     },
     startTimer() {

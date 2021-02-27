@@ -28,7 +28,7 @@ export function useRoom(user, newRoom) {
 
   // Serialize/Deserialize.
   function loadFrom(r) {
-    delete r.players
+    delete r.players // Since computed functions are readonly (prevents console warn)
     Object.assign(room, r)
   }
   function createOrListen() {
@@ -84,7 +84,6 @@ export function useRoom(user, newRoom) {
   async function resetRoom() {
     loadFrom(newRoom(room.name))
     await joinGame(false)
-    console.log('about to set', room)
     await setRoom(room)
   }
 
@@ -103,9 +102,7 @@ export function useRoom(user, newRoom) {
 
     loadFrom,
     enterRoom,
-    // uniquify,
     resetRoom,
-    // joinGame,
-    // saveRoom,
+    saveRoom,
   }
 }
