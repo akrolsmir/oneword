@@ -8,7 +8,7 @@
       >
         <div class="notification">
           <label class="is-block mb-2">Invite your friends to play!</label>
-          <ShareLink :link="currentUrl()" />
+          <ShareLink />
           <button
             class="delete"
             aria-label="close"
@@ -16,14 +16,6 @@
           ></button>
         </div>
       </AnimatedModal>
-
-      <!-- Standard Modals -->
-      <AnimatedModal
-        :visible="showStandardModal"
-        :content="standardModal"
-        @background-click="showStandardModal = false"
-        @cancel="showStandardModal = false"
-      />
     </div>
 
     <div class="message room-box">
@@ -147,7 +139,7 @@
                   </button>
                 </span>
 
-                <span v-if="user.supporter == 'ADMIN'" class="control">
+                <span v-if="user.isAdmin" class="control">
                   <button class="button is-small" @click="resetRoom">
                     Reset Room
                   </button>
@@ -214,9 +206,7 @@
     <div v-if="room.players.length < 3">
       <h2 class="fancy" role="alert">Waiting for 3 players...</h2>
       <p class="mt-5 mb-2">Invite your friends to play!</p>
-      <ShareLink
-        :link="'https://oneword.games/storytime.html/?room=' + room.name"
-      />
+      <ShareLink />
       <div class="card my-4">
         <div class="card-header">
           <h2 class="card-header-title">Optional: Choose a starting prompt</h2>
@@ -346,6 +336,7 @@
               class="control"
               v-for="(response, p) in room.currentRound.responses"
               :key="p"
+              v-once
             >
               <label class="spacy">
                 <input
@@ -389,16 +380,12 @@ import {
   listenForLogin,
   listenRoom,
   setRoom,
+  referSupporter,
   updateRoom,
   updateUserGame,
 } from '../firebase/network'
-import {
-  referSupporter,
-  nextGuesser,
-  randomWord,
-  capitalize,
-  listPlayers,
-} from '../oneword/oneword-utils.js'
+import { nextGuesser, capitalize } from '../oneword/oneword-utils.js'
+import { randomWord } from '../utils.js'
 import { inject } from 'vue'
 import prompts from './prompts.js'
 
@@ -453,8 +440,6 @@ export default {
       adjectives: [randomWord('adjectives'), randomWord('adjectives')],
     },
     showShareModal: false,
-    showStandardModal: false,
-    standardModal: undefined,
     newMod: '',
     prompts,
     vote: '',
@@ -526,7 +511,7 @@ export default {
     },
     isMod() {
       return (
-        this.user?.supporter === 'ADMIN' ||
+        this.user?.isAdmin ||
         (this?.room.players && this.room.players[0] == this.player.name)
       )
     },
@@ -583,10 +568,6 @@ export default {
     },
   },
   methods: {
-    currentUrl() {
-      // Ignore query params, since they may be used for guest login
-      return window.location.href.split('?')[0]
-    },
     randomWord,
     async enterRoom() {
       if (!this.user.canPlay) {
@@ -643,7 +624,7 @@ export default {
         playerData: {
           [this.player.name]: {
             email: this.user.email || '',
-            supporter: this.user.supporter || '',
+            supporter: this.user.isSupporter || '',
           },
         },
       }
@@ -695,6 +676,9 @@ export default {
         update['currentRound.state'] = 'CHOOSING'
       }
       await updateRoom(this.room, update)
+
+      // Store this for user profiles, but don't await for the result
+      updateUserGame(this.user.id, this.room.name)
     },
     async chooseResponse() {
       // unvote if voted already
@@ -782,7 +766,7 @@ export default {
       )
     },
     async upsell(...props) {
-      if (this.user.supporter) {
+      if (this.user.isSupporter) {
         await this.saveRoom(...props)
       } else {
         this.showSupporterModal()
@@ -792,8 +776,7 @@ export default {
       }
     },
     showSupporterModal() {
-      this.showStandardModal = true
-      this.standardModal = {
+      this.$showModal({
         title: 'Want private rooms?',
         text:
           'Earn perks like private rooms, custom avatars, and more by becoming a supporter 😍',
@@ -806,7 +789,7 @@ export default {
             referSupporter('modtools')
           },
         },
-      }
+      })
     },
     // generate new suggestions to replace used words
     replaceSuggestions(response) {

@@ -1,5 +1,5 @@
 <template>
-  <div id="profile">
+  <BigColumn>
     <section class="hero is-info is-bold">
       <div class="hero-body">
         <div class="container">
@@ -7,7 +7,7 @@
             Hey there, {{ displayName }}.
             {{ user.id ? '' : 'Care to sign in?' }}
           </h1>
-          <h2 class="subtitle" v-if="user.supporter">
+          <h2 class="subtitle" v-if="user.isSupporter">
             Thanks for being a supporter!
           </h2>
           <h2 class="subtitle" v-else>Thanks for playing!</h2>
@@ -15,14 +15,17 @@
       </div>
     </section>
     <br />
-    <button v-if="this.user.id" class="button" @click="logout">Sign out</button>
+    <div v-if="this.user.id" class="buttons">
+      <button class="button" @click="logout">Sign out</button>
+      <!-- TODO: Change name button? -->
+    </div>
     <br />
     <br />
 
     <h2 class="title">Your Avatar</h2>
     <Nametag :user="user" :name="displayName" />
     <br />
-    <p v-if="user.supporter">
+    <p v-if="user.isSupporter">
       You can change your avatar on
       <a href="https://en.gravatar.com/">Gravatar</a>.
     </p>
@@ -34,49 +37,64 @@
 
     <h2 class="title">Your Games</h2>
     <div class="box">
-      <h3 class="subtitle">One Word</h3>
-      <p v-for="game in onewordGames">
-        <b
-          ><router-link :to="`/room/${game.roomId}`">{{
-            game.roomId
-          }}</router-link></b
-        >, {{ timeSince(game.lastUpdateTime) }}
-      </p>
-      <br />
-      <h3 class="subtitle">Incrypt</h3>
-      <p v-for="game in incryptGames">
-        <b
-          ><router-link :to="`/incrypt/${game.roomId}`">{{
-            game.roomId
-          }}</router-link></b
-        >, {{ timeSince(game.lastUpdateTime) }}
-      </p>
+      <template v-for="(gameTitle, db) in DB_TO_GAMES">
+        <h3 class="subtitle">{{ gameTitle }}</h3>
+        <div v-if="listGames(db).length === 0">
+          You haven't played {{ gameTitle }} yet...
+        </div>
+        <p v-else v-for="game in listGames(db)">
+          <b
+            ><router-link :to="`/${DB_TO_PATH[db]}/${game.roomId}`">{{
+              game.roomId
+            }}</router-link></b
+          >, {{ timeSince(game.lastUpdateTime) }}
+        </p>
+        <br />
+      </template>
     </div>
-  </div>
+  </BigColumn>
 </template>
 
 <script>
 import { inject } from 'vue'
 import { firebaseLogout } from '../firebase/network.js'
 import { timeSince } from '../utils.js'
+import BigColumn from './BigColumn.vue'
 
 import Nametag from './Nametag.vue'
+
+const DB_TO_GAMES = {
+  rooms: 'One Word',
+  incrypt: 'Incrypt',
+  silver: 'Storytime',
+  pairwise: 'Pairwise',
+}
+
+const DB_TO_PATH = {
+  rooms: 'room',
+  incrypt: 'incrypt',
+  silver: 'storytime',
+  pairwise: 'pairwise',
+}
 
 export default {
   components: {
     Nametag,
+    BigColumn,
   },
+  data: () => ({ DB_TO_GAMES, DB_TO_PATH }),
   setup() {
     return { user: inject('currentUser') }
   },
   methods: {
-    url,
-    title,
     async logout() {
       await firebaseLogout()
       this.user.id = ''
     },
     timeSince,
+    listGames(db) {
+      return this.gamesByTime.filter((game) => game.roomDb === db)
+    },
   },
   computed: {
     displayName() {
@@ -87,26 +105,6 @@ export default {
         (a, b) => b.lastUpdateTime - a.lastUpdateTime
       )
     },
-    onewordGames() {
-      return this.gamesByTime.filter((game) => game.roomDb === 'rooms')
-    },
-    incryptGames() {
-      return this.gamesByTime.filter((game) => game.roomDb === 'incrypt')
-    },
   },
-}
-
-function title(game) {
-  return {
-    rooms: 'One Word',
-    incrypt: 'Incrypt',
-  }[game.roomDb]
-}
-
-function url(game) {
-  return {
-    rooms: `https://oneword.games?room=${game.roomId}`,
-    incrypt: `https://oneword.games/incrypt?room=${game.roomId}`,
-  }[game.roomDb]
 }
 </script>

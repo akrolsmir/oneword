@@ -17,7 +17,7 @@ const firebaseConfig = {
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig)
   try {
-    firebase.analytics()
+    import('firebase/firebase-analytics').then(() => firebase.analytics())
   } catch (e) {
     console.warn('Firebase analytics not enabled (probably got blocked.)')
     // Shim for firebase.analytics().logEvent(...)
@@ -29,14 +29,27 @@ if (!firebase.apps.length) {
   }
 }
 
+export function referSupporter(source) {
+  firebase.analytics().logEvent('view_promotion', {
+    source: source,
+  })
+  window.open('/supporter', '_blank')
+}
+
 // Extracts the right room database to use. based on current URL
 // TODO: This is pretty hardcoded to URL; prefer a more robust approach
 function roomDb() {
-  if (window.location.href.includes('/storytime')) {
+  if (window.location.pathname.startsWith('/storytime')) {
     return 'silver'
   }
-  if (window.location.href.includes('/list')) {
+  if (window.location.pathname.startsWith('/list')) {
     return 'listography'
+  }
+  if (window.location.pathname.startsWith('/incrypt')) {
+    return 'incrypt'
+  }
+  if (window.location.pathname.startsWith('/pairwise')) {
+    return 'pairwise'
   }
   return 'rooms'
 }
@@ -99,6 +112,7 @@ export async function updateUser(userId, user) {
   await db.collection('users').doc(userId).update(user)
 }
 
+/** Record when the user last did an action in this room. */
 export async function updateUserGame(userId, roomId) {
   if (!userId) {
     // Do nothing for anonymous users

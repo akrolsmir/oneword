@@ -18,10 +18,9 @@
       costs.<br />
       <br />
       <a
-        href="./supporter.html"
-        target="_blank"
-        @click="referPremium"
-        class="button is-link"
+        href="./supporter"
+        @click.prevent="referSupporter('game_end')"
+        class="button is-warning"
         >Become a supporter!</a
       ><br />
       <br />
@@ -33,6 +32,7 @@
 </template>
 
 <script>
+import { referSupporter } from '../firebase/network.js'
 import { startFireworks } from './fireworks.js'
 
 const MESSAGES = {
@@ -69,10 +69,7 @@ export default {
     continuePlaying() {
       this.$emit('continue-game')
     },
-    referPremium() {
-      // TODO: this probably doesn't work
-      firebase.analytics().logEvent('view_promotion', { source: 'game_end' })
-    },
+    referSupporter,
   },
   mounted() {
     // const canvasWidth = document.getElementById('#fireworks').parentElement

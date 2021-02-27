@@ -191,7 +191,7 @@ export const nouns = [
   'digestion',
   'fold',
   'wine',
-  'believe',
+  'belief',
   'guitar',
   'pickle',
   'furniture',

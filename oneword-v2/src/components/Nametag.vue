@@ -20,7 +20,7 @@
         style="z-index: 1"
       >
         <img
-          v-if="user && user.email && user.supporter"
+          v-if="user && user.email && user.isSupporter"
           style="
             border-top-left-radius: 4px;
             border-bottom-left-radius: 4px;
@@ -28,13 +28,14 @@
           "
           class="mr-1"
           :src="avatarUrl"
+          loading="lazy"
           alt=""
           height="28"
           width="28"
         />
         {{ name }}
         <button
-          v-if="mod"
+          v-if="mod || self"
           class="delete is-small"
           :title="'Kick ' + name"
           @click="kick"

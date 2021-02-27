@@ -1,5 +1,5 @@
 <template>
-  <BigColumn class="background">
+  <BigColumn>
     <div>
       <div class="fancy big">Welcome!</div>
       This is an online game based on
