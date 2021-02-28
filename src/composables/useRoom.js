@@ -86,13 +86,8 @@ export function useRoom(user, makeNewRoom, onJoin = undefined) {
   async function enterRoom() {
     if (!user.canPlay) {
       // If not logged in, show the sign-in modal
-      const onGuest = () => {
-        uniquify(user.displayName)
-        joinGame()
-      }
-      user.signIn(onGuest)
+      user.signIn(joinGame)
     } else {
-      uniquify(user.displayName)
       await joinGame()
     }
   }
@@ -114,7 +109,7 @@ export function useRoom(user, makeNewRoom, onJoin = undefined) {
   }
 
   async function joinGame(alsoUpload = true) {
-    // Assumes player.name as already been uniquify'd
+    uniquify(user.displayName)
     room.people[player.name] = {
       id: user.id || '',
       supporter: user.isSupporter || '',
