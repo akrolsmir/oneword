@@ -486,7 +486,7 @@ export default {
     },
 
     toggleInvalid(category, entry) {
-      let key = category + entry
+      const key = sanitize(category + entry) // Sanitize for Firestore
       this.room.invalidEntries[key] = !this.room.invalidEntries[key]
       this.saveRoom(`invalidEntries.${key}`)
     },
