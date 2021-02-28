@@ -1,6 +1,7 @@
 import { computed, reactive } from 'vue'
 import { setRoom, updateRoom } from '../firebase/network'
-import { getIn } from '../utils'
+import { capitalize } from '../oneword/oneword-utils'
+import { getIn, randomWord } from '../utils'
 
 function listPlayers(people) {
   return Object.entries(people || {})
@@ -50,22 +51,18 @@ export function useRoom(user, newRoom) {
 
   function uniquify(name) {
     player.name = name
-
-    // TODO: Implement. Here's a sketch:
-
-    // If the player's name collides with another user's (aka different id,
-    // or player is a guest), prepend adjectives until name is unique
-    // while (
-    //   this.players.includes(player.name) &&
-    //   (user.id != this.room.people[player.name].id || user.guest)
-    // ) {
-    //   player.name = capitalize(randomWord('adjectives')) + ' ' + player.name
-    // }
-    // // Let the player know if they were renamed
-    // if (player.name !== name) {
-    //   console.warn('TODOOOOOO')
-    //   // showUniquifiedModal()
-    // }
+    const idsMatch = user.id == room.people[player.name]?.id && !user.guest
+    while (room.players.includes(player.name) && !idsMatch) {
+      const oldName = player.name.split(' ').pop()
+      const title = `Another "${oldName}" is already in this room...\n\nPick a new name!`
+      const zanyName = capitalize(randomWord('adjectives')) + ' ' + player.name
+      // TODO: Prettify modal, by hooking into user.signIn's modal instead
+      let input
+      do {
+        input = prompt(title, zanyName)
+      } while (!input)
+      player.name = input
+    }
   }
 
   async function joinGame(alsoUpload = true) {
