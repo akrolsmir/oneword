@@ -133,6 +133,9 @@
         <button class="button" @click="resetRoom">Reset room</button>
       </div>
       <div class="column">
+        <button class="button" @click="nextStage">Next stage</button>
+      </div>
+      <div class="column">
         <input class="input" size="5" v-model="room.timerLength" />
         seconds <br />
         <button class="button" @click="setTimer">Set timers</button>
@@ -279,7 +282,7 @@ function newRoom(name) {
     },
     history: [],
     invalidEntries: {},
-    timerLength: 30,
+    timerLength: 60,
   }
 }
 
