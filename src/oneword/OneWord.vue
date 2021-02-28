@@ -528,14 +528,14 @@ import {
   capitalize,
   listPlayers,
 } from './oneword-utils.js'
+import { pickRandom } from '../utils.js'
 import {
   randomWord,
-  pickRandom,
-  defaultCategories,
   BASIC_LISTS,
   VIDEO_GAME_LISTS,
   WORD_LISTS,
-} from '../utils.js'
+  defaultCategories,
+} from '../words/lists'
 import { inject } from 'vue'
 
 export default {

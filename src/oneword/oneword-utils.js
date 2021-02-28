@@ -1,4 +1,5 @@
-import { randomWord, wordsMatch } from '../utils.js'
+import { wordsMatch } from '../utils.js'
+import { randomWord } from '../words/lists'
 
 // Returns whether a round's guess is correct.
 export function correct(round) {

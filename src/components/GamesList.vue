@@ -53,7 +53,8 @@
 <script>
 import { inject } from 'vue'
 import { listRooms, referSupporter } from '../firebase/network'
-import { sanitize, timeSince, randomWord } from '../utils'
+import { sanitize, timeSince } from '../utils'
+import { randomWord } from '../words/lists'
 import { listPlayers } from '../oneword/oneword-utils'
 
 function recentRoom(room) {

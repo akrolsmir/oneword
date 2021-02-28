@@ -411,12 +411,12 @@ import {
   updateRoom,
   getRoom,
   listenRoom,
-  unlistenRoom,
   listenForLogin,
   updateUserGame,
 } from '../firebase/network.js'
 import { inject } from 'vue'
-import { getIn, randomWord } from '../utils.js'
+import { getIn } from '../utils.js'
+import { randomWord } from '../words/lists'
 
 export default {
   components: {

@@ -8,7 +8,8 @@ import {
   updateRoom,
 } from '../firebase/network'
 import { capitalize } from '../oneword/oneword-utils'
-import { getIn, randomWord } from '../utils'
+import { getIn } from '../utils'
+import { randomWord } from '../words/lists'
 
 function listPlayers(people) {
   return Object.entries(people || {})

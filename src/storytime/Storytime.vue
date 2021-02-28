@@ -385,7 +385,7 @@ import {
   updateUserGame,
 } from '../firebase/network'
 import { nextGuesser, capitalize } from '../oneword/oneword-utils.js'
-import { randomWord } from '../utils.js'
+import { randomWord } from '../words/lists'
 import { inject } from 'vue'
 import prompts from './prompts.js'
 
