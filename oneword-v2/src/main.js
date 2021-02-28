@@ -9,6 +9,7 @@ import About from './components/About.vue'
 import Supporter from './components/Supporter.vue'
 import Thanks from './components/Thanks.vue'
 import OneWord from './oneword/OneWord.vue'
+import Listography from './listography/Listography.vue'
 import StorytimeFrontPage from './storytime/components/StorytimeFrontPage.vue'
 import Storytime from './storytime/Storytime.vue'
 import IncryptFrontPage from './incrypt/IncryptFrontPage.vue'
@@ -26,6 +27,7 @@ const routes = [
   { path: '/thanks', component: Thanks },
   { path: '/storytime', component: StorytimeFrontPage },
   { path: '/storytime/:id', component: Storytime },
+  { path: '/list/:id', component: Listography },
   { path: '/incrypt', component: IncryptFrontPage },
   { path: '/incrypt/:id', component: Incrypt },
   { path: '/pairwise', component: PairwiseFrontPage },
