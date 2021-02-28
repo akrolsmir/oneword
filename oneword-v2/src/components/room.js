@@ -8,22 +8,20 @@ function listPlayers(people) {
     .map(([name, _person]) => name)
 }
 
+/** Expects a reactive `user` object, and a function that sets up a new room. */
 export function useRoom(user, newRoom) {
-  // Contains local data about the player's choices; not synced to Firestore.
+  // Contains local data about the player's choices; not yet synced to Firestore.
   const player = reactive({
-    name: 'Charliez',
+    name: 'Eve',
   })
 
-  // Synced to Firestore
+  // The room object containing the game state; synced to Firestore.
   const room = reactive({
     // Basic properties
     name: '',
     people: {},
 
-    // See if the computed function will actually upload to Firestore properly
     players: computed(() => listPlayers(room.people)),
-
-    // I think it writes? But it can't be overwritten...
   })
 
   // Serialize/Deserialize.
@@ -31,8 +29,9 @@ export function useRoom(user, newRoom) {
     delete r.players // Since computed functions are readonly (prevents console warn)
     Object.assign(room, r)
   }
+
   function createOrListen() {
-    // TODO
+    // TODO place in the room creation/listening logic that's inside created() atm
   }
 
   async function enterRoom() {
@@ -52,7 +51,7 @@ export function useRoom(user, newRoom) {
   function uniquify(name) {
     player.name = name
 
-    // TODO: need to figure out this.players
+    // TODO: Implement. Here's a sketch:
 
     // If the player's name collides with another user's (aka different id,
     // or player is a guest), prepend adjectives until name is unique
@@ -97,9 +96,11 @@ export function useRoom(user, newRoom) {
   loadFrom(newRoom(room.name))
 
   return {
+    // Reactive objects
     player,
     room,
 
+    // Methods to manipulate rooms
     loadFrom,
     enterRoom,
     resetRoom,
