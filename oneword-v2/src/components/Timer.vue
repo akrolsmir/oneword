@@ -2,10 +2,11 @@
   <progress
     class="progress"
     :value="secondsElapsed"
-    :max="length"
+    :max="intLength"
     :class="{
-      'is-warning': length - 10 < secondsElapsed && secondsElapsed < length - 3,
-      'is-danger': secondsElapsed > length - 3,
+      'is-warning':
+        intLength - 10 < secondsElapsed && secondsElapsed < intLength - 3,
+      'is-danger': secondsElapsed > intLength - 3,
     }"
   ></progress>
 </template>
@@ -29,7 +30,7 @@ export default {
   mounted() {
     const updateProgress = async (timestamp) => {
       this.secondsElapsed = (timestamp - this.startMs) / 1000
-      if (this.secondsElapsed >= this.length + 2 /* 2s padding*/) {
+      if (this.secondsElapsed >= this.intLength + 2 /* 2s padding*/) {
         // We're done! Run onFinish if the timer's still visible.
         if (!this.destroyed) {
           await this.onFinish()
@@ -41,6 +42,14 @@ export default {
       }
     }
     window.requestAnimationFrame(updateProgress)
+  },
+  computed: {
+    intLength() {
+      // Parses string values eg '60' as ints, too
+      return typeof this.length === 'string'
+        ? parseInt(this.length)
+        : this.length
+    },
   },
   methods: {
     reset() {
