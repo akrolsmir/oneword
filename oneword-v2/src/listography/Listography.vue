@@ -248,7 +248,13 @@ import Timer from '../components/Timer.vue'
 import { getRoom, listenRoom } from '../firebase/network.js'
 import { categories } from './cards.js'
 import { useRoom } from '../composables/useRoom.js'
-import { debounce, listIncludes, pickRandom, randomWord } from '../utils'
+import {
+  debounce,
+  listIncludes,
+  pickRandom,
+  randomWord,
+  sanitize,
+} from '../utils'
 
 function newRoom(name) {
   return {
@@ -299,9 +305,7 @@ const CARD_TYPES = {
 
 export default {
   components: {
-    // Nametag,
     Timer,
-    // GameEnd,
   },
   setup() {
     const user = inject('currentUser')
@@ -480,9 +484,8 @@ export default {
       next.focus()
     },
     endGame() {
+      // TODO Turn into a computed check, with appropriate game end UI
       this.room.state = 'END'
-      console.log('game over')
-      // TODO
     },
 
     toggleInvalid(category, entry) {
