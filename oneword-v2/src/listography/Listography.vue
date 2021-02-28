@@ -58,7 +58,7 @@
     <Timer
       class="timer"
       ref="timer"
-      :length="12"
+      :length="room.timerLength"
       :on-finish="nextStage"
       v-if="room.state === 'LISTING'"
       :key="room.round.state"
@@ -127,7 +127,17 @@
     </div>
 
     <!-- Mod tools -->
-    <button class="button" @click="resetRoom">Reset room</button>
+    <div class="subtitle">Mod Tools</div>
+    <div class="columns">
+      <div class="column">
+        <button class="button" @click="resetRoom">Reset room</button>
+      </div>
+      <div class="column">
+        <input class="input" size="5" v-model="room.timerLength" />
+        seconds <br />
+        <button class="button" @click="setTimer">Set timers</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -244,7 +254,7 @@ import { categories } from './cards.js'
 import { useRoom } from '../composables/useRoom.js'
 import { debounce, pickRandom } from '../utils'
 
-function emptyRoom(name) {
+function newRoom(name) {
   return {
     name,
     state: 'START', // "START", "PREVIEW", "LISTING", CHECKING", "END"
@@ -269,6 +279,7 @@ function emptyRoom(name) {
     },
     history: [],
     invalidEntries: {},
+    timerLength: 30,
   }
 }
 
@@ -298,7 +309,7 @@ export default {
   },
   setup() {
     const user = inject('currentUser')
-    const roomHelpers = useRoom(user, emptyRoom)
+    const roomHelpers = useRoom(user, newRoom)
     return Object.assign(roomHelpers, { user })
   },
   async created() {
@@ -465,6 +476,9 @@ export default {
     startTimer() {
       this.room.state = 'LISTING'
       this.saveRoom('state')
+    },
+    setTimer() {
+      this.saveRoom('timerLength')
     },
     submitEntry() {
       // Problem with entering entries directly: two player setting room at the same time?
