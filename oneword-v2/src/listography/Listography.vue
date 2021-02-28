@@ -3,8 +3,6 @@
 
 <template>
   <div id="top-content">
-    <!-- Mod tools -->
-    <button class="button" @click="resetRoom">Reset room</button>
     <div class="narrow card">
       <div class="type">Scores</div>
       <div style="width: 100%; text-align: center">
@@ -60,7 +58,7 @@
     <Timer
       class="timer"
       ref="timer"
-      :length="6"
+      :length="12"
       :on-finish="nextStage"
       v-if="room.state === 'LISTING'"
       :key="room.round.state"
@@ -76,7 +74,8 @@
         <textarea
           class="textarea mb-2"
           :disabled="room.state === 'PREVIEW'"
-          v-model="room.round.entries[player.name][index - 1]"
+          v-model="player.entries[index - 1]"
+          @input="debouncedSubmitEntry"
           @keydown.enter.prevent="focusNextTextArea($event)"
         ></textarea>
       </div>
@@ -126,6 +125,9 @@
         </div>
       </div>
     </div>
+
+    <!-- Mod tools -->
+    <button class="button" @click="resetRoom">Reset room</button>
   </div>
 </template>
 
@@ -240,6 +242,7 @@ import Timer from '../components/Timer.vue'
 import { getRoom, listenRoom } from '../firebase/network.js'
 import { cards } from './cards.js'
 import { useRoom } from '../components/room'
+import { debounce } from '../utils'
 
 function emptyRoom(name) {
   return {
@@ -281,6 +284,8 @@ export default {
     return Object.assign(roomHelpers, { user })
   },
   async created() {
+    this.debouncedSubmitEntry = debounce(this.submitEntry, 300)
+
     // console.log('logz', this.user, this.room)
     // For dev velocity, accept https://oneword.games/room/rome?player=Spartacus
     if (this.$route.query.player && !this.user.id) {
@@ -289,15 +294,12 @@ export default {
     }
 
     this.room.name = this.$route.params.id
-    console.log('created room', this.room)
     const fetchedRoom = await getRoom(this.room)
-    console.log('fetched room', fetchedRoom)
 
     if (!fetchedRoom) {
       // 1. If the room doesn't exist, create it, then return
       this.player.name =
         this.user.displayName || `${randomWord('adjectives')}-anon`
-      console.log('resetting room....')
       await this.resetRoom()
       listenRoom(this.room.name, this.loadFrom)
       return
@@ -334,6 +336,14 @@ export default {
           this.endGame()
           break
         }
+      }
+    },
+    'room.state'(state) {
+      console.log('room.state', state)
+      // Clean up past inputs when the round moves forward.
+      if (state == 'LISTING') {
+        console.log('room.statez')
+        this.player.entries = new Array(this.listSize[this.card.type]).fill('')
       }
     },
   },
@@ -427,9 +437,11 @@ export default {
     },
   },
   methods: {
+    debounce,
     nextStage() {
       this.room.state = 'CHECKING'
       this.room.history.push(this.room.round)
+      this.saveRoom('state', 'history')
     },
     nextRound() {
       this.room.state = 'PREVIEW'
@@ -447,9 +459,23 @@ export default {
       for (let player of this.room.players) {
         this.room.round.entries[player] = []
       }
+      this.saveRoom('state', 'round')
     },
     startTimer() {
       this.room.state = 'LISTING'
+      this.saveRoom('state')
+    },
+    submitEntry() {
+      // Problem with entering entries directly: two player setting room at the same time?
+      // Why doesn't One Word run into this problem on submit...? Because submit is lower QPS?
+      // Oh, because the local player copy isn't clobbered, it's a separate object.
+      // Dynamically sized array sounds kinda annoying to initialize. What if `entries` was just an object...?
+      // Or maybe we just init an empty array, and overwrite undefined at write time.
+      // Or maybe init from state hook isn't that bad...
+
+      this.room.round.entries[this.player.name] = this.player.entries
+      console.log('submitEntry', this.room.round.entries[this.player.name])
+      this.saveRoom(`round.entries.${this.player.name}`)
     },
     focusNextTextArea(event) {
       let next = event.target.parentNode.nextSibling.childNodes[1]

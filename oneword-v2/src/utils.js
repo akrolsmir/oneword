@@ -98,3 +98,17 @@ export function defaultCategories() {
   categories['nouns'] = true
   return categories
 }
+
+// Courtesy of https://stackoverflow.com/a/53486112/1222351
+export function debounce(fn, delay) {
+  // console.log('debouncing', fn, delay)
+  let timeoutID
+  return () => {
+    console.log('debounce', timeoutID)
+    clearTimeout(timeoutID)
+    const args = arguments
+    const that = this
+    timeoutID = setTimeout(() => fn.apply(that, args), delay)
+    console.log('timeoutId', timeoutID)
+  }
+}
