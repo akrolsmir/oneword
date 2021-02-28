@@ -1,32 +1,18 @@
-# Migrating from One Word v1
+# One Word
 
-v2 is an investment into dev velocity and best practices, adding:
-
-- yarn for JS package management
-- Vite for hot reloading, single file Vue components, bundling
-- Vue3 for new language features
+This is the code behind http://oneword.games, a group of online games inspired
+by party games like Just One and Decrypto.
 
 ## Installing
 
 1. Install [Node.js and npm](https://nodejs.org/en/)
-2. Install yarn:
-
-```
-npm install --global yarn
-```
-
-3. Run these commands:
-
-```
-cd oneword-v2
-yarn # installs all JS dependencies
-```
-
-4. [Get the Vue3 devtools](https://chrome.google.com/webstore/detail/vuejs-devtools/ljjemllljcmogpfapbkkighbhhppjdbg?hl=en) (and disable the Vue2 ones)
+2. `$ npm install --global yarn ` to install [Yarn](https://yarnpkg.com/)
+3. `$ yarn` to install JS dependencies
 
 ## Developing
 
-- `yarn dev` to spin up a local server at http://localhost:3000
+1. `$ yarn dev` to spin up a local server at http://localhost:3000
+2. Start editing code! See our [recommended tools.](#recommended-tools)
 
 ## Committing code
 
@@ -38,22 +24,125 @@ Merging code directly into `master` is okay, but if some work you're doing is:
 
 ... then consider opening up a Pull Request instead!
 
-In Github, pull requests also create a deploy preview; perfect for getting quick feedback.
-(TODO: Include screenshot)
+Every pull request will automatically get a separate preview URL; perfect for getting quick feedback.
+![](https://i.imgur.com/K8ZaCYd.png)
 
 ## Deploying
 
-Just push to `master`, and the site will update automatically!
+Just push to `master`, and the site will update automatically.
 
 # Appendix
 
-### Productivity tips
+## Tech stack
 
-- When you save a file, the app should automatically reload!
-  - Note: Hot reload seems broken in Vue3 Carousel
-- You can instantly join as guest by adding `?player=Holo` at the end of a room url.
-  Useful for keeping 3 tabs open, for testing multiplayer interactions!
-- Install these VSCode extensions:
+One Word is built on top of:
+
+- [VueJS](https://v3.vuejs.org/guide/introduction.html) on the frontend
+- [Bulma](https://bulma.io/) for CSS styling
+- [Netlify](https://www.netlify.com/) for hosting
+- [Firestore](https://firebase.google.com/docs/firestore) for the database
+- [Firebase Auth](https://firebase.google.com/docs/auth) for login
+- [Stripe](https://stripe.com/) for payments
+- [Mailjet](https://www.mailjet.com/) for marketing & transactional emails
+
+## Architecture
+
+### The game state is a single JS object
+
+One Word code is all on the client (aka [JAMStack](https://jamstack.org/)). We start
+by defining the game's data: a single JS object to represent one game room. For example:
+
+```
+  Room: {
+    name: apple,
+    players: ['alice', 'bob', 'carol'],
+    currentRound: {
+      state: 'clueing' // or 'guessing', or 'done'
+      guesser: 'alice',
+      word: 'company'
+      clues: {
+        alice: 'corporation',
+        bob: 'collected'
+        carol: 'collected'
+      }
+    }
+    history: [{round1}, ...]
+  }
+```
+
+This has all the info needed to represent the entire state of the game,
+at any point in time. It should be _complete_ (no info missing), but also _minimum_
+(no additional information).
+
+### Vue turns that into HTML
+
+Based on what's in the room object, we then want to show the right HTML and CSS to users. The VueJS framework helps us express our JS object as HTML to show the user, and also
+handles user inputs.
+
+Here's a simple example of Vue code:
+
+```
+<template>
+  <!-- JS expressions inside {{ these braces }} get rendered -->
+  <p v-for="player in room.players">- {{ player }}</p>
+
+  <!-- newPlayer automatically syncs when this input is edited -->
+  <input v-model="newPlayer" />
+
+  <!-- Call some Javascript code using @event notation -->
+  <button @click="addPlayer">Add a player</button>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      room: { players: ['Alice', 'Bob', 'Charlie'] },
+      newPlayer: 'Eve',
+    }
+  },
+  methods: {
+    addPlayer() {
+      this.room.players.push(this.newPlayer)
+    },
+  },
+}
+</script>
+
+```
+
+Which produces:
+
+![](https://i.imgur.com/Z1aPc77.png)
+
+The amazing thing is that Vue binds the HTML elements and forms to our JS data.
+When we update the JS data, the HTML elements will re-render; and when the user clicks on or types in an HTML form, the underlying JS data stays in sync!
+
+### Firestore keeps all players in sync
+
+Now, how does one player's changes get sent to everyone else? A: Firestore. Each different game (One Word, Incrypt) has a different Firestore table, containing every room ever created and keyed by the room's name.
+
+We use some Firestore logic to keep everyone's clients sync'd to the latest state. So your code can act as though its room is always up-to-date; you only think about when you need to _push_ a change to the Firestore database. Super convenient!
+
+To prevent _race conditions_ (one client overwriting the changes of another), try
+to scope down each change to be very narrow. Instead of pushing the entire room object each time, just push the path of the object that updated.
+
+Continuing the example above:
+
+```
+async addPlayer() {
+  this.room.players.push(this.newPlayer)
+  // Only update the 'players' field of the room
+  await saveRoom(room, 'players')
+},
+```
+
+And... that's all you really need to get started with making your own game!
+
+## Recommended tools
+
+- [Get the Vue3 devtools](https://chrome.google.com/webstore/detail/vuejs-devtools/ljjemllljcmogpfapbkkighbhhppjdbg?hl=en) to easily debug and inspect your Vue logic
+- We highly, highly, _highly_ recommend VSCode, along with these extensions:
 
   - `Vetur` for Vue syntax highlighting
   - `Prettier` for format-on-save
@@ -80,30 +169,33 @@ Just push to `master`, and the site will update automatically!
       ![](https://i.imgur.com/uFJa9xS.png)
     - [In-depth setup instructions](https://www.freecodecamp.org/news/how-to-set-up-the-debugger-for-chrome-extension-in-visual-studio-code-c0b3e5937c01/)
 
-### Best practices for working with Vue + Firestore
+- You can instantly join as guest by adding `?player=Holo` at the end of a room url.
+  Useful for keeping 3 tabs open, for testing multiplayer interactions!
+
+## Best practices for working with Vue + Firestore
 
 - Most important: keep your Firestore data structure simple and elegant.
   App logic and visuals are easy to change; backfilling data is annoying.
 - Prefer local computed properties over putting more things into the Firestore room.
+  - Declarative code (the WHAT) is better than imperative code (the HOW); for
+    example, prefer array.map() over for loops.
 - When possible, your Firestore pushes should to be idempotent
   (ie can be called multiple times with the same effect), and free of race conditions
   (ie one client should not overwrite another's changes).
-  - This is most important in frequent actions (eg submitting words); less important
-    in rarer actions (eg joining rooms)
 - Instead of pushing an array to Firestore, consider pushing an object.
   (Then make a computed array, eg with `Object.keys(foo)`). This prevents race
   conditions if multiple clients update the same array
 
-### Other tips
+## Other tips
 
 - Constantly invest in faster dev velocity!
   - Build mod tools for yourself
-  - If anything iteration cycle seems to take long, bother Austin about it
+  - If anything in your iteration cycle seems slow, bother Austin about it
 - Code should be as readable as possible
   - Self-documenting if possible, then comments
-  - It's easier to read less code
+  - It's easier to read less code!
 
-## Compiling locally
+### Compiling locally
 
 This is useful for testing the site for performance, in Chrome Devtool's Lighthouse.
 
