@@ -99,16 +99,14 @@ export function defaultCategories() {
   return categories
 }
 
+// Function wrapper that waits delayMs after the last call before firing.
+// Good for grouping Firestore writes with a 300ms delay
 // Courtesy of https://stackoverflow.com/a/53486112/1222351
-export function debounce(fn, delay) {
-  // console.log('debouncing', fn, delay)
+export function debounce(func, delayMs) {
   let timeoutID
-  return () => {
-    console.log('debounce', timeoutID)
+  // Note: needs to be `function` instead of `=>`, to use this & arguments
+  return function () {
     clearTimeout(timeoutID)
-    const args = arguments
-    const that = this
-    timeoutID = setTimeout(() => fn.apply(that, args), delay)
-    console.log('timeoutId', timeoutID)
+    timeoutID = setTimeout(() => func.apply(this, arguments), delayMs)
   }
 }
