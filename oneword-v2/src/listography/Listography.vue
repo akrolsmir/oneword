@@ -256,7 +256,7 @@ import {
   sanitize,
 } from '../utils'
 
-function newRoom(name) {
+function makeNewRoom(name) {
   return {
     name,
     state: 'START', // "START", "PREVIEW", "LISTING", CHECKING", "END"
@@ -309,7 +309,7 @@ export default {
   },
   setup() {
     const user = inject('currentUser')
-    const roomHelpers = useRoom(user, newRoom)
+    const roomHelpers = useRoom(user, makeNewRoom)
     return Object.assign(roomHelpers, { user })
   },
   async created() {

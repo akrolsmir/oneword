@@ -10,7 +10,7 @@ function listPlayers(people) {
 }
 
 /** Expects a reactive `user` object, and a function that sets up a new room. */
-export function useRoom(user, newRoom) {
+export function useRoom(user, makeNewRoom) {
   // Contains local data about the player's choices; not yet synced to Firestore.
   const player = reactive({
     name: 'Eve',
@@ -25,14 +25,14 @@ export function useRoom(user, newRoom) {
     players: computed(() => listPlayers(room.people)),
   })
 
-  // Serialize/Deserialize.
-  function loadFrom(r) {
-    delete r.players // Since computed functions are readonly (prevents console warn)
-    Object.assign(room, r)
+  function loadFrom(newRoom) {
+    // Strip out computed functions. They're readonly, but this prevents a console warning.
+    delete newRoom.players
+    Object.assign(room, newRoom)
   }
 
   function createOrListen() {
-    // TODO place in the room creation/listening logic that's inside created() atm
+    // TODO Move in room creation/listening logic that's inside created()
   }
 
   async function enterRoom() {
@@ -78,7 +78,7 @@ export function useRoom(user, newRoom) {
   }
 
   async function resetRoom() {
-    loadFrom(newRoom(room.name))
+    loadFrom(makeNewRoom(room.name))
     await joinGame(false)
     await setRoom(room)
   }
@@ -90,7 +90,7 @@ export function useRoom(user, newRoom) {
     )
   }
 
-  loadFrom(newRoom(room.name))
+  loadFrom(makeNewRoom(room.name))
 
   return {
     // Reactive objects
