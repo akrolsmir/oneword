@@ -5,8 +5,8 @@
   <div id="top-content">
     <div class="narrow card">
       <div class="type">Scores</div>
-      <div style="width: 100%; text-align: center">
-        ({{ room.winningScore }} points to win)
+      <div style="width: 100%; text-align: center; font-style: italic">
+        {{ room.winningScore }} points to win
       </div>
       <br />
       <div v-for="player in room.players">
@@ -14,14 +14,9 @@
       </div>
     </div>
     <div class="narrow card round">
-      <div
-        @mouseover="infoHover = true"
-        @mouseout="infoHover = false"
-        :class="{ expanded: infoHover }"
-        v-if="room.state !== 'START'"
-      >
+      <div v-if="room.state !== 'START'">
         <div class="type">
-          {{ cardType.longName }} <img src="./info.png" />
+          {{ cardType.longName }}
           <div class="info">
             Write up to <strong>{{ cardType.listSize }}</strong> answers.
           </div>
@@ -183,14 +178,12 @@
 }
 .type {
   font-size: 1.5em;
-  height: 36px;
-  transition: height 150ms, margin 150ms;
-}
-.expanded .type {
   height: 100px;
   margin-bottom: -64px;
 }
+
 .type > .info {
+  font-style: italic;
   font-size: 0.6em;
 }
 .type > img {
@@ -357,7 +350,6 @@ export default {
   },
   data() {
     return {
-      infoHover: false,
       CARD_TYPES,
     }
   },
