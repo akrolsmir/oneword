@@ -240,7 +240,7 @@
 import { inject } from 'vue'
 import Timer from '../components/Timer.vue'
 import { getRoom, listenRoom } from '../firebase/network.js'
-import { cards } from './cards.js'
+import { categories } from './cards.js'
 import { useRoom } from '../components/room'
 import { debounce } from '../utils'
 
@@ -447,13 +447,16 @@ export default {
       this.room.state = 'PREVIEW'
 
       this.room.round = {}
+      let card = {}
+      card.type = ['1ON1', '3FOLD', 'FORGOTTEN4'][Math.floor(Math.random() * 3)]
       for (let i = 0; i < 1000; i++) {
-        let card = cards[Math.floor(Math.random() * cards.length)]
+        card.category =
+          categories[Math.floor(Math.random() * categories.length)]
         if (!this.previousCategories.includes(card.category)) {
-          this.room.round.card = card
           break
         }
       }
+      this.room.round.card = card
       this.room.round.entries = {}
       this.room.round.number = this.room.history.length
       for (let player of this.room.players) {
