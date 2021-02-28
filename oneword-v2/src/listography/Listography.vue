@@ -437,7 +437,7 @@ export default {
       let scores = {}
       for (let player of this.room.players) {
         scores[player] = this.roundScores.reduce(
-          (total, scores) => total + scores[player],
+          (total, scores) => total + (scores[player] || 0),
           0
         )
       }
