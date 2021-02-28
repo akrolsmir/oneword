@@ -245,16 +245,9 @@
 <script>
 import { inject } from 'vue'
 import Timer from '../components/Timer.vue'
-import { getRoom, listenRoom } from '../firebase/network.js'
 import { categories } from './cards.js'
 import { useRoom } from '../composables/useRoom.js'
-import {
-  debounce,
-  listIncludes,
-  pickRandom,
-  randomWord,
-  sanitize,
-} from '../utils'
+import { debounce, listIncludes, pickRandom, sanitize } from '../utils'
 
 function makeNewRoom(name) {
   return {
@@ -312,45 +305,11 @@ export default {
     const roomHelpers = useRoom(user, makeNewRoom)
     return Object.assign(roomHelpers, { user })
   },
-  async created() {
+  created() {
     this.debouncedSubmitEntries = debounce(this.submitEntries, 300)
-
-    // For dev velocity, accept https://oneword.games/room/rome?player=Spartacus
-    if (this.$route.query.player && !this.user.id) {
-      this.user.guest = true
-      this.user.name = this.$route.query.player
-    }
-
-    this.room.name = this.$route.params.id
-    const fetchedRoom = await getRoom(this.room)
-
-    if (!fetchedRoom) {
-      // 1. If the room doesn't exist, create it, then return
-      this.player.name =
-        this.user.displayName || `${randomWord('adjectives')}-anon`
-      await this.resetRoom()
-      listenRoom(this.room.name, this.loadFrom)
-      return
-    } else {
-      // 2. Set this room's contents, and proceed to enter the room
-      this.loadFrom(fetchedRoom)
-      listenRoom(this.room.name, this.loadFrom)
-    }
-
-    // 3. If returning from Firebase sign in ('?authed=1'), skip the login modal
-    if (this.$route.query.authed) {
-      // Remove the 'authed=1' from the URL for cleanliness
-      const query = { ...this.$route.query }
-      delete query.authed
-      this.$router.replace(query)
-
-      // Then sign them in after the Firebase callback returns
-      listenForLogin((_user) => this.enterRoom())
-      return
-    }
-
-    // 4. Enter the room, prompting for login if needed
-    this.enterRoom()
+  },
+  beforeMount() {
+    /* no await */ this.createOrEnterRoom()
   },
   data() {
     return {

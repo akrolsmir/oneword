@@ -1,5 +1,12 @@
 import { computed, reactive } from 'vue'
-import { setRoom, updateRoom } from '../firebase/network'
+import { useRoute, useRouter } from 'vue-router'
+import {
+  getRoom,
+  listenForLogin,
+  listenRoom,
+  setRoom,
+  updateRoom,
+} from '../firebase/network'
 import { capitalize } from '../oneword/oneword-utils'
 import { getIn, randomWord } from '../utils'
 
@@ -31,8 +38,47 @@ export function useRoom(user, makeNewRoom) {
     Object.assign(room, newRoom)
   }
 
-  function createOrListen() {
-    // TODO Move in room creation/listening logic that's inside created()
+  const router = useRouter()
+  const route = useRoute()
+
+  // Should be called in a Vue app AFTER setup(), eg in beforeMount()
+  // See: https://i.imgur.com/6jVcrja.png
+  async function createOrEnterRoom() {
+    // For dev velocity, accept https://oneword.games/room/rome?player=Spartacus
+    if (route.query.player && !user.id) {
+      user.guest = true
+      user.name = route.query.player
+    }
+
+    room.name = route.params.id
+    const fetchedRoom = await getRoom(room)
+
+    if (!fetchedRoom) {
+      // 1. If the room doesn't exist, create it, then return
+      player.name = user.displayName || `${randomWord('adjectives')}-anon`
+      await resetRoom()
+      listenRoom(room.name, loadFrom)
+      return
+    } else {
+      // 2. Set this room's contents, and proceed to enter the room
+      loadFrom(fetchedRoom)
+      listenRoom(room.name, loadFrom)
+    }
+
+    // 3. If returning from Firebase sign in ('?authed=1'), skip the login modal
+    if (route.query.authed) {
+      // Remove the 'authed=1' from the URL for cleanliness
+      const query = { ...route.query }
+      delete query.authed
+      router.replace(query)
+
+      // Then sign them in after the Firebase callback returns
+      listenForLogin(enterRoom)
+      return
+    }
+
+    // 4. Enter the room, prompting for login if needed
+    await enterRoom()
   }
 
   async function enterRoom() {
@@ -98,8 +144,7 @@ export function useRoom(user, makeNewRoom) {
     room,
 
     // Methods to manipulate rooms
-    loadFrom,
-    enterRoom,
+    createOrEnterRoom,
     resetRoom,
     saveRoom,
   }
