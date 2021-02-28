@@ -71,15 +71,15 @@
             <router-link to="/profile" class="button is-white"
               >Signed in as {{ user.name.split(' ')[0] }}!</router-link
             >
-            <router-link
-              to="/supporter"
+            <a
+              href="/supporter"
               class="button is-warning"
-              @click="referPremium"
+              @click.prevent="referSupporter('navbar')"
             >
               <strong>{{
                 user.isSupporter ? 'Supporter' : 'Become a supporter!'
               }}</strong>
-            </router-link>
+            </a>
           </div>
           <div v-else class="buttons">
             <a class="button is-primary" @click="logIn">
@@ -95,7 +95,7 @@
 
 <script>
 import LoginModal from './LoginModal.vue'
-import { firebaseLogEvent, firebaseLogout } from '../firebase/network.js'
+import { firebaseLogout, referSupporter } from '../firebase/network.js'
 import { inject } from 'vue'
 export default {
   components: {
@@ -112,6 +112,7 @@ export default {
     return { user: inject('currentUser') }
   },
   methods: {
+    referSupporter,
     logIn(onGuestCallback = undefined) {
       this.modalVisible = true
       this.onGuestCallback = onGuestCallback
@@ -119,11 +120,6 @@ export default {
     async logOut() {
       await firebaseLogout()
       this.user.id = ''
-    },
-    referPremium() {
-      firebaseLogEvent('view_promotion', {
-        source: 'navbar',
-      })
     },
   },
 }
