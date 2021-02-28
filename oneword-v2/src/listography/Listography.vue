@@ -241,7 +241,7 @@ import { inject } from 'vue'
 import Timer from '../components/Timer.vue'
 import { getRoom, listenRoom } from '../firebase/network.js'
 import { categories } from './cards.js'
-import { useRoom } from '../components/room'
+import { useRoom } from '../composables/useRoom.js'
 import { debounce, pickRandom } from '../utils'
 
 function emptyRoom(name) {
