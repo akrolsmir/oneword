@@ -510,6 +510,7 @@ export default {
     toggleInvalid(category, entry) {
       let key = category + entry
       this.room.invalidEntries[key] = !this.room.invalidEntries[key]
+      this.saveRoom(`invalidEntries.${key}`)
     },
 
     // TODO cleanup: place inside CARD_TYPES array
