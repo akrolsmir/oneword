@@ -242,7 +242,7 @@ import Timer from '../components/Timer.vue'
 import { getRoom, listenRoom } from '../firebase/network.js'
 import { categories } from './cards.js'
 import { useRoom } from '../components/room'
-import { debounce } from '../utils'
+import { debounce, pickRandom } from '../utils'
 
 function emptyRoom(name) {
   return {
@@ -286,7 +286,6 @@ export default {
   async created() {
     this.debouncedSubmitEntry = debounce(this.submitEntry, 300)
 
-    // console.log('logz', this.user, this.room)
     // For dev velocity, accept https://oneword.games/room/rome?player=Spartacus
     if (this.$route.query.player && !this.user.id) {
       this.user.guest = true
@@ -339,10 +338,8 @@ export default {
       }
     },
     'room.state'(state) {
-      console.log('room.state', state)
-      // Clean up past inputs when the round moves forward.
-      if (state == 'LISTING') {
-        console.log('room.statez')
+      // Reset past entries when the round moves forward.
+      if (state === 'PREVIEW' || state === 'LISTING') {
         this.player.entries = new Array(this.listSize[this.card.type]).fill('')
       }
     },
@@ -447,11 +444,11 @@ export default {
       this.room.state = 'PREVIEW'
 
       this.room.round = {}
-      let card = {}
-      card.type = ['1ON1', '3FOLD', 'FORGOTTEN4'][Math.floor(Math.random() * 3)]
+      const card = {
+        type: pickRandom(['1ON1', '3FOLD', 'FORGOTTEN4']),
+      }
       for (let i = 0; i < 1000; i++) {
-        card.category =
-          categories[Math.floor(Math.random() * categories.length)]
+        card.category = pickRandom(categories)
         if (!this.previousCategories.includes(card.category)) {
           break
         }
@@ -475,9 +472,8 @@ export default {
       // Dynamically sized array sounds kinda annoying to initialize. What if `entries` was just an object...?
       // Or maybe we just init an empty array, and overwrite undefined at write time.
       // Or maybe init from state hook isn't that bad...
-
+      // Or maybe entries is always 10 and we just slice off the last X.....
       this.room.round.entries[this.player.name] = this.player.entries
-      console.log('submitEntry', this.room.round.entries[this.player.name])
       this.saveRoom(`round.entries.${this.player.name}`)
     },
     focusNextTextArea(event) {
