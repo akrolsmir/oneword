@@ -75,7 +75,7 @@
           class="textarea mb-2"
           :disabled="room.state === 'PREVIEW'"
           v-model="player.entries[index - 1]"
-          @input="debouncedSubmitEntry"
+          @input="debouncedSubmitEntries"
           @keydown.enter.prevent="focusNextTextArea($event)"
         ></textarea>
       </div>
@@ -316,7 +316,7 @@ export default {
     return Object.assign(roomHelpers, { user })
   },
   async created() {
-    this.debouncedSubmitEntry = debounce(this.submitEntry, 300)
+    this.debouncedSubmitEntries = debounce(this.submitEntries, 300)
 
     // For dev velocity, accept https://oneword.games/room/rome?player=Spartacus
     if (this.$route.query.player && !this.user.id) {
@@ -362,14 +362,6 @@ export default {
     }
   },
   watch: {
-    playerScores() {
-      for (let player of this.room.players) {
-        if (this.playerScores[player] >= this.room.winningScore) {
-          this.endGame()
-          break
-        }
-      }
-    },
     'room.state'(state) {
       // Reset past entries when the round moves forward.
       if (state === 'PREVIEW' || state === 'LISTING') {
@@ -402,6 +394,7 @@ export default {
             for (let otherName in round.entries) {
               if (name === otherName) continue
 
+              // TODO: Not sufficient, since invalidEntries is exact match
               if (listIncludes(round.entries[otherName], entry)) {
                 collisions[round.number][name][i] += 1
               }
@@ -483,14 +476,7 @@ export default {
     setTimer() {
       this.saveRoom('timerLength')
     },
-    submitEntry() {
-      // Problem with entering entries directly: two player setting room at the same time?
-      // Why doesn't One Word run into this problem on submit...? Because submit is lower QPS?
-      // Oh, because the local player copy isn't clobbered, it's a separate object.
-      // Dynamically sized array sounds kinda annoying to initialize. What if `entries` was just an object...?
-      // Or maybe we just init an empty array, and overwrite undefined at write time.
-      // Or maybe init from state hook isn't that bad...
-      // Or maybe entries is always 10 and we just slice off the last X.....
+    submitEntries() {
       this.room.round.entries[this.player.name] = this.player.entries
       this.saveRoom(`round.entries.${this.player.name}`)
     },
