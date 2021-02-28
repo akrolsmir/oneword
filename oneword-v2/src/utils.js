@@ -24,7 +24,17 @@ export function sanitize(input) {
 export function wordsMatch(word1, word2) {
   const w1 = word1.toLowerCase().replace(/[^a-z]/g, '')
   const w2 = word2.toLowerCase().replace(/[^a-z]/g, '')
-  return pluralize.singular(w1) === w2 || pluralize.plural(w1) === w2
+  // Need to check both directions, or else "birdie" => "birdies" => "birdy"
+  return (
+    pluralize.singular(w1) === w2 ||
+    pluralize.singular(w2) === w1 ||
+    pluralize.plural(w1) === w2 ||
+    pluralize.plural(w2) === w1
+  )
+}
+
+export function listIncludes(list, word) {
+  return list.some((w) => wordsMatch(w, word))
 }
 
 export function timeSince(millis) {

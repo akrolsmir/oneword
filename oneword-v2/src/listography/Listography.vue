@@ -255,7 +255,7 @@ import Timer from '../components/Timer.vue'
 import { getRoom, listenRoom } from '../firebase/network.js'
 import { categories } from './cards.js'
 import { useRoom } from '../composables/useRoom.js'
-import { debounce, pickRandom, randomWord } from '../utils'
+import { debounce, listIncludes, pickRandom, randomWord } from '../utils'
 
 function newRoom(name) {
   return {
@@ -402,7 +402,7 @@ export default {
             for (let otherName in round.entries) {
               if (name === otherName) continue
 
-              if (round.entries[otherName].includes(entry)) {
+              if (listIncludes(round.entries[otherName], entry)) {
                 collisions[round.number][name][i] += 1
               }
             }
