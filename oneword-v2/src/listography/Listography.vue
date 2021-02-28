@@ -21,11 +21,11 @@
         v-if="room.state !== 'START'"
       >
         <div class="type">
-          {{ longName[card.type] }} <img src="./info.png" />
+          {{ cardType.longName }} <img src="./info.png" />
           <div class="info">
-            Write up to <strong>{{ listSize[card.type] }}</strong> answers.
+            Write up to <strong>{{ cardType.listSize }}</strong> answers.
           </div>
-          <div class="info">{{ explanation[card.type] }}</div>
+          <div class="info">{{ cardType.explanation }}</div>
         </div>
       </div>
 
@@ -69,7 +69,7 @@
       v-if="room.state === 'LISTING' || room.state === 'PREVIEW'"
     >
       <strong style="font-size: 1.5em">Your Responses</strong>
-      <div class="item" v-for="index in listSize[card.type]" :key="index">
+      <div class="item" v-for="index in cardType.listSize" :key="index">
         <div class="index">{{ index }}</div>
         <textarea
           class="textarea mb-2"
@@ -85,7 +85,7 @@
       <div v-for="round in room.history" class="card summary">
         <div>
           Round {{ round.number + 1 }}: {{ round.card.category }} ({{
-            longName[round.card.type]
+            CARD_TYPES[round.card.type].longName
           }})
         </div>
         <div class="player" v-for="(entries, name) in round.entries">
@@ -272,6 +272,24 @@ function emptyRoom(name) {
   }
 }
 
+const CARD_TYPES = {
+  '3FOLD': {
+    listSize: 3,
+    longName: 'Threefold',
+    explanation: 'Try to match as MANY players as possible.',
+  },
+  '1ON1': {
+    listSize: 10,
+    longName: 'One on One',
+    explanation: 'Try to match ONLY 1 other player.',
+  },
+  FORGOTTEN4: {
+    listSize: 4,
+    longName: 'Forgotten Four',
+    explanation: 'Try to match NO other players.',
+  },
+}
+
 export default {
   components: {
     // Nametag,
@@ -326,6 +344,7 @@ export default {
   data() {
     return {
       infoHover: false,
+      CARD_TYPES,
     }
   },
   watch: {
@@ -340,34 +359,16 @@ export default {
     'room.state'(state) {
       // Reset past entries when the round moves forward.
       if (state === 'PREVIEW' || state === 'LISTING') {
-        this.player.entries = new Array(this.listSize[this.card.type]).fill('')
+        this.player.entries = new Array(this.cardType.listSize).fill('')
       }
     },
   },
   computed: {
-    listSize() {
-      return {
-        '3FOLD': 3,
-        '1ON1': 10,
-        FORGOTTEN4: 4,
-      }
-    },
-    longName() {
-      return {
-        '3FOLD': 'Threefold',
-        '1ON1': 'One on One',
-        FORGOTTEN4: 'Forgotten Four',
-      }
-    },
-    explanation() {
-      return {
-        '3FOLD': 'Try to match as MANY players as possible.',
-        '1ON1': 'Try to match ONLY 1 other player.',
-        FORGOTTEN4: 'Try to match NO other players.',
-      }
-    },
     card() {
       return this.room.round.card
+    },
+    cardType() {
+      return CARD_TYPES[this.card.type]
     },
     collisions() {
       let collisions = []
@@ -445,7 +446,7 @@ export default {
 
       this.room.round = {}
       const card = {
-        type: pickRandom(['1ON1', '3FOLD', 'FORGOTTEN4']),
+        type: pickRandom(Object.keys(CARD_TYPES)),
       }
       for (let i = 0; i < 1000; i++) {
         card.category = pickRandom(categories)
@@ -494,6 +495,7 @@ export default {
       this.room.invalidEntries[key] = !this.room.invalidEntries[key]
     },
 
+    // TODO cleanup: place inside CARD_TYPES array
     entryScore(collisionCount, round) {
       switch (round.card.type) {
         case '3FOLD':
