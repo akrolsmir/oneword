@@ -251,7 +251,7 @@
             <span class="control">
               <span class="select is-small">
                 <select v-model="newMod">
-                  <option v-for="player in players">
+                  <option v-for="player in room.players">
                     {{ player }}
                   </option>
                 </select>
@@ -263,7 +263,7 @@
         <!-- Players -->
         <div class="field is-grouped is-grouped-multiline">
           <Nametag
-            v-for="tagged in players"
+            v-for="tagged in room.players"
             :key="tagged"
             :name="tagged"
             :user="room.people && room.people[tagged]"
@@ -293,7 +293,7 @@
 
     <!-- Input area (clueing) -->
     <div v-if="room.currentRound.state == 'CLUEING'">
-      <div v-if="players.length < 3">
+      <div v-if="room.players.length < 3">
         <h2 class="fancy" role="alert">Waiting for 3 players...</h2>
         <p class="mt-5 mb-2">Invite your friends to play!</p>
         <ShareLink />
@@ -323,7 +323,7 @@
                 :class="{
                   'is-primary': room.currentRound.clues[player.name],
                 }"
-                :disabled="!players.includes(player.name)"
+                :disabled="!room.players.includes(player.name)"
               />
             </div>
             <div class="control">
@@ -331,7 +331,7 @@
                 class="button"
                 @click="submitClue"
                 :disabled="
-                  !players.includes(player.name) ||
+                  !room.players.includes(player.name) ||
                   dupes(player.clue, room.currentRound.word)
                 "
                 :class="{
@@ -509,9 +509,6 @@ import Chatbox from '../components/Chatbox.vue'
 import GameEnd from './GameEnd.vue'
 
 import {
-  getRoom,
-  listenForLogin,
-  listenRoom,
   setRoom,
   updateRoom,
   updateUserGame,
@@ -525,8 +522,6 @@ import {
   dedupe,
   nextGuesser,
   nextWord,
-  capitalize,
-  listPlayers,
 } from './oneword-utils.js'
 import { pickRandom } from '../utils.js'
 import {
@@ -537,6 +532,37 @@ import {
   defaultCategories,
 } from '../words/lists'
 import { inject } from 'vue'
+import { useRoom } from '../composables/useRoom'
+
+function makeNewRoom(name) {
+  return {
+    name,
+    people: {},
+    currentRound: {
+      state: 'CLUEING',
+      guess: '',
+      word: randomWord(),
+      clues: {},
+      category: 'nouns',
+    },
+    history: [],
+    public: true,
+    roundsInGame: 13,
+    lastUpdateTime: Date.now(),
+    timers: { CLUEING: '', GUESSING: '', DONE: '', running: false },
+    categories: defaultCategories(),
+    customWords: '',
+  }
+}
+
+function onJoin(room, player) {
+  if (!room.currentRound.guesser) {
+    room.currentRound.guesser = player.name
+    room.people[player.name].state = 'MOD'
+  }
+  player.clue = ''
+  player.guess = ''
+}
 
 export default {
   components: {
@@ -549,25 +575,15 @@ export default {
     Chatbox,
   },
   setup() {
-    return { user: inject('currentUser') }
+    const user = inject('currentUser')
+    const roomHelpers = useRoom(user, makeNewRoom, onJoin)
+    return Object.assign(roomHelpers, { user })
+  },
+  beforeMount() {
+    /* no await */ this.createOrEnterRoom()
   },
   data() {
     return {
-      // room contains everything that is synced to Firestore
-      room: {
-        // TODO: These default fillers should not be needed?
-        history: [],
-        players: [],
-        timers: {},
-        categories: {},
-        currentRound: {},
-        people: {},
-      },
-      player: {
-        name: 'Anon',
-        clue: '',
-        guess: '',
-      },
       BASIC_LISTS,
       VIDEO_GAME_LISTS,
       WORD_LISTS,
@@ -575,44 +591,6 @@ export default {
       newMod: '',
       wordsSaved: false,
     }
-  },
-  async created() {
-    // For dev velocity, accept https://oneword.games/room/rome?player=Spartacus
-    if (this.$route.query.player && !this.user.id) {
-      this.user.guest = true
-      this.user.name = this.$route.query.player
-    }
-
-    this.room.name = this.$route.params.id
-    const fetchedRoom = await getRoom(this.room)
-
-    if (!fetchedRoom) {
-      // 1. If the room doesn't exist, create it, then return
-      this.player.name =
-        this.user.displayName || `${randomWord('adjectives')}-anon`
-      await this.resetRoom()
-      listenRoom(this.room.name, (room) => (this.room = room))
-      return
-    } else {
-      // 2. Set this room's contents, and proceed to enter the room
-      this.room = fetchedRoom
-      listenRoom(this.room.name, (room) => (this.room = room))
-    }
-
-    // 3. If returning from Firebase sign in ('?authed=1'), skip the login modal
-    if (this.$route.query.authed) {
-      // Remove the 'authed=1' from the URL for cleanliness
-      const query = { ...this.$route.query }
-      delete query.authed
-      this.$router.replace(query)
-
-      // Then sign them in after the Firebase callback returns
-      listenForLogin((_user) => this.enterRoom())
-      return
-    }
-
-    // 4. Enter the room, prompting for login if needed
-    this.enterRoom()
   },
   watch: {
     'room.currentRound.state'(state) {
@@ -626,9 +604,6 @@ export default {
     },
   },
   computed: {
-    players() {
-      return listPlayers(this.room)
-    },
     timerLength() {
       if (
         this.room.currentRound &&
@@ -674,79 +649,6 @@ export default {
     referSupporter,
     dupes,
     dedupe,
-    async enterRoom() {
-      if (!this.user.canPlay) {
-        // If not logged in, show the sign-in modal
-        const onGuest = () => {
-          this.uniquify(this.user.displayName)
-          this.joinGame()
-        }
-        this.user.signIn(onGuest)
-      } else {
-        this.uniquify(this.user.displayName)
-        await this.joinGame()
-      }
-    },
-    // TODO: only works after "people" is implemented
-    uniquify(name) {
-      this.player.name = name
-      // If the player's name collides with another user's (aka different id,
-      // or player is a guest), prepend adjectives until name is unique
-      while (
-        this.players.includes(this.player.name) &&
-        (this.user.id != this.room.people[this.player.name].id ||
-          this.user.guest)
-      ) {
-        this.player.name =
-          capitalize(randomWord('adjectives')) + ' ' + this.player.name
-      }
-      // Let the player know if they were renamed
-      if (this.player.name !== name) {
-        this.showUniquifiedModal()
-      }
-    },
-    async joinGame() {
-      // Remove this and all other room.people == undefined checks after 2021-04-09
-      if (!this.room.people) {
-        this.room.people = {}
-      }
-      // Assumes player.name as already been uniquify'd
-      this.room.people[this.player.name] = {
-        id: this.user.id || '',
-        supporter: this.user.isSupporter || '',
-        state: 'PLAYING',
-      }
-      await this.saveRoom('people')
-    },
-    async resetRoom() {
-      this.room = {
-        name: this.room.name,
-        currentRound: {
-          state: 'CLUEING',
-          guesser: this.player.name,
-          guess: '',
-          word: randomWord(),
-          clues: {},
-          category: 'nouns',
-        },
-        history: [],
-        public: true,
-        roundsInGame: 13,
-        lastUpdateTime: Date.now(),
-        timers: { CLUEING: '', GUESSING: '', DONE: '', running: false },
-        categories: defaultCategories(),
-        customWords: '',
-        players: [], // For v1 compat support of dev rooms; remove after 2021-04-09
-        people: {
-          [this.player.name]: {
-            id: this.user.id || '',
-            supporter: this.user.isSupporter || '',
-            state: 'MOD', // or 'PLAYING' or 'WATCHING'
-          },
-        },
-      }
-      await setRoom(this.room)
-    },
     async kickPlayer(name) {
       await updateRoom(this.room, { [`people.${name}.state`]: 'WATCHING' })
     },
@@ -773,7 +675,7 @@ export default {
       await updateRoom(this.room, update)
 
       // If all clues are in, move to guessing
-      const doneCluing = this.players.every(
+      const doneCluing = this.room.players.every(
         (p) =>
           this.room.currentRound.clues[p] || p == this.room.currentRound.guesser
       )
@@ -830,7 +732,7 @@ export default {
         state: 'CLUEING',
         guesser: sameGuesser
           ? this.room.currentRound.guesser
-          : nextGuesser(this.room.currentRound.guesser, this.players),
+          : nextGuesser(this.room.currentRound.guesser, this.room.players),
         guess: '',
         word: nextWord(this.room.history, category, this.customWordList),
         clues: {},
@@ -844,13 +746,6 @@ export default {
     async toggleTimers() {
       this.room.timers.running = !this.room.timers.running
       await this.saveRoom('timers')
-    },
-    // Sync any number of properties of this.room to firebase
-    async saveRoom(...props) {
-      await updateRoom(
-        this.room,
-        Object.fromEntries(props.map((prop) => [prop, this.room[prop]]))
-      )
     },
     async upsell(...props) {
       if (this.user.isSupporter) {

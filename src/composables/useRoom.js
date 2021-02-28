@@ -17,8 +17,9 @@ function listPlayers(people) {
     .map(([name, _person]) => name)
 }
 
-/** Expects a reactive `user` object, and a function that sets up a new room. */
-export function useRoom(user, makeNewRoom) {
+// Expects: 1) reactive `user` object, 2) a callback that sets up a new room,
+// and optionally 3) a callback that inits the player and room objects.
+export function useRoom(user, makeNewRoom, onJoin = undefined) {
   // Contains local data about the player's choices; not yet synced to Firestore.
   const player = reactive({
     name: 'Eve',
@@ -118,6 +119,9 @@ export function useRoom(user, makeNewRoom) {
       id: user.id || '',
       supporter: user.isSupporter || '',
       state: 'PLAYING',
+    }
+    if (onJoin) {
+      onJoin(room, player)
     }
     if (alsoUpload) {
       await saveRoom('people')
