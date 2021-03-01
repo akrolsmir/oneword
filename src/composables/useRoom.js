@@ -57,7 +57,7 @@ export function useRoom(user, makeNewRoom, onJoin = undefined) {
 
     if (!fetchedRoom) {
       // 1. If the room doesn't exist, create it, then return
-      player.name = user.displayName || `${randomWord('adjectives')}-anon`
+      // Known issue: Creating as a guest leads to 'Anon'
       await resetRoom()
       listenRoom(room.name, loadFrom)
       return
@@ -112,7 +112,7 @@ export function useRoom(user, makeNewRoom, onJoin = undefined) {
   }
 
   async function joinGame(alsoUpload = true) {
-    uniquify(user.displayName)
+    uniquify(user.displayName || 'Anon')
     room.people[player.name] = {
       id: user.id || '',
       supporter: user.isSupporter || '',
