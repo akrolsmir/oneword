@@ -43,12 +43,13 @@
 import { inject } from 'vue'
 
 import firebase from 'firebase/app'
-import * as firebaseui from 'firebaseui'
 import 'firebaseui/dist/firebaseui.css'
 
 import AnimatedModal from './AnimatedModal.vue'
 
-function injectFirebaseUi() {
+async function injectFirebaseUi() {
+  const firebaseui = await import('firebaseui')
+
   const successUrl = new URL(window.location.href)
   if (successUrl.pathname !== '/') {
     // Add `?authed=1` if signing in from any page but the homepage
@@ -91,10 +92,9 @@ export default {
     }
   },
   mounted() {
-    injectFirebaseUi()
+    /* no await */ injectFirebaseUi()
   },
   methods: {
-    injectFirebaseUi,
     toGuestMode() {
       this.guestMode = true
       // Wait for mount, then focus the input
