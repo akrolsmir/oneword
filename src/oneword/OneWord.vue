@@ -332,7 +332,7 @@
                 @click="submitClue"
                 :disabled="
                   !room.players.includes(player.name) ||
-                  dupes(player.clue, room.currentRound.word)
+                  dupes(player.clue || '', room.currentRound.word)
                 "
                 :class="{
                   'is-primary': room.currentRound.clues[player.name],
@@ -347,7 +347,7 @@
           <div
             class="notification is-danger"
             role="alert"
-            v-if="dupes(player.clue, room.currentRound.word)"
+            v-if="dupes(player.clue || '', room.currentRound.word)"
           >
             This clue is too similar to the word
           </div>
