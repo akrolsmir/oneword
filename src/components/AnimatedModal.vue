@@ -63,3 +63,9 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.animate__faster {
+  --animate-duration: 0.5s;
+}
+</style>

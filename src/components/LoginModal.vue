@@ -2,15 +2,7 @@
   <AnimatedModal :visible="visible">
     <!-- Note: for some reason the card takes up 600px anyways,
     so there's a background click deadzone to the right/left -->
-    <div
-      class="modal-card box"
-      style="max-width: 400px"
-      :class="
-        guestMode
-          ? 'animate__animated animate__flipInY animate__faster'
-          : 'animate__animated animate__flipInX animate__faster'
-      "
-    >
+    <div class="modal-card box" style="max-width: 400px">
       <div class="has-text-centered" v-show="!guestMode">
         <h2 class="fancy title mb-1">Sign in to get started!</h2>
         <div id="firebaseui-auth-container"></div>
@@ -55,7 +47,6 @@ import * as firebaseui from 'firebaseui'
 import 'firebaseui/dist/firebaseui.css'
 
 import AnimatedModal from './AnimatedModal.vue'
-import 'animate.css'
 
 function injectFirebaseUi() {
   const successUrl = new URL(window.location.href)
