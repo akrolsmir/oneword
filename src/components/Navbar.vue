@@ -67,10 +67,11 @@
 
       <div class="navbar-end">
         <div class="navbar-item">
-          <div v-if="user.id" class="buttons">
-            <router-link to="/profile" class="button is-white"
+          <div class="buttons">
+            <router-link v-if="user.id" to="/profile" class="button is-white"
               >Signed in as {{ user.name.split(' ')[0] }}!</router-link
             >
+            <a v-else class="button is-light" @click="logIn"> Sign up </a>
             <a
               href="/supporter"
               class="button is-warning"
@@ -80,12 +81,6 @@
                 user.isSupporter ? 'Supporter' : 'Become a supporter!'
               }}</strong>
             </a>
-          </div>
-          <div v-else class="buttons">
-            <a class="button is-primary" @click="logIn">
-              <strong>Sign up</strong>
-            </a>
-            <a class="button is-light" @click="logIn"> Log in </a>
           </div>
         </div>
       </div>
