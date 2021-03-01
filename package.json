@@ -21,6 +21,21 @@
     "vue-router": "4",
     "vue3-carousel": "^0.1.11"
   },
+  "dependenciesUnpackedSize": {
+    "overall": "850kb, measured 2020-03-01",
+    "@stripe/stripe-js": "2kb",
+    "animate.css": "???",
+    "bulma": "???",
+    "bulma-pricingtable": "???",
+    "date-fns": "10kb",
+    "firebase": "firestore: 330kb, analytics: 35kb, auth: 180kb",
+    "firebaseui": "220kb. Maybe async-ify?",
+    "fontawesome": "???",
+    "pluralize": "6kb",
+    "vue": "40kb from fresh vite install; more with imports?",
+    "vue-router": "20kb?",
+    "vue3-carousel": "???"
+  },
   "devDependencies": {
     "@vitejs/plugin-vue": "^1.1.4",
     "@vue/compiler-sfc": "^3.0.5",
