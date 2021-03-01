@@ -1,5 +1,5 @@
 <template>
-  <div :class="{ box: !hidden }" style="overflow-wrap: break-word">
+  <div class="block" style="overflow-wrap: break-word">
     <p>
       <span class="fancy">Room Chat</span> &nbsp;
       <a v-if="!hidden" @click="hidden = true">(hide)</a>
@@ -122,3 +122,12 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.block {
+  background: transparent;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 1rem;
+}
+</style>
