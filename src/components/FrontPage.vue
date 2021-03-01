@@ -8,9 +8,8 @@
         rel="noopener noreferrer"
         href="https://amzn.to/2xV5lUm"
       >
-        Just One
-      </a>
-      , a co-op word game for 3+ players.<br />
+        Just One</a
+      >, a co-op word game for 3+ players.<br />
       In each of the 13 rounds, come up with a one-word hint for the
       guesser...<br />
       But beware: duplicate hints are discarded!<br />
