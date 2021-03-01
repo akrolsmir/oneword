@@ -148,6 +148,7 @@ export function useRoom(user, makeNewRoom, onJoin = undefined) {
 
     // Methods to manipulate rooms
     createOrEnterRoom,
+    enterRoom,
     resetRoom,
     saveRoom,
   }
