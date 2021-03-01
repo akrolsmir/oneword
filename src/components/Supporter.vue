@@ -281,9 +281,14 @@
 
 <script>
 import 'bulma-pricingtable/dist/css/bulma-pricingtable.min.css'
-import { loadStripe } from '@stripe/stripe-js/pure'
 import { firebaseLogEvent } from '../firebase/network'
 import BigColumn from './BigColumn.vue'
+
+// Dynamically import Stripe to reduce bundle size
+let loadStripe
+async function importStripe() {
+  loadStripe = (await import('@stripe/stripe-js/pure')).loadStripe
+}
 
 export default {
   components: { BigColumn },
@@ -291,6 +296,9 @@ export default {
     return {
       planValues: { supporter: 3, champion: 6, sponsor: 10 },
     }
+  },
+  created() {
+    /* no await */ importStripe()
   },
   methods: {
     async checkout(planName) {
@@ -305,6 +313,7 @@ export default {
       // )
       // const prices = {
       //   supporter: 'price_1IQ2WtCGj90UZkiJHP2cdy31',
+      //   champion: 'price_1IQ2WtCGj90UZkiJHP2cdy31',
       //   sponsor: 'price_1IQ2WtCGj90UZkiJHP2cdy31',
       // }
 
