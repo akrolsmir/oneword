@@ -357,7 +357,7 @@ export default {
 h1,
 h2,
 h3 {
-  font-family: 'Merienda One', cursive;
+  font-family: 'Merienda', cursive;
 }
 
 h1 {
