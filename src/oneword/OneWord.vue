@@ -80,7 +80,7 @@
           <!-- Timers -->
           <span class="ml-1 mr-2 my-1 is-flex is-align-items-center">
             <template v-if="isMod">
-              <label for="clue-timer" class="is-size-7 mx-1 is-flex-grow-1"
+              <label for="clue-timer" class="is-size-7 is-flex-grow-1"
                 >Clue:</label
               >
               <input
@@ -94,7 +94,9 @@
                 v-model.number="room.timers.CLUEING"
                 :disabled="room.timers.running"
               />
-              <label for="guess-timer" class="is-size-7 mx-1 is-flex-grow-1"
+              <span class="is-size-7 mr-4 ml-1">secs</span>
+
+              <label for="guess-timer" class="is-size-7 is-flex-grow-1"
                 >Guess:</label
               >
               <input
@@ -108,6 +110,8 @@
                 v-model.number="room.timers.GUESSING"
                 :disabled="room.timers.running"
               />
+              <span class="is-size-7 mr-4 ml-1">secs</span>
+
               <button
                 class="button is-small mx-1 is-flex-grow-1"
                 @click="toggleTimers"
@@ -147,7 +151,7 @@
 
       <div class="message-body" style="border-width: 0">
         <!-- Mod Categories -->
-        <div v-if="isMod">
+        <div v-if="showModTools">
           <div class="label mt-0">Basic Wordlists</div>
           <span class="field is-grouped is-grouped-multiline my-1">
             <div class="control" v-for="category in BASIC_LISTS">
@@ -223,7 +227,7 @@
         </div>
 
         <!-- Other Mod Tools -->
-        <div v-if="isMod">
+        <div v-if="showModTools">
           <div class="label">Room Controls</div>
           <div class="field has-addons is-inline-flex mb-6">
             <span class="control">
@@ -280,6 +284,11 @@
         </div>
         <div v-if="noMod">
           <a @click="makeMod(player.name)"> (Become the mod...) </a>
+        </div>
+        <div v-else-if="isMod">
+          <a @click="player.modTools = !player.modTools">
+            ({{ player.modTools ? 'Hide' : 'Show' }} mod tools)
+          </a>
         </div>
       </div>
     </div>
@@ -620,6 +629,9 @@ export default {
         (this.room.people &&
           this.room.people[this.player.name]?.state === 'MOD')
       )
+    },
+    showModTools() {
+      return this.isMod && this.player.modTools
     },
     noMod() {
       return !Object.values(this.room.people || {}).some(
