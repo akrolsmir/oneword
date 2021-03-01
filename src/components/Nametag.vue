@@ -20,7 +20,7 @@
         style="z-index: 1"
       >
         <img
-          v-if="user && user.email && user.isSupporter"
+          v-if="user && user.email && (user.isSupporter || user.supporter)"
           style="
             border-top-left-radius: 4px;
             border-bottom-left-radius: 4px;
