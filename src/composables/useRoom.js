@@ -94,6 +94,9 @@ export function useRoom(user, makeNewRoom, onJoin = undefined) {
 
   function uniquify(name) {
     player.name = name
+    // Skip uniquify popup when entering from ?player=Spartacus
+    if (route.query.player) return
+
     const idsMatch = user.id == room.people[player.name]?.id && !user.guest
     while (room.players.includes(player.name) && !idsMatch) {
       const oldName = player.name.split(' ').pop()
