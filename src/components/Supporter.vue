@@ -43,7 +43,7 @@
             class="button is-medium is-warning"
             @click="checkout('supporter')"
           >
-            Become a Supporter! ($2.99/month)
+            Become a Supporter! ($3/month)
           </button>
         </div>
         <br />
@@ -57,7 +57,6 @@
             <div class="promo-img">
               <img
                 class="border"
-                width="377px"
                 src="/images/spot-bad.png"
                 alt="An example game round, where Amey guessed 'speckled' but the word was 'spot'."
               />
@@ -70,7 +69,6 @@
             <div class="promo-img">
               <img
                 class="border"
-                width="377px"
                 src="/images/spot-good.png"
                 alt="The same game round, but now 'speckled' is marked as correct."
               />
@@ -99,7 +97,7 @@
             class="button is-medium is-primary"
             @click="checkout('champion')"
           >
-            Become a Champion! ($4.99/month)
+            Become a Champion! ($6/month)
           </button>
         </div>
         <br />
@@ -111,7 +109,7 @@
         <div class="promo-img">
           <img
             class="border"
-            width="299px"
+            width="299"
             src="/images/sponsors.png"
             alt="Frontpage listing of our sponsors"
           />
@@ -139,7 +137,7 @@
             class="button is-medium is-danger"
             @click="checkout('sponsor')"
           >
-            Become a Sponsor! ($9.99/month)
+            Become a Sponsor! ($10/month)
           </button>
         </div>
         <br />
@@ -301,30 +299,30 @@ export default {
         currency: 'USD',
       })
 
-      // Test APIs
+      // Test API keys
       // const stripe = await loadStripe(
       //   'pk_test_TBbJ3UlK3uxu5fIiaFa1fEgq00F66fSFTg'
       // )
-      // const plans = {
-      //   supporter: 'plan_H44e4fQHCaUePD',
-      //   sponsor: 'plan_H44fh9HqtqTb9B',
+      // const prices = {
+      //   supporter: 'price_1IQ2WtCGj90UZkiJHP2cdy31',
+      //   sponsor: 'price_1IQ2WtCGj90UZkiJHP2cdy31',
       // }
 
-      // Prod APIs
+      // Prod API keys
       const stripe = await loadStripe(
         'pk_live_V662ekSpUVB7NK0YRz6mZRrg00VtBZqQ6k'
       )
-      const plans = {
-        supporter: 'plan_H3ICnHNAVRYziM',
-        champion: 'price_1I9JRXCGj90UZkiJNKLtWiVe',
-        sponsor: 'plan_H3IEHNqkNsWgXz',
+      const prices = {
+        supporter: 'price_1IQ2NWCGj90UZkiJe5UnS3th',
+        champion: 'price_1IQ2MaCGj90UZkiJN1p1jZxc',
+        sponsor: 'price_1IAhI0CGj90UZkiJbHPpHjE5',
       }
 
       // When the customer clicks on the button, redirect them to Checkout.
       stripe
         .redirectToCheckout({
-          items: [{ plan: plans[planName], quantity: 1 }],
-
+          lineItems: [{ price: prices[planName], quantity: 1 }],
+          mode: 'subscription',
           // Do not rely on the redirect to the successUrl for fulfilling
           // purchases, customers may not always reach the success_url after
           // a successful payment.
