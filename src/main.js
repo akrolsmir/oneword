@@ -52,6 +52,11 @@ const router = createRouter({
 
 export const app = createApp(App)
   .use(router)
-  .use(VueTippy, { directive: 'tippy' })
+  .use(VueTippy, {
+    directive: 'tippy',
+    defaultProps: {
+      appendTo: 'parent',
+    },
+  })
 const rootComponent = app.mount('#app')
 app.config.globalProperties.$showModal = rootComponent.showModal
