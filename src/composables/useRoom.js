@@ -15,6 +15,7 @@ function listPlayers(people) {
   return Object.entries(people || {})
     .filter(([_name, person]) => person.state !== 'WATCHING')
     .map(([name, _person]) => name)
+    .sort()
 }
 
 // Expects: 1) reactive `user` object, 2) a callback that sets up a new room,
