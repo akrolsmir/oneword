@@ -116,7 +116,7 @@ export function useRoom(user, makeNewRoom, onJoin = undefined) {
     uniquify(user.displayName || 'Anon')
     room.people[player.name] = {
       id: user.id,
-      supporter: user.isSupporter,
+      supporter: user.supporter,
       state: 'PLAYING',
       guest: user.guest,
       avatarUrl: user.avatarUrl,
