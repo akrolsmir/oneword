@@ -93,7 +93,7 @@
                 :class="{
                   invalid:
                     room.invalidEntries[
-                      round.card.category + entries[index - 1]
+                      sanitize(round.card.category) + entries[index - 1]
                     ],
                 }"
               >
@@ -398,6 +398,7 @@ export default {
   },
   methods: {
     debounce,
+    sanitize,
     nextStage() {
       this.room.state = 'CHECKING'
       this.room.history.push(this.room.round)
