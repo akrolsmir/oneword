@@ -275,6 +275,8 @@ function makeNewRoom(name) {
     history: [],
     invalidEntries: {},
     timerLength: 60,
+    public: true,
+    lastUpdateTime: Date.now(),
   }
 }
 
