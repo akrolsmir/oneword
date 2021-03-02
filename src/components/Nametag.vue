@@ -1,9 +1,6 @@
 <template>
   <div class="control">
     <div class="tags has-addons">
-      <div v-if="modtag" class="tag is-dark" v-tippy="{ content: 'Moderator' }">
-        👑
-      </div>
       <div
         class="tag is-white"
         :class="{
@@ -16,7 +13,7 @@
         style="z-index: 1"
       >
         <img
-          v-if="user && user.email && (user.isSupporter || user.supporter)"
+          v-if="avatarUrl"
           style="
             border-top-left-radius: 4px;
             border-bottom-left-radius: 4px;
@@ -29,6 +26,7 @@
           height="28"
           width="28"
         />
+        <span v-if="modtag" class="mr-1">👑</span>
         {{ name }}
         <button
           v-if="mod || self"
@@ -66,7 +64,12 @@ export default {
   },
   computed: {
     avatarUrl() {
-      return `https://www.gravatar.com/avatar/${md5(this.user.email)}?size=48`
+      return (
+        this.user.avatarUrl ||
+        // Fallback for hardcoded emails (eg on the About page, or Sponsors)
+        (this.user.email &&
+          `https://www.gravatar.com/avatar/${md5(this.user.email)}?size=48`)
+      )
     },
     attr() {
       if (!this.user || this.user.guest) {

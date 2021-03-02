@@ -115,9 +115,11 @@ export function useRoom(user, makeNewRoom, onJoin = undefined) {
   async function joinGame(alsoUpload = true) {
     uniquify(user.displayName || 'Anon')
     room.people[player.name] = {
-      id: user.id || '',
-      supporter: user.isSupporter || '',
+      id: user.id,
+      supporter: user.isSupporter,
       state: 'PLAYING',
+      guest: user.guest,
+      avatarUrl: user.avatarUrl,
     }
     if (onJoin) {
       onJoin(room, player)
