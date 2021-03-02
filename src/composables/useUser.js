@@ -13,6 +13,7 @@ export function useUser() {
     email: '',
     createTime: 0,
     lastUpdateTime: 0,
+    supporter: '',
 
     // NOTE: The following properties are not pulled from Firestore
     // Callback to display the sign in popup
