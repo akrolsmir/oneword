@@ -3,17 +3,17 @@
 
 <template>
   <div id="top-content">
-    <div class="narrow card">
+    <div class="narrow card bg">
       <div class="type">Scores</div>
       <div style="width: 100%; text-align: center; font-style: italic">
         {{ room.winningScore }} points to win
       </div>
       <br />
       <div v-for="[player, score] in playerScores">
-        {{ player }}: {{ score }}
+        <Nametag class="p-1" :name="player" :score="score" />
       </div>
     </div>
-    <div class="narrow card round">
+    <div class="narrow card bg round" style="background-color: #f5f5f5">
       <div v-if="room.state !== 'START'">
         <div class="type">
           {{ cardType.longName }}
@@ -77,7 +77,7 @@
     </div>
 
     <div id="history">
-      <div v-for="round in room.history" class="card summary">
+      <div v-for="round in room.history" class="card bg summary">
         <div>
           Round {{ round.number + 1 }}: {{ round.card.category }} ({{
             CARD_TYPES[round.card.type].longName
@@ -169,6 +169,9 @@
 .card {
   padding: 24px;
 }
+.card.bg {
+  background-color: #f5f5f5;
+}
 
 .type,
 .category {
@@ -245,6 +248,7 @@
 <script>
 import { inject } from 'vue'
 import Timer from '../components/Timer.vue'
+import Nametag from '../components/Nametag.vue'
 import { categories } from './cards.js'
 import { useRoom } from '../composables/useRoom.js'
 import { debounce, listIncludes, pickRandom, sanitize } from '../utils'
@@ -301,6 +305,7 @@ const CARD_TYPES = {
 export default {
   components: {
     Timer,
+    Nametag,
   },
   setup() {
     const user = inject('currentUser')
