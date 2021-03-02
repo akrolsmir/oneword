@@ -9,8 +9,8 @@
         {{ room.winningScore }} points to win
       </div>
       <br />
-      <div v-for="player in room.players">
-        {{ player }}: {{ playerScores[player] }}
+      <div v-for="[player, score] in playerScores">
+        {{ player }}: {{ score }}
       </div>
     </div>
     <div class="narrow card round">
@@ -381,6 +381,7 @@ export default {
       }
       return roundScores
     },
+    // Returns a sorted list eg [['Victor', 10], ['Hugo', 6]...]
     playerScores() {
       let scores = {}
       for (let player of this.room.players) {
@@ -389,7 +390,9 @@ export default {
           0
         )
       }
-      return scores
+      return Object.entries(scores).sort(
+        ([p1, s1], [p2, s2]) => s2 - s1 || p1 < p2
+      )
     },
 
     previousCategories() {
