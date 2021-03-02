@@ -48,31 +48,14 @@
             <div class="mx-1" v-if="isMod">
               <span class="select is-small">
                 <select v-model="room.public" @change="upsell('public')">
-                  <option :value="true">Public</option>
-                  <option :value="false">Private</option>
-                </select>
-              </span>
-              <span class="select is-small">
-                <select
-                  v-model="room.roundsInGame"
-                  @change="upsell('roundsInGame')"
-                >
-                  <option :value="13">13 rounds</option>
-                  <option :value="'Unlimited'">&infin; rounds</option>
+                  <option :value="true">Public room</option>
+                  <option :value="false">Private room</option>
                 </select>
               </span>
             </div>
             <template v-else>
               <span class="mx-2"
-                >{{ room.public ? 'Public' : 'Private' }} Room</span
-              >
-              <span class="mx-2"
-                >{{
-                  room.roundsInGame == 'Unlimited'
-                    ? '&infin;'
-                    : room.roundsInGame
-                }}
-                rounds</span
+                >{{ room.public ? 'Public' : 'Private' }} room</span
               >
             </template>
           </span>
