@@ -112,10 +112,7 @@
               />
               <span class="is-size-7 mr-4 ml-1">secs</span>
 
-              <button
-                class="button is-small mx-1 is-flex-grow-1"
-                @click="toggleTimers"
-              >
+              <button class="button is-small" @click="toggleTimers">
                 {{ room.timers.running ? 'Stop' : 'Start' }} Timers
               </button>
             </template>
