@@ -38,7 +38,7 @@
         <div class="is-flex is-flex-wrap-wrap is-align-items-center">
           <!-- Supporter Settings -->
           <span
-            title="Supporter settings"
+            v-tippy="{ content: 'Supporter settings', placement: 'left' }"
             class="py-1 pl-1 pr-4"
             style="
               background: #ffef99;

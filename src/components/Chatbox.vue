@@ -16,7 +16,10 @@
           flex-direction: column-reverse;
         "
       >
-        <p v-for="line in sortedLogs" :title="formatTime(line.timestamp)">
+        <p
+          v-for="line in sortedLogs"
+          v-tippy="{ content: formatTime(line.timestamp), placement: 'left' }"
+        >
           <b>{{ line.name }}:</b> {{ line.text }}
         </p>
       </div>

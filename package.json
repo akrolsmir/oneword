@@ -19,6 +19,7 @@
     "pluralize": "^8.0.0",
     "vue": "^3.0.5",
     "vue-router": "4",
+    "vue-tippy": "^6.0.0-alpha.25",
     "vue3-carousel": "^0.1.11"
   },
   "dependenciesUnpackedSize": {

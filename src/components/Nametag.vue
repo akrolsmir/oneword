@@ -1,12 +1,7 @@
 <template>
   <div class="control">
     <div class="tags has-addons">
-      <div
-        v-if="modtag"
-        class="tag is-dark"
-        title="moderator"
-        aria-label="moderator"
-      >
+      <div v-if="modtag" class="tag is-dark" v-tippy="{ content: 'Moderator' }">
         👑
       </div>
       <div
@@ -17,6 +12,7 @@
           'has-text-weight-semibold': submitted,
         }"
         v-bind="attr"
+        v-tippy="{ content: attr.title }"
         style="z-index: 1"
       >
         <img
