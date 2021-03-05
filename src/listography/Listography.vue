@@ -315,9 +315,6 @@ export default {
   created() {
     this.debouncedSubmitEntries = debounce(this.submitEntries, 300)
   },
-  beforeMount() {
-    /* no await */ this.createOrEnterRoom()
-  },
   data() {
     return {
       CARD_TYPES,

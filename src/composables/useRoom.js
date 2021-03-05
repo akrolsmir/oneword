@@ -1,4 +1,4 @@
-import { computed, reactive } from 'vue'
+import { computed, onBeforeMount, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   getRoom,
@@ -18,8 +18,14 @@ function listPlayers(people) {
     .sort()
 }
 
-// Expects: 1) reactive `user` object, 2) a callback that sets up a new room,
-// and optionally 3) a callback that inits the player and room objects.
+/**
+ * Creates a template room, usable in different game types.
+ * Room creation & joining logic should go here; game logic should not.
+ *
+ * @param {*} user - Reactive user object from useUser()
+ * @param {Function} makeNewRoom - Should return a new room with no one in it
+ * @param {Function} [onJoin] - Callback, to do more init for player/room
+ */
 export function useRoom(user, makeNewRoom, onJoin = undefined) {
   // Contains local data about the player's choices; not yet synced to Firestore.
   const player = reactive({
@@ -144,13 +150,16 @@ export function useRoom(user, makeNewRoom, onJoin = undefined) {
 
   loadFrom(makeNewRoom(room.name))
 
+  onBeforeMount(() => {
+    /* no await */ createOrEnterRoom()
+  })
+
   return {
     // Reactive objects
     player,
     room,
 
     // Methods to manipulate rooms
-    createOrEnterRoom,
     enterRoom,
     resetRoom,
     saveRoom,

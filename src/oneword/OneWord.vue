@@ -568,9 +568,6 @@ export default {
     const roomHelpers = useRoom(user, makeNewRoom, onJoin)
     return Object.assign(roomHelpers, { user })
   },
-  beforeMount() {
-    /* no await */ this.createOrEnterRoom()
-  },
   data() {
     return {
       BASIC_LISTS,
