@@ -95,31 +95,23 @@
           {{ name }}
           scored <strong>{{ roundScores[round.number][name] }}</strong
           >:&ensp;
-          <span v-for="index in entries.length">
-            <span v-if="entries[index - 1]">
+          <span v-for="(entry, i) in entries">
+            <span v-if="entry">
               <span
-                :class="{
-                  invalid:
-                    room.invalidEntries[
-                      sanitize(round.card.category) + entries[index - 1]
-                    ],
-                }"
+                :class="{ invalid: checkInvalid(round.card.category, entry) }"
               >
                 <span
                   :class="{
-                    fail: !entryScore(
-                      collisions[round.number][name][index - 1],
-                      round
-                    ),
+                    fail: !entryScore(collisions[round.number][name][i], round),
                   }"
                 >
-                  {{ entries[index - 1] }}
+                  {{ entry }}
                 </span>
-                ({{ collisions[round.number][name][index - 1] }})
+                ({{ collisions[round.number][name][i] }})
               </span>
               <span
                 class="trash"
-                @click="toggleInvalid(round.card.category, entries[index - 1])"
+                @click="toggleInvalid(round.card.category, entry)"
                 >🗑️</span
               >
               &ensp;
@@ -282,11 +274,7 @@ function makeNewRoom(name) {
       },
       entries: {
         adrian: ['spruce', 'pine', 'elm'],
-        austin: ['birch', 'spruce', 'maple'],
-      },
-      collisions: {
-        adrian: [0, 0, 0],
-        austin: [0, 0, 0],
+        austin: ['birch', 'spruce', 'MAPLEstory'],
       },
       */
     },
@@ -360,14 +348,12 @@ export default {
           for (let i = 0; i < round.entries[name].length; i++) {
             let entry = round.entries[name][i]
             if (!entry) continue
-            let key = round.card.category + entry
-            if (this.room.invalidEntries[key]) continue
+            if (this.checkInvalid(round.card.category, entry)) continue
 
             collisions[round.number][name][i] = 0
             for (let otherName in round.entries) {
               if (name === otherName) continue
 
-              // TODO: Not sufficient, since invalidEntries is exact match
               if (listIncludes(round.entries[otherName], entry)) {
                 collisions[round.number][name][i] += 1
               }
@@ -386,8 +372,7 @@ export default {
           for (let i = 0; i < round.entries[name].length; i++) {
             let entry = round.entries[name][i]
             if (!entry) continue
-            let key = round.card.category + entry
-            if (this.room.invalidEntries[key]) continue
+            if (this.checkInvalid(round.card.category, entry)) continue
 
             score += this.entryScore(
               this.collisions[round.number][name][i],
@@ -474,6 +459,12 @@ export default {
       const key = sanitize(category + entry) // Sanitize for Firestore
       this.room.invalidEntries[key] = !this.room.invalidEntries[key]
       this.saveRoom(`invalidEntries.${key}`)
+    },
+    checkInvalid(category, entry) {
+      const key = sanitize(category + entry)
+      // TODO: Not sufficient, since invalidEntries is exact match, but we want
+      // to use the fuzzy wordsMatch() instead
+      return this.room.invalidEntries[key]
     },
 
     // TODO cleanup: place inside CARD_TYPES array
