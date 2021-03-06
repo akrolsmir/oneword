@@ -57,3 +57,11 @@ export function debounce(func, delayMs) {
     timeoutID = setTimeout(() => func.apply(this, arguments), delayMs)
   }
 }
+
+// Return a stable ordering of the object's [entries, keys]
+// Good for keeping game state stable across Firestore pushes
+export function orderedEntries(object) {
+  return Object.entries(object)
+    .sort(([k1, v1], [k2, v2]) => k1.localeCompare(k2))
+    .map(([k, v]) => [v, k]) // Swap so entries come before keys
+}

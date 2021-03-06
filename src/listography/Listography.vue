@@ -88,7 +88,10 @@
             CARD_TYPES[round.card.type].longName
           }})
         </div>
-        <div class="player" v-for="(entries, name) in round.entries">
+        <div
+          class="player"
+          v-for="[entries, name] in orderedEntries(round.entries)"
+        >
           {{ name }}
           scored <strong>{{ roundScores[round.number][name] }}</strong
           >:&ensp;
@@ -256,7 +259,13 @@ import Timer from '../components/Timer.vue'
 import Nametag from '../components/Nametag.vue'
 import { categories } from './cards.js'
 import { useRoom } from '../composables/useRoom.js'
-import { debounce, listIncludes, pickRandom, sanitize } from '../utils'
+import {
+  debounce,
+  listIncludes,
+  pickRandom,
+  sanitize,
+  orderedEntries,
+} from '../utils'
 
 function makeNewRoom(name) {
   return {
@@ -409,6 +418,7 @@ export default {
     },
   },
   methods: {
+    orderedEntries,
     debounce,
     sanitize,
     nextStage() {
