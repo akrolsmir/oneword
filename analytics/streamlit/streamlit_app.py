@@ -8,12 +8,13 @@ import pytz
 import streamlit as st
 from google.cloud import firestore
 
+DIR_PATH = os.path.dirname(os.path.realpath(__file__))
+
 
 class FirestoreHelper:
     def __init__(self):
-        self.db = firestore.Client.from_service_account_json(
-            "firestore-account-key.json"
-        )
+        key_path = os.path.join(DIR_PATH, "firestore-account-key.json")
+        self.db = firestore.Client.from_service_account_json(key_path)
 
     @staticmethod
     def firebase_doc_to_room(doc):
@@ -126,6 +127,7 @@ file_name = st.sidebar.text_input("File name for data", value="hashed_rooms") + 
 fetch_data_prev = st.sidebar.button("Fetch " + str(num_rooms) + " older rooms")
 fetch_data_next = st.sidebar.button("Fetch " + str(num_rooms) + " newer rooms")
 
+file_name = os.path.join(DIR_PATH, file_name)
 if os.path.isfile(file_name):
     with open(file_name, "r") as room_dump:
         raw_rooms = json.load(room_dump)

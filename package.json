@@ -1,11 +1,12 @@
 {
-  "name": "oneword-v2",
+  "name": "oneword",
   "version": "2.0.0",
   "scripts": {
     "start": "vite",
     "dev": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "analytics": "streamlit run analytics/streamlit/streamlit_app.py"
   },
   "dependencies": {
     "@stripe/stripe-js": "^1.12.1",
