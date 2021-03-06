@@ -120,7 +120,9 @@ should_filter_empty_room = st.sidebar.checkbox("Filter rooms without games", val
 num_rooms = st.sidebar.number_input(
     "Number of rooms to query", min_value=1, max_value=5000, value=5000
 )
-file_name = st.sidebar.text_input("File name for data", value="test") + ".json"
+# To ignore changes in git: `git update-index --assume-unchanged hashed_rooms.json`
+# See https://stackoverflow.com/a/3320183/1222351
+file_name = st.sidebar.text_input("File name for data", value="hashed_rooms") + ".json"
 fetch_data_prev = st.sidebar.button("Fetch " + str(num_rooms) + " older rooms")
 fetch_data_next = st.sidebar.button("Fetch " + str(num_rooms) + " newer rooms")
 
