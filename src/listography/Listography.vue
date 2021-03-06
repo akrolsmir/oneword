@@ -9,8 +9,13 @@
         {{ room.winningScore }} points to win
       </div>
       <br />
-      <div v-for="[player, score] in playerScores">
-        <Nametag class="p-1" :name="player" :score="score" :user="user" />
+      <div v-for="[player, score] in playerScores" :key="player">
+        <Nametag
+          class="p-1"
+          :name="player"
+          :score="score"
+          :user="room.people[player]"
+        />
       </div>
     </div>
     <div class="narrow card bg round" style="background-color: #f5f5f5">
