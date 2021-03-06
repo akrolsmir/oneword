@@ -4,7 +4,7 @@ import ColorHash from '../vendor/color-hash-esm'
 import { md5 } from '../vendor/md5'
 
 export function useUser() {
-  const colorHash = new ColorHash({ lightness: 0.2, saturation: 1 })
+  const colorHash = new ColorHash({ lightness: 0.5, saturation: 1 })
 
   const user = reactive({
     // If user.id is not filled in, then user is not logged in
@@ -32,7 +32,7 @@ export function useUser() {
       if (user.email && user.isSupporter) {
         return `https://www.gravatar.com/avatar/${md5(user.email)}?size=48`
       }
-      return buildAvatarSvg(user.guest ? '#555' : colorHash.hex(user.name))
+      return buildAvatarSvg(user.guest ? '#aaa' : colorHash.hex(user.name))
     }),
   })
 
