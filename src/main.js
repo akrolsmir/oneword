@@ -24,18 +24,38 @@ import { createRouter, createWebHistory } from 'vue-router'
 const routes = [
   { path: '/', component: FrontPage },
   { path: '/room/:id', component: OneWord },
-  { path: '/profile', component: Profile },
-  { path: '/about', component: About },
-  { path: '/supporter', component: Supporter },
-  { path: '/thanks', component: Thanks },
-  { path: '/storytime', component: StorytimeFrontPage },
-  { path: '/storytime/:id', component: Storytime },
+  { path: '/profile', component: Profile, meta: { title: 'Profile' } },
+  { path: '/about', component: About, meta: { title: 'About Us' } },
+  {
+    path: '/supporter',
+    component: Supporter,
+    meta: { title: 'Support One Word' },
+  },
+  {
+    path: '/thanks',
+    component: Thanks,
+    meta: { title: 'Thanks for your support!' },
+  },
+  {
+    path: '/storytime',
+    component: StorytimeFrontPage,
+    meta: { title: 'Storytime' },
+  },
+  {
+    path: '/storytime/:id',
+    component: Storytime,
+    meta: { title: 'Storytime' },
+  },
   { path: '/list', component: ListographyFrontPage },
   { path: '/list/:id', component: Listography },
-  { path: '/incrypt', component: IncryptFrontPage },
-  { path: '/incrypt/:id', component: Incrypt },
-  { path: '/pairwise', component: PairwiseFrontPage },
-  { path: '/pairwise/:id', component: Pairwise },
+  { path: '/incrypt', component: IncryptFrontPage, meta: { title: 'Incrypt' } },
+  { path: '/incrypt/:id', component: Incrypt, meta: { title: 'Incrypt' } },
+  {
+    path: '/pairwise',
+    component: PairwiseFrontPage,
+    meta: { title: 'Pairwise' },
+  },
+  { path: '/pairwise/:id', component: Pairwise, meta: { title: 'Pairwise' } },
 ]
 
 const router = createRouter({
@@ -48,6 +68,12 @@ const router = createRouter({
       return { top: 0 }
     }
   },
+})
+
+// Change title from route meta. For more advanced meta tags, try @vueuse/head, or
+// https://www.digitalocean.com/community/tutorials/vuejs-vue-router-modify-head
+router.beforeEach((to, from) => {
+  document.title = to.meta.title || 'One Word'
 })
 
 export const app = createApp(App)
