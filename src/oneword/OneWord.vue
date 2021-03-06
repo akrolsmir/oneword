@@ -730,7 +730,7 @@ export default {
       this.room.lastUpdateTime = Date.now()
 
       // Overwrite existing room;
-      await setRoom(this.room)
+      await this.saveRoom('history', 'currentRound', 'lastUpdateTime')
     },
     async toggleTimers() {
       this.room.timers.running = !this.room.timers.running
