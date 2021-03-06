@@ -118,7 +118,7 @@ st.sidebar.subheader("Room Options")
 should_filter_empty_room = st.sidebar.checkbox("Filter rooms without games", value=True)
 
 num_rooms = st.sidebar.number_input(
-    "Number of rooms to query", min_value=1, max_value=1000, value=1000
+    "Number of rooms to query", min_value=1, max_value=5000, value=5000
 )
 file_name = st.sidebar.text_input("File name for data", value="test") + ".json"
 fetch_data_prev = st.sidebar.button("Fetch " + str(num_rooms) + " older rooms")
@@ -152,6 +152,8 @@ end_date = st.sidebar.date_input(
     max_value=max_update_date,
     value=max_update_date,
 )
+
+window = st.sidebar.radio("Group by Day/Week/Month", ["D", "W", "M"], index=1)
 
 exclude_custom_words = st.sidebar.checkbox(
     "Filter out rounds with custom words", value=True
@@ -234,64 +236,34 @@ df = pd.DataFrame(
 )
 
 st.header("Analysis By Games")
-st.subheader("Raw Data")
-st.write("Total rooms: " + str(len(date_filtered_raw_rooms)))
-st.write(
-    "Rooms without rounds: " + str(len(date_filtered_raw_rooms) - len(nonempty_rooms))
-)
-st.write(
-    "Empty room percentage: "
-    + str(len(nonempty_rooms) / (len(date_filtered_raw_rooms) * 1.0))
-)
-st.dataframe(df)
 
-st.subheader("Daily Breakdown")
+st.write(
+    f"Data: {len(date_filtered_raw_rooms)} rooms ({len(nonempty_rooms)} \
+         nonempty = {len(nonempty_rooms) / len(date_filtered_raw_rooms) * 100:.1f}%)"
+)
+# st.dataframe(df)
+st.subheader("Total Metrics")
 df_daily = (
     df.set_index(date)
-    .groupby(pd.Grouper(freq="D"))
+    .groupby(pd.Grouper(freq=window))
     .agg(
         total_games=(room_id, "count"),
         total_players=(num_players_cur, "sum"),
-        average_rounds_per_game=(num_rounds, "mean"),
-        mean_players_per_game=(num_players_cur, "mean"),
-        mean_players_history_per_game=(num_players_history, "mean"),
+        total_rounds=(num_rounds, "sum"),
+        total_players_history=(num_players_history, "sum"),
     )
 )
-st.dataframe(df_daily)
-st.line_chart(df_daily[["total_games", "total_players"]])
-st.line_chart(
-    df_daily[
-        [
-            "average_rounds_per_game",
-            "mean_players_per_game",
-            "mean_players_history_per_game",
-        ]
-    ]
-)
+# st.dataframe(df_daily)
+col1, col2 = st.beta_columns(2)
+col1.line_chart(df_daily[["total_games"]])
+col2.line_chart(df_daily[["total_players"]])
 
-st.subheader("Monthly Breakdown")
-df_monthly = (
-    df.set_index(date)
-    .groupby(pd.Grouper(freq="M"))
-    .agg(
-        total_games=(room_id, "count"),
-        total_players=(num_players_cur, "sum"),
-        average_rounds_per_game=(num_rounds, "mean"),
-        mean_players_per_game=(num_players_cur, "mean"),
-        mean_players_history_per_game=(num_players_history, "mean"),
-    )
-)
-st.dataframe(df_monthly)
-st.line_chart(df_monthly[["total_games", "total_players"]])
-st.line_chart(
-    df_monthly[
-        [
-            "average_rounds_per_game",
-            "mean_players_per_game",
-            "mean_players_history_per_game",
-        ]
-    ]
-)
+col1, col2 = st.beta_columns(2)
+col1.line_chart(df_daily[["total_rounds"]])
+# TODO: This chart doesn't mean that much...
+col2.line_chart(df_daily[["total_players_history"]])
+
+#################### BY ROUNDS ####################
 
 rounds = []
 for room in filtered_rooms:
