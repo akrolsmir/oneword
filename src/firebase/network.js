@@ -54,7 +54,7 @@ function roomDb() {
   return 'rooms'
 }
 
-const db = firebase.firestore()
+export const db = firebase.firestore()
 export async function setRoom(room) {
   await db.collection(roomDb()).doc(room.name).set(room)
 }

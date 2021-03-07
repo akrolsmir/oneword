@@ -16,6 +16,7 @@
 
 <script>
 import BigColumn from './BigColumn.vue'
+import { offerCall, RTC_CONFIG } from '../firebase/webrtc'
 
 // Used for the actual networking
 let peerConnection
@@ -39,6 +40,17 @@ export default {
 
       this.$refs.localVideo.srcObject = localStream
       this.$refs.remoteVideo.srcObject = remoteStream
+    },
+    async startCall() {
+      const peerConnection = new RTCPeerConnection(RTC_CONFIG)
+
+      // Attach user's webcam and audio to the webRTC connection, I think?
+      localStream.getTracks().forEach((track) => {
+        peerConnection.addTrack(track, localStream)
+      })
+
+      const callId = this.$route.params.id
+      await offerCall(callId, peerConnection)
     },
   },
 }
