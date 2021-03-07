@@ -462,9 +462,10 @@ export default {
     },
     checkInvalid(category, entry) {
       const key = sanitize(category + entry)
-      // TODO: Not sufficient, since invalidEntries is exact match, but we want
-      // to use the fuzzy wordsMatch() instead
-      return this.room.invalidEntries[key]
+      const invalidList = Object.entries(this.room.invalidEntries)
+        .filter(([k, v]) => v)
+        .map(([k, v]) => k)
+      return listIncludes(invalidList, key)
     },
 
     // TODO cleanup: place inside CARD_TYPES array
