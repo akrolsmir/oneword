@@ -16,7 +16,7 @@
 
 <script>
 import BigColumn from './BigColumn.vue'
-import { offerCall, RTC_CONFIG } from '../firebase/webrtc'
+import { offerCall, RTC_CONFIG, collectIceCandidates } from '../firebase/webrtc'
 
 // Used for the actual networking
 let peerConnection
@@ -50,7 +50,24 @@ export default {
       })
 
       const callId = this.$route.params.id
+
+      collectIceCandidates(
+        callId,
+        peerConnection,
+        'callerCandidates',
+        'calleeCandidates'
+      )
+
       await offerCall(callId, peerConnection)
+
+      // TODO: not sure what this does...
+      peerConnection.addEventListener('track', (event) => {
+        console.log('Got remote track:', event.streams[0])
+        event.streams[0].getTracks().forEach((track) => {
+          console.log('Add a track to the remoteStream:', track)
+          remoteStream.addTrack(track)
+        })
+      })
     },
   },
 }

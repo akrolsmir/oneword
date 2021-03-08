@@ -35,6 +35,7 @@ export async function offerCall(callId, peerConnection) {
   await callRef.set(callWithOffer)
 
   // Now, wait for when a response gets put up
+  // TODO: does this need to be a separate function, for ordering?
   callRef.onSnapshot(async (snapshot) => {
     const data = snapshot.data()
     if (!peerConnection.currentRemoteDescription && data.answer) {
@@ -91,11 +92,32 @@ function registerPeerConnectionListeners(peerConnection) {
 // These are called ICE candidates. The STUN (Session Traversal Utilities for NAT)
 // server helps us match up on a good connection (?)
 // We use Google's free STUN servers
-async function addIceCandidates(
+export function collectIceCandidates(
   callId,
   peerConnection,
   localName,
   remoteName
-) {}
+) {
+  const callRef = db.collection('calls').doc(callId)
+  const candidates = callRef.collection(localName)
+
+  // Post ICE candidates to Firestore when a new one is found from WebRTC
+  peerConnection.addEventListener('icecandidate', (event) => {
+    if (event.candidate) {
+      const json = event.candidate.toJSON()
+      /* no await */ candidates.add(json)
+    }
+  })
+
+  // When the remote posts a new ICE candidate, add it locally
+  callRef.collection(remoteName).onSnapshot((snapshot) => {
+    snapshot.docChanges().forEach((change) => {
+      if (change.type === 'added') {
+        const candidate = new RTCIceCandidate(change.doc.data())
+        /* no await */ peerConnection.addIceCandidates(candidate)
+      }
+    })
+  })
+}
 
 // Also: more boilerplate around every connecting
