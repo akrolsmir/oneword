@@ -45,7 +45,7 @@
               clip-path: polygon(0 0, 0 100%, 93% 100%, 100% 0);
             "
           >
-            <div class="mx-1" v-if="isMod">
+            <div class="mx-1" v-if="player.isMod">
               <span class="select is-small">
                 <select v-model="room.public" @change="upsell('public')">
                   <option :value="true">Public room</option>
@@ -62,7 +62,7 @@
 
           <!-- Timers -->
           <span class="ml-1 mr-2 my-1 is-flex is-align-items-center">
-            <template v-if="isMod">
+            <template v-if="player.isMod">
               <label for="clue-timer" class="is-size-7 is-flex-grow-1"
                 >Clue:</label
               >
@@ -113,7 +113,7 @@
           </span>
 
           <!-- Player Categories -->
-          <span class="mx-3" v-if="!isMod">
+          <span class="mx-3" v-if="!player.isMod">
             <template v-for="category in enabledCategories">
               <span
                 class="comma"
@@ -256,7 +256,7 @@
               room.currentRound.guesser == tagged
             "
             :guessing="room.currentRound.guesser == tagged"
-            :mod="isMod"
+            :mod="player.isMod"
             :self="tagged === player.name"
             :modtag="room.people && room.people[tagged]?.state === 'MOD'"
             @kick="kickPlayer(tagged)"
@@ -265,7 +265,7 @@
         <div v-if="noMod">
           <a @click="makeMod(player.name)"> (Become the mod...) </a>
         </div>
-        <div v-else-if="isMod">
+        <div v-else-if="player.isMod">
           <a @click="player.modTools = !player.modTools">
             ({{ player.modTools ? 'Hide' : 'Show' }} mod tools)
           </a>
@@ -600,15 +600,8 @@ export default {
       }
       return 0
     },
-    isMod() {
-      return (
-        this.user?.isAdmin ||
-        (this.room.people &&
-          this.room.people[this.player.name]?.state === 'MOD')
-      )
-    },
     showModTools() {
-      return this.isMod && this.player.modTools
+      return this.player.isMod && this.player.modTools
     },
     noMod() {
       return !Object.values(this.room.people || {}).some(

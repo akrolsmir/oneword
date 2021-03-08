@@ -30,6 +30,10 @@ export function useRoom(user, makeNewRoom, onJoin = undefined) {
   // Contains local data about the player's choices; not yet synced to Firestore.
   const player = reactive({
     name: 'Eve',
+
+    isMod: computed(() => {
+      return user.isAdmin || room.people[player.name]?.state === 'MOD'
+    }),
   })
 
   // The room object containing the game state; synced to Firestore.
