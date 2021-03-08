@@ -7,9 +7,9 @@ export const RTC_CONFIG = {
   iceServers: [
     { urls: 'stun:stun.l.google.com:19302' },
     { urls: 'stun:stun1.l.google.com:19302' },
-    { urls: 'stun:stun2.l.google.com:19302' },
-    { urls: 'stun:stun3.l.google.com:19302' },
-    { urls: 'stun:stun4.l.google.com:19302' },
+    // { urls: 'stun:stun2.l.google.com:19302' },
+    // { urls: 'stun:stun3.l.google.com:19302' },
+    // { urls: 'stun:stun4.l.google.com:19302' },
   ],
 }
 
@@ -40,23 +40,22 @@ export async function offerCall(callId, peerConnection) {
     const data = snapshot.data()
     if (!peerConnection.currentRemoteDescription && data.answer) {
       // if no remote connection has been set yet, but we just got an answer, then connect!
-      const answer = new RTCSessionDescription(data.answer)
-      await peerConnection.setRemoteDescription(answer)
+      await peerConnection.setRemoteDescription(data.answer)
     }
   })
 }
 
 // Responds with which media codecs we're going to use to connect
-export async function answerCall(callId) {
-  const peerConnection = new RTCPeerConnection(rtcConfig)
-
-  const callDoc = await db.collection('calls').doc(callId).get()
+export async function answerCall(callId, peerConnection) {
+  const callRef = db.collection('calls').doc(callId)
+  const callDoc = await callRef.get()
   const offer = callDoc.data().offer
+  console.log('Got offer:', offer)
   await peerConnection.setRemoteDescription(offer)
+
   const answer = await peerConnection.createAnswer()
   await peerConnection.setLocalDescription(answer)
 
-  const callRef = db.collection('calls').doc(callId)
   await callRef.update({
     answer: {
       type: answer.type,
@@ -92,29 +91,29 @@ function registerPeerConnectionListeners(peerConnection) {
 // These are called ICE candidates. The STUN (Session Traversal Utilities for NAT)
 // server helps us match up on a good connection (?)
 // We use Google's free STUN servers
-export function collectIceCandidates(
-  callId,
-  peerConnection,
-  localName,
-  remoteName
-) {
+export function pushLocalCandidates(callId, peerConnection, localName) {
   const callRef = db.collection('calls').doc(callId)
-  const candidates = callRef.collection(localName)
+  const localCandidates = callRef.collection(localName)
 
   // Post ICE candidates to Firestore when a new one is found from WebRTC
   peerConnection.addEventListener('icecandidate', (event) => {
     if (event.candidate) {
       const json = event.candidate.toJSON()
-      /* no await */ candidates.add(json)
+      console.log('Adding ice candidate', localName, json)
+      /* no await */ localCandidates.add(json)
     }
   })
+}
 
+export function listenRemoteCandidates(callId, peerConnection, remoteName) {
   // When the remote posts a new ICE candidate, add it locally
+  const callRef = db.collection('calls').doc(callId)
   callRef.collection(remoteName).onSnapshot((snapshot) => {
     snapshot.docChanges().forEach((change) => {
       if (change.type === 'added') {
         const candidate = new RTCIceCandidate(change.doc.data())
-        /* no await */ peerConnection.addIceCandidates(candidate)
+        console.log('Got candidate: ', remoteName, JSON.stringify(candidate))
+        /* no await */ peerConnection.addIceCandidate(candidate)
       }
     })
   })

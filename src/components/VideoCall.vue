@@ -16,13 +16,35 @@
 
 <script>
 import BigColumn from './BigColumn.vue'
-import { offerCall, RTC_CONFIG, collectIceCandidates } from '../firebase/webrtc'
+import {
+  offerCall,
+  RTC_CONFIG,
+  answerCall,
+  pushLocalCandidates,
+  listenRemoteCandidates,
+} from '../firebase/webrtc'
 
-// Used for the actual networking
-let peerConnection
-// Sources for the videos
+// Sources for the <video>s
 let localStream
 let remoteStream
+
+function addLocalTracks(localStream, peerConnection) {
+  // Attach user's webcam and audio to the webRTC connection, I think?
+  localStream.getTracks().forEach((track) => {
+    peerConnection.addTrack(track, localStream)
+  })
+}
+
+function listenRemoteTracks(remoteStream, peerConnection) {
+  // I _think_ this connects the received tracks to the remote <video>
+  peerConnection.addEventListener('track', (event) => {
+    console.log('Got remote track:', event.streams[0])
+    event.streams[0].getTracks().forEach((track) => {
+      console.log('Add a track to the remoteStream:', track)
+      remoteStream.addTrack(track)
+    })
+  })
+}
 
 export default {
   components: {
@@ -44,30 +66,30 @@ export default {
     async startCall() {
       const peerConnection = new RTCPeerConnection(RTC_CONFIG)
 
-      // Attach user's webcam and audio to the webRTC connection, I think?
-      localStream.getTracks().forEach((track) => {
-        peerConnection.addTrack(track, localStream)
-      })
-
       const callId = this.$route.params.id
 
-      collectIceCandidates(
-        callId,
-        peerConnection,
-        'callerCandidates',
-        'calleeCandidates'
-      )
+      addLocalTracks(localStream, peerConnection)
+      pushLocalCandidates(callId, peerConnection, 'callerCandidates')
+
+      listenRemoteTracks(remoteStream, peerConnection)
 
       await offerCall(callId, peerConnection)
 
-      // TODO: not sure what this does...
-      peerConnection.addEventListener('track', (event) => {
-        console.log('Got remote track:', event.streams[0])
-        event.streams[0].getTracks().forEach((track) => {
-          console.log('Add a track to the remoteStream:', track)
-          remoteStream.addTrack(track)
-        })
-      })
+      listenRemoteCandidates(callId, peerConnection, 'calleeCandidates')
+    },
+    async joinCall() {
+      const peerConnection = new RTCPeerConnection(RTC_CONFIG)
+      const callId = this.$route.params.id
+
+      addLocalTracks(localStream, peerConnection)
+      pushLocalCandidates(callId, peerConnection, 'calleeCandidates')
+
+      listenRemoteTracks(remoteStream, peerConnection)
+
+      await answerCall(callId, peerConnection)
+
+      // Has to go after remote description is set from answerCall
+      listenRemoteCandidates(callId, peerConnection, 'callerCandidates')
     },
   },
 }
