@@ -42,7 +42,7 @@ function roomDb() {
   if (window.location.pathname.startsWith('/storytime')) {
     return 'silver'
   }
-  if (window.location.pathname.startsWith('/list')) {
+  if (window.location.pathname.startsWith('/listorama')) {
     return 'listography'
   }
   if (window.location.pathname.startsWith('/incrypt')) {

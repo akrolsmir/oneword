@@ -4,8 +4,8 @@ import About from './components/About.vue'
 import Supporter from './components/Supporter.vue'
 import Thanks from './components/Thanks.vue'
 import OneWord from './oneword/OneWord.vue'
-import ListographyFrontPage from './listography/ListographyFrontPage.vue'
-import Listography from './listography/Listography.vue'
+import ListoramaFrontPage from './listorama/ListoramaFrontPage.vue'
+import Listorama from './listorama/Listorama.vue'
 import StorytimeFrontPage from './storytime/components/StorytimeFrontPage.vue'
 import Storytime from './storytime/Storytime.vue'
 import IncryptFrontPage from './incrypt/IncryptFrontPage.vue'
@@ -39,8 +39,8 @@ const routes = [
     component: Storytime,
     meta: { title: 'Storytime' },
   },
-  { path: '/list', component: ListographyFrontPage },
-  { path: '/list/:id', component: Listography },
+  { path: '/listorama', component: ListoramaFrontPage },
+  { path: '/listorama/:id', component: Listorama },
   { path: '/incrypt', component: IncryptFrontPage, meta: { title: 'Incrypt' } },
   { path: '/incrypt/:id', component: Incrypt, meta: { title: 'Incrypt' } },
   {
