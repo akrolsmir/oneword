@@ -271,6 +271,7 @@ import {
   pickRandom,
   sanitize,
   orderedEntries,
+  pickFromBag,
 } from '../utils'
 
 function makeNewRoom(name) {
@@ -431,8 +432,9 @@ export default {
       this.room.state = 'PREVIEW'
 
       this.room.round = {}
+      const pastTypes = this.room.history.map((round) => round.card.type)
       const card = {
-        type: pickRandom(Object.keys(CARD_TYPES)),
+        type: pickFromBag(Object.keys(CARD_TYPES), pastTypes),
       }
       for (let i = 0; i < 1000; i++) {
         const cardList = card.type === 'FORGOTTEN4' ? narrowCards : allCards

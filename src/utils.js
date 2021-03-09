@@ -46,6 +46,16 @@ export function pickRandom(array) {
   return array[Math.floor(Math.random() * array.length)]
 }
 
+// Tetris-style bag; guarantee to cycle through each of the N options
+export function pickFromBag(bag, history) {
+  // I _think_ this works okay for increasing and decreasing bag sizes?
+  const numDrawn = history.length % bag.length
+  const drawnStart = Math.max(0, history.length - numDrawn - 1)
+  const drawn = history.slice(drawnStart)
+  const undrawn = bag.filter((item) => !drawn.includes(item)) // warning: O(N^2)
+  return pickRandom(undrawn.length > 0 ? undrawn : bag)
+}
+
 // Function wrapper that waits delayMs after the last call before firing.
 // Good for grouping Firestore writes with a 300ms delay
 // Courtesy of https://stackoverflow.com/a/53486112/1222351
