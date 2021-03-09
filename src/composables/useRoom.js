@@ -152,6 +152,17 @@ export function useRoom(user, makeNewRoom, onJoin = undefined) {
     )
   }
 
+  async function kickPlayer(name) {
+    await updateRoom(this.room, { [`people.${name}.state`]: 'WATCHING' })
+  }
+
+  async function makeMod(name) {
+    await updateRoom(this.room, {
+      [`people.${this.player.name}.state`]: 'PLAYING',
+      [`people.${name}.state`]: 'MOD',
+    })
+  }
+
   loadFrom(makeNewRoom(room.name))
 
   onBeforeMount(() => {
@@ -167,5 +178,7 @@ export function useRoom(user, makeNewRoom, onJoin = undefined) {
     enterRoom,
     resetRoom,
     saveRoom,
+    kickPlayer,
+    makeMod,
   }
 }

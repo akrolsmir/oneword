@@ -631,15 +631,6 @@ export default {
     referSupporter,
     dupes,
     dedupe,
-    async kickPlayer(name) {
-      await updateRoom(this.room, { [`people.${name}.state`]: 'WATCHING' })
-    },
-    async makeMod(name) {
-      await updateRoom(this.room, {
-        [`people.${this.player.name}.state`]: 'PLAYING',
-        [`people.${name}.state`]: 'MOD',
-      })
-    },
     wordForWord(category) {
       return WORD_LISTS[category].inline
     },
