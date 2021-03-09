@@ -9,12 +9,17 @@
         {{ room.winningScore }} points to win
       </div>
       <br />
-      <div v-for="[player, score] in playerScores" :key="player">
+      <div v-for="[tagged, score] in playerScores" :key="tagged">
         <Nametag
           class="p-1"
-          :name="player"
+          :name="tagged"
+          :key="tagged"
           :score="score"
-          :user="room.people[player]"
+          :user="room.people[tagged]"
+          :self="tagged === player.name"
+          :modtag="room.people && room.people[tagged]?.state === 'MOD'"
+          :mod="player.isMod"
+          @kick="kickPlayer(tagged)"
         />
       </div>
     </div>
@@ -122,18 +127,20 @@
     </div>
 
     <!-- Mod tools -->
-    <div class="subtitle">Mod Tools</div>
-    <div class="columns">
-      <div class="column">
-        <button class="button" @click="resetRoom">Reset room</button>
-      </div>
-      <div class="column">
-        <button class="button" @click="nextStage">Next stage</button>
-      </div>
-      <div class="column">
-        <input class="input" size="5" v-model="room.timerLength" />
-        seconds <br />
-        <button class="button" @click="setTimer">Set timers</button>
+    <div v-if="player.isMod">
+      <div class="subtitle">Mod Tools</div>
+      <div class="columns">
+        <div class="column">
+          <button class="button" @click="resetRoom">Reset room</button>
+        </div>
+        <div class="column">
+          <button class="button" @click="nextStage">Next stage</button>
+        </div>
+        <div class="column">
+          <input class="input" size="5" v-model="room.timerLength" />
+          seconds <br />
+          <button class="button" @click="setTimer">Set timers</button>
+        </div>
       </div>
     </div>
   </div>
