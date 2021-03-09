@@ -63,7 +63,7 @@ export const categories = [
   'Authors',
   'Halloween costumes',
   'Weapons',
-  'Thigns that are round',
+  'Things that are round',
   'Words associated with exercise',
   'Common names',
   'Rivers',
