@@ -100,19 +100,25 @@
           {{ name }}
           scored <strong>{{ roundScores[round.number][name] }}</strong
           >:&ensp;
-          <span v-for="(entry, i) in entries">
+          <span
+            v-for="(entry, i) in entries"
+            v-tippy="{ content: collisions[round.number][name][i]?.join(', ') }"
+          >
             <span v-if="entry">
               <span
                 :class="{ invalid: checkInvalid(round.card.category, entry) }"
               >
                 <span
                   :class="{
-                    fail: !entryScore(collisions[round.number][name][i], round),
+                    fail: !entryScore(
+                      collisions[round.number][name][i]?.length,
+                      round
+                    ),
                   }"
                 >
                   {{ entry }}
                 </span>
-                ({{ collisions[round.number][name][i] }})
+                ({{ collisions[round.number][name][i]?.length }})
               </span>
               <span
                 class="trash"
@@ -344,6 +350,8 @@ export default {
     cardType() {
       return CARD_TYPES[this.card.type]
     },
+    // Returns a list of collisions in each round, eg
+    // [{ adrian: [[], ['austin'], []], austin: [['adrian'], [], []] } ...]
     collisions() {
       let collisions = []
 
@@ -357,12 +365,12 @@ export default {
             if (!entry) continue
             if (this.checkInvalid(round.card.category, entry)) continue
 
-            collisions[round.number][name][i] = 0
+            collisions[round.number][name][i] = []
             for (let otherName in round.entries) {
               if (name === otherName) continue
 
               if (listIncludes(round.entries[otherName], entry)) {
-                collisions[round.number][name][i] += 1
+                collisions[round.number][name][i].push(otherName)
               }
             }
           }
@@ -382,7 +390,7 @@ export default {
             if (this.checkInvalid(round.card.category, entry)) continue
 
             score += this.entryScore(
-              this.collisions[round.number][name][i],
+              this.collisions[round.number][name][i].length,
               round
             )
           }
