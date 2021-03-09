@@ -135,7 +135,7 @@ export function useRoom(user, makeNewRoom, onJoin = undefined) {
       onJoin(room, player)
     }
     if (alsoUpload) {
-      await saveRoom('people')
+      await saveRoom(`people.${player.name}`)
     }
   }
 
