@@ -36,7 +36,7 @@
 
       <div v-if="room.state === 'START'"></div>
       <div class="category" v-else-if="room.state === 'PREVIEW'">???</div>
-      <div class="category" v-else>
+      <div class="category fancy" v-else>
         {{ room.round.card.category }}
       </div>
 
@@ -88,17 +88,17 @@
 
     <div id="history">
       <div v-for="round in room.history" class="card bg summary">
-        <div>
+        <div class="fancy normal mb-2">
           Round {{ round.number + 1 }}: {{ round.card.category }} ({{
             CARD_TYPES[round.card.type].longName
           }})
         </div>
         <div
-          class="player"
+          class="player mb-4"
           v-for="[entries, name] in orderedEntries(round.entries)"
         >
-          {{ name }}
-          scored <strong>{{ roundScores[round.number][name] }}</strong
+          <strong
+            >{{ name }} scored {{ roundScores[round.number][name] }}</strong
           >:&ensp;
           <span
             v-for="(entry, i) in entries"
@@ -119,12 +119,12 @@
                   {{ entry }}
                 </span>
                 ({{ collisions[round.number][name][i]?.length }})
+                <a
+                  @click="toggleInvalid(round.card.category, entry)"
+                  aria-label="invalidate"
+                  >×</a
+                >
               </span>
-              <span
-                class="trash"
-                @click="toggleInvalid(round.card.category, entry)"
-                >🗑️</span
-              >
               &ensp;
             </span>
           </span>
@@ -191,6 +191,7 @@
   width: 100%;
   text-align: center;
   overflow-y: hidden;
+  overflow-wrap: break-word;
 }
 .type {
   font-size: 1.5em;
