@@ -263,7 +263,7 @@
 import { inject } from 'vue'
 import Timer from '../components/Timer.vue'
 import Nametag from '../components/Nametag.vue'
-import { categories } from './cards.js'
+import { narrowCards, allCards } from './cards.js'
 import { useRoom } from '../composables/useRoom.js'
 import {
   debounce,
@@ -435,7 +435,8 @@ export default {
         type: pickRandom(Object.keys(CARD_TYPES)),
       }
       for (let i = 0; i < 1000; i++) {
-        card.category = pickRandom(categories)
+        const cardList = card.type === 'FORGOTTEN4' ? narrowCards : allCards
+        card.category = pickRandom(cardList)
         if (!this.previousCategories.includes(card.category)) {
           break
         }
