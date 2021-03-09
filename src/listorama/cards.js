@@ -72,7 +72,7 @@ export const wideCards = [
   'Cars',
   'Spices/herbs',
   'Bad habits',
-  'Celebreties',
+  'Celebrities',
   'Parks',
   'Leisure activities',
   'Restaurants',
