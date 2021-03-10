@@ -96,9 +96,15 @@
       </div>
     </div>
 
+    <div class="p-3" v-if="room.players.length < 3 && room.state === 'START'">
+      <h2 class="fancy" role="alert">Waiting for 3 players...</h2>
+      <p class="mt-5 mb-2">Invite your friends to play!</p>
+      <ShareLink />
+    </div>
+
     <!-- Mod tools -->
     <!-- Copied from Incrypt -->
-    <div class="notification mx-3 mt-4 mb-6" v-if="player.isMod">
+    <div v-else-if="player.isMod" class="notification mx-3 mt-4 mb-6">
       <h2>Mod tools</h2>
       <br />
       <div class="columns">
@@ -311,6 +317,7 @@ import BigColumn from '../components/BigColumn.vue'
 import Chatbox from '../components/Chatbox.vue'
 import Timer from '../components/Timer.vue'
 import Nametag from '../components/Nametag.vue'
+import ShareLink from '../components/ShareLink.vue'
 import { narrowCards, allCards } from './cards.js'
 import { useRoom } from '../composables/useRoom.js'
 import {
@@ -373,6 +380,7 @@ export default {
     Chatbox,
     Timer,
     Nametag,
+    ShareLink,
   },
   setup() {
     const user = inject('currentUser')
