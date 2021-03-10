@@ -2,66 +2,76 @@
 <!-- Buy: https://www.amazon.com/Listography-Game-May-Best-List/dp/1452151776 -->
 
 <template>
-  <div id="top-content">
-    <div class="narrow card bg">
-      <div class="type">Scores</div>
-      <div style="width: 100%; text-align: center; font-style: italic">
-        {{ room.winningScore }} points to win
-      </div>
-      <br />
-      <div v-for="[tagged, score] in playerScores" :key="tagged">
-        <Nametag
-          class="p-1"
-          :name="tagged"
-          :key="tagged"
-          :score="score"
-          :user="room.people[tagged]"
-          :self="tagged === player.name"
-          :modtag="room.people && room.people[tagged]?.state === 'MOD'"
-          :mod="player.isMod"
-          @kick="kickPlayer(tagged)"
-        />
-      </div>
-    </div>
-    <div class="narrow card bg round">
-      <div v-if="room.state !== 'START'">
-        <div class="type">
-          {{ cardType.longName }}
-          <div class="info">
-            Write up to <strong>{{ cardType.listSize }}</strong> answers.
-          </div>
-          <div class="info">{{ cardType.explanation }}</div>
+  <BigColumn :showPanes="true">
+    <template #right-pane>
+      <Chatbox
+        v-model="room.chatlog"
+        :name="player.name"
+        :room-id="room.name"
+      />
+    </template>
+
+    <div class="columns">
+      <div class="column narrow card bg">
+        <div class="type">Scores</div>
+        <div style="width: 100%; text-align: center; font-style: italic">
+          {{ room.winningScore }} points to win
+        </div>
+        <br />
+        <div v-for="[tagged, score] in playerScores" :key="tagged">
+          <Nametag
+            class="p-1"
+            :name="tagged"
+            :key="tagged"
+            :score="score"
+            :user="room.people[tagged]"
+            :self="tagged === player.name"
+            :modtag="room.people && room.people[tagged]?.state === 'MOD'"
+            :mod="player.isMod"
+            @kick="kickPlayer(tagged)"
+          />
         </div>
       </div>
+      <div class="column narrow card bg round">
+        <div v-if="room.state !== 'START'">
+          <div class="type">
+            {{ cardType.longName }}
+            <div class="info">
+              Write up to <strong>{{ cardType.listSize }}</strong> answers.
+            </div>
+            <div class="info">{{ cardType.explanation }}</div>
+          </div>
+        </div>
 
-      <div v-if="room.state === 'START'"></div>
-      <div class="category" v-else-if="room.state === 'PREVIEW'">???</div>
-      <div class="category fancy" v-else>
-        {{ room.round.card.category }}
+        <div v-if="room.state === 'START'"></div>
+        <div class="category" v-else-if="room.state === 'PREVIEW'">???</div>
+        <div class="category fancy" v-else>
+          {{ room.round.card.category }}
+        </div>
+
+        <button
+          class="button"
+          @click="nextRound"
+          v-if="room.state === 'START' || room.state === 'CHECKING'"
+        >
+          Draw Card
+        </button>
+        <button
+          class="button"
+          @click="startTimer"
+          v-else-if="room.state === 'PREVIEW'"
+        >
+          Show Card & Start Timer
+        </button>
+        <div v-else style="height: 40px"></div>
       </div>
-
-      <button
-        class="button"
-        @click="nextRound"
-        v-if="room.state === 'START' || room.state === 'CHECKING'"
-      >
-        Draw Card
-      </button>
-      <button
-        class="button"
-        @click="startTimer"
-        v-else-if="room.state === 'PREVIEW'"
-      >
-        Show Card & Start Timer
-      </button>
-      <div v-else style="height: 40px"></div>
     </div>
-  </div>
 
-  <div class="centerer">
-    <div style="height: 16px" v-if="room.state === 'PREVIEW'"></div>
+    <!-- Dummy div to prevent layout from shifting when Timer appears -->
+    <div style="height: 24px" v-if="room.state === 'PREVIEW'"></div>
     <Timer
-      class="timer"
+      style="margin: 0 auto"
+      class="timer mb-2"
       ref="timer"
       :length="room.timerLength"
       :on-finish="nextStage"
@@ -86,8 +96,8 @@
       </div>
     </div>
 
-    <div id="history">
-      <div v-for="round in room.history" class="block bg summary">
+    <div id="history" class="mt-6">
+      <div v-for="round in room.history" class="bg summary">
         <div class="fancy normal mb-2" style="font-weight: 500">
           {{ round.number + 1 }}. {{ round.card.category }} ({{
             CARD_TYPES[round.card.type].longName
@@ -150,15 +160,12 @@
         </div>
       </div>
     </div>
-  </div>
+  </BigColumn>
 </template>
 
 <style scoped>
-#top-content {
-  margin-top: 48px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
+.background {
+  background-color: #e0e7ff;
 }
 .centerer {
   margin-top: 24px;
@@ -218,6 +225,7 @@
 }
 
 .list {
+  margin: 0 auto;
   width: 250px;
   display: flex;
   flex-direction: column;
@@ -243,11 +251,6 @@
   display: flex;
   flex-direction: column-reverse;
 }
-.summary {
-  width: 548px;
-  max-width: 100%;
-  margin-bottom: 24px;
-}
 .fail {
   text-decoration: line-through;
 }
@@ -255,8 +258,9 @@
   opacity: 0.3;
   text-decoration: line-through;
 }
-.block {
-  padding: 0.5rem 0;
+.summary {
+  padding: 1rem;
+  margin-bottom: 24px;
   /* Needed for Tippy, apparently...? */
   position: relative;
 }
@@ -264,6 +268,8 @@
 
 <script>
 import { inject } from 'vue'
+import BigColumn from '../components/BigColumn.vue'
+import Chatbox from '../components/Chatbox.vue'
 import Timer from '../components/Timer.vue'
 import Nametag from '../components/Nametag.vue'
 import { narrowCards, allCards } from './cards.js'
@@ -324,6 +330,8 @@ const CARD_TYPES = {
 
 export default {
   components: {
+    BigColumn,
+    Chatbox,
     Timer,
     Nametag,
   },
