@@ -53,6 +53,7 @@
 
 <script>
 import { updateRoom } from '../firebase/network'
+import { timeSince } from '../utils'
 
 export default {
   props: {
@@ -110,7 +111,7 @@ export default {
       )
     },
     formatTime(timestamp) {
-      return new Date(Number(timestamp)).toLocaleTimeString()
+      return timeSince(timestamp)
     },
   },
   computed: {
