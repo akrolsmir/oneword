@@ -158,6 +158,22 @@
           <!-- v-tippy="{ content: collisions[round.number][name][i]?.join(', ') }" -->
           <span v-for="(entry, i) in entries" :key="entry">
             <span v-if="entry">
+              <a
+                @click="toggleInvalid(round.card.category, entry)"
+                aria-label="invalidate"
+              >
+                <span
+                  class="has-text-danger-dark"
+                  v-if="
+                    !entryScore(
+                      collisions[round.number][name][i]?.length,
+                      round
+                    )
+                  "
+                  >×
+                </span>
+                <span v-else class="has-text-success-dark">✓ </span>
+              </a>
               <!-- PERF: Inline calculations are expensive --
                 eg they invoke checkInvalid on each keystroke -->
               <span
@@ -173,13 +189,9 @@
                 >
                   {{ entry }}
                 </span>
-                ({{ collisions[round.number][name][i]?.length }})
-                <a
-                  @click="toggleInvalid(round.card.category, entry)"
-                  aria-label="invalidate"
-                  class="has-text-danger-dark"
-                  >×</a
-                >
+                <span v-if="collisions[round.number][name][i]">
+                  ({{ collisions[round.number][name][i].length }})
+                </span>
               </span>
               &ensp;
             </span>
