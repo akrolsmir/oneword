@@ -1,5 +1,10 @@
 import { formatDistanceToNow } from 'date-fns'
-import pluralize from 'pluralize'
+import { singular, plural as pluralur } from 'pluralize'
+
+// Compile these regexes for performance
+const RE_MATCH_LETTER_DASH = /[^\p{L}-]/gu // dash, or letter in any language
+const RE_MATCH_WHITESPACE = /\s/g
+const RE_MATCH_LOWER_ALPHA = /[^a-z]/g
 
 // Turns "This is @NOT okay" to "this-is-not-okay
 // Good for making URLs from user input (TODO: try foreign chars)
@@ -7,21 +12,30 @@ export function sanitize(input) {
   return input
     .trim()
     .toLowerCase()
-    .replace(/\s/g, '-') // whitespace
-    .replace(/[^\p{L}-]/gu, '') // not (dash or letter in any language)
+    .replace(RE_MATCH_WHITESPACE, '-')
+    .replace(RE_MATCH_LETTER_DASH, '')
 }
+
+// Cache results from the pluralize lib, since each call is fairly expensive
+const cache = { single: {}, plural: {} }
 
 // "Dr. Mario" matches "dr mario", and "Dogs" matches "dog"
 // Good for validating whether a user's input is correct
 export function wordsMatch(word1, word2) {
-  const w1 = word1.toLowerCase().replace(/[^a-z]/g, '')
-  const w2 = word2.toLowerCase().replace(/[^a-z]/g, '')
+  const w1 = word1.toLowerCase().replace(RE_MATCH_LOWER_ALPHA, '')
+  const w2 = word2.toLowerCase().replace(RE_MATCH_LOWER_ALPHA, '')
+  function single(word) {
+    return cache.single[word] || (cache.single[word] = singular(word))
+  }
+  function plural(word) {
+    return cache.plural[word] || (cache.plural[word] = pluralur(word))
+  }
   // Need to check both directions, or else "birdie" => "birdies" => "birdy"
   return (
-    pluralize.singular(w1) === w2 ||
-    pluralize.singular(w2) === w1 ||
-    pluralize.plural(w1) === w2 ||
-    pluralize.plural(w2) === w1
+    single(w1) === w2 ||
+    single(w2) === w1 ||
+    plural(w1) === w2 ||
+    plural(w2) === w1
   )
 }
 

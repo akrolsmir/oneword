@@ -97,7 +97,8 @@
     </div>
 
     <div id="history" class="mt-6">
-      <div v-for="round in room.history" class="bg summary">
+      <!-- PERF: paginate through history for better list render performance -->
+      <div v-for="round in room.history" :key="round.number" class="bg summary">
         <div class="fancy normal mb-2" style="font-weight: 500">
           {{ round.number + 1 }}. {{ round.card.category }} ({{
             CARD_TYPES[round.card.type].longName
@@ -106,15 +107,17 @@
         <div
           class="player mb-4 ml-5"
           v-for="[entries, name] in orderedEntries(round.entries)"
+          :key="name"
         >
           <span class="has-text-weight-semibold"
             >{{ name }} scored {{ roundScores[round.number][name] }}:</span
           >&ensp;
-          <span
-            v-for="(entry, i) in entries"
-            v-tippy="{ content: collisions[round.number][name][i]?.join(', ') }"
-          >
+          <!-- TODO: enable Vue Tippy after https://github.com/KABBOUCHI/vue-tippy/issues/166 resolved -->
+          <!-- v-tippy="{ content: collisions[round.number][name][i]?.join(', ') }" -->
+          <span v-for="(entry, i) in entries" :key="entry">
             <span v-if="entry">
+              <!-- PERF: Inline calculations are expensive --
+                eg they invoke checkInvalid on each keystroke -->
               <span
                 :class="{ invalid: checkInvalid(round.card.category, entry) }"
               >
@@ -382,6 +385,13 @@ export default {
             for (let otherName in round.entries) {
               if (name === otherName) continue
 
+              // 10 rounds of 10 players with 10 entries each =
+              // 100 checks per pair, 100 pairs, 10 times = 100k calls to wordsMatch
+              // For only 1k words! ideas:
+              // - Make wordsMatch cheaper
+              //   - cache singular and plural forms (done!)
+              //   - use a different stemming algorithm? Faster + broad, but less accurate...
+              // - Restructure code so only affected round gets recalculated...?
               if (listIncludes(round.entries[otherName], entry)) {
                 collisions[round.number][name][i].push(otherName)
               }
@@ -429,6 +439,13 @@ export default {
     previousCategories() {
       return this.room.history.map((round) => round.card.category)
     },
+
+    // Cache this list, since recalulating a lot becomes expensive
+    invalidList() {
+      return Object.entries(this.room.invalidEntries)
+        .filter(([k, v]) => v)
+        .map(([k, v]) => k)
+    },
   },
   methods: {
     orderedEntries,
@@ -470,7 +487,7 @@ export default {
       this.saveRoom('timerLength')
     },
     submitEntries() {
-      this.room.round.entries[this.player.name] = this.player.entries
+      this.room.round.entries[this.player.name] = this.player.entries.slice()
       this.saveRoom(`round.entries.${this.player.name}`)
     },
     focusNextTextArea(event) {
@@ -491,11 +508,11 @@ export default {
       this.saveRoom(`invalidEntries.${key}`)
     },
     checkInvalid(category, entry) {
+      // TODO: Possibly cache in-memory to skip listIncludes?
+      // A map of (category, entry) => listIncludes result
+      // Can be computed, aka recalculated when invalidList changes
       const key = sanitize(category + entry)
-      const invalidList = Object.entries(this.room.invalidEntries)
-        .filter(([k, v]) => v)
-        .map(([k, v]) => k)
-      return listIncludes(invalidList, key)
+      return listIncludes(this.invalidList, key)
     },
 
     // TODO cleanup: place inside CARD_TYPES array
