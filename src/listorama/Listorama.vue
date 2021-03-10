@@ -23,7 +23,7 @@
         />
       </div>
     </div>
-    <div class="narrow card bg round" style="background-color: #f5f5f5">
+    <div class="narrow card bg round">
       <div v-if="room.state !== 'START'">
         <div class="type">
           {{ cardType.longName }}
@@ -73,7 +73,7 @@
       class="list card"
       v-if="room.state === 'LISTING' || room.state === 'PREVIEW'"
     >
-      <strong style="font-size: 1.5em">Your Responses</strong>
+      <div class="type"><strong>Your Responses</strong></div>
       <div class="item" v-for="index in cardType.listSize" :key="index">
         <div class="index">{{ index }}</div>
         <textarea
@@ -87,19 +87,19 @@
     </div>
 
     <div id="history">
-      <div v-for="round in room.history" class="card bg summary">
-        <div class="fancy normal mb-2">
-          Round {{ round.number + 1 }}: {{ round.card.category }} ({{
+      <div v-for="round in room.history" class="block bg summary">
+        <div class="fancy normal mb-2" style="font-weight: 500">
+          {{ round.number + 1 }}. {{ round.card.category }} ({{
             CARD_TYPES[round.card.type].longName
           }})
         </div>
         <div
-          class="player mb-4"
+          class="player mb-4 ml-5"
           v-for="[entries, name] in orderedEntries(round.entries)"
         >
-          <strong
-            >{{ name }} scored {{ roundScores[round.number][name] }}</strong
-          >:&ensp;
+          <span class="has-text-weight-semibold"
+            >{{ name }} scored {{ roundScores[round.number][name] }}:</span
+          >&ensp;
           <span
             v-for="(entry, i) in entries"
             v-tippy="{ content: collisions[round.number][name][i]?.join(', ') }"
@@ -122,6 +122,7 @@
                 <a
                   @click="toggleInvalid(round.card.category, entry)"
                   aria-label="invalidate"
+                  class="has-text-danger-dark"
                   >×</a
                 >
               </span>
@@ -152,7 +153,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
 #top-content {
   margin-top: 48px;
   width: 100%;
@@ -254,8 +255,10 @@
   opacity: 0.3;
   text-decoration: line-through;
 }
-.trash {
-  cursor: pointer;
+.block {
+  padding: 0.5rem 0;
+  /* Needed for Tippy, apparently...? */
+  position: relative;
 }
 </style>
 
