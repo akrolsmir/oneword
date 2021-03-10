@@ -9,7 +9,6 @@
       Inspired by Listography, a party game for 3+ players.<br />
     </div>
     <GamesList roomDirectory="/listorama/" />
-    <Sponsors />
     <br /><br />
   </BigColumn>
 </template>
