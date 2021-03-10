@@ -75,7 +75,7 @@
       ref="timer"
       :length="room.timerLength"
       :on-finish="nextStage"
-      v-if="room.state === 'LISTING'"
+      v-if="room.state === 'LISTING' && room.timerLength > 0"
       :key="room.round.state"
     ></Timer>
 
@@ -93,6 +93,48 @@
           @input="debouncedSubmitEntries"
           @keydown.enter.prevent="focusNextTextArea($event)"
         ></textarea>
+      </div>
+    </div>
+
+    <!-- Mod tools -->
+    <!-- Copied from Incrypt -->
+    <div class="notification mx-3 mt-4 mb-6" v-if="player.isMod">
+      <h2>Mod tools</h2>
+      <br />
+      <div class="columns">
+        <div class="column">
+          <button class="button is-small is-danger" @click="nextStage">
+            End round
+          </button>
+          <button
+            v-if="player.isDev"
+            class="button is-small is-danger"
+            @click="resetRoom"
+          >
+            Reset game
+          </button>
+        </div>
+        <div class="column is-size-7">
+          <div class="field has-addons">
+            <div class="control">
+              <input
+                class="input is-small"
+                style="flex: 1 2 48px"
+                v-model.number="player.timerLength"
+              />
+            </div>
+            <div class="control">
+              <button class="button is-small" @click="updateTimer">
+                Set round timer (secs)
+              </button>
+            </div>
+          </div>
+          <br />
+          <b>Timer suggestion</b><br />
+          90 secs for a new group<br />
+          60 secs for an experienced group<br />
+          0 secs to disable timers<br />
+        </div>
       </div>
     </div>
 
@@ -142,24 +184,6 @@
               &ensp;
             </span>
           </span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Mod tools -->
-    <div v-if="player.isMod">
-      <div class="subtitle">Mod Tools</div>
-      <div class="columns">
-        <div class="column">
-          <button class="button" @click="resetRoom">Reset room</button>
-        </div>
-        <div class="column">
-          <button class="button" @click="nextStage">Next stage</button>
-        </div>
-        <div class="column">
-          <input class="input" size="5" v-model="room.timerLength" />
-          seconds <br />
-          <button class="button" @click="setTimer">Set timers</button>
         </div>
       </div>
     </div>
@@ -307,7 +331,7 @@ function makeNewRoom(name) {
     },
     history: [],
     invalidEntries: {},
-    timerLength: 60,
+    timerLength: 90,
     public: true,
     lastUpdateTime: Date.now(),
   }
@@ -341,6 +365,7 @@ export default {
   setup() {
     const user = inject('currentUser')
     const roomHelpers = useRoom(user, makeNewRoom)
+    roomHelpers.player.timerLength = 90
     return Object.assign(roomHelpers, { user })
   },
   created() {
@@ -483,7 +508,8 @@ export default {
       this.room.state = 'LISTING'
       this.saveRoom('state')
     },
-    setTimer() {
+    updateTimer() {
+      this.room.timerLength = this.player.timerLength
       this.saveRoom('timerLength')
     },
     submitEntries() {

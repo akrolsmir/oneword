@@ -34,6 +34,11 @@ export function useRoom(user, makeNewRoom, onJoin = undefined) {
     isMod: computed(() => {
       return user.isAdmin || room.people[player.name]?.state === 'MOD'
     }),
+    isDev: computed(() => {
+      return (
+        user.isAdmin || ['localhost', '127.0.0.1'].includes(location.hostname)
+      )
+    }),
   })
 
   // The room object containing the game state; synced to Firestore.
