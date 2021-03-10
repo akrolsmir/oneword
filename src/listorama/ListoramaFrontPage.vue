@@ -6,7 +6,13 @@
       <i>Forgotten Four</i> — Find four examples that nobody else will pick<br />
       <i>Threefold</i> — Think of the three most popular answers<br />
       <i>One on One</i> — Match *exactly* one other player<br /><br />
-      Inspired by Listography, a party game for 3+ players.<br />
+      Inspired by
+      <a
+        target="_blank"
+        rel="noopener noreferrer"
+        href="https://amzn.to/3t8gNmA"
+        >Listography</a
+      >, a party game for 3+ players.<br />
     </div>
     <GamesList roomDirectory="/listorama/" />
     <br /><br />
