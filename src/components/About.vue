@@ -10,12 +10,11 @@
           />
         </div>
         <p>
-          I'm Austin, and I made One Word. I created this in March of 2020 as my
-          COVID side project just so I could play it with my friends; to my
-          surprise and delight, it's grown to what you see today! By day, I'm a
-          tech lead at
-          <a href="https://www.streamlit.io/">Streamlit</a>. In my free time I
-          like to host board game nights and hackathons with my friends.
+          I'm Austin, and I made One Word. It started in March of 2020 as my
+          COVID side project, just for my friends and I; to my surprise, it's
+          grown to what you see today! I work at
+          <a href="https://www.streamlit.io/">Streamlit</a> by day, and host
+          board game nights and hackathons in my free time.
         </p>
         <br />
         <p>
@@ -41,8 +40,7 @@
           Email:
           <a href="mailto:sinclair@oneword.games">sinclair@oneword.games</a
           ><br />
-          Or contact me via my site:
-          <a href="https://sipec.github.io">sipec.github.io</a>.
+          Website: <a href="https://sipec.github.io">sipec.github.io</a>
         </p>
         <br /><br />
 
@@ -94,6 +92,32 @@
         <p>
           Email: <a href="mailto:shawn@oneword.games">shawn@oneword.games</a>
         </p>
+        <br /><br />
+
+        <div class="field">
+          <Nametag
+            name="Adrian Marple"
+            :user="{ email: 'adrian@marplebot.com', supporter: 'ADMIN' }"
+          />
+        </div>
+        <p>
+          I'm Adrian, an indie game dev and thus One Word's resident expert. I
+          built <router-link to="/listorama">Listorama</router-link> at a
+          hackathon; my own games include
+          <a href="https://store.steampowered.com/app/1102040/Obversion/">
+            Obversion</a
+          >
+          and <a href="https://www.marplebot.com/blog/">Metasweeper</a> (work in
+          progress!)
+        </p>
+        <br />
+        <p>
+          Email:
+          <a href="mailto:adrian@marplebot.com">adrian@marplebot.com</a><br />
+          Website:
+          <a href="https://www.marplebot.com">https://www.marplebot.com</a>
+        </p>
+
         <br /><br /><br />
 
         <div class="content">
