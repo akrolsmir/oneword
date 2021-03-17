@@ -1,16 +1,17 @@
 <template>
   <BigColumn>
     <h1 class="fancy big mb-4">MetaPrompt</h1>
-    <div class="box prompt">
+    <div class="box prompt is-italic">
       {{ promptCard.text }}
     </div>
     <textarea
       class="textarea"
       v-model="text"
+      placeholder="Respond here..."
       @keydown.enter="handleEnter"
     ></textarea>
     <div class="buttons mt-2">
-      <button class="button is-primary is-light" @click="submitCard">
+      <button class="button is-info" @click="submitCard">
         Submit (Ctrl + Enter)
       </button>
       <button class="button" @click="shuffle">
@@ -24,9 +25,9 @@
     <div class="history" v-for="card in history" :key="cards.createTime">
       <p>{{ card.text }}</p>
       <br />
-      <p>
+      <p style="color: #888">
         <i
-          >Created {{ timeSince(card.createTime) }} •
+          >{{ timeSince(card.createTime) }} • By {{ card.author }} •
           <a @click="deleteCard(card)">Delete</a>
         </i>
       </p>
@@ -130,6 +131,9 @@ function tagged(cards, tag) {
 </script>
 
 <style scoped>
+.background {
+  background-color: #ecfdf5;
+}
 .prompt {
   white-space: pre-wrap;
 }
