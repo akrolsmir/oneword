@@ -50,7 +50,7 @@ const routes = [
     meta: { title: 'Pairwise' },
   },
   { path: '/pairwise/:id', component: Pairwise, meta: { title: 'Pairwise' } },
-  { path: '/metaprompt', component: MetaPrompt },
+  { path: '/metaprompt', component: MetaPrompt, meta: { title: 'MetaPrompt' } },
 ]
 
 export const router = createRouter({
