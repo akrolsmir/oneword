@@ -44,6 +44,7 @@
 </template>
 
 <script>
+import { inject } from '@vue/runtime-core'
 import { db } from '../firebase/network'
 import { pickRandom, timeSince } from '../utils'
 import BigColumn from './BigColumn.vue'
@@ -69,13 +70,16 @@ export default {
         {
           text: DEFAULT_PROMPT,
           createTime: Date.now(),
-          author: 'Austin',
+          author: this.user.displayName || 'Anon',
         },
       ],
       promptCard: {},
       text: '',
       filter: '',
     }
+  },
+  setup() {
+    return { user: inject('currentUser') }
   },
   async mounted() {
     const deck = await loadDeck('default-deck')
@@ -97,7 +101,7 @@ export default {
       this.cards.push({
         text: this.text,
         createTime: Date.now(),
-        author: 'Austin',
+        author: this.user.displayName || 'Anon',
       })
       await saveCards('default-deck', this.cards)
       this.text = ''
