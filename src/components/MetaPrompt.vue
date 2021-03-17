@@ -107,8 +107,15 @@ export default {
       this.cards = without(this.cards, card)
       await saveCards('default-deck', this.cards)
     },
-    shuffle() {
-      this.promptCard = pickRandom(tagged(this.cards, '#prompt'))
+    // Try shuffling until we get a unique result.
+    // TODO: Could try to write this functional-ly
+    shuffle(iterationsUntilDupe = 100) {
+      const nextCard = pickRandom(tagged(this.cards, '#prompt'))
+      if (nextCard === this.promptCard && iterationsUntilDupe > 0) {
+        this.shuffle(iterationsUntilDupe - 1)
+      } else {
+        this.promptCard = nextCard
+      }
     },
   },
   computed: {
