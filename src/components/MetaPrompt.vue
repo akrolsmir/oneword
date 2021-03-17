@@ -21,13 +21,14 @@
 
     <!-- History -->
     <h2 class="fancy mb-2 mt-6">All Cards</h2>
-    Filter: <input class="input mb-2" v-model="filter" />
+    Filter (eg "stranger", "#fiction", "truth @Austin")
+    <input class="input mb-2" v-model="filter" />
     <div class="history" v-for="card in history" :key="cards.createTime">
       <p>{{ card.text }}</p>
       <br />
       <p style="color: #888">
         <i
-          >{{ timeSince(card.createTime) }} • By {{ card.author }} •
+          >{{ timeSince(card.createTime) }} • By @{{ card.author }} •
           <a @click="deleteCard(card)">Delete</a>
         </i>
       </p>
@@ -124,11 +125,17 @@ export default {
   },
   computed: {
     history() {
+      const queries = this.filter.split(' ')
       return this.cards
-        .filter((card) => card.text.includes(this.filter))
+        .filter((card) => queries.every((query) => cardMatches(card, query)))
         .reverse()
     },
   },
+}
+
+function cardMatches(card, query) {
+  const corpus = card.text + '@' + card.author
+  return corpus.toLowerCase().includes(query.toLowerCase())
 }
 
 function without(array, item) {
