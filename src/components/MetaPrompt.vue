@@ -32,6 +32,14 @@
         </i>
       </p>
     </div>
+
+    <div class="is-italic has-text-centered">
+      Inspired by
+      <a
+        href="https://www.lesswrong.com/posts/PNoyBBJ4c7pTKqpdh/metaprompt-a-tool-for-telling-yourself-what-to-do"
+        >this post by abramdemski</a
+      >
+    </div>
   </BigColumn>
 </template>
 
