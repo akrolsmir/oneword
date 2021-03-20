@@ -1,0 +1,37 @@
+// One way to import a new font:
+// @import url('https://fonts.googleapis.com/css?family=Nunito:400,700');
+// $family-sans-serif: 'Nunito', sans-serif;
+
+// Define variables here to overwrite Bulma defaults
+// See https://bulma.io/documentation/customize/variables/
+$navbar-breakpoint: 600px;
+
+@import 'bulma/bulma.sass';
+
+// And then global definitions for normal CSS
+html {
+  margin: 0;
+  height: 100%;
+  background-color: #faf6d8;
+  position: relative;
+  overflow: auto;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Merienda:wght@400;700&display=swap');
+
+.fancy {
+  font-family: 'Merienda', cursive;
+  font-weight: 700;
+  margin-top: 16px;
+  font-size: 24px;
+}
+
+.fancy.big {
+  margin-top: 0;
+  font-size: 40px;
+}
+
+.fancy.normal {
+  margin-top: 0;
+  font-size: 100%;
+}

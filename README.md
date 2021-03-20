@@ -1,56 +1,207 @@
-## One Word
+# One Word
 
-Just One, online! Available at http://oneword.games
+This is the code behind http://oneword.games, a group of online games inspired
+by party games like Just One and Decrypto.
+
+## Installing
+
+1. Install [Node.js and npm](https://nodejs.org/en/)
+2. `$ npm install --global yarn ` to install [Yarn](https://yarnpkg.com/)
+3. `$ yarn` to install JS dependencies
+
+## Developing
+
+1. `$ yarn dev` to spin up a local server at http://localhost:3000
+2. Start editing code! See our [recommended tools.](#recommended-tools)
+
+## Committing code
+
+Merging code directly into `master` is okay, but if some work you're doing is:
+
+- Risky (could break existing gameplay)
+- Uncertain (not sure if we want this)
+- Touches code that others are also modifying
+
+... then consider opening up a Pull Request instead!
+
+Every pull request will automatically get a separate preview URL; perfect for getting quick feedback.
+![](https://i.imgur.com/K8ZaCYd.png)
+
+## Deploying
+
+Just push to `master`, and the site will update automatically.
+
+# Appendix
 
 ## Tech stack
 
 One Word is built on top of:
 
-- VueJS on the frontend
-- Bulma for CSS
-- Netlify for hosting
-- Firestore for the database
-- Firebase Auth for login
-- Stripe for payments
-- Mailjet for marketing & transactional emails
-- ImprovMX for email forwarding
+- [VueJS](https://v3.vuejs.org/guide/introduction.html) on the frontend
+- [Bulma](https://bulma.io/) for CSS styling
+- [Netlify](https://www.netlify.com/) for hosting
+- [Firestore](https://firebase.google.com/docs/firestore) for the database
+- [Firebase Auth](https://firebase.google.com/docs/auth) for login
+- [Stripe](https://stripe.com/) for payments
+- [Mailjet](https://www.mailjet.com/) for marketing & transactional emails
 
-The site is entirely static (there's no build process!)
-To test the site locally, just clone the code, then spin up a local server.
-E.g.:
+## Architecture
+
+### The game state is a single JS object
+
+One Word code is all on the client (aka [JAMStack](https://jamstack.org/)). We start
+by defining the game's data: a single JS object to represent one game room. For example:
 
 ```
-git clone https://github.com/akrolsmir/oneword.git
-cd oneword
-python -m http.server 8020
+  Room: {
+    name: apple,
+    players: ['alice', 'bob', 'carol'],
+    currentRound: {
+      state: 'clueing' // or 'guessing', or 'done'
+      guesser: 'alice',
+      word: 'company'
+      clues: {
+        alice: 'corporation',
+        bob: 'collected'
+        carol: 'collected'
+      }
+    }
+    history: [{round1}, ...]
+  }
 ```
 
-And then open http://localhost:8020.
+This has all the info needed to represent the entire state of the game,
+at any point in time. It should be _complete_ (no info missing), but also _minimum_
+(no additional information).
 
-While developing: Prettier is mandatory, VSCode is recommended.
+### Vue turns that into HTML
 
-To deploy: just push to master, and Netlify will update the site!
+Based on what's in the room object, we then want to show the right HTML and CSS to users. The VueJS framework helps us express our JS object as HTML to show the user, and also
+handles user inputs.
 
-## Code structure
+Here's a simple example of Vue code:
 
-- One Word is basically a single page app, and that page is index.html.
-- Each player always has a full local copy of the room, which is kept in sync with Firestore.
-- Each room obeys this structure:
-  ```
-   Room: {
-     name: apple,
-     players: ['alice', 'bob', 'carol'],
-     currentRound: {
-       state: 'clueing' // or 'guessing', or 'done'
-       guesser: 'alice',
-       word: 'company'
-       clues: {
-         alice: 'corporation',
-         bob: 'collected'
-         carol: 'collected'
-       }
-     }
-     history: [{round1}, ...]
-   }
-  ```
-- Players are uniquely identified by the string they chose for their name.
+```
+<template>
+  <!-- JS expressions inside {{ these braces }} get rendered -->
+  <p v-for="player in room.players">- {{ player }}</p>
+
+  <!-- newPlayer automatically syncs when this input is edited -->
+  <input v-model="newPlayer" />
+
+  <!-- Call some Javascript code using @event notation -->
+  <button @click="addPlayer">Add a player</button>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      room: { players: ['Alice', 'Bob', 'Charlie'] },
+      newPlayer: 'Eve',
+    }
+  },
+  methods: {
+    addPlayer() {
+      this.room.players.push(this.newPlayer)
+    },
+  },
+}
+</script>
+
+```
+
+Which produces:
+
+![](https://i.imgur.com/Z1aPc77.png)
+
+The amazing thing is that Vue binds the HTML elements and forms to our JS data.
+When we update the JS data, the HTML elements will re-render; and when the user clicks on or types in an HTML form, the underlying JS data stays in sync!
+
+### Firestore keeps all players in sync
+
+Now, how does one player's changes get sent to everyone else? A: Firestore. Each different game (One Word, Incrypt) has a different Firestore table, containing every room ever created and keyed by the room's name.
+
+We use some Firestore logic to keep everyone's clients sync'd to the latest state. So your code can act as though its room is always up-to-date; you only think about when you need to _push_ a change to the Firestore database. Super convenient!
+
+To prevent _race conditions_ (one client overwriting the changes of another), try
+to scope down each change to be very narrow. Instead of pushing the entire room object each time, just push the path of the object that updated.
+
+Continuing the example above:
+
+```
+async addPlayer() {
+  this.room.players.push(this.newPlayer)
+  // Only update the 'players' field of the room
+  await saveRoom(room, 'players')
+},
+```
+
+And... that's all you really need to get started with making your own game!
+
+## Recommended tools
+
+- [Get the Vue3 devtools](https://chrome.google.com/webstore/detail/vuejs-devtools/ljjemllljcmogpfapbkkighbhhppjdbg?hl=en) to easily debug and inspect your Vue logic
+- We highly, highly, _highly_ recommend VSCode, along with these extensions:
+
+  - `Vetur` for Vue syntax highlighting
+  - `Prettier` for format-on-save
+
+    - Then open VSCode `Preferences: Open Settings (JSON)`, and add
+
+    ```
+    "editor.formatOnSave": true,
+    "[html]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[javascript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[vue]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    ```
+
+    - [In-depth setup instructions](https://www.robinwieruch.de/how-to-use-prettier-vscode)
+
+  - **Optional** `Debugger for Chrome` for breakpoint debugging from inside VSCode
+    - Then from the menu, `Run` > `Add configuration` > `Chrome (preview)`
+      ![](https://i.imgur.com/uFJa9xS.png)
+    - [In-depth setup instructions](https://www.freecodecamp.org/news/how-to-set-up-the-debugger-for-chrome-extension-in-visual-studio-code-c0b3e5937c01/)
+
+- You can instantly join as guest by adding `?player=Holo` at the end of a room url.
+  Useful for keeping 3 tabs open, for testing multiplayer interactions!
+
+## Best practices for working with Vue + Firestore
+
+- Most important: keep your Firestore data structure simple and elegant.
+  App logic and visuals are easy to change; backfilling data is annoying.
+- Prefer local computed properties over putting more things into the Firestore room.
+  - Declarative code (the WHAT) is better than imperative code (the HOW); for
+    example, prefer array.map() over for loops.
+- When possible, your Firestore pushes should to be idempotent
+  (ie can be called multiple times with the same effect), and free of race conditions
+  (ie one client should not overwrite another's changes).
+- Instead of pushing an array to Firestore, consider pushing an object.
+  (Then make a computed array, eg with `Object.keys(foo)`). This prevents race
+  conditions if multiple clients update the same array
+
+## Other tips
+
+- Constantly invest in faster dev velocity!
+  - Build mod tools for yourself
+  - If anything in your iteration cycle seems slow, bother Austin about it
+- Code should be as readable as possible
+  - Self-documenting if possible, then comments
+  - It's easier to read less code!
+
+### Compiling locally
+
+This is useful for testing the site for performance, in Chrome Devtool's Lighthouse.
+
+```
+$ yarn build
+$ yarn serve
+```
+
+Then go to http://localhost:5000 and [run Lighthouse](https://developers.google.com/web/tools/lighthouse#devtools)!
