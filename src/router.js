@@ -12,6 +12,7 @@ import IncryptFrontPage from './incrypt/IncryptFrontPage.vue'
 import Incrypt from './incrypt/Incrypt.vue'
 import PairwiseFrontPage from './pairwise/PairwiseFrontPage.vue'
 import Pairwise from './pairwise/Pairwise.vue'
+import MetaPrompt from './components/MetaPrompt.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
@@ -49,6 +50,7 @@ const routes = [
     meta: { title: 'Pairwise' },
   },
   { path: '/pairwise/:id', component: Pairwise, meta: { title: 'Pairwise' } },
+  { path: '/metaprompt', component: MetaPrompt, meta: { title: 'MetaPrompt' } },
 ]
 
 export const router = createRouter({
