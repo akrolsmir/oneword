@@ -2,6 +2,7 @@ import firebase from 'firebase/app'
 // TODO: Split up into room.js and auth.js
 import 'firebase/firestore'
 import 'firebase/auth'
+import 'firebase/functions'
 
 const firebaseConfig = {
   apiKey: 'AIzaSyA2JfA8ZGxT6pKV87TwhGfUGR1kAdcPMyU',
@@ -258,3 +259,8 @@ Austin
     },
   })
 }
+
+const functions = firebase.functions()
+// If testing with local emulator:
+// functions.useEmulator('localhost', 5001)
+export const customerPortal = functions.httpsCallable('customerPortal')

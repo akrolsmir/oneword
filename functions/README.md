@@ -22,20 +22,24 @@ Adapted from https://firebase.google.com/docs/functions/get-started
    The Emulator UI is at http://localhost:4000; the functions are hosted on :5001.
    Note: You have to kill and restart emulators when you change code; no hot reload =(
 
-## Debugging (TODO)
+## Debugging
 
-- How to find local and deployed logs
+- Find local logs from your shell
+- Find deployed logs [here](https://console.firebase.google.com/project/oneword-cf74a/functions/logs?search=&&severity=DEBUG)
 
 ## Deploying
 
 1. `$ yarn deploy` to push your changes live!
+   (It's the best way to test Stripe atm, since that has a config secret;
+   [TODO set up local secrets](https://firebase.google.com/docs/functions/local-emulator#set_up_functions_configuration_optional))
 
 ## Why are these Typescript (.ts) files? Do I need to use types?
 
 These are .ts so we can ask the Typescript compiler (tsc) to take our standard way of writing code, and get it to work on the Node server environment. [Main benefits](https://firebase.google.com/docs/functions/typescript):
 
-- ES5 imports
-- async/await
+- ES5 import syntax
+- async/await syntax
+- Code checking on compile
 
 No typing needed! You can pretend it's just Javascript.
 
@@ -43,9 +47,10 @@ No typing needed! You can pretend it's just Javascript.
 
 - [x] How to test onCall locally? => functions.useEmulator('localhost', 5001)
 - [x] How to test onRequest locally? => set CORS
-- [ ] Integrate Stripe customer portal
+- [x] Integrate Stripe customer portal
 - [ ] Try to get functions on a schedule
 - [ ] One-click upload CSV to Mailjet
 - [ ] Put it all together!
 - [ ] Write that drip campaign
 - [ ] Move admin.html to oruga to get Vite goodness
+- [ ] Add a way to sudo in as a user

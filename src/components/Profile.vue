@@ -52,12 +52,26 @@
         <br />
       </template>
     </div>
+
+    <h2 class="title">Supporter Settings</h2>
+    <div v-if="user.isSupporter">
+      Thanks for being a One Word {{ user.supporterString }}! <br />
+      <!-- TODO: also include on Supporter page -->
+      <a @click="launchCustomerPortal"> Manage your settings </a>
+    </div>
+    <div v-else>
+      You're not currently a supporter 😢 <br />
+      <!-- TODO: Could set up referral tracking -->
+      <router-link to="/supporter" class="button is-warning"
+        >Become one!</router-link
+      >
+    </div>
   </BigColumn>
 </template>
 
 <script>
 import { inject } from 'vue'
-import { firebaseLogout } from '../firebase/network.js'
+import { customerPortal, firebaseLogout } from '../firebase/network.js'
 import { timeSince } from '../utils.js'
 import BigColumn from './BigColumn.vue'
 
@@ -94,6 +108,19 @@ export default {
     timeSince,
     listGames(db) {
       return this.gamesByTime.filter((game) => game.roomDb === db)
+    },
+    async launchCustomerPortal() {
+      try {
+        const resp = await customerPortal({
+          returnUrl: window.location.toString(),
+        })
+        const url = resp.data
+        window.open(url, '_blank')
+      } catch (error) {
+        alert(
+          `Whoops, our system broke! Please contact austin@oneword.games\n\n${error}`
+        )
+      }
     },
   },
   computed: {
