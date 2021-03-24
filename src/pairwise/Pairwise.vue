@@ -110,8 +110,8 @@
             <!-- TODO consider adding limit of 10 players so games aren't too big? -->
             <!-- If there are enough players to play -->
             <div v-else>
-              <!-- Current player's turn to pick a word and give clues -->
-              <div v-if="room.currentRound.clueGiver == player.name">
+              <!-- If player does not have an entry in room's wordsAndClues, prompt to enter -->
+              <div v-if="!room.wordsAndClues[player.name]">
                 <div class="box">
                   <h2 class="fancy has-text-centered" role="alert">
                     Pick a phrase among the following, and write a clue that
@@ -122,7 +122,7 @@
                       @click="cluerSelectsWord(word)"
                       v-for="word in player.wordList"
                       :key="word"
-                      :class="{ 'is-info': room.currentRound.word == word }"
+                      :class="{ 'is-info': player.currentWord == word }"
                     >
                       {{ word }}
                     </button>
@@ -134,7 +134,7 @@
                         class="input"
                         id="hintInput"
                         type="text"
-                        v-model="room.currentRound.clue"
+                        v-model="player.currentClue"
                         @keyup.enter="submitClue"
                         :class="{ 'is-primary': true }"
                       />
@@ -150,17 +150,16 @@
                       </button>
                     </div>
                   </div>
-                  <!-- <div class="notification is-danger" role="alert" v-if="hasSpecialCharacters(room.currentRound.clue)">
-                    Are you sure this is a real word?
-                  </div> -->
                 </div>
               </div>
-              <!-- Not current player's turn -->
+              <!-- After submitting clues, but not everyone has done so yet -->
               <div v-else>
                 <h2 class="fancy" role="alert">
-                  Waiting for
-                  <strong>{{ room.currentRound.clueGiver }}</strong> to pick a
-                  phrase and a clue...
+                  Still waiting for
+                  {{
+                    room.players.length - Object.keys(room.wordsAndClues).length
+                  }}
+                  more player to pick a phrase and a clue...
                 </h2>
                 <br />
               </div>
@@ -190,12 +189,19 @@
             </div>
           </div>
 
-          <!-- Input area (toossing in decoys) -->
+          <!-- Input area (tossing in decoys) -->
           <div v-if="room.currentRound.state == 'TOSS_IN_DECOYS'">
             <!-- All except the clueGiver guesses which word is the real one, based on the clue giver's clues. -->
             <div class="box">
               <div v-if="room.currentRound.clueGiver != player.name">
                 <h2 class="fancy has-text-centered" role="alert">
+                  Your clue from {{ room.currentRound.clueGiver }} is:
+                  <strong>{{
+                    room.wordsAndClues[room.currentRound.clueGiver].clue
+                  }}</strong>
+                </h2>
+                <br />
+                <h2 class="has-text-centered" role="alert">
                   Pick one option from each word category to construct a decoy
                   phrase best matching
                   <strong>{{ room.currentRound.clueGiver }}</strong
@@ -255,10 +261,6 @@
                     }}
                   </button>
                 </div>
-                <h2 class="fancy has-text-centered" role="alert">
-                  Your clue from {{ room.currentRound.clueGiver }} is:
-                  <strong>{{ room.currentRound.clue }}</strong>
-                </h2>
               </div>
               <div v-else>
                 <h2 class="fancy" role="alert">
@@ -267,7 +269,9 @@
                 </h2>
                 <br />
                 <div class="has-text-centered">
-                  <strong>{{ room.currentRound.clue }}</strong>
+                  <strong>{{
+                    room.wordsAndClues[room.currentRound.clueGiver].clue
+                  }}</strong>
                 </div>
                 <h2 class="fancy has-text-centered" role="alert">
                   <span
@@ -339,7 +343,7 @@
                   Your clue from {{ room.currentRound.clueGiver }}:
                 </h2>
                 <div class="fancy has-text-centered newline">
-                  {{ room.currentRound.clue }}
+                  {{ room.wordsAndClues[room.currentRound.clueGiver].clue }}
                 </div>
               </div>
             </div>
@@ -351,7 +355,7 @@
               <h2 class="fancy has-text-centered" role="alert">
                 The phrase from
                 <strong>{{ room.currentRound.clueGiver }}</strong> was "{{
-                  room.currentRound.word
+                  room.wordsAndClues[room.currentRound.clueGiver].word
                 }}"!
               </h2>
               <br />
@@ -437,20 +441,24 @@ export default {
       numItemsPerPlayer: 7,
       // bare bones room, to be overwritten from db if needed
       room: {
-        // get name from search params, or create a new one.
+        // get room name from search params if exists, or create a new room name.
         name:
           new URL(window.location.href).searchParams.get('room') ||
           randomWord('adjectives') + '-' + randomWord('nouns'),
+        // info about current round
         currentRound: {},
         history: [],
         players: [],
       },
       player: {
         name: new URL(window.location.href).searchParams.get('player') || '',
+        // how many options (of adj, verb etc) to construct decoy
         choicesPerDecoyCategory: 7,
-        // currentRoom is not used at the moment
-        currentRoom: new URL(window.location.href).searchParams.get('room'),
-        // wordlist for as future clue giver
+        // cache's player's choice for word on the player object, to reduce room update freq
+        currentWord: '',
+        // cache's player's choice for clue on the player object, to reduce room update freq
+        currentClue: '',
+        // wordlist to choose from as future clue giver
         wordList: [],
         // decoy adj & list
         decoyAdj: '',
@@ -479,7 +487,9 @@ export default {
     if (!fetchedRoom) {
       // 1. If the room doesn't exist, create it, then return
       this.player.name =
-        this.user.displayName || `${randomWord('adjectives')}-anon`
+        this.user.displayName ||
+        this.user.name ||
+        `${randomWord('adjectives')}-anon`
       await this.resetRoom()
       listenRoom(this.room.name, (room) => (this.room = room))
       return
@@ -505,6 +515,10 @@ export default {
     // Timer currently not yet implemented for pairwise
     'room.currentRound.state'(state) {
       this.$emit('reset-timer')
+      if (state === 'CLUER_PICKING') {
+        this.player.currentWord = ''
+        this.player.currentClue = ''
+      }
       if (state === 'TOSS_IN_DECOYS') {
         this.player.decoyAdjList = this.generateDecoyWordList('adjectives')
         this.player.decoyNounList = this.generateDecoyWordList('nouns')
@@ -547,17 +561,15 @@ export default {
           state: 'CLUER_PICKING',
           // First player becomes the first one to pick a word and a clue
           clueGiver: this.player.name,
-          // Stores the real word from the clue giver; resets every round.
-          word: '',
           // Stores both the real word and all decoys from other players; resets every round.
           allWords: {},
-          // Stores the clue from the clue giver
-          clue: '',
           // Stores counts of votes for both the real word and the decoy; resets every round.
           votes: {},
           // category will be either default or a theme
           category: 'nouns',
         },
+        // Map of [player:<word,clue>], repopulated after all players' guesses have cycled through
+        wordsAndClues: {},
         gameOver: false,
         gameWinner: '',
         winnerPoints: 0,
@@ -576,7 +588,7 @@ export default {
         playerData: {
           [this.player.name]: {
             email: this.user.email || '',
-            supporter: this.user.isSupporter || '',
+            supporter: this.user.supporter || '',
           },
         },
       }
@@ -587,13 +599,43 @@ export default {
       if (!this.room.players.includes(this.player.name)) {
         return true
       }
-      if (Object.keys(this.room.currentRound.allWords).length === 0) {
+      if (this.player.currentWord === '') {
         return true
       }
-      if (this.room.currentRound.clue === '') {
+      if (this.player.currentClue === '') {
         return true
       }
       return false
+    },
+    async cluerSelectsWord(w) {
+      this.player.currentWord = w
+    },
+    async submitClue() {
+      // sync chosen word and clue from local player to the room's list of words & clues
+      this.room.wordsAndClues[`${this.player.name}`] = {
+        word: this.player.currentWord,
+        clue: this.player.currentClue,
+      }
+      // if player is the current clueGiver, immediately save word to all words this round
+      if (this.room.currentRound.clueGiver === this.player.name) {
+        this.room.currentRound.allWords[
+          this.player.name
+        ] = this.player.currentWord
+      }
+      // if this is the last player to submit a clue, change state.
+      if (
+        Object.keys(this.room.wordsAndClues).length >= this.room.players.length
+      ) {
+        this.room.currentRound.state = 'TOSS_IN_DECOYS'
+      }
+      await setRoom(this.room)
+
+      // reset wordlist and regenerated it
+      this.player.wordList = []
+      this.generatePlayerWordList()
+
+      // Store this for user profiles, but don't await for the result
+      updateUserGame(this.user.id, this.room.name)
     },
     isDecoySubmitDisabled() {
       if (!this.player.decoyAdj) {
@@ -604,47 +646,25 @@ export default {
       }
       return false
     },
-    async cluerSelectsWord(w) {
-      await updateRoom(this.room, { 'currentRound.word': w })
-      await this.saveWordToAllWordsInRoom(w)
-    },
-    async saveWordToAllWordsInRoom(w) {
+    async saveWordToAllWordsThisRound(w) {
       const update = {}
       update[`currentRound.allWords.${this.player.name}`] = w
       await updateRoom(this.room, update)
+    },
+    async submitDecoy() {
+      await this.saveWordToAllWordsThisRound(
+        this.player.decoyAdj + '-' + this.player.decoyNoun
+      )
       if (
         Object.keys(this.room.currentRound.allWords).length ==
         this.room.players.length
       ) {
         await updateRoom(this.room, { 'currentRound.state': 'GUESSING' })
       }
-    },
-    async submitClue() {
-      const indexToRemove = this.player.wordList.indexOf(
-        this.room.currentRound.word
-      )
-      if (indexToRemove > -1) {
-        this.player.wordList.splice(indexToRemove, 1)
-        this.player.wordList.push(
-          randomWord('adjectives') + '-' + randomWord('nouns')
-        )
-      }
-      this.room.currentRound.state = 'TOSS_IN_DECOYS'
-      // room.currentRound.clue should already be updated due to bi-di binding
-      await setRoom(this.room)
-
       // Store this for user profiles, but don't await for the result
       updateUserGame(this.user.id, this.room.name)
     },
-    async submitDecoy() {
-      await this.saveWordToAllWordsInRoom(
-        this.player.decoyAdj + '-' + this.player.decoyNoun
-      )
-
-      // Store this for user profiles, but don't await for the result
-      updateUserGame(this.user.id, this.room.name)
-    },
-    // vote is the word the guesser picked
+    // Guesser vote what they believe to be the correct word based on their clue.
     async submitVote(vote) {
       const update = {}
       update[`currentRound.votes.${this.player.name}`] = vote
@@ -678,21 +698,17 @@ export default {
         this.room.players.push(this.player.name)
         await this.saveRoom('playerData', 'players')
       }
-      // generate playerWordList so wordList keeps some state after page refresh.
+
       this.generatePlayerWordList()
     },
     generatePlayerWordList() {
-      const allWordsThisRound = this.room.currentRound.allWords
-      // If the user refreshed their page, we preserve the word they had
-      if (allWordsThisRound && allWordsThisRound[this.player.name]) {
-        this.player.wordList.push(allWordsThisRound[this.player.name])
-      }
       while (this.player.wordList.length < this.numItemsPerPlayer) {
         this.player.wordList.push(
           randomWord('adjectives') + '-' + randomWord('nouns')
         )
       }
     },
+    // Currently decoy wordlist is either all nouns or all adjectives
     generateDecoyWordList(type) {
       const wordList = []
       while (wordList.length < this.player.choicesPerDecoyCategory) {
@@ -706,32 +722,39 @@ export default {
       this.winnerPoints = playerScore[1]
     },
     async kickPlayer(name) {
+      delete this.room.wordsAndClues[name]
       if (this.room.players.includes(name)) {
         const index = this.room.players.indexOf(name)
         this.room.players.splice(index, 1)
         if (this.room.currentRound.clueGiver === name) {
           this.room.currentRound.clueGiver = this.room.players[0]
         }
-        await this.saveRoom('currentRound.clueGiver', 'players')
       }
+      await this.saveRoom('currentRound.clueGiver', 'players', 'wordsAndClues')
     },
-    async newRound(sameGuesser = false) {
+    async newRound() {
+      // delete current clueGiver's word and clue
+      delete this.room.wordsAndClues[this.room.currentRound.clueGiver]
+      // get the next cluegiver
+      const newClueGiver = nextClueGiver(
+        this.room.currentRound.clueGiver,
+        this.room.players
+      )
+      const nextClue =
+        this.room.wordsAndClues[newClueGiver] &&
+        this.room.wordsAndClues[newClueGiver].clue
+      // reset the round
       this.room.currentRound = {
-        state: 'CLUER_PICKING',
+        // If next cluer already gave clues, jump straight to decoys section
+        state: nextClue ? 'TOSS_IN_DECOYS' : 'CLUER_PICKING',
         // Pick next guesser
-        clueGiver: nextClueGiver(
-          this.room.currentRound.clueGiver,
-          this.room.players
-        ),
-        // Stores the real word from the clue giver; resets every round.
-        word: '',
-        // Stores both the real word and all decoys from other players; resets every round.
-        allWords: {},
-        // Stores the clue from the clue giver
-        clue: '',
+        clueGiver: newClueGiver,
+        // Stores both the real word and all decoys from other players; resets every round (with new clue if available).
+        allWords: nextClue ? { [newClueGiver]: nextClue } : {},
         // Stores counts of votes for both the real word and the decoy; resets every round.
         votes: {},
-        category: 'nouns', //remove this
+        // placeholder for different themes, etc
+        category: 'nouns',
       }
       this.room.lastUpdateTime = Date.now()
       // Overwrite existing room;
