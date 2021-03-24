@@ -20,8 +20,14 @@
     <!-- Column-based layout for leader board, Main UI, and Chat box -->
     <div class="columns is-centered">
       <!-- Left pane is for leader board. Only shown in-game and when width > 1216px -->
-      <div class="column is-hidden-touch">
+      <!-- <div class="column is-hidden-touch">
         <ScoreRules :state="room.currentRound.state" />
+      </div> -->
+      <div class="column is-hidden-touch">
+        <History
+          :scoreHistories="tallyScores.scoreHistories"
+          :state="room.currentRound.state"
+        ></History>
       </div>
       <!-- Center (main) pane. -->
       <div class="column is-two-thirds is-half-widescreen">
@@ -387,18 +393,9 @@
             :state="room.currentRound.state"
           ></History>
         </div>
-        <!-- Duplicate score rules column when screen is narrow -->
-        <div class="is-hidden-desktop">
-          <ScoreRules :state="room.currentRound.state" />
-        </div>
       </div>
       <!-- Right pane for chat (to be implemented) -->
-      <div class="column is-hidden-touch">
-        <History
-          :scoreHistories="tallyScores.scoreHistories"
-          :state="room.currentRound.state"
-        ></History>
-      </div>
+      <div class="column is-hidden-touch"></div>
     </div>
   </BigColumn>
 </template>
@@ -893,7 +890,7 @@ export default {
       })
       return {
         playerScores: sortedPlayerScores,
-        scoreHistories: scoreHistories,
+        scoreHistories: scoreHistories.reverse(),
       }
     },
   },
