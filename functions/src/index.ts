@@ -1,14 +1,11 @@
 import * as functions from 'firebase-functions'
 import * as admin from 'firebase-admin'
+import fetch from 'node-fetch'
 admin.initializeApp()
 
 import Stripe from 'stripe'
-// Configured with https://firebase.google.com/docs/functions/config-env
-// eg `$ firebase functions:config:set stripe.test_secret="THE-API-KEY"
-// Preview with `$ firebase functions:config:get`
-const stripe = new Stripe(functions.config().stripe.prod_secret, {
-  apiVersion: '2020-08-27',
-})
+const STRIPE_SECRET = functions.config().stripe.prod_secret
+const stripe = new Stripe(STRIPE_SECRET, { apiVersion: '2020-08-27' })
 
 // onCall = callable from JS directly. See https://firebase.google.com/docs/functions/callable
 export const helloWorld = functions.https.onCall(async (data, context) => {
@@ -58,3 +55,52 @@ export const customerPortal = functions.https.onCall(async (data, context) => {
   })
   return portalResponse.url
 })
+
+const LIST_ID = '2484740' // TODO: Change
+const MAILJET_PUBLIC = functions.config().mailjet.public_key
+const MAILJET_PRIVATE = functions.config().mailjet.private_key
+
+export const addContactsToMailjet = functions.https.onCall(
+  async (data, context) => {
+    const contacts = data?.contacts || []
+
+    const url = `https://api.mailjet.com/v3/REST/contactslist/${LIST_ID}/managemanycontacts`
+    const MAILJET_KEY = `${MAILJET_PUBLIC}:${MAILJET_PRIVATE}`
+
+    const body = {
+      Action: 'addnoforce',
+      Contacts: contacts,
+    }
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${bufferToA(MAILJET_KEY)}`,
+      },
+      body: JSON.stringify(body),
+    })
+
+    return await response.json()
+  }
+)
+
+// Nodejs polyfill for btoa()
+function bufferToA(input: string) {
+  return Buffer.from(input, 'utf-8').toString('base64')
+}
+
+// TODO unimplemented
+export const syncUsersToMailjet = functions.pubsub
+  .schedule('every 5 minutes')
+  .onRun((context) => {
+    console.log('Running syncUsersToMailjet')
+  })
+
+// NEXT TODO:
+// Clean up/scope down manageManyMailjet
+// Copy contact formatting logic & firestore code into index
+// Test out pubsub locally
+// Deploy live steps: 100 users per 5 min; correct list ID
+// Write drip campaign
+// Automate in Mailjet
