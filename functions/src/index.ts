@@ -1,9 +1,12 @@
 import * as functions from 'firebase-functions'
 import * as admin from 'firebase-admin'
 import fetch from 'node-fetch'
-admin.initializeApp()
-
 import Stripe from 'stripe'
+import { listUsersNewest, usersToContacts } from './users'
+
+admin.initializeApp()
+const db = admin.firestore()
+
 const STRIPE_SECRET = functions.config().stripe.prod_secret
 const stripe = new Stripe(STRIPE_SECRET, { apiVersion: '2020-08-27' })
 
@@ -62,28 +65,34 @@ const MAILJET_PRIVATE = functions.config().mailjet.private_key
 
 export const addContactsToMailjet = functions.https.onCall(
   async (data, context) => {
-    const contacts = data?.contacts || []
-
-    const url = `https://api.mailjet.com/v3/REST/contactslist/${LIST_ID}/managemanycontacts`
-    const MAILJET_KEY = `${MAILJET_PUBLIC}:${MAILJET_PRIVATE}`
-
-    const body = {
-      Action: 'addnoforce',
-      Contacts: contacts,
-    }
-
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Basic ${bufferToA(MAILJET_KEY)}`,
-      },
-      body: JSON.stringify(body),
-    })
-
-    return await response.json()
+    return await uploadContacts()
   }
 )
+
+async function uploadContacts() {
+  const users = await listUsersNewest(db)
+  const contacts = usersToContacts(users)
+  console.log(`Got ${contacts.length} contacts, here's the first:`, contacts[0])
+
+  const url = `https://api.mailjet.com/v3/REST/contactslist/${LIST_ID}/managemanycontacts`
+  const MAILJET_KEY = `${MAILJET_PUBLIC}:${MAILJET_PRIVATE}`
+
+  const body = {
+    Action: 'addnoforce',
+    Contacts: contacts,
+  }
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Basic ${bufferToA(MAILJET_KEY)}`,
+    },
+    body: JSON.stringify(body),
+  })
+
+  return await response.json()
+}
 
 // Nodejs polyfill for btoa()
 function bufferToA(input: string) {
@@ -93,14 +102,16 @@ function bufferToA(input: string) {
 // TODO unimplemented
 export const syncUsersToMailjet = functions.pubsub
   .schedule('every 5 minutes')
-  .onRun((context) => {
+  .onRun(async (context) => {
     console.log('Running syncUsersToMailjet')
+    const resp = await uploadContacts()
+    console.log('Done syncing, Mailjet response:', resp)
+    return resp
   })
 
 // NEXT TODO:
-// Clean up/scope down manageManyMailjet
 // Copy contact formatting logic & firestore code into index
-// Test out pubsub locally
+// Test out pubsub locally => annoying, apparently
 // Deploy live steps: 100 users per 5 min; correct list ID
 // Write drip campaign
 // Automate in Mailjet
