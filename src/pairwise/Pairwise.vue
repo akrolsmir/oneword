@@ -149,6 +149,7 @@
                       <!-- TODO: add tool tip to show why button is disabled https://wikiki.github.io/elements/tooltip/ -->
                       <button
                         class="button"
+                        onkeydown="return event.key != 'Enter';"
                         @click="submitClue"
                         :disabled="isClueSubmitDisabled()"
                       >
@@ -374,14 +375,15 @@
                 <strong> {{ player }} </strong> guessed "{{ vote }}"!
               </div>
             </div>
-            <div v-if="gameOver" class="box">
-              And that's it! <strong> {{ gameWinner }} </strong> won with "{{
-                winnerPoints
-              }}
+            <div v-if="room.gameOver" class="box">
+              And that's it! <strong> {{ room.gameWinner }} </strong> won with
+              "{{ room.winnerPoints }}
               points"!
-              <!-- <button class="button" @click="newRound(false)">Play Again</button> -->
+              <button class="button play-again" @click="newRound()">
+                Play Again
+              </button>
             </div>
-            <button v-else class="button" @click="newRound(false)">Next</button>
+            <button v-else class="button" @click="newRound()">Next</button>
           </div>
           <br /><br />
           <!-- History TO ADD LATER -->
@@ -446,6 +448,9 @@ export default {
         currentRound: {},
         history: [],
         players: [],
+        // game over if a player has over 30 pts (same as dixit)
+        gameOver: false,
+        gameOverThreshold: 15,
       },
       player: {
         name: new URL(window.location.href).searchParams.get('player') || '',
@@ -465,9 +470,6 @@ export default {
         decoyNounList: [],
       },
       alertIsShowing: false,
-      // game over if a player has over 30 pts (same as dixit)
-      gameOver: false,
-      gameOverPoints: 30,
       newMod: '',
       wordsSaved: false,
       showGameRules: false,
@@ -567,9 +569,12 @@ export default {
         },
         // Map of [player:<word,clue>], repopulated after all players' guesses have cycled through
         wordsAndClues: {},
+        // game over if a player has over 30 pts (same as dixit)
         gameOver: false,
+        gameOverThreshold: 15,
         gameWinner: '',
-        winnerPoints: 0,
+        winnerPoints: '',
+        // history of previous rounds
         history: [],
         public: true,
         lastUpdateTime: Date.now(),
@@ -713,11 +718,6 @@ export default {
       }
       return wordList
     },
-    handleGameOver(playerScore) {
-      this.gameOver = true
-      this.gameWinner = playerScore[0]
-      this.winnerPoints = playerScore[1]
-    },
     async kickPlayer(name) {
       delete this.room.wordsAndClues[name]
       if (this.room.players.includes(name)) {
@@ -737,23 +737,36 @@ export default {
         this.room.currentRound.clueGiver,
         this.room.players
       )
-      const nextClue =
+      const nextWord =
         this.room.wordsAndClues[newClueGiver] &&
-        this.room.wordsAndClues[newClueGiver].clue
+        this.room.wordsAndClues[newClueGiver].word
       // reset the round
       this.room.currentRound = {
         // If next cluer already gave clues, jump straight to decoys section
-        state: nextClue ? 'TOSS_IN_DECOYS' : 'CLUER_PICKING',
+        state: nextWord ? 'TOSS_IN_DECOYS' : 'CLUER_PICKING',
         // Pick next guesser
         clueGiver: newClueGiver,
         // Stores both the real word and all decoys from other players; resets every round (with new clue if available).
-        allWords: nextClue ? { [newClueGiver]: nextClue } : {},
+        allWords: nextWord ? { [newClueGiver]: nextWord } : {},
         // Stores counts of votes for both the real word and the decoy; resets every round.
         votes: {},
         // placeholder for different themes, etc
         category: 'nouns',
       }
+      // if newRound is after gameover, reset the game
+      if (this.room.gameOver) {
+        // clear history first, so tallyPoints() doesn't overwrite gameOver, gameWinner, winnerPoints
+        this.room.history = []
+        this.room.gameOver = false
+        this.room.gameWinner = ''
+        this.room.winnerPoints = 0
+        this.wordsAndClues = {}
+        this.currentRound.state = 'CLUER_PICKING'
+        this.currentRound.allWords = {}
+      }
+
       this.room.lastUpdateTime = Date.now()
+
       // Overwrite existing room;
       await setRoom(this.room)
     },
@@ -802,14 +815,19 @@ export default {
       })
       // Each player's client computes point totals for everyone independently
       this.room.history.forEach((round) => {
+        const realWordThisRound = round.allWords[round.clueGiver]
         const historyThisRound = []
         // If all players found the clueGiver's phrase
-        if (Object.values(round.votes).every((guess) => guess === round.word)) {
+        if (
+          Object.values(round.votes).every(
+            (guess) => guess === realWordThisRound
+          )
+        ) {
           historyThisRound.push(
             `Wow, everyone guessed ` +
               round.clueGiver +
               `'s actual pair '` +
-              round.word +
+              realWordThisRound +
               `'!`
           )
           // all players from that round who are still in the room
@@ -824,16 +842,19 @@ export default {
           historyThisRound.push('And ' + round.clueGiver + ' gets no points :c')
         }
         // If some players found the clueGiver's word combo but not all
-        else if (Object.values(round.votes).includes(round.word)) {
+        else if (Object.values(round.votes).includes(realWordThisRound)) {
           historyThisRound.push(
-            round.clueGiver + `'s actual phrase was '` + round.word + `'!`
+            round.clueGiver +
+              `'s actual phrase was '` +
+              realWordThisRound +
+              `'!`
           )
           // Award 3 pts to every guesser still in the game who guessed correctly
           Object.keys(leaderBoard).forEach((player) => {
             // Note that clueGiver does not vote
-            if (round.votes[player] === round.word) {
+            if (round.votes[player] === realWordThisRound) {
               leaderBoard[player] += 3
-              historyThisRound.push(player + ' guessed right! +3 points')
+              historyThisRound.push(player + ' guessed right! 3 points')
             }
             // Incorrect guesses awards 1 point to whoever threw the decoy that earned the guess
             else {
@@ -856,9 +877,7 @@ export default {
         // nobody guessed the word
         else {
           historyThisRound.push(
-            'Nobody guess correctly! So ' +
-              round.clueGiver +
-              ' gets 0 points :c'
+            'Nobody guess correctly! So ' + round.clueGiver + ' gets no points'
           )
           // ClueGiver gets 0 points but all other players of that round get 2pts automatically
           Object.keys(leaderBoard).forEach((player) => {
@@ -883,10 +902,12 @@ export default {
       )
       // emit "gameover" signal if game over
       sortedPlayerScores.some((playerScore) => {
-        if (playerScore[1] >= this.total) {
-          this.$emit('gameover', playerScore)
+        if (playerScore[1] >= this.room.gameOverThreshold) {
+          this.room.gameOver = true
+          this.room.gameWinner = playerScore[0]
+          this.room.winnerPoints = playerScore[1]
         }
-        return playerScore[1] >= this.total
+        return playerScore[1] >= this.room.gameOverThreshold
       })
       return {
         playerScores: sortedPlayerScores,
@@ -917,7 +938,7 @@ function awardPointsToDecoyWriter(
           player +
           ` with '` +
           playersVote +
-          `', +1 for ` +
+          `', 1 point for ` +
           goodDecoyTosser
       )
     }
@@ -964,5 +985,11 @@ function nextClueGiver(lastGuesser, players) {
   overflow: hidden;
   transition: max-height 0.2s ease-out;
   background-color: #f1f1f1;
+}
+
+.play-again {
+  position: absolute;
+  right: 20px;
+  transform: translateY(-25%);
 }
 </style>
