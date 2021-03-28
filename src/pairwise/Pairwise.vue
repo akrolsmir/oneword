@@ -183,15 +183,17 @@
                   padding: !showGameRules ? '0px' : '18px',
                 }"
               >
-                <strong>1)</strong> Wait for
-                <strong>{{ room.currentRound.clueGiver }}</strong> to pick a
-                random pair of words (i.e. a phrase), and write some text (i.e.
-                the clue) that relates to the phrase <br />
-                <strong>2)</strong> Based on the clue, everyone else constructs
-                a decoy phrase they think best matches the clue <br />
+                <strong>1)</strong> Each player picks a pair of words from a
+                randomly generated set, and writes a clue (of any length) that
+                relates to that pair <br />
+                <strong>2)</strong> In each round, players try to construct
+                decoys they think best matches each others' clues <br />
                 <strong>3)</strong> Once all decoys are submitted, players try
-                to guess <strong>{{ room.currentRound.clueGiver }}</strong
-                >'s real phrase among the decoys
+                to guess the real word pair among the decoys
+                <br />
+                <br />
+                Decoys that trick more people earn the most points! Clues that
+                are either too obvious or too offbeat will hold you back!
               </div>
             </div>
           </div>
