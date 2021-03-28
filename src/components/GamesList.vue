@@ -1,11 +1,10 @@
 <template>
   <form
     v-if="user.id || user.guest"
-    @submit.prevent="navigateToRoom"
+    @submit.prevent="navigateToRoom()"
     method="POST"
   >
-    <label class="label mt-2">Player: {{ user.displayName }}</label>
-    <label class="label mt-2">Room</label>
+    <label class="label mt-5">Hi, {{ user.displayName }}! Room name:</label>
     <input
       class="input"
       type="text"
@@ -13,8 +12,18 @@
       placeholder="apple"
       required
     />
-    <br /><br />
-    <input class="button" type="submit" value="Enter Room" />
+    <input
+      class="button mt-2 mr-2 has-text-weight-bold"
+      type="submit"
+      value="Enter Room"
+    />
+    <button
+      class="button is-warning mt-2"
+      type="button"
+      @click="createPrivateRoom"
+    >
+      Create Private Room
+    </button>
   </form>
   <template v-else>
     <br />
@@ -119,11 +128,19 @@ export default {
         return this.activeFunc(openRoom)
       }
     },
-    navigateToRoom() {
+    navigateToRoom(query = {}) {
       this.roomName = sanitize(this.roomName)
       this.$router.push({
         path: `${this.roomDirectory}${this.roomName}`,
+        query,
       })
+    },
+    createPrivateRoom() {
+      if (this.user.isSupporter) {
+        this.navigateToRoom({ private: true })
+      } else {
+        this.showCreatePrivateModal()
+      }
     },
     showPrivateModal() {
       this.$showModal({
@@ -137,6 +154,21 @@ export default {
         callbacks: {
           okay: () => {
             referSupporter('private_room_modal')
+          },
+        },
+      })
+    },
+    showCreatePrivateModal() {
+      this.$showModal({
+        title: 'To create a private room, become a supporter!',
+        text: "You'll also get other perks, like a custom avatar~",
+        buttons: {
+          okay: 'Become a supporter!',
+          cancel: 'Not now',
+        },
+        callbacks: {
+          okay: () => {
+            referSupporter('create_private_modal')
           },
         },
       })

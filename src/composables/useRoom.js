@@ -60,7 +60,7 @@ export function useRoom(user, makeNewRoom, onJoin = undefined) {
   const route = useRoute()
 
   // Should be called in a Vue app AFTER setup(), eg in beforeMount()
-  // See: https://i.imgur.com/6jVcrja.png
+  // See Vue lifecycle: https://i.imgur.com/6jVcrja.png
   async function createOrEnterRoom() {
     // For dev velocity, accept https://oneword.games/room/rome?player=Spartacus
     if (route.query.player && !user.id) {
@@ -75,6 +75,12 @@ export function useRoom(user, makeNewRoom, onJoin = undefined) {
       // 1. If the room doesn't exist, create it, then return
       // Known issue: Creating as a guest leads to 'Anon'
       await resetRoom()
+
+      // 1.5. If room should be private ('?private=1'), privatize & clean the URL
+      if (route.query.private) {
+        router.replace(without(route.query, 'private'))
+        await updateRoom(room, { public: false })
+      }
       listenRoom(room.name, loadFrom)
       return
     } else {
@@ -86,9 +92,7 @@ export function useRoom(user, makeNewRoom, onJoin = undefined) {
     // 3. If returning from Firebase sign in ('?authed=1'), skip the login modal
     if (route.query.authed) {
       // Remove the 'authed=1' from the URL for cleanliness
-      const query = { ...route.query }
-      delete query.authed
-      router.replace(query)
+      router.replace(without(route.query, 'authed'))
 
       // Then sign them in after the Firebase callback returns
       listenForLogin(enterRoom)
@@ -158,14 +162,20 @@ export function useRoom(user, makeNewRoom, onJoin = undefined) {
   }
 
   async function kickPlayer(name) {
-    await updateRoom(this.room, { [`people.${name}.state`]: 'WATCHING' })
+    await updateRoom(room, { [`people.${name}.state`]: 'WATCHING' })
   }
 
   async function makeMod(name) {
-    await updateRoom(this.room, {
+    await updateRoom(room, {
       [`people.${this.player.name}.state`]: 'PLAYING',
       [`people.${name}.state`]: 'MOD',
     })
+  }
+
+  function without(object, ...props) {
+    const copy = { ...object }
+    props.forEach((prop) => delete copy[prop])
+    return copy
   }
 
   loadFrom(makeNewRoom(room.name))

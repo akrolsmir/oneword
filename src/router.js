@@ -39,8 +39,16 @@ const routes = [
     component: Storytime,
     meta: { title: 'Storytime' },
   },
-  { path: '/listorama', component: ListoramaFrontPage },
-  { path: '/listorama/:id', component: Listorama },
+  {
+    path: '/listorama',
+    component: ListoramaFrontPage,
+    meta: { title: 'Listorama' },
+  },
+  {
+    path: '/listorama/:id',
+    component: Listorama,
+    meta: { title: 'Listorama' },
+  },
   { path: '/incrypt', component: IncryptFrontPage, meta: { title: 'Incrypt' } },
   { path: '/incrypt/:id', component: Incrypt, meta: { title: 'Incrypt' } },
   {

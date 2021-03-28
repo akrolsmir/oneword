@@ -64,7 +64,7 @@ export function pickRandom(array) {
 export function pickFromBag(bag, history) {
   // I _think_ this works okay for increasing and decreasing bag sizes?
   const numDrawn = history.length % bag.length
-  const drawnStart = Math.max(0, history.length - numDrawn - 1)
+  const drawnStart = Math.max(0, history.length - numDrawn)
   const drawn = history.slice(drawnStart)
   const undrawn = bag.filter((item) => !drawn.includes(item)) // warning: O(N^2)
   return pickRandom(undrawn.length > 0 ? undrawn : bag)

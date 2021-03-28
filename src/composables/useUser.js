@@ -22,6 +22,7 @@ export function useUser() {
     displayName: computed(() => user.name.split(' ')[0]),
     guest: false,
     canPlay: computed(() => user.id || (user.guest && user.displayName)),
+    supporterString: computed(() => SUPPORTER_TITLES[user.supporter]),
     // Note: Higher tiers qualify for lower tiers (Eg champions are supporters)
     isSupporter: computed(() => Boolean(user.supporter)),
     isChampion: computed(() =>
@@ -35,6 +36,13 @@ export function useUser() {
       return buildAvatarSvg(user.guest ? '#aaa' : colorHash.hex(user.name))
     }),
   })
+
+  const SUPPORTER_TITLES = {
+    BASE: 'Supporter',
+    CHAMPION: 'Champion',
+    SPONSOR: 'Sponsor',
+    ADMIN: 'Admin',
+  }
 
   listenForLogin((newUser) => {
     Object.assign(user, newUser)

@@ -30,10 +30,9 @@
         </div>
         <p>
           I'm Sinclair, Austin's sister, and I started working on One Word in
-          July. For some reason, right after I started and added a ton of site
-          improvements, many more people started playing 🤔. Now, I continue to
-          work on this site full time as well as run our official discord,
-          though I am currently looking for a job as a software engineer.
+          July of 2020. Around that time, a lot of people started playing. I
+          claim 120% credit for this.<br />
+          I also built <router-link to="/storytime">Storytime</router-link>!
         </p>
         <br />
         <p>
