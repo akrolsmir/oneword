@@ -93,7 +93,7 @@ export default {
             title: 'Designer',
             style: {
               boxShadow:
-                '-1px 1px 3px #2d26ff, 1px 1px 3px #2d26ff, -1px -1px 3px #ff217a, 1px -1px 3px #ff217a',
+                '-1px 1px 3px #5ec8e5, 1px 1px 3px #5ec8e5, -1px -1px 3px #ff48b0, 1px -1px 3px #ff48b0',
             },
           }
         }
