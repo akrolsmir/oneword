@@ -25,7 +25,7 @@
       </div> -->
       <div class="column is-hidden-touch">
         <History
-          :scoreHistories="tallyScores.scoreHistories"
+          :scoreHistories="tallyScores().scoreHistories"
           :state="room.currentRound.state"
         ></History>
       </div>
@@ -73,7 +73,7 @@
                 <span class="mb-2 mr-2">Players:</span>
                 <!-- TODO: refactor submitted/guessing into functions. This is currently a hack -->
                 <Nametag
-                  v-for="(playerScore, ind) in tallyScores.playerScores"
+                  v-for="(playerScore, ind) in tallyScores().playerScores"
                   :key="playerScore[0]"
                   :name="playerScore[0]"
                   :user="room.playerData && room.playerData[playerScore[0]]"
@@ -391,7 +391,7 @@
         <!-- Duplicate history column when screen is narrow -->
         <div class="is-hidden-desktop">
           <History
-            :scoreHistories="tallyScores.scoreHistories"
+            :scoreHistories="tallyScores().scoreHistories"
             :state="room.currentRound.state"
           ></History>
         </div>
@@ -755,14 +755,14 @@ export default {
       }
       // if newRound is after gameover, reset the game
       if (this.room.gameOver) {
-        // clear history first, so tallyPoints() doesn't overwrite gameOver, gameWinner, winnerPoints
+        // clear history first, so tallyScores() doesn't overwrite gameOver, gameWinner, winnerPoints
         this.room.history = []
         this.room.gameOver = false
         this.room.gameWinner = ''
         this.room.winnerPoints = 0
-        this.wordsAndClues = {}
-        this.currentRound.state = 'CLUER_PICKING'
-        this.currentRound.allWords = {}
+        this.room.wordsAndClues = {}
+        this.room.currentRound.state = 'CLUER_PICKING'
+        this.room.currentRound.allWords = {}
       }
 
       this.room.lastUpdateTime = Date.now()
@@ -784,26 +784,6 @@ export default {
     async toggleTimers() {
       this.room.timers.running = !this.room.timers.running
       await this.saveRoom('timers')
-    },
-  },
-  computed: {
-    timerLength() {
-      if (
-        this.room.currentRound &&
-        this.room.timers &&
-        this.room.timers.running
-      ) {
-        return this.room.timers[this.room.currentRound.state]
-      }
-      return 0
-    },
-    isMod() {
-      if (this.user.isAdmin) {
-        return true
-      }
-      if (this.room && this.room.players) {
-        return this.player.name == this.room.players[0]
-      }
     },
     // tallyScores only counts rounds that have been pushed to history
     tallyScores() {
@@ -854,7 +834,7 @@ export default {
             // Note that clueGiver does not vote
             if (round.votes[player] === realWordThisRound) {
               leaderBoard[player] += 3
-              historyThisRound.push(player + ' guessed right! 3 points')
+              historyThisRound.push(player + ' guessed right-- 3 points!')
             }
             // Incorrect guesses awards 1 point to whoever threw the decoy that earned the guess
             else {
@@ -912,6 +892,26 @@ export default {
       return {
         playerScores: sortedPlayerScores,
         scoreHistories: scoreHistories.reverse(),
+      }
+    },
+  },
+  computed: {
+    timerLength() {
+      if (
+        this.room.currentRound &&
+        this.room.timers &&
+        this.room.timers.running
+      ) {
+        return this.room.timers[this.room.currentRound.state]
+      }
+      return 0
+    },
+    isMod() {
+      if (this.user.isAdmin) {
+        return true
+      }
+      if (this.room && this.room.players) {
+        return this.player.name == this.room.players[0]
       }
     },
   },
