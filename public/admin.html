@@ -222,7 +222,7 @@
     methods: {
       async fetchUsers() {
         try {
-          this.users = await listUsersNewest()
+          this.users = await listUsers()
           for (const user of this.users) {
             user.createdDate = new Date(user.createTime)
             user.updatedTime = new Date(user.lastUpdateTime)
@@ -246,9 +246,7 @@
         // Note: Also try sticking in lastUpdateTime for recency info
       },
       async uploadContacts() {
-        const users = await listUsersNewest()
-        const contacts = usersToContacts(users)
-        const response = await addContactsToMailjet({ contacts })
+        const response = await addContactsToMailjet()
         console.log('Uploaded contacts', response)
       },
     },
@@ -261,16 +259,6 @@
   async function listUsers() {
     const db = firebase.firestore()
     const response = await db.collection('users').get()
-    return response.docs.map((doc) => doc.data())
-  }
-
-  async function listUsersNewest(limit = 100) {
-    const db = firebase.firestore()
-    const response = await db
-      .collection('users')
-      .orderBy('createTime', 'desc')
-      .limit(100)
-      .get()
     return response.docs.map((doc) => doc.data())
   }
 
@@ -290,24 +278,6 @@
       .join('\n')
     // Add a CSV header and trailing newline
     return `email\tfirstname\tlastname\tcreateddate\toneword_plays\tsupporter\n${usersString}\n`
-  }
-
-  function usersToContacts(users) {
-    return users.map((user) => {
-      const [firstname, lastname] = splitName(user.name)
-      return {
-        Email: user.email,
-        IsExcludedFromCampaigns: 'false',
-        Name: user.name,
-        Properties: {
-          firstname,
-          lastname,
-          createddate: moment(user.createdDate).format(),
-          oneword_plays: user.onewordGames,
-          supporter: user.supporter || '',
-        },
-      }
-    })
   }
 
   function writeToFile(filename, contents) {
