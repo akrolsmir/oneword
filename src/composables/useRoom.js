@@ -4,6 +4,7 @@ import {
   getRoom,
   listenForLogin,
   listenRoom,
+  serverLog,
   setRoom,
   updateRoom,
 } from '../firebase/network'
@@ -72,6 +73,7 @@ export function useRoom(user, makeNewRoom, onJoin = undefined) {
     const fetchedRoom = await getRoom(room)
 
     if (!fetchedRoom) {
+      await serverLog(`Room not found, resetting: ${room.name}`)
       // 1. If the room doesn't exist, create it, then return
       // Known issue: Creating as a guest leads to 'Anon'
       await resetRoom()

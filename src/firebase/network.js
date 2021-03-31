@@ -69,6 +69,13 @@ export async function getRoom(room) {
   return doc.data()
 }
 
+export async function serverLog(message) {
+  await db.collection('serverlogs').doc().set({
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    message,
+  })
+}
+
 export async function listRooms(limit = 20, publicRoom = true) {
   const db = firebase.firestore()
   const docs = await db
