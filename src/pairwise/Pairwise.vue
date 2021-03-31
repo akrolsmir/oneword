@@ -20,8 +20,14 @@
     <!-- Column-based layout for leader board, Main UI, and Chat box -->
     <div class="columns is-centered">
       <!-- Left pane is for leader board. Only shown in-game and when width > 1216px -->
-      <div class="column is-hidden-touch">
+      <!-- <div class="column is-hidden-touch">
         <ScoreRules :state="room.currentRound.state" />
+      </div> -->
+      <div class="column is-hidden-touch">
+        <History
+          :scoreHistories="tallyScores().scoreHistories"
+          :state="room.currentRound.state"
+        ></History>
       </div>
       <!-- Center (main) pane. -->
       <div class="column is-two-thirds is-half-widescreen">
@@ -67,7 +73,7 @@
                 <span class="mb-2 mr-2">Players:</span>
                 <!-- TODO: refactor submitted/guessing into functions. This is currently a hack -->
                 <Nametag
-                  v-for="(playerScore, ind) in tallyScores.playerScores"
+                  v-for="(playerScore, ind) in tallyScores().playerScores"
                   :key="playerScore[0]"
                   :name="playerScore[0]"
                   :user="room.playerData && room.playerData[playerScore[0]]"
@@ -110,8 +116,8 @@
             <!-- TODO consider adding limit of 10 players so games aren't too big? -->
             <!-- If there are enough players to play -->
             <div v-else>
-              <!-- Current player's turn to pick a word and give clues -->
-              <div v-if="room.currentRound.clueGiver == player.name">
+              <!-- If player does not have an entry in room's wordsAndClues, prompt to enter -->
+              <div v-if="!room.wordsAndClues[player.name]">
                 <div class="box">
                   <h2 class="fancy has-text-centered" role="alert">
                     Pick a phrase among the following, and write a clue that
@@ -122,7 +128,7 @@
                       @click="cluerSelectsWord(word)"
                       v-for="word in player.wordList"
                       :key="word"
-                      :class="{ 'is-info': room.currentRound.word == word }"
+                      :class="{ 'is-info': player.currentWord == word }"
                     >
                       {{ word }}
                     </button>
@@ -134,7 +140,7 @@
                         class="input"
                         id="hintInput"
                         type="text"
-                        v-model="room.currentRound.clue"
+                        v-model="player.currentClue"
                         @keyup.enter="submitClue"
                         :class="{ 'is-primary': true }"
                       />
@@ -143,6 +149,7 @@
                       <!-- TODO: add tool tip to show why button is disabled https://wikiki.github.io/elements/tooltip/ -->
                       <button
                         class="button"
+                        onkeydown="return event.key != 'Enter';"
                         @click="submitClue"
                         :disabled="isClueSubmitDisabled()"
                       >
@@ -150,17 +157,16 @@
                       </button>
                     </div>
                   </div>
-                  <!-- <div class="notification is-danger" role="alert" v-if="hasSpecialCharacters(room.currentRound.clue)">
-                    Are you sure this is a real word?
-                  </div> -->
                 </div>
               </div>
-              <!-- Not current player's turn -->
+              <!-- After submitting clues, but not everyone has done so yet -->
               <div v-else>
                 <h2 class="fancy" role="alert">
-                  Waiting for
-                  <strong>{{ room.currentRound.clueGiver }}</strong> to pick a
-                  phrase and a clue...
+                  Still waiting for
+                  {{
+                    room.players.length - Object.keys(room.wordsAndClues).length
+                  }}
+                  more player to pick a phrase and a clue...
                 </h2>
                 <br />
               </div>
@@ -177,25 +183,34 @@
                   padding: !showGameRules ? '0px' : '18px',
                 }"
               >
-                <strong>1)</strong> Wait for
-                <strong>{{ room.currentRound.clueGiver }}</strong> to pick a
-                random pair of words (i.e. a phrase), and write some text (i.e.
-                the clue) that relates to the phrase <br />
-                <strong>2)</strong> Based on the clue, everyone else constructs
-                a decoy phrase they think best matches the clue <br />
+                <strong>1)</strong> Each player picks a pair of words from a
+                randomly generated set, and writes a clue (of any length) that
+                relates to that pair <br />
+                <strong>2)</strong> In each round, players try to construct
+                decoys they think best matches each others' clues <br />
                 <strong>3)</strong> Once all decoys are submitted, players try
-                to guess <strong>{{ room.currentRound.clueGiver }}</strong
-                >'s real phrase among the decoys
+                to guess the real word pair among the decoys
+                <br />
+                <br />
+                Decoys that trick more people earn the most points! Clues that
+                are either too obvious or too offbeat will hold you back!
               </div>
             </div>
           </div>
 
-          <!-- Input area (toossing in decoys) -->
+          <!-- Input area (tossing in decoys) -->
           <div v-if="room.currentRound.state == 'TOSS_IN_DECOYS'">
             <!-- All except the clueGiver guesses which word is the real one, based on the clue giver's clues. -->
             <div class="box">
               <div v-if="room.currentRound.clueGiver != player.name">
                 <h2 class="fancy has-text-centered" role="alert">
+                  Your clue from {{ room.currentRound.clueGiver }} is:
+                  <strong>{{
+                    room.wordsAndClues[room.currentRound.clueGiver].clue
+                  }}</strong>
+                </h2>
+                <br />
+                <h2 class="has-text-centered" role="alert">
                   Pick one option from each word category to construct a decoy
                   phrase best matching
                   <strong>{{ room.currentRound.clueGiver }}</strong
@@ -255,10 +270,6 @@
                     }}
                   </button>
                 </div>
-                <h2 class="fancy has-text-centered" role="alert">
-                  Your clue from {{ room.currentRound.clueGiver }} is:
-                  <strong>{{ room.currentRound.clue }}</strong>
-                </h2>
               </div>
               <div v-else>
                 <h2 class="fancy" role="alert">
@@ -267,7 +278,9 @@
                 </h2>
                 <br />
                 <div class="has-text-centered">
-                  <strong>{{ room.currentRound.clue }}</strong>
+                  <strong>{{
+                    room.wordsAndClues[room.currentRound.clueGiver].clue
+                  }}</strong>
                 </div>
                 <h2 class="fancy has-text-centered" role="alert">
                   <span
@@ -339,7 +352,7 @@
                   Your clue from {{ room.currentRound.clueGiver }}:
                 </h2>
                 <div class="fancy has-text-centered newline">
-                  {{ room.currentRound.clue }}
+                  {{ room.wordsAndClues[room.currentRound.clueGiver].clue }}
                 </div>
               </div>
             </div>
@@ -351,7 +364,7 @@
               <h2 class="fancy has-text-centered" role="alert">
                 The phrase from
                 <strong>{{ room.currentRound.clueGiver }}</strong> was "{{
-                  room.currentRound.word
+                  room.wordsAndClues[room.currentRound.clueGiver].word
                 }}"!
               </h2>
               <br />
@@ -364,14 +377,15 @@
                 <strong> {{ player }} </strong> guessed "{{ vote }}"!
               </div>
             </div>
-            <div v-if="gameOver" class="box">
-              And that's it! <strong> {{ gameWinner }} </strong> won with "{{
-                winnerPoints
-              }}
+            <div v-if="room.gameOver" class="box">
+              And that's it! <strong> {{ room.gameWinner }} </strong> won with
+              "{{ room.winnerPoints }}
               points"!
-              <!-- <button class="button" @click="newRound(false)">Play Again</button> -->
+              <button class="button play-again" @click="newRound()">
+                Play Again
+              </button>
             </div>
-            <button v-else class="button" @click="newRound(false)">Next</button>
+            <button v-else class="button" @click="newRound()">Next</button>
           </div>
           <br /><br />
           <!-- History TO ADD LATER -->
@@ -379,22 +393,13 @@
         <!-- Duplicate history column when screen is narrow -->
         <div class="is-hidden-desktop">
           <History
-            :scoreHistories="tallyScores.scoreHistories"
+            :scoreHistories="tallyScores().scoreHistories"
             :state="room.currentRound.state"
           ></History>
         </div>
-        <!-- Duplicate score rules column when screen is narrow -->
-        <div class="is-hidden-desktop">
-          <ScoreRules :state="room.currentRound.state" />
-        </div>
       </div>
       <!-- Right pane for chat (to be implemented) -->
-      <div class="column is-hidden-touch">
-        <History
-          :scoreHistories="tallyScores.scoreHistories"
-          :state="room.currentRound.state"
-        ></History>
-      </div>
+      <div class="column is-hidden-touch"></div>
     </div>
   </BigColumn>
 </template>
@@ -437,20 +442,27 @@ export default {
       numItemsPerPlayer: 7,
       // bare bones room, to be overwritten from db if needed
       room: {
-        // get name from search params, or create a new one.
+        // get room name from search params if exists, or create a new room name.
         name:
           new URL(window.location.href).searchParams.get('room') ||
           randomWord('adjectives') + '-' + randomWord('nouns'),
+        // info about current round
         currentRound: {},
         history: [],
         players: [],
+        // game over if a player has over 30 pts (same as dixit)
+        gameOver: false,
+        gameOverThreshold: 15,
       },
       player: {
         name: new URL(window.location.href).searchParams.get('player') || '',
+        // how many options (of adj, verb etc) to construct decoy
         choicesPerDecoyCategory: 7,
-        // currentRoom is not used at the moment
-        currentRoom: new URL(window.location.href).searchParams.get('room'),
-        // wordlist for as future clue giver
+        // cache's player's choice for word on the player object, to reduce room update freq
+        currentWord: '',
+        // cache's player's choice for clue on the player object, to reduce room update freq
+        currentClue: '',
+        // wordlist to choose from as future clue giver
         wordList: [],
         // decoy adj & list
         decoyAdj: '',
@@ -460,9 +472,6 @@ export default {
         decoyNounList: [],
       },
       alertIsShowing: false,
-      // game over if a player has over 30 pts (same as dixit)
-      gameOver: false,
-      gameOverPoints: 30,
       newMod: '',
       wordsSaved: false,
       showGameRules: false,
@@ -479,7 +488,9 @@ export default {
     if (!fetchedRoom) {
       // 1. If the room doesn't exist, create it, then return
       this.player.name =
-        this.user.displayName || `${randomWord('adjectives')}-anon`
+        this.user.displayName ||
+        this.user.name ||
+        `${randomWord('adjectives')}-anon`
       await this.resetRoom()
       listenRoom(this.room.name, (room) => (this.room = room))
       return
@@ -505,6 +516,10 @@ export default {
     // Timer currently not yet implemented for pairwise
     'room.currentRound.state'(state) {
       this.$emit('reset-timer')
+      if (state === 'CLUER_PICKING') {
+        this.player.currentWord = ''
+        this.player.currentClue = ''
+      }
       if (state === 'TOSS_IN_DECOYS') {
         this.player.decoyAdjList = this.generateDecoyWordList('adjectives')
         this.player.decoyNounList = this.generateDecoyWordList('nouns')
@@ -547,20 +562,21 @@ export default {
           state: 'CLUER_PICKING',
           // First player becomes the first one to pick a word and a clue
           clueGiver: this.player.name,
-          // Stores the real word from the clue giver; resets every round.
-          word: '',
           // Stores both the real word and all decoys from other players; resets every round.
           allWords: {},
-          // Stores the clue from the clue giver
-          clue: '',
           // Stores counts of votes for both the real word and the decoy; resets every round.
           votes: {},
           // category will be either default or a theme
           category: 'nouns',
         },
+        // Map of [player:<word,clue>], repopulated after all players' guesses have cycled through
+        wordsAndClues: {},
+        // game over if a player has over 30 pts (same as dixit)
         gameOver: false,
+        gameOverThreshold: 15,
         gameWinner: '',
-        winnerPoints: 0,
+        winnerPoints: '',
+        // history of previous rounds
         history: [],
         public: true,
         lastUpdateTime: Date.now(),
@@ -576,7 +592,7 @@ export default {
         playerData: {
           [this.player.name]: {
             email: this.user.email || '',
-            supporter: this.user.isSupporter || '',
+            supporter: this.user.supporter || '',
           },
         },
       }
@@ -587,13 +603,43 @@ export default {
       if (!this.room.players.includes(this.player.name)) {
         return true
       }
-      if (Object.keys(this.room.currentRound.allWords).length === 0) {
+      if (this.player.currentWord === '') {
         return true
       }
-      if (this.room.currentRound.clue === '') {
+      if (this.player.currentClue === '') {
         return true
       }
       return false
+    },
+    async cluerSelectsWord(w) {
+      this.player.currentWord = w
+    },
+    async submitClue() {
+      // sync chosen word and clue from local player to the room's list of words & clues
+      this.room.wordsAndClues[`${this.player.name}`] = {
+        word: this.player.currentWord,
+        clue: this.player.currentClue,
+      }
+      // if player is the current clueGiver, immediately save word to all words this round
+      if (this.room.currentRound.clueGiver === this.player.name) {
+        this.room.currentRound.allWords[
+          this.player.name
+        ] = this.player.currentWord
+      }
+      // if this is the last player to submit a clue, change state.
+      if (
+        Object.keys(this.room.wordsAndClues).length >= this.room.players.length
+      ) {
+        this.room.currentRound.state = 'TOSS_IN_DECOYS'
+      }
+      await setRoom(this.room)
+
+      // reset wordlist and regenerated it
+      this.player.wordList = []
+      this.generatePlayerWordList()
+
+      // Store this for user profiles, but don't await for the result
+      updateUserGame(this.user.id, this.room.name)
     },
     isDecoySubmitDisabled() {
       if (!this.player.decoyAdj) {
@@ -604,47 +650,25 @@ export default {
       }
       return false
     },
-    async cluerSelectsWord(w) {
-      await updateRoom(this.room, { 'currentRound.word': w })
-      await this.saveWordToAllWordsInRoom(w)
-    },
-    async saveWordToAllWordsInRoom(w) {
+    async saveWordToAllWordsThisRound(w) {
       const update = {}
       update[`currentRound.allWords.${this.player.name}`] = w
       await updateRoom(this.room, update)
+    },
+    async submitDecoy() {
+      await this.saveWordToAllWordsThisRound(
+        this.player.decoyAdj + '-' + this.player.decoyNoun
+      )
       if (
         Object.keys(this.room.currentRound.allWords).length ==
         this.room.players.length
       ) {
         await updateRoom(this.room, { 'currentRound.state': 'GUESSING' })
       }
-    },
-    async submitClue() {
-      const indexToRemove = this.player.wordList.indexOf(
-        this.room.currentRound.word
-      )
-      if (indexToRemove > -1) {
-        this.player.wordList.splice(indexToRemove, 1)
-        this.player.wordList.push(
-          randomWord('adjectives') + '-' + randomWord('nouns')
-        )
-      }
-      this.room.currentRound.state = 'TOSS_IN_DECOYS'
-      // room.currentRound.clue should already be updated due to bi-di binding
-      await setRoom(this.room)
-
       // Store this for user profiles, but don't await for the result
       updateUserGame(this.user.id, this.room.name)
     },
-    async submitDecoy() {
-      await this.saveWordToAllWordsInRoom(
-        this.player.decoyAdj + '-' + this.player.decoyNoun
-      )
-
-      // Store this for user profiles, but don't await for the result
-      updateUserGame(this.user.id, this.room.name)
-    },
-    // vote is the word the guesser picked
+    // Guesser vote what they believe to be the correct word based on their clue.
     async submitVote(vote) {
       const update = {}
       update[`currentRound.votes.${this.player.name}`] = vote
@@ -678,21 +702,17 @@ export default {
         this.room.players.push(this.player.name)
         await this.saveRoom('playerData', 'players')
       }
-      // generate playerWordList so wordList keeps some state after page refresh.
+
       this.generatePlayerWordList()
     },
     generatePlayerWordList() {
-      const allWordsThisRound = this.room.currentRound.allWords
-      // If the user refreshed their page, we preserve the word they had
-      if (allWordsThisRound && allWordsThisRound[this.player.name]) {
-        this.player.wordList.push(allWordsThisRound[this.player.name])
-      }
       while (this.player.wordList.length < this.numItemsPerPlayer) {
         this.player.wordList.push(
           randomWord('adjectives') + '-' + randomWord('nouns')
         )
       }
     },
+    // Currently decoy wordlist is either all nouns or all adjectives
     generateDecoyWordList(type) {
       const wordList = []
       while (wordList.length < this.player.choicesPerDecoyCategory) {
@@ -700,40 +720,55 @@ export default {
       }
       return wordList
     },
-    handleGameOver(playerScore) {
-      this.gameOver = true
-      this.gameWinner = playerScore[0]
-      this.winnerPoints = playerScore[1]
-    },
     async kickPlayer(name) {
+      delete this.room.wordsAndClues[name]
       if (this.room.players.includes(name)) {
         const index = this.room.players.indexOf(name)
         this.room.players.splice(index, 1)
         if (this.room.currentRound.clueGiver === name) {
           this.room.currentRound.clueGiver = this.room.players[0]
         }
-        await this.saveRoom('currentRound.clueGiver', 'players')
       }
+      await this.saveRoom('currentRound.clueGiver', 'players', 'wordsAndClues')
     },
-    async newRound(sameGuesser = false) {
+    async newRound() {
+      // delete current clueGiver's word and clue
+      delete this.room.wordsAndClues[this.room.currentRound.clueGiver]
+      // get the next cluegiver
+      const newClueGiver = nextClueGiver(
+        this.room.currentRound.clueGiver,
+        this.room.players
+      )
+      const nextWord =
+        this.room.wordsAndClues[newClueGiver] &&
+        this.room.wordsAndClues[newClueGiver].word
+      // reset the round
       this.room.currentRound = {
-        state: 'CLUER_PICKING',
+        // If next cluer already gave clues, jump straight to decoys section
+        state: nextWord ? 'TOSS_IN_DECOYS' : 'CLUER_PICKING',
         // Pick next guesser
-        clueGiver: nextClueGiver(
-          this.room.currentRound.clueGiver,
-          this.room.players
-        ),
-        // Stores the real word from the clue giver; resets every round.
-        word: '',
-        // Stores both the real word and all decoys from other players; resets every round.
-        allWords: {},
-        // Stores the clue from the clue giver
-        clue: '',
+        clueGiver: newClueGiver,
+        // Stores both the real word and all decoys from other players; resets every round (with new clue if available).
+        allWords: nextWord ? { [newClueGiver]: nextWord } : {},
         // Stores counts of votes for both the real word and the decoy; resets every round.
         votes: {},
-        category: 'nouns', //remove this
+        // placeholder for different themes, etc
+        category: 'nouns',
       }
+      // if newRound is after gameover, reset the game
+      if (this.room.gameOver) {
+        // clear history first, so tallyScores() doesn't overwrite gameOver, gameWinner, winnerPoints
+        this.room.history = []
+        this.room.gameOver = false
+        this.room.gameWinner = ''
+        this.room.winnerPoints = 0
+        this.room.wordsAndClues = {}
+        this.room.currentRound.state = 'CLUER_PICKING'
+        this.room.currentRound.allWords = {}
+      }
+
       this.room.lastUpdateTime = Date.now()
+
       // Overwrite existing room;
       await setRoom(this.room)
     },
@@ -752,26 +787,6 @@ export default {
       this.room.timers.running = !this.room.timers.running
       await this.saveRoom('timers')
     },
-  },
-  computed: {
-    timerLength() {
-      if (
-        this.room.currentRound &&
-        this.room.timers &&
-        this.room.timers.running
-      ) {
-        return this.room.timers[this.room.currentRound.state]
-      }
-      return 0
-    },
-    isMod() {
-      if (this.user.isAdmin) {
-        return true
-      }
-      if (this.room && this.room.players) {
-        return this.player.name == this.room.players[0]
-      }
-    },
     // tallyScores only counts rounds that have been pushed to history
     tallyScores() {
       const leaderBoard = {}
@@ -782,14 +797,19 @@ export default {
       })
       // Each player's client computes point totals for everyone independently
       this.room.history.forEach((round) => {
+        const realWordThisRound = round.allWords[round.clueGiver]
         const historyThisRound = []
         // If all players found the clueGiver's phrase
-        if (Object.values(round.votes).every((guess) => guess === round.word)) {
+        if (
+          Object.values(round.votes).every(
+            (guess) => guess === realWordThisRound
+          )
+        ) {
           historyThisRound.push(
             `Wow, everyone guessed ` +
               round.clueGiver +
               `'s actual pair '` +
-              round.word +
+              realWordThisRound +
               `'!`
           )
           // all players from that round who are still in the room
@@ -804,16 +824,19 @@ export default {
           historyThisRound.push('And ' + round.clueGiver + ' gets no points :c')
         }
         // If some players found the clueGiver's word combo but not all
-        else if (Object.values(round.votes).includes(round.word)) {
+        else if (Object.values(round.votes).includes(realWordThisRound)) {
           historyThisRound.push(
-            round.clueGiver + `'s actual phrase was '` + round.word + `'!`
+            round.clueGiver +
+              `'s actual phrase was '` +
+              realWordThisRound +
+              `'!`
           )
           // Award 3 pts to every guesser still in the game who guessed correctly
           Object.keys(leaderBoard).forEach((player) => {
             // Note that clueGiver does not vote
-            if (round.votes[player] === round.word) {
+            if (round.votes[player] === realWordThisRound) {
               leaderBoard[player] += 3
-              historyThisRound.push(player + ' guessed right! +3 points')
+              historyThisRound.push(player + ' guessed right-- 3 points!')
             }
             // Incorrect guesses awards 1 point to whoever threw the decoy that earned the guess
             else {
@@ -836,9 +859,7 @@ export default {
         // nobody guessed the word
         else {
           historyThisRound.push(
-            'Nobody guess correctly! So ' +
-              round.clueGiver +
-              ' gets 0 points :c'
+            'Nobody guess correctly! So ' + round.clueGiver + ' gets no points'
           )
           // ClueGiver gets 0 points but all other players of that round get 2pts automatically
           Object.keys(leaderBoard).forEach((player) => {
@@ -863,14 +884,36 @@ export default {
       )
       // emit "gameover" signal if game over
       sortedPlayerScores.some((playerScore) => {
-        if (playerScore[1] >= this.total) {
-          this.$emit('gameover', playerScore)
+        if (playerScore[1] >= this.room.gameOverThreshold) {
+          this.room.gameOver = true
+          this.room.gameWinner = playerScore[0]
+          this.room.winnerPoints = playerScore[1]
         }
-        return playerScore[1] >= this.total
+        return playerScore[1] >= this.room.gameOverThreshold
       })
       return {
         playerScores: sortedPlayerScores,
-        scoreHistories: scoreHistories,
+        scoreHistories: scoreHistories.reverse(),
+      }
+    },
+  },
+  computed: {
+    timerLength() {
+      if (
+        this.room.currentRound &&
+        this.room.timers &&
+        this.room.timers.running
+      ) {
+        return this.room.timers[this.room.currentRound.state]
+      }
+      return 0
+    },
+    isMod() {
+      if (this.user.isAdmin) {
+        return true
+      }
+      if (this.room && this.room.players) {
+        return this.player.name == this.room.players[0]
       }
     },
   },
@@ -897,7 +940,7 @@ function awardPointsToDecoyWriter(
           player +
           ` with '` +
           playersVote +
-          `', +1 for ` +
+          `', 1 point for ` +
           goodDecoyTosser
       )
     }
@@ -944,5 +987,11 @@ function nextClueGiver(lastGuesser, players) {
   overflow: hidden;
   transition: max-height 0.2s ease-out;
   background-color: #f1f1f1;
+}
+
+.play-again {
+  position: absolute;
+  right: 20px;
+  transform: translateY(-25%);
 }
 </style>
