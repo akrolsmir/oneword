@@ -1,3 +1,4 @@
+import debug from './oneword/debug.vue'
 import FrontPage from './components/FrontPage.vue'
 import Profile from './components/Profile.vue'
 import About from './components/About.vue'
@@ -57,6 +58,7 @@ const routes = [
     meta: { title: 'Pairwise' },
   },
   { path: '/pairwise/:id', component: Pairwise, meta: { title: 'Pairwise' } },
+  { path: '/debug', component: debug, meta: { title: 'debug' } },
 ]
 
 export const router = createRouter({
