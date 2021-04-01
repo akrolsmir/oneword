@@ -1,6 +1,8 @@
 <template>
   <BigColumn :width="1200" class="background">
-    <!-- Notification -->
+    <!-- TODO: add a Chatbox #right-pane -->
+
+    <!-- TODO: replace with Share Link Modal -->
     <div class="modal" :class="{ 'is-active': alertIsShowing }">
       <div class="modal-background" @click="alertIsShowing = false"></div>
       <div class="modal-content">
@@ -71,32 +73,13 @@
               <!-- Players -->
               <div class="field is-grouped is-grouped-multiline">
                 <span class="mb-2 mr-2">Players:</span>
-                <!-- TODO: refactor submitted/guessing into functions. This is currently a hack -->
                 <Nametag
                   v-for="(playerScore, ind) in tallyScores().playerScores"
                   :key="playerScore[0]"
                   :name="playerScore[0]"
                   :user="room.playerData && room.playerData[playerScore[0]]"
                   :index="ind"
-                  :submitted="
-                    (Object.keys(room.currentRound.allWords).includes(
-                      playerScore[0]
-                    ) &&
-                      playerScore[0] != room.currentRound.clueGiver) ||
-                    (playerScore[0] == room.currentRound.clueGiver &&
-                      !Object.keys(room.currentRound.allWords).includes(
-                        playerScore[0]
-                      ))
-                  "
-                  :guessing="
-                    Object.keys(room.currentRound.votes).includes(
-                      playerScore[0]
-                    ) ||
-                    (player == room.currentRound.clueGiver &&
-                      Object.keys(room.currentRound.allWords).includes(
-                        playerScore[0]
-                      ))
-                  "
+                  :submitted="isColorSubmitted(playerScore[0])"
                   :mod="isMod"
                   :score="playerScore[1]"
                   @kick="kickPlayer(playerScore[0])"
@@ -117,6 +100,7 @@
             <!-- If there are enough players to play -->
             <div v-else>
               <!-- If player does not have an entry in room's wordsAndClues, prompt to enter -->
+              <!-- This works because we don't re-enter state=CLUER_PICKING until wordsAndClues becomes empty (theoretically) -->
               <div v-if="!room.wordsAndClues[player.name]">
                 <div class="box">
                   <h2 class="fancy has-text-centered" role="alert">
@@ -438,8 +422,6 @@ export default {
     return {
       //stores authentication metadata (whether user is signed in or guest)
       user: {},
-      // customizable
-      numItemsPerPlayer: 7,
       // bare bones room, to be overwritten from db if needed
       room: {
         // get room name from search params if exists, or create a new room name.
@@ -462,6 +444,8 @@ export default {
         currentWord: '',
         // cache's player's choice for clue on the player object, to reduce room update freq
         currentClue: '',
+        // how many entries in the wordList to pick out real pair
+        choicesOfWordPairs: 7,
         // wordlist to choose from as future clue giver
         wordList: [],
         // decoy adj & list
@@ -472,9 +456,8 @@ export default {
         decoyNounList: [],
       },
       alertIsShowing: false,
-      newMod: '',
-      wordsSaved: false,
       showGameRules: false,
+      newMod: '',
     }
   },
   async created() {
@@ -599,6 +582,22 @@ export default {
       await setRoom(this.room)
       await this.joinGame()
     },
+    // for nametags, `submitted` has light green color
+    isColorSubmitted(playerName) {
+      const shouldColorBeSubmitted =
+        (this.room.currentRound.state === 'CLUER_PICKING' &&
+          // player submitted their real pair and associated clue in CLUER_PICKING state
+          Object.keys(this.room.wordsAndClues).includes(playerName)) ||
+        (this.room.currentRound.state === 'TOSS_IN_DECOYS' &&
+          // players have tossed in their decoys in allWords
+          Object.keys(this.room.currentRound.allWords).includes(playerName)) ||
+        (this.room.currentRound.state === 'GUESSING' &&
+          // players have voted on which pair they think is the real one
+          (Object.keys(this.room.currentRound.votes).includes(playerName) ||
+            this.room.currentRound.clueGiver === playerName))
+      console.log(shouldColorBeSubmitted)
+      return shouldColorBeSubmitted
+    },
     isClueSubmitDisabled() {
       if (!this.room.players.includes(this.player.name)) {
         return true
@@ -706,7 +705,7 @@ export default {
       this.generatePlayerWordList()
     },
     generatePlayerWordList() {
-      while (this.player.wordList.length < this.numItemsPerPlayer) {
+      while (this.player.wordList.length < this.player.choicesOfWordPairs) {
         this.player.wordList.push(
           randomWord('adjectives') + '-' + randomWord('nouns')
         )
@@ -907,6 +906,13 @@ export default {
         return this.room.timers[this.room.currentRound.state]
       }
       return 0
+    },
+    isColorGuessing() {
+      return (
+        Object.keys(room.currentRound.votes).includes(playerScore[0]) ||
+        (player == room.currentRound.clueGiver &&
+          Object.keys(room.currentRound.allWords).includes(playerScore[0]))
+      )
     },
     isMod() {
       if (this.user.isAdmin) {
