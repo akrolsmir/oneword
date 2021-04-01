@@ -11,7 +11,7 @@ export default {
   async setup() {
     const timeseries = {}
     const peoplelessRooms = await getPeoplelessRooms()
-    // console.log(peoplelessRooms.map((room) => new Date(room.lastUpdateTime)))
+    console.log(peoplelessRooms.map((room) => new Date(room.lastUpdateTime)))
     // peopelessRooms.forEach(room => {
     //   const timeStampMod
     //   timeseries[]

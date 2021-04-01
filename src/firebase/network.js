@@ -58,6 +58,7 @@ function roomDb() {
 const db = firebase.firestore()
 
 export async function getPeoplelessRooms() {
+  console.log('IS THIS WORKING')
   // return []
   const ref = await db
     .collection('rooms')
@@ -69,9 +70,10 @@ export async function getPeoplelessRooms() {
   const rooms = ref.docs.map((doc) => doc.data())
 
   // return rooms
-  return rooms
-    .filter((room) => room.people && Object.keys(room.people).length === 0)
-    .filter((room) => room.public)
+  return rooms.filter(
+    (room) => room.people && Object.keys(room.people).length === 0
+  )
+  // .filter((room) => !room.public)
 }
 
 export async function setRoom(room) {
