@@ -5,6 +5,7 @@ import {
   updateUserGame,
   referSupporter,
   getPeoplelessRooms,
+  getServerLogMessages,
 } from '../firebase/network'
 
 export default {
@@ -17,6 +18,17 @@ export default {
     //   timeseries[]
     // })
     console.log('peopleless rooms ', peoplelessRooms)
+
+    const serverLogMessages = await getServerLogMessages()
+    const messagesArray = serverLogMessages.map((entry) => entry.message)
+    const dupset = {}
+    messagesArray.forEach((message) => {
+      if (dupset[message]) {
+        console.log('dup found: ' + message)
+      } else {
+        dupset[message] = 1
+      }
+    })
   },
 }
 </script>
