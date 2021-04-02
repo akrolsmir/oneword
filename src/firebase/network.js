@@ -66,7 +66,7 @@ export async function setRoom(room) {
 
 export async function updateRoom(room, update) {
   if (roomDb() == 'rooms') {
-    await serverLog(room.name, `updateRoom`, update)
+    serverLog(room.name, `updateRoom`, update)
   }
   await db.collection(roomDb()).doc(room.name).update(update)
 }
