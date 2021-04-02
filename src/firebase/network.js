@@ -56,11 +56,18 @@ function roomDb() {
 }
 
 const db = firebase.firestore()
+
 export async function setRoom(room) {
+  if (roomDb() == 'rooms') {
+    await serverLog(room.name, `setRoom`, room)
+  }
   await db.collection(roomDb()).doc(room.name).set(room)
 }
 
 export async function updateRoom(room, update) {
+  if (roomDb() == 'rooms') {
+    serverLog(room.name, `updateRoom`, update)
+  }
   await db.collection(roomDb()).doc(room.name).update(update)
 }
 
@@ -69,11 +76,16 @@ export async function getRoom(room) {
   return doc.data()
 }
 
-export async function serverLog(message) {
-  await db.collection('serverlogs').doc().set({
-    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-    message,
-  })
+export async function serverLog(roomName, action, extraFields = {}) {
+  await db
+    .collection('serverlogs')
+    .doc()
+    .set({
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      roomName,
+      action,
+      ...extraFields,
+    })
 }
 
 export async function listRooms(limit = 20, publicRoom = true) {
