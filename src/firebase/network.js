@@ -77,15 +77,19 @@ export async function getRoom(room) {
 }
 
 export async function serverLog(roomName, action, extraFields = {}) {
-  await db
-    .collection('serverlogs')
-    .doc()
-    .set({
-      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-      roomName,
-      action,
-      ...extraFields,
-    })
+  try {
+    await db
+      .collection('serverlogs')
+      .doc()
+      .set({
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        roomName,
+        action,
+        ...extraFields,
+      })
+  } catch (error) {
+    console.error('serverLog error:', error)
+  }
 }
 
 export async function listRooms(limit = 20, publicRoom = true) {
