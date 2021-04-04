@@ -52,6 +52,9 @@ function roomDb() {
   if (window.location.pathname.startsWith('/pairwise')) {
     return 'pairwise'
   }
+  if (window.location.pathname.startsWith('/asplos-2021')) {
+    return 'oneword-asplos'
+  }
   return 'rooms'
 }
 
