@@ -199,7 +199,6 @@ export function listenForLogin(onUser /* callback that takes in a user */) {
           lastUpdateTime: Date.now(),
         }
         await db.collection('users').doc(fetchedUser.id).set(fetchedUser)
-        await sendWelcomeEmail(fetchedUser)
       }
       onUser(fetchedUser)
 
