@@ -40,6 +40,11 @@ export default {
 
 <style scoped>
 .background {
-  background-color: #fee2e2;
+  background-image: linear-gradient(
+    hsl(313, 77%, 93%),
+    hsl(313, 77%, 93%) 66%,
+    hsl(6, 83%, 88%)
+  );
+  background-attachment: fixed;
 }
 </style>

@@ -568,6 +568,15 @@ export default {
     const roomHelpers = useRoom(user, makeNewRoom, onJoin)
     return Object.assign(roomHelpers, { user })
   },
+  mounted() {
+    // Override color for conference pages. Kinda hacky...
+    if (window.location.pathname.startsWith('/asplos-2021')) {
+      const bgElement = document.querySelector('.background')
+      bgElement.style.backgroundImage =
+        'linear-gradient(hsl(313, 77%, 93%), hsl(313, 77%, 93%) 66%, hsl(6, 83%, 88%))'
+      bgElement.style.backgroundAttachment = 'fixed'
+    }
+  },
   data() {
     return {
       BASIC_LISTS,
