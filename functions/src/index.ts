@@ -115,63 +115,57 @@ export const watchRoomUpdateForPeopleChange = functions.firestore
   .document('rooms/{roomId}')
   // onUpdate triggers when a document already exists and has any value changed.
   .onUpdate(async (change, context) => {
+    const roomId = context.params.roomId
+
     const previousRoomState = change.before.data()
     const newRoomState = change.after.data()
+
+    let loggableActionName = ''
     const loggableRoomStatePair = {
       previousRoomState,
       newRoomState,
     }
 
+    // People should always exist since the function calls onUpdate (room already exists)
     if (typeof newRoomState.people === 'undefined') {
-      functions.logger.info(
-        `Room ${context.params.roomId}`,
-        'peopleIsUndefined'
-      )
-      await serverLogFromCloud(
-        context.params.roomId /* roomName */,
-        'cloud_updateRoom_peopleIsUndefined' /* action */,
-        loggableRoomStatePair
-      )
-    } else if (
+      functions.logger.info(`Room ${roomId}, people field is undefined`)
+      loggableActionName = 'cloud_updateRoom_peopleIsUndefined'
+    }
+    // People should always be an object, not an array, string etc.
+    else if (
       typeof newRoomState.people !== 'object' ||
       newRoomState.people.constructor !== Object
     ) {
-      functions.logger.info(
-        `Room ${context.params.roomId}`,
-        'peopleIsNotObject'
-      )
-      await serverLogFromCloud(
-        context.params.roomId /* roomName */,
-        'cloud_updateRoom_peopleIsNotObject' /* action */,
-        loggableRoomStatePair
-      )
-    } else if (Object.keys(newRoomState.people).length === 0) {
-      functions.logger.info(
-        `Room ${context.params.roomId}`,
-        'peopleObjectCompletelyWiped'
-      )
-      await serverLogFromCloud(
-        context.params.roomId /* roomName */,
-        'cloud_updateRoom_peopleObjectCompletelyWiped' /* action */,
-        loggableRoomStatePair
-      )
-    } else if (
+      functions.logger.info(`Room ${roomId}, people field is not an object`)
+      loggableActionName = 'cloud_updateRoom_peopleIsNotObject'
+    }
+    // People object should never be erased unless it's a call from admin resetRoom
+    else if (Object.keys(newRoomState.people).length === 0) {
+      const logString = `Room ${roomId}, people object was completely wiped`
+      functions.logger.info(logString)
+      loggableActionName = 'cloud_updateRoom_peopleObjectCompletelyWiped'
+    }
+    // People object should never see items removed unless it's a call from admin resetRoom
+    else if (
       Object.keys(newRoomState.people).length <
       Object.keys(previousRoomState.people).length
     ) {
-      functions.logger.info(
-        `Room ${context.params.roomId}`,
-        'peopleObjectHasEntriesRemoved'
-      )
+      const logstring = `Room ${roomId}, people object was not empty but had entries removed`
+      functions.logger.info(logstring)
+      loggableActionName = 'cloud_updateRoom_peopleObjectHasEntriesRemoved'
+    }
+
+    // Only log if one of the above conditions were met
+    if (loggableActionName !== '') {
       await serverLogFromCloud(
         context.params.roomId /* roomName */,
-        'cloud_updateRoom_peopleObjectHasEntriesRemoved' /* action */,
+        loggableActionName /* action */,
         loggableRoomStatePair
       )
     }
   })
 
-// Need a new serverlog function (from network.js/serverLog) since this log is emitted from "server-side"
+// Need a new serverlog function (diff from network.js/serverLog) since this log is emitted from "server-side"
 async function serverLogFromCloud(
   roomName = 'undef_room_name',
   action = 'cloud_undef_action_name',
