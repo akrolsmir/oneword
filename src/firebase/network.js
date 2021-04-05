@@ -286,6 +286,10 @@ Austin
 }
 
 const functions = firebase.functions()
-// If testing with local emulator:
+
+/* Uncomment the following lines if testing with local function or db emulators: */
 // functions.useEmulator('localhost', 5001)
+// db.useEmulator('localhost', 8080)
+// NOTE: if testing server-side updateRoom logging, comment out user.isAdmin in OneWord.vue to expose resetRoom button
+
 export const customerPortal = functions.httpsCallable('customerPortal')

@@ -3,7 +3,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "yarn serve",
-    "serve": "tsc && firebase emulators:start --only functions",
+    "serve": "tsc && firebase emulators:start --only functions,firestore",
     "shell": "tsc && firebase functions:shell",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log"
