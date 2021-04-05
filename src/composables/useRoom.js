@@ -4,6 +4,7 @@ import {
   getRoom,
   listenForLogin,
   listenRoom,
+  serverLog,
   setRoom,
   updateRoom,
 } from '../firebase/network'
@@ -151,7 +152,9 @@ export function useRoom(user, makeNewRoom, onJoin = undefined) {
   async function resetRoom() {
     loadFrom(makeNewRoom(room.name))
     await joinGame(false)
-    await setRoom(room)
+    const roomCopy = { ...room }
+    delete roomCopy.players
+    await setRoom(roomCopy)
   }
 
   async function saveRoom(...props) {

@@ -18,7 +18,7 @@ const firebaseConfig = {
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig)
   try {
-    firebase.analytics()
+    import('firebase/firebase-analytics').then(() => firebase.analytics())
   } catch (e) {
     console.warn('Firebase analytics not enabled (probably got blocked.)')
     // Shim for firebase.analytics().logEvent(...)
@@ -52,21 +52,47 @@ function roomDb() {
   if (window.location.pathname.startsWith('/pairwise')) {
     return 'pairwise'
   }
+  if (window.location.pathname.startsWith('/asplos-2021')) {
+    return 'oneword-asplos'
+  }
   return 'rooms'
 }
 
 const db = firebase.firestore()
+
 export async function setRoom(room) {
+  if (roomDb() == 'rooms') {
+    await serverLog(room.name, `setRoom`, room)
+  }
   await db.collection(roomDb()).doc(room.name).set(room)
 }
 
 export async function updateRoom(room, update) {
+  if (roomDb() == 'rooms') {
+    serverLog(room.name, `updateRoom`, update)
+  }
   await db.collection(roomDb()).doc(room.name).update(update)
 }
 
 export async function getRoom(room) {
   const doc = await db.collection(roomDb()).doc(room.name).get()
   return doc.data()
+}
+
+export async function serverLog(roomName, action, extraFields = {}) {
+  try {
+    await db
+      .collection('serverlogs')
+      .doc()
+      .set({
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        roomName,
+        action,
+        ...extraFields,
+      })
+  } catch (error) {
+    console.error('serverLog error:', error)
+  }
 }
 
 export async function listRooms(limit = 20, publicRoom = true) {
@@ -176,7 +202,6 @@ export function listenForLogin(onUser /* callback that takes in a user */) {
           lastUpdateTime: Date.now(),
         }
         await db.collection('users').doc(fetchedUser.id).set(fetchedUser)
-        await sendWelcomeEmail(fetchedUser)
       }
       onUser(fetchedUser)
 
@@ -261,6 +286,10 @@ Austin
 }
 
 const functions = firebase.functions()
-// If testing with local emulator:
+
+/* Uncomment the following lines if testing with local function or db emulators: */
 // functions.useEmulator('localhost', 5001)
+// db.useEmulator('localhost', 8080)
+// NOTE: if testing server-side updateRoom logging, comment out user.isAdmin in OneWord.vue to expose resetRoom button
+
 export const customerPortal = functions.httpsCallable('customerPortal')
