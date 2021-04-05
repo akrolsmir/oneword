@@ -20,15 +20,16 @@ export default {
     console.log('peopleless rooms ', peoplelessRooms)
 
     const serverLogMessages = await getServerLogMessages()
-    const messagesArray = serverLogMessages.map((entry) => entry.message)
-    const dupset = {}
-    messagesArray.forEach((message) => {
-      if (dupset[message]) {
-        console.log('dup found: ' + message)
-      } else {
-        dupset[message] = 1
-      }
-    })
+    serverLogMessages.forEach((entry) => console.log(entry))
+    // const messagesArray = serverLogMessages.map((entry) => entry.message)
+    // const dupset = {}
+    // messagesArray.forEach((message) => {
+    //   if (dupset[message]) {
+    //     console.log('dup found: ' + message)
+    //   } else {
+    //     dupset[message] = 1
+    //   }
+    // })
   },
 }
 </script>

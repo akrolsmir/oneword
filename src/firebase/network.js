@@ -79,6 +79,7 @@ export async function getServerLogMessages() {
   // return []
   const ref = await db
     .collection('serverlogs')
+    .where('roomName', '==', 'abortive-belief')
     .limit(5000)
     .orderBy('timestamp', 'desc')
     .get()
