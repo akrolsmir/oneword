@@ -109,6 +109,89 @@ export const syncUsersToMailjet = functions.pubsub
     return resp
   })
 
+// Watches for room.people changes; logs to serverlogs if anomalies are detected
+// Helps pinpoint whether room.people gets wiped from client-side calls, or from a potential cloud firestore bug
+export const watchRoomUpdateForPeopleChange = functions.firestore
+  .document('rooms/{roomId}')
+  .onUpdate(async (change, context) => {
+    const previousRoomState = change.before.data()
+    const newRoomState = change.after.data()
+    const loggableRoomStatePair = {
+      previousRoomState,
+      newRoomState,
+    }
+
+    if (typeof newRoomState.people === 'undefined') {
+      functions.logger.info(
+        `Room ${context.params.roomId}`,
+        'newRoomStatePeopleIsUndefined'
+      )
+      await serverLogFromCloud(
+        context.params.roomId /* roomName */,
+        'cloud_updateRoom_newRoomStatePeopleIsUndefined' /* action */,
+        loggableRoomStatePair
+      )
+    } else if (
+      typeof newRoomState.people !== 'object' ||
+      newRoomState.people.constructor !== Object
+    ) {
+      functions.logger.info(
+        `Room ${context.params.roomId}`,
+        'newRoomStatePeopleIsNotObject'
+      )
+      await serverLogFromCloud(
+        context.params.roomId /* roomName */,
+        'cloud_updateRoom_newRoomStatePeopleIsNotObject' /* action */,
+        loggableRoomStatePair
+      )
+    } else if (Object.keys(newRoomState.people).length === 0) {
+      functions.logger.info(
+        `Room ${context.params.roomId}`,
+        'newRoomStateEmptyPeopleObject'
+      )
+      await serverLogFromCloud(
+        context.params.roomId /* roomName */,
+        'cloud_updateRoom_newRoomStateEmptyPeopleObject' /* action */,
+        loggableRoomStatePair
+      )
+    } else if (
+      Object.keys(newRoomState.people).length <
+      Object.keys(previousRoomState.people).length
+    ) {
+      functions.logger.info(
+        `Room ${context.params.roomId}`,
+        'newRoomStatePeopleEntriesRemoved'
+      )
+      await serverLogFromCloud(
+        context.params.roomId /* roomName */,
+        'cloud_updateRoom_newRoomStatePeopleEntriesRemoved' /* action */,
+        loggableRoomStatePair
+      )
+    }
+  })
+
+// Need a new serverlog function (from network.js/serverLog) since this log is emitted from "server-side"
+async function serverLogFromCloud(
+  roomName = 'undef_room_name',
+  action = 'cloud_undef_action_name',
+  extraFields = {}
+) {
+  try {
+    await db
+      .collection('serverlogs')
+      .doc()
+      .set({
+        timestamp: admin.database.ServerValue.TIMESTAMP,
+        roomName,
+        action,
+        ...extraFields,
+      })
+  } catch (error) {
+    // standard Cloud Function logger https://firebase.google.com/docs/functions/writing-and-viewing-logs
+    functions.logger.error('serverLog error:', error)
+  }
+}
+
 // NEXT TODO:
 // Copy contact formatting logic & firestore code into index
 // Test out pubsub locally => annoying, apparently
