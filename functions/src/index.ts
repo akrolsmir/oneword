@@ -113,6 +113,7 @@ export const syncUsersToMailjet = functions.pubsub
 // Helps pinpoint whether room.people gets wiped from client-side calls, or from a potential cloud firestore bug
 export const watchRoomUpdateForPeopleChange = functions.firestore
   .document('rooms/{roomId}')
+  // onUpdate triggers when a document already exists and has any value changed.
   .onUpdate(async (change, context) => {
     const previousRoomState = change.before.data()
     const newRoomState = change.after.data()
@@ -124,11 +125,11 @@ export const watchRoomUpdateForPeopleChange = functions.firestore
     if (typeof newRoomState.people === 'undefined') {
       functions.logger.info(
         `Room ${context.params.roomId}`,
-        'newRoomStatePeopleIsUndefined'
+        'peopleIsUndefined'
       )
       await serverLogFromCloud(
         context.params.roomId /* roomName */,
-        'cloud_updateRoom_newRoomStatePeopleIsUndefined' /* action */,
+        'cloud_updateRoom_peopleIsUndefined' /* action */,
         loggableRoomStatePair
       )
     } else if (
@@ -137,21 +138,21 @@ export const watchRoomUpdateForPeopleChange = functions.firestore
     ) {
       functions.logger.info(
         `Room ${context.params.roomId}`,
-        'newRoomStatePeopleIsNotObject'
+        'peopleIsNotObject'
       )
       await serverLogFromCloud(
         context.params.roomId /* roomName */,
-        'cloud_updateRoom_newRoomStatePeopleIsNotObject' /* action */,
+        'cloud_updateRoom_peopleIsNotObject' /* action */,
         loggableRoomStatePair
       )
     } else if (Object.keys(newRoomState.people).length === 0) {
       functions.logger.info(
         `Room ${context.params.roomId}`,
-        'newRoomStateEmptyPeopleObject'
+        'peopleObjectCompletelyWiped'
       )
       await serverLogFromCloud(
         context.params.roomId /* roomName */,
-        'cloud_updateRoom_newRoomStateEmptyPeopleObject' /* action */,
+        'cloud_updateRoom_peopleObjectCompletelyWiped' /* action */,
         loggableRoomStatePair
       )
     } else if (
@@ -160,11 +161,11 @@ export const watchRoomUpdateForPeopleChange = functions.firestore
     ) {
       functions.logger.info(
         `Room ${context.params.roomId}`,
-        'newRoomStatePeopleEntriesRemoved'
+        'peopleObjectHasEntriesRemoved'
       )
       await serverLogFromCloud(
         context.params.roomId /* roomName */,
-        'cloud_updateRoom_newRoomStatePeopleEntriesRemoved' /* action */,
+        'cloud_updateRoom_peopleObjectHasEntriesRemoved' /* action */,
         loggableRoomStatePair
       )
     }
@@ -193,8 +194,4 @@ async function serverLogFromCloud(
 }
 
 // NEXT TODO:
-// Copy contact formatting logic & firestore code into index
 // Test out pubsub locally => annoying, apparently
-// Deploy live steps: 100 users per 5 min; correct list ID
-// Write drip campaign
-// Automate in Mailjet
