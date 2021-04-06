@@ -19,10 +19,11 @@ Adapted from https://firebase.google.com/docs/functions/get-started
 
 ## Developing locally
 
-1. `$ yarn dev` to spin up the emulators
+1. `$ firebase login` if you aren't logged into Firebase via commandline yet. Ask Austin to give you access to OneWord firebase.
+2. `$ yarn dev` to spin up the emulators
    The Emulator UI is at http://localhost:4000; the functions are hosted on :5001.
    Note: You have to kill and restart emulators when you change code; no hot reload =(
-2. Connect to emulators by enabling `functions.useEmulator('localhost', 5001)`
+3. Connect to emulators by enabling `functions.useEmulator('localhost', 5001)`
 
 ## Debugging
 

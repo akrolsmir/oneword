@@ -23,10 +23,17 @@ export function useUser() {
     guest: false,
     canPlay: computed(() => user.id || (user.guest && user.displayName)),
     supporterString: computed(() => SUPPORTER_TITLES[user.supporter]),
+    // Grant supporter benefits for conference pages.
+    // TODO: Remove after 2021-04-30
+    isConference: computed(() =>
+      window.location.pathname.startsWith('/asplos-2021')
+    ),
     // Note: Higher tiers qualify for lower tiers (Eg champions are supporters)
-    isSupporter: computed(() => Boolean(user.supporter)),
-    isChampion: computed(() =>
-      ['CHAMPION', 'SPONSOR', 'ADMIN'].includes(user.supporter)
+    isSupporter: computed(() => Boolean(user.supporter) || user.isConference),
+    isChampion: computed(
+      () =>
+        ['CHAMPION', 'SPONSOR', 'ADMIN'].includes(user.supporter) ||
+        user.isConference
     ),
     isAdmin: computed(() => user.supporter === 'ADMIN'),
     avatarUrl: computed(() => {

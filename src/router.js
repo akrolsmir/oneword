@@ -5,6 +5,7 @@ import About from './components/About.vue'
 import Supporter from './components/Supporter.vue'
 import Thanks from './components/Thanks.vue'
 import OneWord from './oneword/OneWord.vue'
+import Asplos2021 from './oneword/conferences/Asplos2021.vue'
 import ListoramaFrontPage from './listorama/ListoramaFrontPage.vue'
 import Listorama from './listorama/Listorama.vue'
 import StorytimeFrontPage from './storytime/components/StorytimeFrontPage.vue'
@@ -59,6 +60,16 @@ const routes = [
   },
   { path: '/pairwise/:id', component: Pairwise, meta: { title: 'Pairwise' } },
   { path: '/debug', component: debug, meta: { title: 'debug' } },
+  {
+    path: '/asplos-2021',
+    component: Asplos2021,
+    meta: { title: 'ASPLOS 2021' },
+  },
+  {
+    path: '/asplos-2021/:id',
+    component: OneWord,
+    meta: { title: 'ASPLOS 2021' },
+  },
 ]
 
 export const router = createRouter({
