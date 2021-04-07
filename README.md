@@ -31,6 +31,23 @@ Every pull request will automatically get a separate preview URL; perfect for ge
 
 Just push to `master`, and the site will update automatically.
 
+## Android
+
+We use [Capacitor](https://capacitorjs.com/docs/v3) to package our web apps into
+mobile apps.
+
+### Setup
+
+1. Install [Android Studio](https://developer.android.com/studio)
+2. Set up an Android emulator, or connect your phone in [developer mode](https://developer.android.com/studio/debug/dev-options#enable)
+
+### Developing
+
+1. `$ yarn build` to build Vue app for distribution
+2. `$ npx cap run --list android` to check that your emulator/phone is connected
+3. `$ npx cap run android` to run on Android
+   - Or `$ npx cap open android` to edit project in Android Studio
+
 # Appendix
 
 ## Tech stack

@@ -1,0 +1,6 @@
+{
+  "appId": "games.oneword",
+  "appName": "One Word",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}

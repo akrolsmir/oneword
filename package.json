@@ -9,6 +9,9 @@
     "analytics": "streamlit run analytics/streamlit/streamlit_app.py"
   },
   "dependencies": {
+    "@capacitor/android": "^3.0.0-rc.0",
+    "@capacitor/cli": "^3.0.0-rc.0",
+    "@capacitor/core": "^3.0.0-rc.0",
     "@stripe/stripe-js": "^1.12.1",
     "animate.css": "^4.1.1",
     "bulma": "^0.9.1",
