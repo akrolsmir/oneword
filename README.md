@@ -48,6 +48,11 @@ mobile apps.
 3. `$ npx cap run android` to run on Android
    - Or `$ npx cap open android` to edit project in Android Studio
 
+### Notes
+
+- `$ yarn resources` to [generate app icons](https://capacitorjs.com/docs/v3/guides/splash-screens-and-icons)
+  - For Android, we use [adaptive icons](https://developer.android.com/guide/practices/ui_guidelines/icon_design_adaptive)
+
 # Appendix
 
 ## Tech stack

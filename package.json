@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "analytics": "streamlit run analytics/streamlit/streamlit_app.py"
+    "analytics": "streamlit run analytics/streamlit/streamlit_app.py",
+    "resources": "cordova-res android --skip-config --copy"
   },
   "dependencies": {
     "@capacitor/android": "^3.0.0-rc.0",
@@ -44,6 +45,7 @@
   "devDependencies": {
     "@vitejs/plugin-vue": "^1.1.4",
     "@vue/compiler-sfc": "^3.0.5",
+    "cordova-res": "^0.15.3",
     "sass": "^1.32.8",
     "vite": "^2.0.0-beta.65"
   }
