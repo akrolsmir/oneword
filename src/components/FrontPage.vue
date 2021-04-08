@@ -1,7 +1,8 @@
 <template>
   <BigColumn>
     <div>
-      <div class="notification is-info py-2 has-text-centered">
+      <!-- TODO: Make this show up automatically on Mondays -->
+      <!-- <div class="notification is-info py-2 has-text-centered">
         <a
           target="_blank"
           rel="noopener noreferrer"
@@ -9,7 +10,7 @@
           >Join us on Discord</a
         >
         for our Weekly Game Nights: Monday at 6pm PT!
-      </div>
+      </div> -->
       <div class="fancy big">Welcome!</div>
       This is an online game based on
       <a
