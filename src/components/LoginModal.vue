@@ -5,6 +5,13 @@
     <div class="modal-card box" style="max-width: 400px">
       <div class="has-text-centered" v-show="!guestMode">
         <h2 class="fancy title mb-1">Sign in to get started!</h2>
+        <button
+          v-if="capacitorPlatform === 'android'"
+          class="button"
+          @click="googleSignIn"
+        >
+          Sign in with Googlex
+        </button>
         <div id="firebaseui-auth-container"></div>
         <a class="is-size-7" @click="toGuestMode">Or play without an account</a>
       </div>
@@ -41,6 +48,8 @@
 
 <script>
 import { inject } from 'vue'
+import { cfaSignIn } from 'capacitor-firebase-auth'
+import { Capacitor } from '@capacitor/core'
 
 import firebase from 'firebase/app'
 import 'firebaseui/dist/firebaseui.css'
@@ -84,6 +93,7 @@ export default {
   data() {
     return {
       guestMode: false,
+      capacitorPlatform: Capacitor.getPlatform() /* "web", "ios", or "android" */,
     }
   },
   setup() {
@@ -110,6 +120,9 @@ export default {
       // If onGuestCallback is not provided, it'll be sth like a MouseEvent
       this.onGuestCallback instanceof Function && this.onGuestCallback()
       this.$emit('hide')
+    },
+    googleSignIn() {
+      cfaSignIn('google.com').subscribe((user) => alert(JSON.stringify(user)))
     },
   },
 }
