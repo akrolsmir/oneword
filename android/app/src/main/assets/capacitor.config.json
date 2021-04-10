@@ -4,10 +4,8 @@
 	"webDir": "dist",
 	"bundledWebRuntime": false,
 	"server": {
-		"allowNavigation": [
-			"oneword-cf74a.firebaseapp.com",
-			"accounts.google.com"
-		]
+		"//": "Copy the network URL from `yarn dev` for live reloading",
+		"// url": "http://192.168.1.5:3001"
 	},
 	"plugins": {
 		"CapacitorFirebaseAuth": {

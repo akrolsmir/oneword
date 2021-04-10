@@ -7,7 +7,8 @@
     "build": "vite build",
     "serve": "vite preview",
     "analytics": "streamlit run analytics/streamlit/streamlit_app.py",
-    "resources": "cordova-res android --skip-config --copy"
+    "resources": "cordova-res android --skip-config --copy",
+    "android": "npx cap run android"
   },
   "dependencies": {
     "@capacitor/android": "^3.0.0-rc.0",

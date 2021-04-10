@@ -45,8 +45,17 @@ mobile apps.
 
 1. `$ yarn build` to build Vue app for distribution
 2. `$ npx cap run --list android` to check that your emulator/phone is connected
-3. `$ npx cap run android` to run on Android
+3. `$ yarn android` to run on Android
    - Or `$ npx cap open android` to edit project in Android Studio
+
+OR for live reloading from your local server:
+
+1. `$ yarn dev` to spin up a local Vue server
+2. Copy the network url (e.g. `http://192.168.1.5:3001`)
+3. Paste it into `capacitor.config.json`'s `server.url` field.
+4. `$ yarn android` to run on Android
+
+(TODO: would be cool to have `$ yarn android-dev` do all of the above)
 
 ### Notes
 
