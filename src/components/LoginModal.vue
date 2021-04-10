@@ -145,7 +145,7 @@ export default {
       this.$emit('hide')
     },
     googleSignIn() {
-      cfaSignIn('google.com').subscribe((user) => alert(JSON.stringify(user)))
+      cfaSignIn('google.com').subscribe((_user) => this.$emit('hide'))
     },
   },
 }
