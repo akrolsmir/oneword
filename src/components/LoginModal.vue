@@ -1,8 +1,8 @@
 <template>
-  <AnimatedModal :visible="visible">
+  <AnimatedModal :visible="visible" :width="400">
     <!-- Note: for some reason the card takes up 600px anyways,
     so there's a background click deadzone to the right/left -->
-    <div class="modal-card box" style="max-width: 400px">
+    <div class="box">
       <div class="has-text-centered" v-show="!guestMode">
         <h2 class="fancy title mb-1">Sign in to get started!</h2>
         <div
