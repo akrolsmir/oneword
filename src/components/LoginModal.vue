@@ -5,13 +5,33 @@
     <div class="modal-card box" style="max-width: 400px">
       <div class="has-text-centered" v-show="!guestMode">
         <h2 class="fancy title mb-1">Sign in to get started!</h2>
-        <button
+        <div
+          id="android-google-signin"
+          class="mt-4"
           v-if="capacitorPlatform === 'android'"
-          class="button"
-          @click="googleSignIn"
         >
-          Sign in with Googlex
-        </button>
+          <!-- Copied the "Sign In with Google" button from FirebaseUI -->
+          <button
+            class="firebaseui-idp-button mdl-button mdl-js-button mdl-button--raised firebaseui-idp-google firebaseui-id-idp-button"
+            data-provider-id="google.com"
+            style="background-color: #ffffff"
+            data-upgraded=",MaterialButton"
+            @click="googleSignIn"
+          >
+            <span class="firebaseui-idp-icon-wrapper"
+              ><img
+                class="firebaseui-idp-icon"
+                alt=""
+                src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" /></span
+            ><span class="firebaseui-idp-text firebaseui-idp-text-long"
+              >Sign in with Google</span
+            ><span class="firebaseui-idp-text firebaseui-idp-text-short"
+              >Google</span
+            >
+          </button>
+          <h3 class="m-2">OR</h3>
+        </div>
+        <!-- <button class="button">Sign in with Googlexyz</button> -->
         <div id="firebaseui-auth-container"></div>
         <a class="is-size-7" @click="toGuestMode">Or play without an account</a>
       </div>
@@ -65,14 +85,17 @@ async function injectFirebaseUi() {
     successUrl.searchParams.set('authed', '1')
   }
 
+  const signInOptions = [firebase.auth.EmailAuthProvider.PROVIDER_ID]
+  // On Android, Google auth is handled by capacitor-firebase-auth
+  if (Capacitor.getPlatform() !== 'android') {
+    signInOptions.unshift(firebase.auth.GoogleAuthProvider.PROVIDER_ID)
+  }
+
   // FirebaseUI config.
   const uiConfig = {
     // Redirect back to the same URL after a successful sign-in.
     signInSuccessUrl: successUrl.toString(),
-    signInOptions: [
-      firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-      firebase.auth.EmailAuthProvider.PROVIDER_ID,
-    ],
+    signInOptions,
   }
   // Initialize the FirebaseUI Widget using Firebase.
   const ui =
