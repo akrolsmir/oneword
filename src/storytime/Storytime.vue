@@ -432,6 +432,7 @@ export default {
       // name: randomWord('adjectives') + '-' + randomWord('nouns'),
       history: [],
       players: [],
+      timers: {},
     },
     player: {
       name: '',
@@ -740,13 +741,6 @@ export default {
         }
         return await updateRoom(this.room, { 'currentRound.state': 'CHOOSING' })
       } else if (this.room.currentRound.state == 'CHOOSING') {
-        // Choose the story continuation
-        const winners = Object.entries(this.room.currentRound.responses)
-          .filter(
-            (entry) =>
-              entry[1].votes.length === this.maxVotes(this.room.currentRound)
-          )
-          .map((entry) => entry[0])
         return await this.newRound()
       }
     },
