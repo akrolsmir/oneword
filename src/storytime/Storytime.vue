@@ -334,9 +334,12 @@
             </div>
             <div
               class="control"
-              v-for="(response, p) in room.currentRound.responses"
+              v-for="[p, response] in Object.entries(
+                room.currentRound.responses
+              ).sort(([, responseA], [, responseB]) =>
+                responseA.story > responseB.story ? 1 : -1
+              )"
               :key="p"
-              v-once
             >
               <label class="spacy" v-if="p != player.name">
                 <input
