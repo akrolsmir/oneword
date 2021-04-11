@@ -561,7 +561,12 @@ export default {
       const scores = Object.fromEntries(
         this.room.players.map((player) => [player, 0])
       )
-      for (let round of this.room.history) {
+      // count backwards until the first round of the chapter
+      for (let round of [...this.room.history].reverse()) {
+        if (round.type === 'chapterEnd') {
+          return scores
+        }
+
         const roundScores = this.score(round)
         for (let player in roundScores) {
           scores[player] += roundScores[player]
@@ -747,6 +752,22 @@ export default {
     },
     async newRound() {
       this.room.history.push(this.room.currentRound)
+      if (Object.values(this.scores).some((s) => s > 150)) {
+        this.room.history.push({
+          type: 'chapterEnd',
+          chooser: 'End Chapter',
+          responses: {
+            ' ': {
+              story:
+                'The round has ended because someone got over 150 points.' +
+                `\nScores for this round: ${JSON.stringify(this.scores)}` +
+                '\nFeel free to continue if there is more to this tale!',
+              words: [],
+              votes: [],
+            },
+          },
+        })
+      }
       this.room.currentRound = {
         state: 'PROMPT',
         chooser: nextGuesser(this.room.currentRound.chooser, this.room.players),
@@ -807,6 +828,7 @@ export default {
     async chooseStartingPrompt(index) {
       this.room.history = [
         {
+          type: 'premise',
           chooser: 'Premise',
           responses: {
             ' ': {
