@@ -57,6 +57,14 @@ OR for live reloading from your local server:
 
 (TODO: would be cool to have `$ yarn android-dev` do all of the above)
 
+### Deploying to Google Play Store
+
+See also [this guide](https://www.joshmorony.com/deploying-capacitor-applications-to-android-development-distribution/) 0. Get the keystore file (`oneword.jks`) and passwords from Austin
+
+1. `$ npx cap open android` to open Android Studio
+2. Build > Generate Signed APK
+3. Find the generated app in `oneword/android/app/release/app-release.aab`
+
 ### Notes
 
 - `$ yarn resources` to [generate app icons](https://capacitorjs.com/docs/v3/guides/splash-screens-and-icons)
