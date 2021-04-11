@@ -338,7 +338,7 @@
               :key="p"
               v-once
             >
-              <label class="spacy">
+              <label class="spacy" v-if="p != player.name">
                 <input
                   class="radio"
                   type="radio"
