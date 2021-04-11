@@ -59,11 +59,14 @@ OR for live reloading from your local server:
 
 ### Deploying to Google Play Store
 
-See also [this guide](https://www.joshmorony.com/deploying-capacitor-applications-to-android-development-distribution/) 0. Get the keystore file (`oneword.jks`) and passwords from Austin
+See also [this guide to Play Store deployment.](https://www.joshmorony.com/deploying-capacitor-applications-to-android-development-distribution/)
 
+0. Get the keystore file (`oneword.jks`) and passwords from Austin
 1. `$ npx cap open android` to open Android Studio
 2. Build > Generate Signed APK
 3. Find the generated app in `oneword/android/app/release/app-release.aab`
+
+(TODO: Try out [Appflow](https://ionic.io/appflow) for automatic app deploys)
 
 ### Notes
 
