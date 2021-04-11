@@ -31,6 +31,48 @@ Every pull request will automatically get a separate preview URL; perfect for ge
 
 Just push to `master`, and the site will update automatically.
 
+## Android
+
+We use [Capacitor](https://capacitorjs.com/docs/v3) to package our web apps into
+mobile apps.
+
+### Setup
+
+1. Install [Android Studio](https://developer.android.com/studio)
+2. Set up an Android emulator, or connect your phone in [developer mode](https://developer.android.com/studio/debug/dev-options#enable)
+
+### Developing
+
+1. `$ yarn build` to build Vue app for distribution
+2. `$ npx cap run --list android` to check that your emulator/phone is connected
+3. `$ yarn android` to run on Android
+   - Or `$ npx cap open android` to edit project in Android Studio
+
+OR for live reloading from your local server:
+
+1. `$ yarn dev` to spin up a local Vue server
+2. Copy the network url (e.g. `http://192.168.1.5:3001`)
+3. Paste it into `capacitor.config.json`'s `server.url` field.
+4. `$ yarn android` to run on Android
+
+(TODO: would be cool to have `$ yarn android-dev` do all of the above)
+
+### Deploying to Google Play Store
+
+See also [this guide to Play Store deployment.](https://www.joshmorony.com/deploying-capacitor-applications-to-android-development-distribution/)
+
+0. Get the keystore file (`oneword.jks`) and passwords from Austin
+1. `$ npx cap open android` to open Android Studio
+2. Build > Generate Signed APK
+3. Find the generated app in `oneword/android/app/release/app-release.aab`
+
+(TODO: Try out [Appflow](https://ionic.io/appflow) for automatic app deploys)
+
+### Notes
+
+- `$ yarn resources` to [generate app icons](https://capacitorjs.com/docs/v3/guides/splash-screens-and-icons)
+  - For Android, we use [adaptive icons](https://developer.android.com/guide/practices/ui_guidelines/icon_design_adaptive)
+
 # Appendix
 
 ## Tech stack

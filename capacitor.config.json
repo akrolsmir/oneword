@@ -1,0 +1,19 @@
+{
+  "appId": "games.oneword",
+  "appName": "One Word",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "//": "Copy the network URL from `yarn dev` for live reloading",
+    "// url": "http://192.168.1.5:3001"
+  },
+  "plugins": {
+    "CapacitorFirebaseAuth": {
+      "providers": ["google.com"],
+      "languageCode": "en",
+      "permissions": {
+        "google": ["profile"]
+      }
+    }
+  }
+}
