@@ -28,7 +28,7 @@
     "vue": "^3.0.5",
     "vue-router": "4",
     "vue-tippy": "^6.0.0-alpha.25",
-    "vue3-carousel": "^0.1.11"
+    "vue3-carousel": "^0.1.15"
   },
   "dependenciesUnpackedSize": {
     "overall": "850kb, measured 2020-03-01",
@@ -50,6 +50,6 @@
     "@vue/compiler-sfc": "^3.0.5",
     "cordova-res": "^0.15.3",
     "sass": "^1.32.8",
-    "vite": "^2.0.0-beta.65"
+    "vite": "^2.1.2"
   }
 }
