@@ -144,8 +144,7 @@
     <div style="height: 4em" class="has-text-centered">
       Want to contribute? Contact us at
       <a href="mailto:hello@oneword.games">hello@oneword.games</a>.<br />
-      As always, feel free to contact us if you have any questions or need
-      support.
+      <router-link to="/privacy">Privacy policy</router-link>
     </div>
   </BigColumn>
 </template>

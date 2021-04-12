@@ -2,6 +2,7 @@ import debug from './oneword/debug.vue'
 import FrontPage from './components/FrontPage.vue'
 import Profile from './components/Profile.vue'
 import About from './components/About.vue'
+import Privacy from './components/Privacy.vue'
 import Supporter from './components/Supporter.vue'
 import Thanks from './components/Thanks.vue'
 import OneWord from './oneword/OneWord.vue'
@@ -21,6 +22,7 @@ const routes = [
   { path: '/room/:id', component: OneWord },
   { path: '/profile', component: Profile, meta: { title: 'Profile' } },
   { path: '/about', component: About, meta: { title: 'About Us' } },
+  { path: '/privacy', component: Privacy, meta: { title: 'Privacy Policy' } },
   {
     path: '/supporter',
     component: Supporter,

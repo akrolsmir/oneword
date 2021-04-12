@@ -6,11 +6,14 @@
       class="modal-background animate__animated animate__fadeIn animate__faster"
       @click="$emit('background-click')"
     ></div>
-    <div class="modal-content animate__animated animate__pulse animate__faster">
+    <div
+      class="modal-content animate__animated animate__pulse animate__faster"
+      :style="`width: ${width}px`"
+    >
       <div
         v-if="content"
         class="modal-card box has-text-centered p-6"
-        style="max-width: 500px"
+        :style="`max-width: ${width}px`"
       >
         <div class="title">
           <h2>{{ content.title }}</h2>
@@ -55,6 +58,10 @@ export default {
     visible: Boolean,
     /* content: { title, text, buttons: {okay: '', cancel: ''}, callbacks: {okay: ...} } */
     content: Object,
+    width: {
+      type: Number,
+      default: 500,
+    },
   },
   computed: {
     okayCallback() {
