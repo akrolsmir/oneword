@@ -334,11 +334,14 @@
             </div>
             <div
               class="control"
-              v-for="(response, p) in room.currentRound.responses"
+              v-for="[p, response] in Object.entries(
+                room.currentRound.responses
+              ).sort(([, responseA], [, responseB]) =>
+                responseA.story > responseB.story ? 1 : -1
+              )"
               :key="p"
-              v-once
             >
-              <label class="spacy">
+              <label class="spacy" v-if="p != player.name">
                 <input
                   class="radio"
                   type="radio"
@@ -429,6 +432,7 @@ export default {
       // name: randomWord('adjectives') + '-' + randomWord('nouns'),
       history: [],
       players: [],
+      timers: {},
     },
     player: {
       name: '',
@@ -558,7 +562,12 @@ export default {
       const scores = Object.fromEntries(
         this.room.players.map((player) => [player, 0])
       )
-      for (let round of this.room.history) {
+      // count backwards until the first round of the chapter
+      for (let round of [...this.room.history].reverse()) {
+        if (round.type === 'chapterEnd') {
+          return scores
+        }
+
         const roundScores = this.score(round)
         for (let player in roundScores) {
           scores[player] += roundScores[player]
@@ -732,18 +741,27 @@ export default {
         }
         return await updateRoom(this.room, { 'currentRound.state': 'CHOOSING' })
       } else if (this.room.currentRound.state == 'CHOOSING') {
-        // Choose the story continuation
-        const winners = Object.entries(this.room.currentRound.responses)
-          .filter(
-            (entry) =>
-              entry[1].votes.length === this.maxVotes(this.room.currentRound)
-          )
-          .map((entry) => entry[0])
         return await this.newRound()
       }
     },
     async newRound() {
       this.room.history.push(this.room.currentRound)
+      if (Object.values(this.scores).some((s) => s > 150)) {
+        this.room.history.push({
+          type: 'chapterEnd',
+          chooser: 'End Chapter',
+          responses: {
+            ' ': {
+              story:
+                'The round has ended because someone got over 150 points.' +
+                `\nScores for this round: ${JSON.stringify(this.scores)}` +
+                '\nFeel free to continue if there is more to this tale!',
+              words: [],
+              votes: [],
+            },
+          },
+        })
+      }
       this.room.currentRound = {
         state: 'PROMPT',
         chooser: nextGuesser(this.room.currentRound.chooser, this.room.players),
@@ -804,6 +822,7 @@ export default {
     async chooseStartingPrompt(index) {
       this.room.history = [
         {
+          type: 'premise',
           chooser: 'Premise',
           responses: {
             ' ': {
