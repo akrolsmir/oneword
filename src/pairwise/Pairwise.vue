@@ -15,19 +15,6 @@
       ></History>
     </template>
 
-    <!-- TODO: REMOVE, since we already have share modal -->
-    <!-- <div class="modal">
-      <div class="modal-background"></div>
-      <div class="modal-content">
-        <div class="notification">
-          <label class="is-block mb-2">Invite your friends to play!</label>
-          <ShareLink />
-
-          <button class="delete" aria-label="close"></button>
-        </div>
-      </div>
-    </div> -->
-
     <div v-cloak id="modals">
       <!-- Share Link Modal -->
       <AnimatedModal
@@ -49,7 +36,10 @@
     <!-- Room header -->
     <div class="message">
       <div class="message-header has-text-weight-normal is-flex-wrap-wrap">
-        <h1 class="fancy big">Round {{ room.history.length + 1 }}</h1>
+        <h1 class="fancy big">
+          Pairwise | Round {{ room.history.length + 1 }}
+        </h1>
+        <!-- TODO: how to make showShareModal more obvious? -->
         <a class="fancy" @click="showShareModal = true">{{ room.name }}</a>
       </div>
       <div>
@@ -78,11 +68,13 @@
             </template>
           </span>
           <!-- Timers -->
-          <!-- TODO: FIX TIMER UI IT LOOKS LIKE TRASH -->
-          <span class="ml-2 mr-2 mt-4 is-flex is-align-items-center">
+          <span
+            class="message-body is-flex is-align-items-center"
+            style="border-width: 0"
+          >
             <template v-if="player.isMod">
               <label for="cluer-picking-timer" class="is-size-7 is-flex-grow-1"
-                >Word pair and clue:</label
+                >Clueing:</label
               >
               <input
                 class="input is-small"
@@ -148,89 +140,100 @@
               <span v-else class="mx-1">No timers</span>
             </template>
           </span>
-
           <!-- Enable categories for Pairwise -->
           <!-- <span class="mx-3" v-if="!player.isMod">
-            <template v-for="category in enabledCategories">
-              <span
-                class="comma"
-                :class="{
-                  'has-text-weight-bold':
-                    room.currentRound.category == category,
-                }"
-              >
-                {{ WORD_LISTS[category].name }}</span
-              >
-            </template>
-          </span> -->
+          <template v-for="category in enabledCategories">
+            <span
+              class="comma"
+              :class="{
+                'has-text-weight-bold':
+                  room.currentRound.category == category,
+              }"
+            >
+              {{ WORD_LISTS[category].name }}</span
+            >
+          </template>
+        </span> -->
         </div>
       </div>
-
-      <!-- Mod Tools -->
-      <div v-if="showModTools">
-        <div class="label">Room Controls</div>
-        <div class="field has-addons is-inline-flex mb-6">
-          <span class="control">
-            <button class="button is-small" @click="nextStage">
-              Next Stage
-            </button>
-          </span>
-          <span class="control">
-            <button class="button is-small" @click="newRound(true)">
-              Skip Word
-            </button>
-          </span>
-          <span v-if="user.isAdmin" class="control">
-            <button class="button is-small" @click="resetRoom">
-              Reset Room
-            </button>
-          </span>
-        </div>
-        <div class="field has-addons is-inline-flex">
-          <span class="control">
-            <button class="button is-small" @click="makeMod(newMod)">
-              Transfer Mod
-            </button>
-          </span>
-          <span class="control">
-            <span class="select is-small">
-              <select v-model="newMod">
-                <option v-for="player in room.players">
-                  {{ player }}
-                </option>
-              </select>
-            </span>
-          </span>
-        </div>
-      </div>
-
       <div class="message-body" style="border-width: 0">
+        <!-- Mod Tools -->
+        <div v-if="showModTools" style="margin: auto">
+          <div class="label">Room Controls</div>
+          <div class="field has-addons is-inline-flex mb-6">
+            <span class="control">
+              <button class="button is-small" @click="nextStage">
+                Next Stage
+              </button>
+            </span>
+            <span class="control">
+              <button class="button is-small" @click="newRound(true)">
+                Skip Word
+              </button>
+            </span>
+            <span v-if="user.isAdmin" class="control">
+              <button class="button is-small" @click="resetRoom">
+                Reset Room
+              </button>
+            </span>
+          </div>
+          <div class="field has-addons is-inline-flex">
+            <span class="control">
+              <button class="button is-small" @click="makeMod(newMod)">
+                Transfer Mod
+              </button>
+            </span>
+            <span class="control">
+              <span class="select is-small">
+                <select v-model="newMod">
+                  <option
+                    v-for="player in room.players"
+                    v-bind:key="player.name"
+                  >
+                    {{ player }}
+                  </option>
+                </select>
+              </span>
+            </span>
+          </div>
+        </div>
+
         <!-- Players -->
         <div class="field is-grouped is-grouped-multiline">
-          <span class="mb-2 mr-2">Players:</span>
+          <!-- TODO: add guessing under submitted-->
+          <!-- :guessing="room.currentRound.guesser == tagged" -->
           <Nametag
-            v-for="(playerScore, ind) in tallyScores().playerScores"
+            v-for="playerScore in tallyScores().playerScores"
             :key="playerScore[0]"
             :name="playerScore[0]"
             :user="room.people && room.people[playerScore[0]]"
-            :index="ind"
             :submitted="isColorSubmitted(playerScore[0])"
-            :mod="isMod"
-            :score="playerScore[1]"
+            :mod="player.isMod"
+            :self="playerScore[0] === player.name"
+            :modtag="
+              room.people && room.people[playerScore[0]]?.state === 'MOD'
+            "
             @kick="kickPlayer(playerScore[0])"
-          />
+          ></Nametag>
+        </div>
+        <div v-if="noMod">
+          <a @click="makeMod(player.name)"> (Become the mod...) </a>
+        </div>
+        <div v-else-if="player.isMod">
+          <a @click="player.modTools = !player.modTools">
+            ({{ player.modTools ? 'Hide' : 'Show' }} mod tools)
+          </a>
         </div>
       </div>
     </div>
 
-    <!-- TODO enable timer! -->
-    <!-- <Timer
+    <Timer
       ref="timer"
       :length="timerLength"
       :on-finish="nextStage"
       v-if="timerLength > 0"
       :key="room.currentRound.state"
-    ></Timer> -->
+    ></Timer>
 
     <!-- Input area (CLUER_PICKING) -->
     <div v-if="room.currentRound.state == 'CLUER_PICKING'">
@@ -565,7 +568,13 @@ function makeNewRoom(name) {
     history: [],
     public: true,
     lastUpdateTime: Date.now(),
-    timers: { PICKING: '', GUESSING: '', DONE: '', running: false },
+    timers: {
+      CLUER_PICKING: '',
+      TOSS_IN_DECOYS: '',
+      GUESSING: '',
+      DONE: '',
+      running: false,
+    },
     // Todo: add categories
     customWords: '',
 
@@ -880,6 +889,10 @@ export default {
     },
     async nextStage() {
       if (this.room.currentRound.state == 'CLUER_PICKING') {
+        return await updateRoom(this.room, {
+          'currentRound.state': 'TOSS_IN_DECOYS',
+        })
+      } else if (this.room.currentRound.state == 'TOSS_IN_DECOYS') {
         return await updateRoom(this.room, { 'currentRound.state': 'GUESSING' })
       } else if (this.room.currentRound.state == 'GUESSING') {
         return await updateRoom(this.room, { 'currentRound.state': 'DONE' })
