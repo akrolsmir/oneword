@@ -56,7 +56,11 @@
       }})
     </p>
     <h2 class="fancy" v-if="privateRooms.length > 0">Private Rooms</h2>
-    <p v-for="privateRoom in privateRooms" :key="privateRoom.name">
+    <p
+      v-for="privateRoom in privateRooms"
+      :class="{ halfOpacity: !isActive(privateRoom) }"
+      :key="privateRoom.name"
+    >
       <a href="#" @click.prevent="showPrivateModal">
         <b>{{ 'Private room' }} with {{ listPlayers(privateRoom)[0] }}</b>
       </a>
