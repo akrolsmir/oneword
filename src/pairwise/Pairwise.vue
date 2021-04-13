@@ -201,18 +201,19 @@
         <!-- Players -->
         <div class="field is-grouped is-grouped-multiline">
           <!-- TODO: add guessing under submitted-->
-          <!-- :guessing="room.currentRound.guesser == tagged" -->
           <Nametag
             v-for="playerScore in tallyScores().playerScores"
             :key="playerScore[0]"
             :name="playerScore[0]"
             :user="room.people && room.people[playerScore[0]]"
             :submitted="isColorSubmitted(playerScore[0])"
+            :guessing="room.currentRound.clueGiver === playerScore[0]"
             :mod="player.isMod"
             :self="playerScore[0] === player.name"
             :modtag="
               room.people && room.people[playerScore[0]]?.state === 'MOD'
             "
+            :score="playerScore[1]"
             @kick="kickPlayer(playerScore[0])"
           ></Nametag>
         </div>
@@ -250,20 +251,20 @@
         <div v-if="!room.wordsAndClues[player.name]">
           <div class="box">
             <h2 class="fancy has-text-centered" role="alert">
-              Pick a phrase among the following, and write a clue that describes
-              it in the clue box!
+              Pick a phrase among the following, and write a text clue that
+              describes it in the clue box!
               <br /><br />
               <button
                 class="button is-rounded"
                 @click="cluerSelectsWord(word)"
-                v-for="word in player.wordList"
+                v-for="word in player.pairList"
                 :key="word"
                 :class="{ 'is-info': player.currentWord == word }"
               >
                 {{ word }}
               </button>
             </h2>
-            <label class="label" for="hintInput">Your clue</label>
+            <label class="label">Your clue</label>
             <div class="field has-addons">
               <div class="control is-expanded">
                 <input
@@ -287,6 +288,7 @@
                 </button>
               </div>
             </div>
+            <div class="fancy small">Drawing-based clues coming soon!</div>
           </div>
         </div>
         <!-- After submitting clues, but not everyone has done so yet -->
@@ -294,7 +296,7 @@
           <h2 class="fancy" role="alert">
             Still waiting for
             {{ room.players.length - Object.keys(room.wordsAndClues).length }}
-            more player to pick a phrase and a clue...
+            more player(s) to pick a phrase and a clue...
           </h2>
           <br />
         </div>
@@ -309,7 +311,7 @@
           }"
         >
           <strong>1)</strong> Each player picks a pair of words from a randomly
-          generated set, and writes a clue (of any length) that relates to that
+          generated list, and writes a clue (of any length) that relates to that
           pair <br />
           <strong>2)</strong> In each round, players try to construct decoys
           they think best matches each others' clues <br />
@@ -317,9 +319,10 @@
           guess the real word pair among the decoys
           <br />
           <br />
-          Decoys that trick more people earn the most points! Clues that are
-          either too obvious (everyone guessed right) or too offbeat (nobody
-          guessed right) will hold you back!
+          Decoys that trick more people earn the most points! Clues that are too
+          obvious (everyone guessed right) or too offbeat (nobody guessed right)
+          will hold you back!
+          <strong> First player to reach 30 points wins! </strong>
         </div>
       </div>
     </div>
@@ -491,15 +494,17 @@
           <strong> {{ player }} </strong> guessed "{{ vote }}"!
         </div>
       </div>
-      <div v-if="room.gameOver" class="box">
-        And that's it! <strong> {{ room.gameWinner }} </strong> won with "{{
-          room.winnerPoints
-        }}
-        points"!
+      <div v-if="room.gameOver">
+        <div class="box">
+          And that's it! <strong> {{ room.gameWinner }} </strong> won with "{{
+            room.winnerPoints
+          }}
+          points"!
+        </div>
         <button class="button play-again" @click="newRound()">
-          Play Again
+            Play Again
         </button>
-      </div>
+        </div>
       <button v-else class="button" @click="newRound()">Next</button>
     </div>
     <br /><br />
@@ -599,10 +604,10 @@ function initializePlayerOnJoin(room, player) {
   player.currentWord = ''
   // cache's player's choice for clue on the player object, to reduce room update freq
   player.currentClue = ''
-  // how many entries in the wordList to pick out real pair
+  // how many entries in the pairList to pick out real pair
   player.choicesOfWordPairs = 7
-  // wordlist array to choose from for picking out real pairs
-  player.wordList = []
+  // pairlist array to choose from for picking out real pairs
+  player.pairList = []
   // how many options (of adj, verb etc) to construct decoy
   player.choicesPerDecoyCategory = 7
   // decoy adj & list
@@ -612,8 +617,8 @@ function initializePlayerOnJoin(room, player) {
   player.decoyNoun = ''
   player.decoyNounList = []
   // TODO: extract out to common generatePlayerWordPairs()
-  while (player.wordList.length < player.choicesOfWordPairs) {
-    player.wordList.push(randomWord('adjectives') + '-' + randomWord('nouns'))
+  while (player.pairList.length < player.choicesOfWordPairs) {
+    player.pairList.push(randomWord('adjectives') + '-' + randomWord('nouns'))
   }
 }
 
@@ -660,10 +665,10 @@ export default {
       //   currentWord: '',
       //   // cache's player's choice for clue on the player object, to reduce room update freq
       //   currentClue: '',
-      //   // how many entries in the wordList to pick out real pair
+      //   // how many entries in the pairList to pick out real pair
       //   choicesOfWordPairs: 7,
-      //   // wordlist to choose from as future clue giver
-      //   wordList: [],
+      //   // pairlist to choose from as future clue giver
+      //   pairList: [],
       //   // decoy adj & list
       //   decoyAdj: '',
       //   decoyAdjList: [],
@@ -744,13 +749,6 @@ export default {
       }
       return 0
     },
-    isColorGuessing() {
-      return (
-        Object.keys(room.currentRound.votes).includes(playerScore[0]) ||
-        (player == room.currentRound.clueGiver &&
-          Object.keys(room.currentRound.allWords).includes(playerScore[0]))
-      )
-    },
     isMod() {
       if (this.user.isAdmin) {
         return true
@@ -762,11 +760,11 @@ export default {
     showModTools() {
       return this.player.isMod && this.player.modTools
     },
-    //   noMod() {
-    //     return !Object.values(this.room.people || {}).some(
-    //       (person) => person.state === 'MOD'
-    //     )
-    //   },
+    noMod() {
+      return !Object.values(this.room.people || {}).some(
+        (person) => person.state === 'MOD'
+      )
+    },
     //   totalRounds() {
     //     // Eg "Round 1 of 13"; "Round 13 of 13"; "Round 14 of 26"
     //     return 13 * (Math.floor(this.room.history.length / 13) + 1)
@@ -800,7 +798,6 @@ export default {
           // players have voted on which pair they think is the real one
           (Object.keys(this.room.currentRound.votes).includes(playerName) ||
             this.room.currentRound.clueGiver === playerName))
-      console.log(shouldColorBeSubmitted)
       return shouldColorBeSubmitted
     },
     isClueSubmitDisabled() {
@@ -831,16 +828,17 @@ export default {
         ] = this.player.currentWord
       }
       // if this is the last player to submit a clue, change state.
-      if (
-        Object.keys(this.room.wordsAndClues).length >= this.room.players.length
-      ) {
+      const allCluesSubmitted = this.room.players.every(
+        (p) => this.room.wordsAndClues[p]
+      )
+      if (allCluesSubmitted) {
         this.room.currentRound.state = 'TOSS_IN_DECOYS'
       }
       await setRoom(this.room)
 
-      // reset wordlist and regenerated it
-      this.player.wordList = []
-      this.generatePlayerWordList()
+      // reset pairList and regenerated it
+      this.player.pairList = []
+      this.generatePlayerPairList()
 
       // Store this for user profiles, but don't await for the result
       updateUserGame(this.user.id, this.room.name)
@@ -863,10 +861,10 @@ export default {
       await this.saveWordToAllWordsThisRound(
         this.player.decoyAdj + '-' + this.player.decoyNoun
       )
-      if (
-        Object.keys(this.room.currentRound.allWords).length ==
-        this.room.players.length
-      ) {
+      const allDecoysCollected = this.room.players.every(
+        (p) => this.room.currentRound.allWords[p]
+      )
+      if (allDecoysCollected) {
         await updateRoom(this.room, { 'currentRound.state': 'GUESSING' })
       }
       // Store this for user profiles, but don't await for the result
@@ -877,11 +875,13 @@ export default {
       const update = {}
       update[`currentRound.votes.${this.player.name}`] = vote
       await updateRoom(this.room, update)
-      // Total votes are players.length - 1 since clueGiver can't vote.
-      if (
-        Object.keys(this.room.currentRound.votes).length >=
-        this.room.players.length - 1
-      ) {
+      // If all votes are in, move on to DONE to show score!
+      const doneVoting = this.room.players.every(
+        (p) =>
+          this.room.currentRound.votes[p] ||
+          p == this.room.currentRound.clueGiver
+      )
+      if (doneVoting) {
         this.room.currentRound.state = 'DONE'
         this.room.history.push(this.room.currentRound)
         await setRoom(this.room)
@@ -900,20 +900,20 @@ export default {
         return await this.newRound()
       }
     },
-    generatePlayerWordList() {
-      while (this.player.wordList.length < this.player.choicesOfWordPairs) {
-        this.player.wordList.push(
+    generatePlayerPairList() {
+      while (this.player.pairList.length < this.player.choicesOfWordPairs) {
+        this.player.pairList.push(
           randomWord('adjectives') + '-' + randomWord('nouns')
         )
       }
     },
     // Currently decoy wordlist is either all nouns or all adjectives
     generateDecoyWordList(type) {
-      const wordList = []
-      while (wordList.length < this.player.choicesPerDecoyCategory) {
-        wordList.push(randomWord(type))
+      const pairList = []
+      while (pairList.length < this.player.choicesPerDecoyCategory) {
+        pairList.push(randomWord(type))
       }
-      return wordList
+      return pairList
     },
     async kickPlayer(name) {
       delete this.room.wordsAndClues[name]
