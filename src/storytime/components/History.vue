@@ -5,7 +5,7 @@
     </span>
     <Carousel :items-to-show="1" wrap-around>
       <Slide
-        v-for="(player, i) in players.filter((p) => round.responses[p])"
+        v-for="(player, i) in players"
         :key="i"
         :style="{ backgroundColor: i == 0 ? 'default' : '#f9ced7' }"
       >
@@ -53,9 +53,6 @@ export default {
     round: Object,
     scores: Object,
   },
-  data: () => ({
-    shownPlayer: String, // name
-  }),
   computed: {
     // list of players sorted by score, bonus words, then brevity (highest first)
     players() {
@@ -66,7 +63,7 @@ export default {
             response2.words.length - response1.words.length ||
             response1.story.length - response2.story.length
         )
-        .map((entry) => entry[0])
+        .map(([player, _]) => player)
     },
   },
 }

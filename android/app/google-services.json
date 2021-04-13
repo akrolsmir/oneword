@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "340753176141",
+    "firebase_url": "https://oneword-cf74a.firebaseio.com",
+    "project_id": "oneword-cf74a",
+    "storage_bucket": "oneword-cf74a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:340753176141:android:30afdbc915a152c3da2e04",
+        "android_client_info": {
+          "package_name": "games.oneword"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "340753176141-hacddlutajbi0eah37n98et06cl343p6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDi_7XDp1LxNf3dILontj99KzAh-q8pcmg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "340753176141-hacddlutajbi0eah37n98et06cl343p6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
