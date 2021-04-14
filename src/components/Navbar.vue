@@ -64,6 +64,18 @@
             </a>
           </div>
         </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link"> Swag </a>
+          <div class="navbar-dropdown">
+            <a
+              class="navbar-item"
+              href="https://teespring.com/onewordgame"
+              target="_blank"
+              rel="noopener noreferrer"
+              >T-Shirts</a
+            >
+          </div>
+        </div>
       </div>
 
       <div class="navbar-end">
