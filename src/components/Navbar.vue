@@ -69,7 +69,7 @@
           <div class="navbar-dropdown">
             <a
               class="navbar-item"
-              href="https://teespring.com/onewordgame"
+              href="https://teespring.com/oneword"
               target="_blank"
               rel="noopener noreferrer"
               >T-Shirts</a
