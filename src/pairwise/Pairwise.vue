@@ -429,6 +429,9 @@
             </span>
           </h2>
         </div>
+        <button class="button play-again" @click="newRound()">
+          Play Again
+        </button>
       </div>
     </div>
 
@@ -758,6 +761,7 @@ export default {
         this.room.timers.running
       ) {
         return this.room.timers[this.room.currentRound.state]
+<<<<<<< HEAD
       }
       return 0
     },
@@ -796,8 +800,12 @@ export default {
         this.showSupporterModal()
         // Reset UI to non-supporter defaults
         this.room.public = true
+=======
+>>>>>>> 738af4480a2e2194bb4227bfeb79e7c3257b5797
       }
+      return 0
     },
+<<<<<<< HEAD
     showSupporterModal() {
       this.$showModal({
         title: 'Want private rooms?',
@@ -829,6 +837,44 @@ export default {
         },
       })
     },
+=======
+    isMod() {
+      if (this.user.isAdmin) {
+        return true
+      }
+      if (this.room && this.room.players) {
+        return this.player.name == this.room.players[0]
+      }
+    },
+    showModTools() {
+      return this.player.isMod && this.player.modTools
+    },
+    noMod() {
+      return !Object.values(this.room.people || {}).some(
+        (person) => person.state === 'MOD'
+      )
+    },
+    //   totalRounds() {
+    //     // Eg "Round 1 of 13"; "Round 13 of 13"; "Round 14 of 26"
+    //     return 13 * (Math.floor(this.room.history.length / 13) + 1)
+    //   },
+    //   customWordList() {
+    //     // If there are any commas, parse as csv; else, parse with whitespace
+    //     let words = this.room.customWords.split(',')
+    //     if (words.length <= 1) {
+    //       words = this.room.customWords.split(/\s/)
+    //     }
+    //     // Lowercase and trim out whitespace; take out empty words
+    //     return words.map((w) => w.toLowerCase().trim()).filter((w) => w)
+    //   },
+    //   enabledCategories() {
+    //     return Object.keys(this.room.categories).filter(
+    //       (c) => this.room.categories[c]
+    //     )
+    //   },
+  },
+  methods: {
+>>>>>>> 738af4480a2e2194bb4227bfeb79e7c3257b5797
     // for nametags, `submitted` has light green color
     isColorSubmitted(playerName) {
       const shouldColorBeSubmitted =
@@ -1023,6 +1069,14 @@ export default {
       // Overwrite existing room;
       await setRoom(this.room)
     },
+<<<<<<< HEAD
+=======
+    // TODO: REMOVE THIS
+    // async updateTimer() {
+    //   this.room.timerLength = this.player.timerLength
+    //   this.saveRoom('timerLength')
+    // },
+>>>>>>> 738af4480a2e2194bb4227bfeb79e7c3257b5797
     async toggleTimers() {
       this.room.timers.running = !this.room.timers.running
       await this.saveRoom('timers')
