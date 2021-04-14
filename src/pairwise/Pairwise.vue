@@ -538,13 +538,10 @@ import Chatbox from '../components/Chatbox.vue'
 import {
   setRoom,
   updateRoom,
-  getRoom,
-  listenRoom,
-  listenForLogin,
   updateUserGame,
+  referSupporter,
 } from '../firebase/network.js'
 import { inject } from 'vue'
-import { getIn } from '../utils.js'
 import { randomWord } from '../words/lists'
 import { useRoom } from '../composables/useRoom'
 
@@ -764,14 +761,6 @@ export default {
       }
       return 0
     },
-    isMod() {
-      if (this.user.isAdmin) {
-        return true
-      }
-      if (this.room && this.room.players) {
-        return this.player.name == this.room.players[0]
-      }
-    },
     showModTools() {
       return this.player.isMod && this.player.modTools
     },
@@ -800,6 +789,46 @@ export default {
     //   },
   },
   methods: {
+    async upsell(...props) {
+      if (this.user.isSupporter) {
+        await this.saveRoom(...props)
+      } else {
+        this.showSupporterModal()
+        // Reset UI to non-supporter defaults
+        this.room.public = true
+      }
+    },
+    showSupporterModal() {
+      this.$showModal({
+        title: 'Want private rooms?',
+        text:
+          'Earn perks like private rooms, custom avatars, and more by becoming a supporter 😍',
+        buttons: {
+          okay: 'Okay!',
+          cancel: 'Not now',
+        },
+        callbacks: {
+          okay: () => {
+            referSupporter('modtools')
+          },
+        },
+      })
+    },
+    showChampionModal() {
+      this.$showModal({
+        title: 'Mark this guess as correct?',
+        text: 'Unlock this perk by becoming a One Word champion 😍',
+        buttons: {
+          okay: 'Okay!',
+          cancel: 'Not now',
+        },
+        callbacks: {
+          okay: () => {
+            referSupporter('champion_modal')
+          },
+        },
+      })
+    },
     // for nametags, `submitted` has light green color
     isColorSubmitted(playerName) {
       const shouldColorBeSubmitted =
@@ -994,11 +1023,6 @@ export default {
       // Overwrite existing room;
       await setRoom(this.room)
     },
-    // TODO: REMOVE THIS
-    // async updateTimer() {
-    //   this.room.timerLength = this.player.timerLength
-    //   this.saveRoom('timerLength')
-    // },
     async toggleTimers() {
       this.room.timers.running = !this.room.timers.running
       await this.saveRoom('timers')
