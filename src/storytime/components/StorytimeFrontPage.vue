@@ -1,11 +1,33 @@
 <template>
   <BigColumn>
-    <div>
-      You and your friends find yourself in a text adventure! Each turn, one of
-      your friends will decide what their character does, then you and your
-      friends will continue the story. <br />
-      After that, you all vote for who wrote it the best - or in other words,
-      you choose your friends' adventure!
+    <div class="content">
+      <h2 class="fancy mb-2">Storytime</h2>
+      <div class="subtitle">Choose Your Friends' Adventure</div>
+      You and your friends find yourself in a text adventure! Each turn is as
+      follows:
+      <ol>
+        <li>
+          One of you decides what the character does (like "run towards the
+          dragon")
+        </li>
+        <li>
+          You each write what happens next, with nothing but your own bonus
+          words and your imagination to guide you.
+        </li>
+        <li>Vote for who wrote it the best!</li>
+      </ol>
+      You get a certain number of points per vote, depending on how many bonus
+      words you used, such that getting lots of votes is rewarded more than
+      using lots of words is.
+      <br />
+      <br />
+      <div class="is-italic">
+        Developer's note: This game is still in beta. It's rough visually, not
+        fully game-designed, and bug infested. But my friends like it, so try it
+        out anyways! Report any issues on discord or
+        <a href="mailto:sinclair@oneword.games?Subject=Storytime">email me</a>
+        directly. -Sinclair
+      </div>
     </div>
     <GamesList roomDirectory="/storytime/" />
     <Sponsors />

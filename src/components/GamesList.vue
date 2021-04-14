@@ -5,13 +5,22 @@
     method="POST"
   >
     <label class="label mt-5">Hi, {{ user.displayName }}! Room name:</label>
-    <input
-      class="input"
-      type="text"
-      v-model="roomName"
-      placeholder="apple"
-      required
-    />
+
+    <div class="field has-addons">
+      <div class="control is-expanded">
+        <input
+          class="input"
+          type="text"
+          v-model="roomName"
+          placeholder="apple"
+          required
+        />
+      </div>
+      <div class="control">
+        <a class="button" @click="rerollName">🎲</a>
+      </div>
+    </div>
+
     <input
       class="button mt-2 mr-2 has-text-weight-bold"
       type="submit"
@@ -47,7 +56,11 @@
       }})
     </p>
     <h2 class="fancy" v-if="privateRooms.length > 0">Private Rooms</h2>
-    <p v-for="privateRoom in privateRooms" :key="privateRoom.name">
+    <p
+      v-for="privateRoom in privateRooms"
+      :class="{ halfOpacity: !isActive(privateRoom) }"
+      :key="privateRoom.name"
+    >
       <a href="#" @click.prevent="showPrivateModal">
         <b>{{ 'Private room' }} with {{ listPlayers(privateRoom)[0] }}</b>
       </a>
@@ -115,10 +128,13 @@ export default {
   methods: {
     timeSince,
     listPlayers,
+    rerollName() {
+      this.roomName = `${randomWord('adjectives')}-${randomWord('nouns')}`
+    },
     // Returns a bool indicating if the provided Room object should be full opacity.
     // 1. If some but not all rooms match the filter, match those
     // 2. Otherwise, match "active" rooms, as defined by the prop `activeFunc`
-    isActive: function (openRoom) {
+    isActive(openRoom) {
       if (
         this.filteredRoomNameSet.size != 0 &&
         this.filteredRoomNameSet.size != this.allRooms.length

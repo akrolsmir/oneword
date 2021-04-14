@@ -45,14 +45,14 @@
             <router-link class="navbar-item" to="/">One Word</router-link>
             <router-link class="navbar-item" to="/incrypt">Incrypt</router-link>
             <router-link class="navbar-item" to="/listorama">
-              Listorama <span class="tag is-link is-light ml-1">New!</span>
+              Listorama
             </router-link>
-            <!-- <router-link class="navbar-item" to="/storytime">
+            <router-link class="navbar-item" to="/storytime">
               Storytime <span class="tag is-link is-light ml-1">New!</span>
             </router-link>
             <router-link class="navbar-item" to="/pairwise">
               Pairwise <span class="tag is-link is-light ml-1">New!</span>
-            </router-link> -->
+            </router-link>
             <hr class="navbar-divider" />
             <a
               class="navbar-item"
