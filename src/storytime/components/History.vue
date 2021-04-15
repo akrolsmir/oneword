@@ -5,7 +5,7 @@
       <Slide
         v-for="(player, i) in players"
         :key="i"
-        :style="{ backgroundColor: i == 0 ? 'default' : '#f9ced7' }"
+        :style="{ backgroundColor: i == 0 ? 'default' : '#00000010' }"
       >
         <div class="tile is-ancestor px-5 py-1">
           <div class="tile is-parent">
@@ -23,7 +23,9 @@
                 {{ round.responses[player].votes.length }} votes
               </div>
               <div>{{ round.responses[player].words.length }} words</div>
-              <div>{{ scores[player] }} points</div>
+              <div v-tippy="{ content: explainScore(round, player, i) }">
+                {{ scores[player] }} points
+              </div>
             </div>
           </div>
         </div>
@@ -66,6 +68,18 @@ export default {
         .map(([player, _]) => player)
     },
   },
+  methods: {
+    explainScore,
+  },
+}
+
+function explainScore(round, player, i) {
+  const votes = round.responses[player].votes.length
+  const words = round.responses[player].words.length
+  return (
+    `${votes} votes × (5 + ${words} words used)` +
+    (i == 0 ? ' + 5 winning bonus' : '')
+  )
 }
 </script>
 <style scoped>
