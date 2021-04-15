@@ -331,7 +331,7 @@
               {{ room.currentRound.prompt }}
             </div>
             <div
-              class="control"
+              class="control mb-1"
               v-for="[p, response] in Object.entries(
                 room.currentRound.responses
               ).sort(([, responseA], [, responseB]) =>
@@ -347,6 +347,10 @@
                   :value="p"
                   v-model="vote"
                 />
+                {{ response.story }}
+              </label>
+              <label class="spacy has-text-grey" v-else>
+                <input class="radio" type="radio" disabled />
                 {{ response.story }}
               </label>
             </div>
