@@ -23,7 +23,7 @@
                 {{ round.responses[player].votes.length }} votes
               </div>
               <div>{{ round.responses[player].words.length }} words</div>
-              <div v-tippy="{ content: explainScore(round, player, i) }">
+              <div v-tippy="{ content: explainScore(round, player) }">
                 {{ scores[player] }} points
               </div>
             </div>
@@ -73,7 +73,7 @@ export default {
   },
 }
 
-function explainScore(round, player, i) {
+function explainScore(round, player) {
   const votes = round.responses[player].votes.length
   const words = round.responses[player].words.length
   return `${votes} votes × (5 + ${words} words) + ${words} words`

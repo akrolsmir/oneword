@@ -707,13 +707,7 @@ export default {
         await this.nextStage()
       }
     },
-    maxVotes(round) {
-      return Math.max(
-        ...Object.values(round.responses).map((resp) => resp.votes.length)
-      )
-    },
     score(round) {
-      const maxVotes = this.maxVotes(round)
       return Object.fromEntries(
         Object.entries(round.responses).map((entry) => {
           const [name, resp] = entry
