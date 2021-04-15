@@ -289,9 +289,7 @@
                     :key="i"
                     class="tag"
                     :class="{
-                      'is-success': player.response
-                        .toLowerCase()
-                        .includes(word),
+                      'is-link': player.response.toLowerCase().includes(word),
                     }"
                   >
                     {{ word }}
