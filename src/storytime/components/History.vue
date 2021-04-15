@@ -76,10 +76,7 @@ export default {
 function explainScore(round, player, i) {
   const votes = round.responses[player].votes.length
   const words = round.responses[player].words.length
-  return (
-    `${votes} votes × (5 + ${words} words used)` +
-    (i == 0 ? ' + 5 winning bonus' : '')
-  )
+  return `${votes} votes × (5 + ${words} words) + ${words} words`
 }
 </script>
 <style scoped>

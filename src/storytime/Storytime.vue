@@ -719,8 +719,7 @@ export default {
           const [name, resp] = entry
           return [
             name,
-            resp.votes.length * (5 + resp.words.length) +
-              (resp.votes.length === maxVotes) * 5,
+            resp.votes.length * (5 + resp.words.length) + resp.words.length,
           ]
         })
       )
