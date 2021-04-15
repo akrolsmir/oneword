@@ -75,4 +75,8 @@ export default {
   background-color: #ffffff42;
   border-radius: 8px;
 }
+
+.spacy {
+  white-space: pre-wrap;
+}
 </style>
