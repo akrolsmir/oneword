@@ -527,12 +527,12 @@ export default {
     prettyStatus() {
       if (this.room.currentRound.state == 'PROMPT') {
         return this.isChooser
-          ? 'What do you do now?'
+          ? `What does ${this.user.displayName} do now?`
           : `${this.room.currentRound.chooser} is writing their next action`
       } else if (this.room.currentRound.state == 'RESPONSE') {
         return 'Write the next paragraph of this story'
       } else if (this.room.currentRound.state == 'CHOOSING') {
-        return 'Fate is in your hands.'
+        return 'Choose what happens next. Fate is in your hands!'
       }
     },
     prettySuggestions() {
