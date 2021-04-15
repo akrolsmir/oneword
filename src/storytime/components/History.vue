@@ -1,7 +1,12 @@
 <template>
   <div class="main pt-3 mb-2">
     <div class="px-5 is-size-5">{{ round.chooser }}&gt; {{ round.prompt }}</div>
-    <Carousel :items-to-show="1" wrap-around>
+    <!-- Show a carousel of responses for player-written responses -->
+    <Carousel
+      :items-to-show="1"
+      wrap-around
+      v-if="!round.type || round.type === 'CHAPTER_MIDDLE'"
+    >
       <Slide
         v-for="(player, i) in players"
         :key="i"
@@ -36,6 +41,13 @@
         <Pagination />
       </template>
     </Carousel>
+    <!-- Don't show carousel for system-generated messages -->
+    <div v-else>
+      <div class="tile spacy px-5 py-1 pb-5">
+        <!-- TODO: Using ' ' as a key for these messages is pretty hacky... -->
+        {{ round.responses[' '].story }}
+      </div>
+    </div>
   </div>
 </template>
 <script>

@@ -566,7 +566,7 @@ export default {
       )
       // count backwards until the first round of the chapter
       for (let round of [...this.room.history].reverse()) {
-        if (round.type === 'chapterEnd') {
+        if (round.type === 'CHAPTER_END') {
           return scores
         }
 
@@ -741,15 +741,17 @@ export default {
     },
     async newRound() {
       this.room.history.push(this.room.currentRound)
-      if (Object.values(this.scores).some((s) => s > 150)) {
+      // TODO: This should be an idempotent end-state check, instead.
+      const END_SCORE = 100
+      if (Object.values(this.scores).some((s) => s > END_SCORE)) {
         this.room.history.push({
-          type: 'chapterEnd',
+          type: 'CHAPTER_END',
           chooser: 'End Chapter',
           responses: {
             ' ': {
               story:
-                'The round has ended because someone got over 150 points.' +
-                `\nScores for this round: ${JSON.stringify(this.scores)}` +
+                `This chapter has ended because someone got over ${END_SCORE} points.` +
+                `\nScores for this chapter: ${JSON.stringify(this.scores)}` +
                 '\nFeel free to continue if there is more to this tale!',
               words: [],
               votes: [],
@@ -761,6 +763,7 @@ export default {
         state: 'PROMPT',
         chooser: nextGuesser(this.room.currentRound.chooser, this.room.players),
         responses: {},
+        type: 'CHAPTER_MIDDLE',
       }
       this.room.lastUpdateTime = Date.now()
 
@@ -817,7 +820,7 @@ export default {
     async chooseStartingPrompt(index) {
       this.room.history = [
         {
-          type: 'premise',
+          type: 'PREMISE',
           chooser: 'Premise',
           responses: {
             ' ': {
