@@ -19,7 +19,9 @@
             </div>
             <div class="tile is-child">
               <div>{{ player }}</div>
-              <div :title="round.responses[player].votes.join(', ')">
+              <div
+                v-tippy="{ content: round.responses[player].votes.join(', ') }"
+              >
                 {{ round.responses[player].votes.length }} votes
               </div>
               <div>{{ round.responses[player].words.length }} words</div>
