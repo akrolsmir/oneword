@@ -548,24 +548,12 @@ import { useRoom } from '../composables/useRoom'
 function makeNewRoom(name) {
   return {
     name: name,
-
-    /** TODO remove below */
-    // // moderator of the room (One Word used to rely on index position in players list)
-    // mod: '',
-    // // players changed from list to object so it can also store each player's points
-    // players: [this.player.name],
-
     // players array will be computed from this room.people
     people: {},
     // Each round has its own object.
     currentRound: {
       // States can be 'CLUER_PICKING' 'TOSS_IN_DECOYS' 'GUESSING' and 'DONE'
       state: 'CLUER_PICKING',
-
-      /** TODO remove below */
-      // // First player becomes the first one to pick a word and a clue
-      // clueGiver: this.player.name,
-
       // Stores both the real word and all decoys from other players; resets every round.
       allWords: {},
       // Stores counts of votes for both the real word and the decoy; resets every round.
@@ -593,14 +581,6 @@ function makeNewRoom(name) {
     },
     // Todo: add categories
     customWords: '',
-
-    /** Todo: remove playerData */
-    // playerData: {
-    //   [this.player.name]: {
-    //     email: this.user.email || '',
-    //     supporter: this.user.supporter || '',
-    //   },
-    // },
   }
 }
 
@@ -653,83 +633,11 @@ export default {
   },
   data() {
     return {
-      // TODO: Remove the below
-      // //stores authentication metadata (whether user is signed in or guest)
-      // user: {},
-      // // bare bones room, to be overwritten from db if needed
-      // room: {
-      //   // get room name from search params if exists, or create a new room name.
-      //   name:
-      //     new URL(window.location.href).searchParams.get('room') ||
-      //     randomWord('adjectives') + '-' + randomWord('nouns'),
-      //   // info about current round
-      //   currentRound: {},
-      //   history: [],
-      //   players: [],
-      //   // game over if a player has over 30 pts (same as dixit)
-      //   gameOver: false,
-      //   gameOverThreshold: 15,
-      // },
-      // player: {
-      //   name: new URL(window.location.href).searchParams.get('player') || '',
-      //   // how many options (of adj, verb etc) to construct decoy
-      //   choicesPerDecoyCategory: 7,
-      //   // cache's player's choice for word on the player object, to reduce room update freq
-      //   currentWord: '',
-      //   // cache's player's choice for clue on the player object, to reduce room update freq
-      //   currentClue: '',
-      //   // how many entries in the pairList to pick out real pair
-      //   choicesOfWordPairs: 7,
-      //   // pairlist to choose from as future clue giver
-      //   pairList: [],
-      //   // decoy adj & list
-      //   decoyAdj: '',
-      //   decoyAdjList: [],
-      //   // decoy noun & list
-      //   decoyNoun: '',
-      //   decoyNounList: [],
-      // },
       showShareModal: false,
       showGameRules: false,
       newMod: '',
     }
   },
-  // TODO: REMOVE THIS
-  // async created() {
-  //   // For dev velocity, accept https://oneword.games/room/rome?player=Spartacus
-  //   if (this.$route.query.player && !this.user.id) {
-  //     this.user.guest = true
-  //     this.user.name = this.$route.query.player
-  //   }
-  //   this.room.name = this.$route.params.id
-  //   const fetchedRoom = await getRoom(this.room)
-  //   if (!fetchedRoom) {
-  //     // 1. If the room doesn't exist, create it, then return
-  //     this.player.name =
-  //       this.user.displayName ||
-  //       this.user.name ||
-  //       `${randomWord('adjectives')}-anon`
-  //     await this.resetRoom()
-  //     listenRoom(this.room.name, (room) => (this.room = room))
-  //     return
-  //   } else {
-  //     // 2. Set this room's contents, and proceed to enter the room
-  //     this.room = fetchedRoom
-  //     listenRoom(this.room.name, (room) => (this.room = room))
-  //   }
-  //   // 3. If returning from Firebase sign in ('?authed=1'), skip the login modal
-  //   if (this.$route.query.authed) {
-  //     // Remove the 'authed=1' from the URL for cleanliness
-  //     const query = { ...this.$route.query }
-  //     delete query.authed
-  //     this.$router.replace(query)
-  //     // Then sign them in after the Firebase callback returns
-  //     listenForLogin((_user) => this.enterRoom())
-  //     return
-  //   }
-  //   // 4. Enter the room, prompting for login if needed
-  //   this.enterRoom()
-  // },
   watch: {
     'room.currentRound.state'(state) {
       this.$refs.timer?.reset()
@@ -749,7 +657,6 @@ export default {
       }
     },
   },
-  // TODO: ENABLE THESE:
   computed: {
     timerLength() {
       if (
@@ -769,24 +676,6 @@ export default {
         (person) => person.state === 'MOD'
       )
     },
-    //   totalRounds() {
-    //     // Eg "Round 1 of 13"; "Round 13 of 13"; "Round 14 of 26"
-    //     return 13 * (Math.floor(this.room.history.length / 13) + 1)
-    //   },
-    //   customWordList() {
-    //     // If there are any commas, parse as csv; else, parse with whitespace
-    //     let words = this.room.customWords.split(',')
-    //     if (words.length <= 1) {
-    //       words = this.room.customWords.split(/\s/)
-    //     }
-    //     // Lowercase and trim out whitespace; take out empty words
-    //     return words.map((w) => w.toLowerCase().trim()).filter((w) => w)
-    //   },
-    //   enabledCategories() {
-    //     return Object.keys(this.room.categories).filter(
-    //       (c) => this.room.categories[c]
-    //     )
-    //   },
   },
   methods: {
     async upsell(...props) {
@@ -970,18 +859,6 @@ export default {
       }
       return list
     },
-    // TODO: REMOVE THIS
-    // async kickPlayer(name) {
-    //   delete this.room.wordsAndClues[name]
-    //   if (this.room.players.includes(name)) {
-    //     const index = this.room.players.indexOf(name)
-    //     this.room.players.splice(index, 1)
-    //     if (this.room.currentRound.clueGiver === name) {
-    //       this.room.currentRound.clueGiver = this.room.players[0]
-    //     }
-    //   }
-    //   await this.saveRoom('currentRound.clueGiver', 'players', 'wordsAndClues')
-    // },
     async newRound() {
       // delete current clueGiver's word and clue
       delete this.room.wordsAndClues[this.room.currentRound.clueGiver]

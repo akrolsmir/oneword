@@ -72,7 +72,7 @@
               href="https://teespring.com/oneword"
               target="_blank"
               rel="noopener"
-              >T-Shirts</a
+              >T-Shirts <span class="tag is-link is-light ml-1">New!</span></a
             >
           </div>
         </div>
