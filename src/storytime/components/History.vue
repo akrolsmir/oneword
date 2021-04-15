@@ -1,8 +1,6 @@
 <template>
   <div class="main pt-3 mb-2">
-    <span class="px-5 is-size-5">
-      {{ round.chooser }}&gt; {{ round.prompt }}
-    </span>
+    <div class="px-5 is-size-5">{{ round.chooser }}&gt; {{ round.prompt }}</div>
     <Carousel :items-to-show="1" wrap-around>
       <Slide
         v-for="(player, i) in players"
