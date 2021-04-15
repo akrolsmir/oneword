@@ -21,7 +21,7 @@ export default {
         rest.substring(0, i),
         h(
           'span',
-          { class: { 'has-text-weight-semibold': true } },
+          { class: { 'tag is-light is-link': true } },
           rest.substring(i, i + word.length)
         )
       )
