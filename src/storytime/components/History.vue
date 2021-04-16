@@ -14,7 +14,7 @@
       >
         <div class="tile is-ancestor px-5 py-1">
           <div class="tile is-parent">
-            <div class="tile is-child is-10 pr-5 has-text-left">
+            <div class="tile is-child is-10 pr-5 has-text-left main-text">
               <HistorySection
                 :response="round.responses[player]"
                 class="spacy"
@@ -99,5 +99,9 @@ function explainScore(round, player) {
 
 .spacy {
   white-space: pre-wrap;
+}
+
+.main-text {
+  overflow-wrap: anywhere;
 }
 </style>
