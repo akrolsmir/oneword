@@ -3,7 +3,7 @@
     <h1>And that's a wrap!</h1>
     <h1 class="mb-3">
       While you're here, check out two of our new games
-      <a href="/storytime"> <strong> StoryTime </strong> </a> and
+      <a href="/storytime"> <strong> Storytime </strong> </a> and
       <a href="/pairwise"> <strong> Pairwise </strong> </a>!
     </h1>
 
