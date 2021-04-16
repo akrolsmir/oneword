@@ -1,7 +1,11 @@
 <template>
   <div>
     <h1>And that's a wrap!</h1>
-    <br />
+    <h1 class="mb-3">
+      While you're here, check out two of our new games
+      <a href="/storytime"> <strong> StoryTime </strong> </a> and
+      <a href="/pairwise"> <strong> Pairwise </strong> </a>!
+    </h1>
 
     <canvas id="fireworks" style="width: 100%"></canvas>
 
