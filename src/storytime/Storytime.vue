@@ -289,9 +289,7 @@
                     :key="i"
                     class="tag"
                     :class="{
-                      'is-success': player.response
-                        .toLowerCase()
-                        .includes(word),
+                      'is-link': player.response.toLowerCase().includes(word),
                     }"
                   >
                     {{ word }}
@@ -333,7 +331,7 @@
               {{ room.currentRound.prompt }}
             </div>
             <div
-              class="control"
+              class="control mb-1"
               v-for="[p, response] in Object.entries(
                 room.currentRound.responses
               ).sort(([, responseA], [, responseB]) =>
@@ -349,6 +347,10 @@
                   :value="p"
                   v-model="vote"
                 />
+                {{ response.story }}
+              </label>
+              <label class="spacy has-text-grey" v-else>
+                <input class="radio" type="radio" disabled />
                 {{ response.story }}
               </label>
             </div>
@@ -525,12 +527,12 @@ export default {
     prettyStatus() {
       if (this.room.currentRound.state == 'PROMPT') {
         return this.isChooser
-          ? 'What do you do now?'
+          ? `What does ${this.user.displayName} do now?`
           : `${this.room.currentRound.chooser} is writing their next action`
       } else if (this.room.currentRound.state == 'RESPONSE') {
         return 'Write the next paragraph of this story'
       } else if (this.room.currentRound.state == 'CHOOSING') {
-        return 'Fate is in your hands.'
+        return 'Choose what happens next. Fate is in your hands!'
       }
     },
     prettySuggestions() {
@@ -564,7 +566,7 @@ export default {
       )
       // count backwards until the first round of the chapter
       for (let round of [...this.room.history].reverse()) {
-        if (round.type === 'chapterEnd') {
+        if (round.type === 'CHAPTER_END') {
           return scores
         }
 
@@ -705,20 +707,13 @@ export default {
         await this.nextStage()
       }
     },
-    maxVotes(round) {
-      return Math.max(
-        ...Object.values(round.responses).map((resp) => resp.votes.length)
-      )
-    },
     score(round) {
-      const maxVotes = this.maxVotes(round)
       return Object.fromEntries(
         Object.entries(round.responses).map((entry) => {
           const [name, resp] = entry
           return [
             name,
-            resp.votes.length * (5 + resp.words.length) +
-              (resp.votes.length === maxVotes) * 5,
+            resp.votes.length * (5 + resp.words.length) + resp.words.length,
           ]
         })
       )
@@ -746,15 +741,17 @@ export default {
     },
     async newRound() {
       this.room.history.push(this.room.currentRound)
-      if (Object.values(this.scores).some((s) => s > 150)) {
+      // TODO: This should be an idempotent end-state check, instead.
+      const END_SCORE = 100
+      if (Object.values(this.scores).some((s) => s > END_SCORE)) {
         this.room.history.push({
-          type: 'chapterEnd',
+          type: 'CHAPTER_END',
           chooser: 'End Chapter',
           responses: {
             ' ': {
               story:
-                'The round has ended because someone got over 150 points.' +
-                `\nScores for this round: ${JSON.stringify(this.scores)}` +
+                `This chapter has ended because someone got over ${END_SCORE} points.` +
+                `\nScores for this chapter: ${JSON.stringify(this.scores)}` +
                 '\nFeel free to continue if there is more to this tale!',
               words: [],
               votes: [],
@@ -766,6 +763,7 @@ export default {
         state: 'PROMPT',
         chooser: nextGuesser(this.room.currentRound.chooser, this.room.players),
         responses: {},
+        type: 'CHAPTER_MIDDLE',
       }
       this.room.lastUpdateTime = Date.now()
 
@@ -822,7 +820,7 @@ export default {
     async chooseStartingPrompt(index) {
       this.room.history = [
         {
-          type: 'premise',
+          type: 'PREMISE',
           chooser: 'Premise',
           responses: {
             ' ': {
