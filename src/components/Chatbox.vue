@@ -2,11 +2,11 @@
   <div class="block" style="overflow-wrap: break-word">
     <p>
       <span class="fancy">Room Chat</span> &nbsp;
-      <a v-if="!hidden" @click="hidden = true">(hide)</a>
+      <a v-if="!hidden" href="#" @click.prevent="hidden = true">(hide)</a>
     </p>
-    <a v-if="hidden" @click="hidden = false"
-      >{{ sortedLogs.length }} messages hidden</a
-    >
+    <a v-if="hidden" href="#" @click.prevent="hidden = false">
+      {{ sortedLogs.length }} messages hidden
+    </a>
     <div v-else>
       <div
         style="

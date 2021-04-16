@@ -32,7 +32,9 @@
         <h1 class="fancy big">
           Round {{ room.history.length + 1 }} of {{ totalRounds }}
         </h1>
-        <a class="fancy" @click="showShareModal = true">{{ room.name }}</a>
+        <a class="fancy" href="#" @click.prevent="showShareModal = true">{{
+          room.name
+        }}</a>
       </div>
       <div>
         <div class="is-flex is-flex-wrap-wrap is-align-items-center">
@@ -263,10 +265,12 @@
           ></Nametag>
         </div>
         <div v-if="noMod">
-          <a @click="makeMod(player.name)"> (Become the mod...) </a>
+          <a href="#" @click.prevent="makeMod(player.name)">
+            (Become the mod...)
+          </a>
         </div>
         <div v-else-if="player.isMod">
-          <a @click="player.modTools = !player.modTools">
+          <a href="#" @click.prevent="player.modTools = !player.modTools">
             ({{ player.modTools ? 'Hide' : 'Show' }} mod tools)
           </a>
         </div>
@@ -409,7 +413,8 @@
         <a
           v-if="!correct(room.currentRound)"
           class="is-size-7"
-          @click="toggleRoundCorrect"
+          href="#"
+          @click.prevent="toggleRoundCorrect"
         >
           (Mark as correct)
         </a>
@@ -476,10 +481,11 @@
       <a
         v-if="!correct(round)"
         class="is-size-7"
-        @click="toggleHistoryCorrect(i)"
-        >(Mark as correct)</a
+        href="#"
+        @click.prevent="toggleHistoryCorrect(i)"
       >
-
+        (Mark as correct)
+      </a>
       <p class="newline mt-5">{{ dedupe(round.clues) }}</p>
       <br />
     </template>

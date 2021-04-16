@@ -33,7 +33,9 @@
         </div>
         <!-- <button class="button">Sign in with Googlexyz</button> -->
         <div id="firebaseui-auth-container"></div>
-        <a class="is-size-7" @click="toGuestMode">Or play without an account</a>
+        <a class="is-size-7" href="#" @click.prevent="toGuestMode"
+          >Or play without an account</a
+        >
       </div>
       <div v-show="guestMode">
         <h2 class="fancy title has-text-centered">Play without an account</h2>

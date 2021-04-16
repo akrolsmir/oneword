@@ -83,7 +83,9 @@
             <router-link v-if="user.id" to="/profile" class="button is-white"
               >Signed in as {{ user.name.split(' ')[0] }}!</router-link
             >
-            <a v-else class="button is-light" @click="logIn"> Sign up </a>
+            <button v-else class="button is-light" @click="logIn">
+              Sign up
+            </button>
             <a
               href="/supporter"
               class="button is-warning"

@@ -17,7 +17,7 @@
         />
       </div>
       <div class="control">
-        <a class="button" @click="rerollName">🎲</a>
+        <a class="button" href="#" @click.prevent="rerollName">🎲</a>
       </div>
     </div>
 
