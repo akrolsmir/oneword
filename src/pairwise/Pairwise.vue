@@ -1088,9 +1088,4 @@ function nextClueGiver(lastGuesser, players) {
   background-color: #f1f1f1;
 }
 
-.play-again {
-  position: absolute;
-  right: 20px;
-  transform: translateY(-25%);
-}
 </style>
