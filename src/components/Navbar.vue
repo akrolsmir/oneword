@@ -39,8 +39,7 @@
     >
       <div class="navbar-start">
         <div class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link"> All Games </a>
-
+          <a class="navbar-link" href="#" @click.prevent> All Games </a>
           <div class="navbar-dropdown">
             <router-link class="navbar-item" to="/">One Word</router-link>
             <router-link class="navbar-item" to="/incrypt">Incrypt</router-link>
@@ -65,7 +64,7 @@
           </div>
         </div>
         <div class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link"> Swag </a>
+          <a class="navbar-link" href="#" @click.prevent> Swag </a>
           <div class="navbar-dropdown">
             <a
               class="navbar-item"
