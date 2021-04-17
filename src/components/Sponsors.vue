@@ -14,6 +14,10 @@
         :user="{ email: 'colemanotoole@gmail.com ', supporter: 'SPONSOR' }"
       />
       <Nametag
+        name="Sara O."
+        :user="{ email: '	sarajolguin@gmail.com', supporter: 'SPONSOR' }"
+      />
+      <Nametag
         name="Tory N."
         :user="{ email: 'telarian@gmail.com', supporter: 'SPONSOR' }"
       />
