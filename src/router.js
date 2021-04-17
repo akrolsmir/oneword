@@ -14,6 +14,8 @@ import IncryptFrontPage from './incrypt/IncryptFrontPage.vue'
 import Incrypt from './incrypt/Incrypt.vue'
 import PairwiseFrontPage from './pairwise/PairwiseFrontPage.vue'
 import Pairwise from './pairwise/Pairwise.vue'
+import SpectrumFrontPage from './spectrum/SpectrumFrontPage.vue'
+import Spectrum from './spectrum/Spectrum.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
@@ -70,6 +72,12 @@ const routes = [
     component: OneWord,
     meta: { title: 'ASPLOS 2021' },
   },
+  {
+    path: '/spectrum',
+    component: SpectrumFrontPage,
+    meta: { title: 'Spectrum' },
+  },
+  { path: '/spectrum/:id', component: Spectrum, meta: { title: 'Spectrum' } },
 ]
 
 export const router = createRouter({
