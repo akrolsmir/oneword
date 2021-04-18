@@ -203,7 +203,7 @@
             :name="playerScore[0]"
             :user="room.people && room.people[playerScore[0]]"
             :submitted="isColorSubmitted(playerScore[0])"
-            :guessing="room.currentRound.clueGiver === playerScore[0]"
+            :guessing="isColorGuessing(playerScore[0])"
             :mod="player.isMod"
             :self="playerScore[0] === player.name"
             :modtag="
@@ -231,6 +231,21 @@
       v-if="timerLength > 0"
       :key="room.currentRound.state"
     ></Timer>
+
+    <!-- Notify user if they're spectating -->
+    <div
+      v-cloak
+      class="notification is-info is-light"
+      v-if="!user.canPlay || room.people[player.name]?.state === 'WATCHING'"
+    >
+      <span class="subtitle">You are currently spectating this game!</span>
+      <div class="buttons mt-3">
+        <button class="button is-primary" @click="spectatorJoinsGame">
+          <strong>Join game</strong>
+        </button>
+        <router-link class="button is-ghost" to="/">Back to home</router-link>
+      </div>
+    </div>
 
     <!-- Input area (CLUER_PICKING) -->
     <div v-if="room.currentRound.state == 'CLUER_PICKING'">
@@ -435,8 +450,14 @@
     <!-- Input area (guessing) -->
     <div v-if="room.currentRound.state == 'GUESSING'">
       <!-- All except the clueGiver guesses which word is the real one, based on the clue giver's clues. -->
+      <!-- Also can't guess if you ain't in the game -->
       <div class="box">
-        <div v-if="room.currentRound.clueGiver == player.name">
+        <div
+          v-if="
+            room.currentRound.clueGiver == player.name ||
+            !room.players.includes(player.name)
+          "
+        >
           <h2 class="fancy has-text-centered" role="alert">
             <button
               class="button is-rounded"
@@ -718,6 +739,10 @@ export default {
         },
       })
     },
+    async spectatorJoinsGame() {
+      await this.enterRoom()
+      initializePlayerOnJoin(this.room.name, this.player.name)
+    },
     // for nametags, `submitted` has light green color
     isColorSubmitted(playerName) {
       const shouldColorBeSubmitted =
@@ -732,6 +757,16 @@ export default {
           (Object.keys(this.room.currentRound.votes).includes(playerName) ||
             this.room.currentRound.clueGiver === playerName))
       return shouldColorBeSubmitted
+    },
+    // for nametags, `guessing` has dark blue color. Technically this color applies to the
+    // 'ClueGiver' in Pairwise, not the 'Guesser's, but we are reusing prop name from OneWord
+    isColorGuessing(playerName) {
+      // If still picking the pair and giving clues, no one is actually guessing
+      if (this.room.currentRound.state === 'CLUER_PICKING') {
+        return false
+      }
+      // otherwise in TOSS_IN_DECOYS and GUESSING phase, guesser is the clueGiver
+      return this.room.currentRound.clueGiver === playerName
     },
     isClueSubmitDisabled() {
       if (!this.room.players.includes(this.player.name)) {
@@ -783,6 +818,9 @@ export default {
       updateUserGame(this.user.id, this.room.name)
     },
     isDecoySubmitDisabled() {
+      if (!this.room.players.includes(this.player.name)) {
+        return true
+      }
       if (!this.player.decoyAdj) {
         return true
       }
@@ -1087,5 +1125,4 @@ function nextClueGiver(lastGuesser, players) {
   transition: max-height 0.2s ease-out;
   background-color: #f1f1f1;
 }
-
 </style>
