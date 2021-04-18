@@ -612,7 +612,6 @@ function makeNewRoom(name) {
   }
 }
 
-// Returns true if need to sync to FireBase
 function initializePlayerOnJoin(room, player) {
   // cache's player's choice for word on the player object, to reduce room update freq
   player.currentWord = ''
@@ -793,26 +792,40 @@ export default {
         this.player.showPickClueWarning = true
         return
       }
+      // reset to false if previously it was true :)
       this.player.showPickClueWarning = false
+
+      const fieldsToSave = []
       // sync chosen word and clue from local player to the room's list of words & clues
       this.room.wordsAndClues[`${this.player.name}`] = {
         word: this.player.currentWord,
         clue: this.player.currentClue,
       }
+      fieldsToSave.push(`wordsAndClues.${this.player.name}`)
+
+      // Set clueGiver if it's not already set
+      if (!this.room.currentRound.clueGiver) {
+        this.room.currentRound.clueGiver = this.player.name
+        fieldsToSave.push(`currentRound.clueGiver`)
+      }
+
       // if player is the current clueGiver, immediately save word to all words this round
       if (this.room.currentRound.clueGiver === this.player.name) {
         this.room.currentRound.allWords[
           this.player.name
         ] = this.player.currentWord
       }
+      fieldsToSave.push(`currentRound.allWords`)
+
       // if this is the last player to submit a clue, change state.
       const allCluesSubmitted = this.room.players.every(
         (p) => this.room.wordsAndClues[p]
       )
       if (allCluesSubmitted) {
         this.room.currentRound.state = 'TOSS_IN_DECOYS'
+        fieldsToSave.push(`currentRound.state`)
       }
-      await setRoom(this.room)
+      await this.saveRoom(...fieldsToSave)
 
       // reset pairList and regenerated it
       this.player.pairList = []
