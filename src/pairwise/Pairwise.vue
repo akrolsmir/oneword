@@ -317,30 +317,6 @@
           </h2>
           <br />
         </div>
-        <button class="collapsible" @click="showGameRules = !showGameRules">
-          How the game works
-        </button>
-        <div
-          class="content"
-          :style="{
-            'max-height': !showGameRules ? '0px' : 'inherit',
-            padding: !showGameRules ? '0px' : '18px',
-          }"
-        >
-          <strong>1)</strong> Each player picks a pair of words from a randomly
-          generated list, and writes a clue (of any length) that relates to that
-          pair <br />
-          <strong>2)</strong> In each round, players try to construct decoys
-          they think best matches each others' clues <br />
-          <strong>3)</strong> Once all decoys are submitted, players try to
-          guess the real word pair among the decoys
-          <br />
-          <br />
-          Decoys that trick more people earn the most points! Clues that are too
-          obvious (everyone guessed right) or too offbeat (nobody guessed right)
-          will hold you back!
-          <strong> First player to reach 30 points wins! </strong>
-        </div>
       </div>
     </div>
 
@@ -542,6 +518,30 @@
       </div>
       <button v-else class="button" @click="newRound()">Next</button>
     </div>
+    <button class="collapsible" @click="showGameRules = !showGameRules">
+      How the game works
+    </button>
+    <div
+      class="content"
+      :style="{
+        'max-height': !showGameRules ? '0px' : 'inherit',
+        padding: !showGameRules ? '0px' : '18px',
+      }"
+    >
+      <strong>1)</strong> Each player picks a pair of words from a randomly
+      generated list, and writes a clue of any length that relates to that pair
+      <br />
+      <strong>2)</strong> In each round, players try to construct decoys they
+      think best matches each others' clues <br />
+      <strong>3)</strong> Once all decoys are submitted, players try to guess
+      the real word pair among the decoys
+      <br />
+      <br />
+      Decoys that trick more people earn the most points! Clues that are too
+      obvious (everyone guessed right) or too offbeat (nobody guessed right)
+      will hold you back!
+      <strong> First player to reach 30 points wins! </strong>
+    </div>
     <br /><br />
   </BigColumn>
 </template>
@@ -605,13 +605,8 @@ function makeNewRoom(name) {
   }
 }
 
+// Returns true if need to sync to FireBase
 function initializePlayerOnJoin(room, player) {
-  // clueGiver does not exist as an inintial field in room.currentRound
-  if (!room.currentRound.clueGiver) {
-    room.currentRound.clueGiver = player.name
-    // Question: where does player.name get added to room.people in the first place?
-    room.people[player.name].state = 'MOD'
-  }
   // cache's player's choice for word on the player object, to reduce room update freq
   player.currentWord = ''
   // cache's player's choice for clue on the player object, to reduce room update freq
@@ -741,7 +736,9 @@ export default {
     },
     async spectatorJoinsGame() {
       await this.enterRoom()
-      initializePlayerOnJoin(this.room.name, this.player.name)
+      initializePlayerOnJoin(this.room, this.player)
+      this.player.decoyAdjList = this.generateDecoyWordList('adjectives')
+      this.player.decoyNounList = this.generateDecoyWordList('nouns')
     },
     // for nametags, `submitted` has light green color
     isColorSubmitted(playerName) {
