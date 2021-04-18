@@ -542,6 +542,13 @@
       will hold you back!
       <strong> First player to reach 30 points wins! </strong>
     </div>
+
+    <div class="is-hidden-widescreen">
+      <History
+        :scoreHistories="tallyScores().scoreHistories"
+        :state="room.currentRound.state"
+      ></History>
+    </div>
     <br /><br />
   </BigColumn>
 </template>
