@@ -265,9 +265,12 @@
           ></Nametag>
         </div>
         <div v-if="noMod">
-          <a href="#" @click.prevent="makeMod(player.name)">
-            (Become the mod...)
-          </a>
+          <button
+            class="button is-ghost p-0"
+            @click.prevent="makeMod(player.name)"
+          >
+            Become the mod
+          </button>
         </div>
         <div v-else-if="player.isMod">
           <a href="#" @click.prevent="player.modTools = !player.modTools">
@@ -410,14 +413,14 @@
             room.currentRound.guess
           }}", but it was "{{ room.currentRound.word }}"...
         </h2>
-        <a
+        <button
           v-if="!correct(room.currentRound)"
-          class="is-size-7"
-          href="#"
+          class="button is-ghost p-0"
+          style="height: inherit"
           @click.prevent="toggleRoundCorrect"
         >
           (Mark as correct)
-        </a>
+        </button>
       </div>
       <div class="fancy newline">
         {{ dedupe(room.currentRound.clues) }}
@@ -478,14 +481,14 @@
           </p>
         </div>
       </div>
-      <a
+      <button
         v-if="!correct(round)"
-        class="is-size-7"
-        href="#"
-        @click.prevent="toggleHistoryCorrect(i)"
+        class="button is-ghost is-small p-0"
+        style="height: inherit"
+        @click="toggleHistoryCorrect(i)"
       >
         (Mark as correct)
-      </a>
+      </button>
       <p class="newline mt-5">{{ dedupe(round.clues) }}</p>
       <br />
     </template>

@@ -1,12 +1,18 @@
 <template>
   <div class="block" style="overflow-wrap: break-word">
     <p>
-      <span class="fancy">Room Chat</span> &nbsp;
-      <a v-if="!hidden" href="#" @click.prevent="hidden = true">(hide)</a>
+      <span class="fancy">Room Chat</span>
+      <button v-if="!hidden" @click="hidden = true" class="button is-ghost">
+        (hide)
+      </button>
     </p>
-    <a v-if="hidden" href="#" @click.prevent="hidden = false">
+    <button
+      v-if="hidden"
+      @click.prevent="hidden = false"
+      class="button is-ghost px-0"
+    >
       {{ sortedLogs.length }} messages hidden
-    </a>
+    </button>
     <div v-else>
       <div
         style="
