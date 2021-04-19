@@ -57,7 +57,9 @@
     <div v-if="user.isSupporter">
       Thanks for being a One Word {{ user.supporterString }}! <br />
       <!-- TODO: also include on Supporter page -->
-      <a @click="launchCustomerPortal"> Manage your settings </a>
+      <button class="button is-ghost p-0" @click.prevent="launchCustomerPortal">
+        Manage your settings
+      </button>
     </div>
     <div v-else>
       You're not currently a supporter 😢 <br />
