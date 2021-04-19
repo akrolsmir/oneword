@@ -89,6 +89,11 @@ You'll need:
 2. `$ yarn ios` to run on iOS
    - Or `$ npx cap open ios` to edit project in Xcode
 
+### iOS Misc
+
+- While setting up, needed `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer` (see [link](https://github.com/nodejs/node-gyp/issues/569))
+- OAuth client ID: `340753176141-k38315g3fgbnfq3avasgq05dmg9evjj2.apps.googleusercontent.com` (see [reference](https://developers.google.com/identity/sign-in/ios/start-integrating#add_a_url_scheme_to_your_project))
+
 # Appendix
 
 ## Tech stack
