@@ -203,7 +203,7 @@
             :name="playerScore[0]"
             :user="room.people && room.people[playerScore[0]]"
             :submitted="isColorSubmitted(playerScore[0])"
-            :guessing="room.currentRound.clueGiver === playerScore[0]"
+            :guessing="isColorGuessing(playerScore[0])"
             :mod="player.isMod"
             :self="playerScore[0] === player.name"
             :modtag="
@@ -231,6 +231,21 @@
       v-if="timerLength > 0"
       :key="room.currentRound.state"
     ></Timer>
+
+    <!-- Notify user if they're spectating -->
+    <div
+      v-cloak
+      class="notification is-info is-light"
+      v-if="!user.canPlay || room.people[player.name]?.state === 'WATCHING'"
+    >
+      <span class="subtitle">You are currently spectating this game!</span>
+      <div class="buttons mt-3">
+        <button class="button is-primary" @click="spectatorJoinsGame">
+          <strong>Join game</strong>
+        </button>
+        <router-link class="button is-ghost" to="/">Back to home</router-link>
+      </div>
+    </div>
 
     <!-- Input area (CLUER_PICKING) -->
     <div v-if="room.currentRound.state == 'CLUER_PICKING'">
@@ -301,30 +316,6 @@
             more player(s) to pick a phrase and a clue...
           </h2>
           <br />
-        </div>
-        <button class="collapsible" @click="showGameRules = !showGameRules">
-          How the game works
-        </button>
-        <div
-          class="content"
-          :style="{
-            'max-height': !showGameRules ? '0px' : 'inherit',
-            padding: !showGameRules ? '0px' : '18px',
-          }"
-        >
-          <strong>1)</strong> Each player picks a pair of words from a randomly
-          generated list, and writes a clue (of any length) that relates to that
-          pair <br />
-          <strong>2)</strong> In each round, players try to construct decoys
-          they think best matches each others' clues <br />
-          <strong>3)</strong> Once all decoys are submitted, players try to
-          guess the real word pair among the decoys
-          <br />
-          <br />
-          Decoys that trick more people earn the most points! Clues that are too
-          obvious (everyone guessed right) or too offbeat (nobody guessed right)
-          will hold you back!
-          <strong> First player to reach 30 points wins! </strong>
         </div>
       </div>
     </div>
@@ -435,8 +426,14 @@
     <!-- Input area (guessing) -->
     <div v-if="room.currentRound.state == 'GUESSING'">
       <!-- All except the clueGiver guesses which word is the real one, based on the clue giver's clues. -->
+      <!-- Also can't guess if you ain't in the game -->
       <div class="box">
-        <div v-if="room.currentRound.clueGiver == player.name">
+        <div
+          v-if="
+            room.currentRound.clueGiver == player.name ||
+            !room.players.includes(player.name)
+          "
+        >
           <h2 class="fancy has-text-centered" role="alert">
             <button
               class="button is-rounded"
@@ -521,6 +518,37 @@
       </div>
       <button v-else class="button" @click="newRound()">Next</button>
     </div>
+    <button class="collapsible" @click="showGameRules = !showGameRules">
+      How the game works
+    </button>
+    <div
+      class="content"
+      :style="{
+        'max-height': !showGameRules ? '0px' : 'inherit',
+        padding: !showGameRules ? '0px' : '18px',
+      }"
+    >
+      <strong>1)</strong> Each player picks a pair of words from a randomly
+      generated list, and writes a clue of any length that relates to that pair
+      <br />
+      <strong>2)</strong> In each round, players try to construct decoys they
+      think best matches each others' clues <br />
+      <strong>3)</strong> Once all decoys are submitted, players try to guess
+      the real word pair among the decoys
+      <br />
+      <br />
+      Decoys that trick more people earn the most points! Clues that are too
+      obvious (everyone guessed right) or too offbeat (nobody guessed right)
+      will hold you back!
+      <strong> First player to reach 30 points wins! </strong>
+    </div>
+
+    <div class="is-hidden-widescreen">
+      <History
+        :scoreHistories="tallyScores().scoreHistories"
+        :state="room.currentRound.state"
+      ></History>
+    </div>
     <br /><br />
   </BigColumn>
 </template>
@@ -585,12 +613,6 @@ function makeNewRoom(name) {
 }
 
 function initializePlayerOnJoin(room, player) {
-  // clueGiver does not exist as an inintial field in room.currentRound
-  if (!room.currentRound.clueGiver) {
-    room.currentRound.clueGiver = player.name
-    // Question: where does player.name get added to room.people in the first place?
-    room.people[player.name].state = 'MOD'
-  }
   // cache's player's choice for word on the player object, to reduce room update freq
   player.currentWord = ''
   // cache's player's choice for clue on the player object, to reduce room update freq
@@ -718,6 +740,12 @@ export default {
         },
       })
     },
+    async spectatorJoinsGame() {
+      await this.enterRoom()
+      initializePlayerOnJoin(this.room, this.player)
+      this.player.decoyAdjList = this.generateDecoyWordList('adjectives')
+      this.player.decoyNounList = this.generateDecoyWordList('nouns')
+    },
     // for nametags, `submitted` has light green color
     isColorSubmitted(playerName) {
       const shouldColorBeSubmitted =
@@ -732,6 +760,16 @@ export default {
           (Object.keys(this.room.currentRound.votes).includes(playerName) ||
             this.room.currentRound.clueGiver === playerName))
       return shouldColorBeSubmitted
+    },
+    // for nametags, `guessing` has dark blue color. Technically this color applies to the
+    // 'ClueGiver' in Pairwise, not the 'Guesser's, but we are reusing prop name from OneWord
+    isColorGuessing(playerName) {
+      // If still picking the pair and giving clues, no one is actually guessing
+      if (this.room.currentRound.state === 'CLUER_PICKING') {
+        return false
+      }
+      // otherwise in TOSS_IN_DECOYS and GUESSING phase, guesser is the clueGiver
+      return this.room.currentRound.clueGiver === playerName
     },
     isClueSubmitDisabled() {
       if (!this.room.players.includes(this.player.name)) {
@@ -754,26 +792,41 @@ export default {
         this.player.showPickClueWarning = true
         return
       }
+      // reset to false if previously it was true :)
       this.player.showPickClueWarning = false
+
+      const fieldsToSave = []
+
       // sync chosen word and clue from local player to the room's list of words & clues
       this.room.wordsAndClues[`${this.player.name}`] = {
         word: this.player.currentWord,
         clue: this.player.currentClue,
       }
+      fieldsToSave.push(`wordsAndClues.${this.player.name}`)
+
+      // Set clueGiver if it's not already set
+      if (!this.room.currentRound.clueGiver) {
+        this.room.currentRound.clueGiver = this.player.name
+        fieldsToSave.push(`currentRound.clueGiver`)
+      }
+
       // if player is the current clueGiver, immediately save word to all words this round
       if (this.room.currentRound.clueGiver === this.player.name) {
         this.room.currentRound.allWords[
           this.player.name
         ] = this.player.currentWord
+        fieldsToSave.push(`currentRound.allWords.${this.player.name}`)
       }
-      // if this is the last player to submit a clue, change state.
+
+      // if this is the last player to submit a clue, change state
       const allCluesSubmitted = this.room.players.every(
         (p) => this.room.wordsAndClues[p]
       )
       if (allCluesSubmitted) {
         this.room.currentRound.state = 'TOSS_IN_DECOYS'
+        fieldsToSave.push(`currentRound.state`)
       }
-      await setRoom(this.room)
+      await this.saveRoom(...fieldsToSave)
 
       // reset pairList and regenerated it
       this.player.pairList = []
@@ -783,6 +836,9 @@ export default {
       updateUserGame(this.user.id, this.room.name)
     },
     isDecoySubmitDisabled() {
+      if (!this.room.players.includes(this.player.name)) {
+        return true
+      }
       if (!this.player.decoyAdj) {
         return true
       }
@@ -1087,5 +1143,4 @@ function nextClueGiver(lastGuesser, players) {
   transition: max-height 0.2s ease-out;
   background-color: #f1f1f1;
 }
-
 </style>
