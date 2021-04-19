@@ -73,6 +73,22 @@ See also [this guide to Play Store deployment.](https://www.joshmorony.com/deplo
 - `$ yarn resources` to [generate app icons](https://capacitorjs.com/docs/v3/guides/splash-screens-and-icons)
   - For Android, we use [adaptive icons](https://developer.android.com/guide/practices/ui_guidelines/icon_design_adaptive)
 
+## iOS
+
+### Setup
+
+You'll need:
+
+- A Mac to develop on, with:
+  - [Xcode](https://apps.apple.com/us/app/xcode/id497799835?mt=12)
+  - CocoaPods (`sudo gem install cocoapods` to install)
+
+### Developing
+
+1. `$ yarn build` to build Vue app for distribution
+2. `$ yarn ios` to run on iOS
+   - Or `$ npx cap open ios` to edit project in Xcode
+
 # Appendix
 
 ## Tech stack

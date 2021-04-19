@@ -55,6 +55,11 @@
   dependencies:
     tslib "^2.1.0"
 
+"@capacitor/ios@^3.0.0-rc.0":
+  version "3.0.0-rc.0"
+  resolved "https://registry.yarnpkg.com/@capacitor/ios/-/ios-3.0.0-rc.0.tgz#36e71a6abea071c69a158c875bc627c64a52609f"
+  integrity sha512-c92qeHIKoC/HPBB9Ji+kdn9LJ2HPeRoWpamV/7OOlS2SAB+GjHWHWjuP8aWLnUFqFZxI7Mfrfo65Gd6N4haoGw==
+
 "@firebase/analytics-types@0.4.0":
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/@firebase/analytics-types/-/analytics-types-0.4.0.tgz#d6716f9fa36a6e340bc0ecfe68af325aa6f60508"
