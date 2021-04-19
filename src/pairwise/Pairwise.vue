@@ -796,6 +796,7 @@ export default {
       this.player.showPickClueWarning = false
 
       const fieldsToSave = []
+
       // sync chosen word and clue from local player to the room's list of words & clues
       this.room.wordsAndClues[`${this.player.name}`] = {
         word: this.player.currentWord,
@@ -814,10 +815,10 @@ export default {
         this.room.currentRound.allWords[
           this.player.name
         ] = this.player.currentWord
+        fieldsToSave.push(`currentRound.allWords.${this.player.name}`)
       }
-      fieldsToSave.push(`currentRound.allWords`)
 
-      // if this is the last player to submit a clue, change state.
+      // if this is the last player to submit a clue, change state
       const allCluesSubmitted = this.room.players.every(
         (p) => this.room.wordsAndClues[p]
       )
