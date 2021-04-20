@@ -8,7 +8,7 @@
         <div
           id="android-google-signin"
           class="mt-4"
-          v-if="capacitorPlatform === 'android'"
+          v-if="['android', 'ios'].includes(capacitorPlatform)"
         >
           <!-- Copied the "Sign In with Google" button from FirebaseUI -->
           <button
@@ -88,8 +88,8 @@ async function injectFirebaseUi() {
   }
 
   const signInOptions = [firebase.auth.EmailAuthProvider.PROVIDER_ID]
-  // On Android, Google auth is handled by capacitor-firebase-auth
-  if (Capacitor.getPlatform() !== 'android') {
+  // On mobile, Google auth is handled by capacitor-firebase-auth
+  if (!['android', 'ios'].includes(Capacitor.getPlatform())) {
     signInOptions.unshift(firebase.auth.GoogleAuthProvider.PROVIDER_ID)
   }
 
