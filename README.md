@@ -72,6 +72,8 @@ See also [this guide to Play Store deployment.](https://www.joshmorony.com/deplo
 
 - `$ yarn resources` to [generate app icons](https://capacitorjs.com/docs/v3/guides/splash-screens-and-icons)
   - For Android, we use [adaptive icons](https://developer.android.com/guide/practices/ui_guidelines/icon_design_adaptive)
+- To crack the keystore password, see [this](https://github.com/floyd-fuh/JKS-private-key-cracker-hashcat)
+  - To use Java JDK after Android Studio is installed: `export JAVA_HOME=/Applications/Android\ Studio.app/Contents/jre/jdk/Contents/Home`
 
 ## iOS
 
