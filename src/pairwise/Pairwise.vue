@@ -775,12 +775,6 @@ export default {
       if (!this.room.players.includes(this.player.name)) {
         return true
       }
-      if (this.player.currentWord === '') {
-        return true
-      }
-      if (this.player.currentClue === '') {
-        return true
-      }
       return false
     },
     async cluerSelectsWord(w) {
