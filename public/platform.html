@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" href="/oneword-favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>One Word Platform</title>
     <link
@@ -40,6 +41,10 @@
         font-weight: 400 !important;
         line-height: 36px !important;
       }
+
+      a {
+        color: #5323d0 !important;
+      }
     </style>
   </head>
 
@@ -47,18 +52,21 @@
     <!-- NavBar va a todo lo ancho -->
     <nav class="navbar" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
-        <h1 class="title is-text-4 p-4">The One Word Platform</h1>
+        <h1 class="title is-text-4 p-4">
+          <img class="mr-3" src="/oneword-favicon.png" width="28px" />One Word
+          <a href="#platform">Platform</a>
+        </h1>
       </div>
 
       <div class="navbar-menu">
         <div class="navbar-end">
-          <a class="navbar-item"> EXISTING GAMES </a>
+          <a class="navbar-item" href="./"> EXISTING GAMES </a>
 
-          <a class="navbar-item"> FAQ </a>
+          <!-- <a class="navbar-item"> FAQ </a> -->
 
-          <a class="navbar-item"> ABOUT US </a>
+          <a class="navbar-item" href="./about"> ABOUT US </a>
 
-          <a class="navbar-item"> FOR ORGANIZERS </a>
+          <a class="navbar-item" href="./supporter"> FOR ORGANIZERS </a>
         </div>
       </div>
     </nav>
@@ -74,25 +82,38 @@
               <h1 class="title titled is-1 mb-6">
                 Create your first <b>online board game</b>
               </h1>
-              <h2
-                class="subtitled subtitle has-text-grey is-4 has-text-weight-normal is-family-sans-serif"
-              >
-                On the same platform that powers
-                <u><a href="https://oneword.games">One Word</a></u
-                >.
+              <h2 class="subtitled subtitle has-text-grey">
+                With the same system that powers
+                <a href="https://oneword.games">One Word</a>.
               </h2>
-              <div class="field has-addons">
+
+              <form
+                class="field has-addons"
+                name="platform-signups"
+                method="POST"
+                data-netlify="true"
+              >
                 <p class="control">
                   <input
                     class="input"
                     type="email"
+                    name="email"
                     placeholder="you@email.com"
                   />
                 </p>
                 <p class="control">
-                  <a class="button is-black"> Try the beta </a>
+                  <button type="submit" class="button is-black">
+                    Try the beta
+                  </button>
                 </p>
-              </div>
+              </form>
+
+              <br />
+              <h2 class="mt-6 is-size-5 subtitle has-text-grey">
+                Or read on about our <a href="#platform">platform</a>,
+                <a href="#toolkit">toolkit</a>, and
+                <a href="#community">community</a>.
+              </h2>
             </div>
             <div
               data-aos="fade-right"
@@ -108,7 +129,7 @@
     </section>
 
     <!-- Hero del producto -->
-    <section class="hero is-white is-fullheight">
+    <section class="hero is-white is-fullheight" id="platform">
       <div class="hero-body">
         <div class="container">
           <div class="columns is-vcentered reverse-columns">
@@ -119,19 +140,19 @@
               <h1 class="title titled is-1 mb-6">
                 Focus on what you love: game design.
               </h1>
-              <h2
-                class="subtitled subtitle has-text-grey is-4 has-text-weight-normal is-family-sans-serif"
-              >
-                We'll take care of the rest.<br />
-                - No coding needed with our
-                <b>simple drag & drop editor</b>
-                <br />
-                - Our game servers keep your players
-                <b>together in real time</b>
-                <br />
-                - Login, payments, mobile & desktop apps:
-                <b>we handle it all!</b>
-                <br />
+              <h2 class="subtitled subtitle has-text-grey">
+                We'll take care of the rest.
+                <div class="content">
+                  <ul>
+                    <li>No coding needed; use our simple drag & drop editor</li>
+                    <li>
+                      Our servers let your players game together in real time
+                    </li>
+                    <li>
+                      Sign-in. Payments. iOS & Android apps. We handle it all!
+                    </li>
+                  </ul>
+                </div>
               </h2>
             </div>
             <div
@@ -149,7 +170,7 @@
       </div>
     </section>
 
-    <section class="hero is-white is-fullheight">
+    <section class="hero is-white is-fullheight" id="toolkit">
       <div class="hero-body">
         <div class="container">
           <div class="columns is-vcentered">
@@ -170,13 +191,24 @@
               <h1 class="titled title is-1 mb-6">
                 Starting from scratch can be scary.
               </h1>
-              <h2 class="subtitled subtitle">
+              <h2 class="subtitled subtitle has-text-grey">
                 That's why we provide an entire toolkit:<br />
-                - Hit the ground running with our game templates, inspired by
-                hits like Just One, Codenames, and The Resistance<br />
-                - Tap into our basic components such as shufflers, timers & text
-                chat<br />
-                - Customize your game with our classic or trending word lists<br />
+                <div class="content">
+                  <ul>
+                    <li>
+                      Hit the ground running with our game templates, inspired
+                      by hits like Just One, Codenames, and The Resistance
+                    </li>
+                    <li>
+                      Tap into our basic components such as shufflers, timers &
+                      text chat
+                    </li>
+                    <li>
+                      Customize your game with our classic or trending word
+                      lists
+                    </li>
+                  </ul>
+                </div>
               </h2>
             </div>
           </div>
@@ -184,7 +216,7 @@
       </div>
     </section>
 
-    <section class="hero is-white is-fullheight">
+    <section class="hero is-white is-fullheight" id="community">
       <div class="hero-body">
         <div class="container">
           <div class="columns is-vcentered reverse-columns">
@@ -195,11 +227,20 @@
               <h1 class="title titled is-1 mb-6">
                 More than just a game engine.
               </h1>
-              <h2 class="subtitle subtitled">
-                Join an entire <b>game creator community.</b><br />
-                - Get in-depth feedback from like-minded designers<br />
-                - Playtest your designs at our weekly game nights<br />
-                - Publish and promote your game to our entire playerbase<br />
+              <h2 class="subtitled subtitle has-text-grey">
+                Join our <b>game creator community.</b><br />
+                <div class="content">
+                  <ul>
+                    <li>Get in-depth feedback from like-minded designers</li>
+                    <li>
+                      Find playtesters for your designs at our weekly game
+                      nights
+                    </li>
+                    <li>
+                      Publish and promote your game to our entire playerbase
+                    </li>
+                  </ul>
+                </div>
               </h2>
             </div>
             <div
@@ -227,18 +268,26 @@
               <h2 class="subtitle subtitled">
                 Sign up for early access to the One Word Platform!
               </h2>
-              <div class="field has-addons has-addons-centered">
+              <form
+                class="field has-addons has-addons-centered"
+                name="platform-signups"
+                method="POST"
+                data-netlify="true"
+              >
                 <p class="control">
                   <input
                     class="input"
                     type="email"
+                    name="email"
                     placeholder="you@email.com"
                   />
                 </p>
                 <p class="control">
-                  <a class="button is-black"> Try the beta </a>
+                  <button type="submit" class="button is-black">
+                    Try the beta
+                  </button>
                 </p>
-              </div>
+              </form>
             </div>
           </div>
         </div>
