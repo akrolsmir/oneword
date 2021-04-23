@@ -72,6 +72,29 @@ See also [this guide to Play Store deployment.](https://www.joshmorony.com/deplo
 
 - `$ yarn resources` to [generate app icons](https://capacitorjs.com/docs/v3/guides/splash-screens-and-icons)
   - For Android, we use [adaptive icons](https://developer.android.com/guide/practices/ui_guidelines/icon_design_adaptive)
+- To crack the keystore password, see [this](https://github.com/floyd-fuh/JKS-private-key-cracker-hashcat)
+  - To use Java JDK after Android Studio is installed: `export JAVA_HOME=/Applications/Android\ Studio.app/Contents/jre/jdk/Contents/Home`
+
+## iOS
+
+### Setup
+
+You'll need:
+
+- A Mac to develop on, with:
+  - [Xcode](https://apps.apple.com/us/app/xcode/id497799835?mt=12)
+  - CocoaPods (`sudo gem install cocoapods` to install)
+
+### Developing
+
+1. `$ yarn build` to build Vue app for distribution
+2. `$ yarn ios` to run on iOS
+   - Or `$ npx cap open ios` to edit project in Xcode
+
+### iOS Misc
+
+- While setting up, needed `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer` (see [link](https://github.com/nodejs/node-gyp/issues/569))
+- OAuth client ID: `340753176141-k38315g3fgbnfq3avasgq05dmg9evjj2.apps.googleusercontent.com` (see [reference](https://developers.google.com/identity/sign-in/ios/start-integrating#add_a_url_scheme_to_your_project))
 
 # Appendix
 
