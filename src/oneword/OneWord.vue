@@ -536,11 +536,6 @@ function makeNewRoom(name) {
   // Add a default list of custom words for a conference.
   const categories = defaultCategories()
   let customWords = ''
-  if (window.location.pathname.startsWith('/asplos-2021')) {
-    categories['custom'] = true
-    customWords =
-      '26th International Conference Architectural Support Programming Languages Operating Systems'
-  }
 
   return {
     name,
