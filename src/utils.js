@@ -1,5 +1,6 @@
 import { formatDistanceToNow } from 'date-fns'
 import { singular, plural as pluralur } from 'pluralize'
+import { seededRandom } from './vendor/rng'
 
 // Compile these regexes for performance
 const RE_MATCH_LETTER_DASH = /[^\p{L}-]/gu // dash, or letter in any language
@@ -56,8 +57,9 @@ export function getIn(object, path) {
   return node
 }
 
-export function pickRandom(array) {
-  return array[Math.floor(Math.random() * array.length)]
+export function pickRandom(array, seed = '') {
+  const rand = seed ? seededRandom(seed) : Math.random()
+  return array[Math.floor(rand * array.length)]
 }
 
 // Tetris-style bag; guarantee to cycle through each of the N options

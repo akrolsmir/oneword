@@ -92,10 +92,19 @@ export function nextWord(history, category = 'nouns', customWordList = []) {
     if (loops > 10000) {
       return "You're out of custom words..."
     }
-    // TODO: consider generating a stable next word using seeded RNG.
-    word = randomWord(category, customWordList)
+    const seed = seedFromHistory(history)
+    word = randomWord(category, customWordList, seed)
   } while (history.map((round) => round.word).includes(word))
   return word
+}
+
+// Generate a deterministic seed string for a particular game history
+// Returns '' if history is empty
+function seedFromHistory(history) {
+  return history
+    .flatMap((round) => Object.values(round.clues).concat(round.word))
+    .sort()
+    .join(', ')
 }
 
 export function capitalize(str) {

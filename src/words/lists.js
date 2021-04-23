@@ -8,10 +8,10 @@ import {
   countries,
 } from './themes'
 
-export function randomWord(category = 'nouns', customWordList = []) {
+export function randomWord(category = 'nouns', customWordList = [], seed = '') {
   const words =
     category === 'custom' ? customWordList : WORD_LISTS[category].words
-  return pickRandom(words) || 'Random word generator broke =('
+  return pickRandom(words, seed) || 'Random word generator broke =('
 }
 
 export const WORD_LISTS = {
