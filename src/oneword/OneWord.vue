@@ -328,7 +328,8 @@
                 @click="submitClue"
                 :disabled="
                   !room.players.includes(player.name) ||
-                  dupes(player.clue || '', room.currentRound.word)
+                  dupes(player.clue || '', room.currentRound.word) ||
+                  hasSpecialCharacters(player.clue)
                 "
                 :class="{
                   'is-primary': room.currentRound.clues[player.name],
