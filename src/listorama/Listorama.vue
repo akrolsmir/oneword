@@ -94,6 +94,14 @@
           @keydown.enter.prevent="focusNextTextArea($event)"
         ></textarea>
       </div>
+      <!-- TODO: Would be cool if submit button were also the timer -->
+      <button
+        @click="clickSubmit"
+        class="button"
+        :class="{ 'is-success': room.round.submitted[player.name] }"
+      >
+        {{ room.round.submitted[player.name] ? 'Submitted' : 'Submit' }}
+      </button>
     </div>
 
     <div class="p-3" v-if="room.players.length < 3 && room.state === 'START'">
@@ -346,6 +354,9 @@ function makeNewRoom(name) {
         adrian: ['spruce', 'pine', 'elm'],
         austin: ['birch', 'spruce', 'MAPLEstory'],
       },
+      submitted: {
+        adrian: true
+      },
       */
     },
     history: [],
@@ -491,6 +502,12 @@ export default {
         .filter(([k, v]) => v)
         .map(([k, v]) => k)
     },
+    allSubmitted() {
+      // Test array equality by coercing to strings (see https://stackoverflow.com/a/42442909/1222351)
+      const playing = [...this.room.players].sort().join(', ')
+      const submitted = Object.keys(this.room.round.submitted).sort().join(', ')
+      return playing === submitted
+    },
   },
   methods: {
     orderedEntries,
@@ -518,6 +535,7 @@ export default {
       }
       this.room.round.card = card
       this.room.round.entries = {}
+      this.room.round.submitted = {}
       this.room.round.number = this.room.history.length
       for (let player of this.room.players) {
         this.room.round.entries[player] = []
@@ -535,6 +553,19 @@ export default {
     submitEntries() {
       this.room.round.entries[this.player.name] = this.player.entries.slice()
       this.saveRoom(`round.entries.${this.player.name}`)
+    },
+    clickSubmit() {
+      // Same as submitEntries above
+      this.room.round.entries[this.player.name] = this.player.entries.slice()
+      // Also mark player as 'submitted', and advance game if everyone is done
+      this.room.round.submitted[this.player.name] = true
+      this.saveRoom(
+        `round.entries.${this.player.name}`,
+        `round.submitted.${this.player.name}`
+      )
+      if (this.allSubmitted) {
+        this.nextStage()
+      }
     },
     focusNextTextArea(event) {
       let next = event.target.parentNode.nextSibling.childNodes[1]
