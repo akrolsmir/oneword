@@ -30,6 +30,13 @@
             :mod="player.isMod"
             @kick="kickPlayer(tagged)"
           />
+          <progress
+            class="progress mt-1 mb-2"
+            style="height: 0.3rem !important"
+            :class="{ 'is-success': room.round.submitted[tagged] }"
+            :value="numEntries(tagged)"
+            :max="cardType.listSize"
+          />
         </div>
       </div>
       <div class="column narrow card bg round">
@@ -604,6 +611,11 @@ export default {
         default:
           return 0
       }
+    },
+
+    numEntries(player) {
+      const SUM = (a, b) => a + b
+      return this.room.round.entries[player].map(Boolean).reduce(SUM, 0)
     },
   },
 }
