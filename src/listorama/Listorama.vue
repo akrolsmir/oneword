@@ -31,9 +31,10 @@
             @kick="kickPlayer(tagged)"
           />
           <progress
+            v-if="room.state !== 'START'"
             class="progress mt-1 mb-2"
-            style="height: 0.3rem !important"
-            :class="{ 'is-success': room.round.submitted[tagged] }"
+            style="height: 6px !important"
+            :class="{ 'is-success': room.round.submitted?.[tagged] }"
             :value="numEntries(tagged)"
             :max="cardType.listSize"
           />
@@ -105,9 +106,9 @@
       <button
         @click="clickSubmit"
         class="button"
-        :class="{ 'is-success': room.round.submitted[player.name] }"
+        :class="{ 'is-success': room.round.submitted?.[player.name] }"
       >
-        {{ room.round.submitted[player.name] ? 'Submitted' : 'Submit' }}
+        {{ room.round.submitted?.[player.name] ? 'Submitted' : 'Submit' }}
       </button>
     </div>
 
@@ -615,7 +616,9 @@ export default {
 
     numEntries(player) {
       const SUM = (a, b) => a + b
-      return this.room.round.entries[player].map(Boolean).reduce(SUM, 0)
+      return (this.room.round.entries?.[player] || [])
+        .map(Boolean)
+        .reduce(SUM, 0)
     },
   },
 }
