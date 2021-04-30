@@ -27,4 +27,19 @@
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
   </body>
+  <script type="text/javascript">
+    ;(function (l, e, a, p) {
+      window.UserLeap = function () {
+        U._queue.push(arguments)
+      }
+      var U = window.UserLeap
+      U.appId = a
+      U._queue = []
+      a = l.createElement('script')
+      a.async = 1
+      a.src = e + '?id=' + U.appId
+      p = l.getElementsByTagName('script')[0]
+      p.parentNode.insertBefore(a, p)
+    })(document, 'https://cdn.userleap.com/shim.js', '4DNR5JklfJ')
+  </script>
 </html>
