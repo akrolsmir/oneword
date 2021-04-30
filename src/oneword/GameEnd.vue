@@ -79,6 +79,8 @@ export default {
     // const canvasWidth = document.getElementById('#fireworks').parentElement
     // .clientWidth
     startFireworks(this.score)
+    // Game ended, time to survey!
+    UserLeap('track', 'GAME_OVER')
   },
 }
 </script>
