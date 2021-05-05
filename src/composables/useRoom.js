@@ -64,7 +64,7 @@ export function useRoom(user, makeNewRoom, onJoin = undefined) {
   // See Vue lifecycle: https://i.imgur.com/6jVcrja.png
   async function createOrEnterRoom() {
     // For dev velocity, accept https://oneword.games/room/rome?player=Spartacus
-    if (route.query.player && !user.id) {
+    if (route.query.player) {
       user.guest = true
       user.name = route.query.player
     }
