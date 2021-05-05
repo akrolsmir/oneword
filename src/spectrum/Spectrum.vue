@@ -19,29 +19,48 @@
         />
         <h2 class="title">{{ room.round.card.to }}</h2>
       </div>
-      <h1 class="subtitle">{{ room.state }}</h1>
-      <button class="button" @click="nextStage">Next Stage</button>
-      <button class="button" @click="resetRoom">Reset Room</button>
+      <h1 class="subtitle">State: {{ room.state }}</h1>
+      <h1 class="subtitle">Players: {{ room.players }}</h1>
 
       <div v-if="room.state === 'PREVIEW'">
-        Currently in Preview
+        Here are the two words on your spectrum! Ready to go?
         <!-- Show both areas but not the target -->
       </div>
 
       <div v-if="room.state === 'CLUE1'">
-        Now in Clue1
+        <div v-if="player.name === room.round.cluer">
+          You are trying to clue your team! <br />
+          Target: {{ room.round.target }} <br />
+          Clue:
+          <input
+            class="input"
+            v-model="room.round.clue1"
+            placeholder="Give a clue"
+          />
+        </div>
+        <div v-else>Waiting for {{ room.round.cluer }} to give a clue...</div>
         <!-- Show the target & an entry box for the cluer -->
       </div>
 
       <div v-if="room.state === 'GUESS2'">
-        Now in Guess2
+        <div v-if="player.name === room.round.cluer">
+          Waiting for your team to interpret the clue...
+        </div>
+        <div v-else>
+          Guess what {{ room.round.cluer }} meant by "{{ room.round.clue1 }}"
+        </div>
         <!-- Show both areas but not the target -->
       </div>
 
       <div v-if="room.state === 'END'">
-        Now it's over!
+        Your team guessed {{ room.round.clue1 }}, and the target was
+        {{ room.round.target }}
         <!-- Show the result -->
       </div>
+
+      Controls:
+      <button class="button" @click="nextStage">Next Stage</button>
+      <button class="button" @click="resetRoom">Reset Room</button>
     </div>
   </BigColumn>
 </template>
@@ -60,7 +79,7 @@ input[type='range'][orient='vertical'] {
   writing-mode: bt-lr; /* IE */
   -webkit-appearance: slider-vertical; /* WebKit */
   width: 8px;
-  height: 60vh;
+  height: 40vh;
   padding: 0 5px;
 }
 </style>
@@ -167,7 +186,7 @@ export default {
               to: pickRandom(nouns),
             },
             target: Math.floor(Math.random() * 10), // Random from 0 to 9
-            guesser: this.room.players[0], // TODO: randomly re-pick
+            cluer: this.room.players[0], // TODO: randomly re-pick
           }
           propsToSave.push('round')
       }
