@@ -662,7 +662,11 @@ export default {
     },
     async submitClue() {
       this.player.clue = this.player.clue.toLowerCase().trim()
-      if (dupes(this.player.clue, this.room.currentRound.word)) {
+      if (
+        dupes(this.player.clue, this.room.currentRound.word) ||
+        this.hasSpecialCharacters(this.player.clue)
+      ) {
+        // Just ignore invalid clues (ie too similar, or special chars)
         return
       }
 
