@@ -2725,7 +2725,6 @@ export const adjectives = [
   'tough',
   'available',
   'berserk',
-  'uppity',
   'grandiose',
   'living',
   'cheerful',
