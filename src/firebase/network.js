@@ -40,20 +40,18 @@ export function referSupporter(source) {
 // Extracts the right room database to use. based on current URL
 // TODO: This is pretty hardcoded to URL; prefer a more robust approach
 function roomDb() {
-  if (window.location.pathname.startsWith('/storytime')) {
-    return 'silver'
+  const TABLES = {
+    storytime: 'silver',
+    listorama: 'listography',
+    incrypt: 'incrypt',
+    pairwise: 'pairwise',
+    'asplos-2021': 'oneword-asplos',
+    twowords: 'twowords',
   }
-  if (window.location.pathname.startsWith('/listorama')) {
-    return 'listography'
-  }
-  if (window.location.pathname.startsWith('/incrypt')) {
-    return 'incrypt'
-  }
-  if (window.location.pathname.startsWith('/pairwise')) {
-    return 'pairwise'
-  }
-  if (window.location.pathname.startsWith('/asplos-2021')) {
-    return 'oneword-asplos'
+  for (const [name, table] of Object.entries(TABLES)) {
+    if (window.location.pathname.startsWith(`/${name}`)) {
+      return table
+    }
   }
   return 'rooms'
 }
