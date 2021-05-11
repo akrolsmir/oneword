@@ -75,9 +75,7 @@
             >
           </div>
         </div>
-        <a class="navbar-item" href="/platform"
-          >Design&nbsp;<i>your</i>&nbsp;game</a
-        >
+        <a class="navbar-item" href="/platform">Design Your Own Game</a>
       </div>
 
       <div class="navbar-end">
