@@ -40,7 +40,23 @@ export default {
           })
         case 'BREAK':
           return h('br')
+        case 'TEXT':
+          // return h('h2', {}, this.interpolate(element.label))
+          return h(
+            'h2',
+            { class: { subtitle: true } },
+            this.interpolate(element.label)
+          )
       }
+    },
+
+    // Bind instances of [[label]] to the appropriate input
+    interpolate(text) {
+      const replacer = (match, label) => {
+        return this.inputs[label]
+      }
+
+      return text.replace(/\[\[(.+?)\]\]/, replacer)
     },
   },
 }

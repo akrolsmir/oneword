@@ -221,6 +221,10 @@ export default {
           type: 'BUTTON',
           label: 'Or clear, maybe?',
         },
+        {
+          type: 'TEXT',
+          label: `You typed in: [[Type type type]]`,
+        },
       ],
       testInputs: {},
       // rules: {
