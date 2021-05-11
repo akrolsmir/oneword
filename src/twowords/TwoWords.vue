@@ -61,6 +61,8 @@
       Controls:
       <button class="button" @click="nextStage">Next Stage</button>
       <button class="button" @click="resetRoom">Reset Room</button>
+      <ElementList :elements="testElements" :inputs="testInputs" />
+      inputs: {{ testInputs }}
     </div>
   </BigColumn>
 </template>
@@ -86,6 +88,7 @@ input[type='range'][orient='vertical'] {
 
 <script>
 import { inject } from 'vue'
+import ElementList from './components/ElementList.vue'
 import BigColumn from '../components/BigColumn.vue'
 import Chatbox from '../components/Chatbox.vue'
 import Timer from '../components/Timer.vue'
@@ -194,6 +197,7 @@ export default {
     Timer,
     Nametag,
     ShareLink,
+    ElementList,
   },
   setup() {
     const user = inject('currentUser')
@@ -204,47 +208,46 @@ export default {
   created() {
     // this.debouncedSubmitEntries = debounce(this.submitEntries, 300)
   },
+  data() {
+    return {
+      testElements: [
+        { type: 'TEXT_INPUT', label: 'Type type type' },
+        {
+          type: 'BUTTON',
+          label: 'Submit button!',
+        },
+        { type: 'BREAK' },
+        {
+          type: 'BUTTON',
+          label: 'Or clear, maybe?',
+        },
+      ],
+      testInputs: {},
+      // rules: {
+      //   goal: {
+      //     type: 'COLLAB',
+      //     end: 'ROUNDS',
+      //     target: 13,
+      //   },
+      //   stages: ['CLUEING', 'GUESSING', 'DONE'],
+      //   roles: {
+      //     CLUER: 1,
+      //     GUESSER: 'REST',
+      //   },
+      // },
+      // transitions: {
+      //   DONE: () => {
+      //     // TODO: Generate new word, move random player
+      //     // Serializing functions:
+      //     // https://stackoverflow.com/questions/7395686/how-can-i-serialize-a-function-in-javascript/51123745#51123745
+      //     // or Eval: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval#never_use_eval!
+      //   },
+      // },
+    }
+  },
   computed: {},
   methods: {
     sanitize,
-    nextStage() {
-      const propsToSave = ['state']
-
-      switch (this.room.state) {
-        case 'PREVIEW':
-          this.room.state = 'CLUE1'
-          break
-        case 'CLUE1':
-          this.room.state = 'GUESS2' // Note: Skips GUESS1 and CLUE2 for now
-          break
-        case 'GUESS1':
-          // TODO: Should depend on the results. But assume always clue2 for now
-          this.room.state = 'CLUE2'
-          break
-        case 'CLUE2':
-          this.room.state = 'GUESS2'
-          break
-        case 'GUESS2':
-          this.room.state = 'END'
-          this.room.history.push(this.room.round)
-          propsToSave.push('history')
-          break
-        case 'START':
-        case 'END':
-          this.room.state = 'PREVIEW'
-          this.room.round = {
-            // TODO: Actually randomly generate these each round
-            card: {
-              from: pickRandom(nouns),
-              to: pickRandom(nouns),
-            },
-            target: Math.floor(Math.random() * 10), // Random from 0 to 9
-            cluer: this.room.players[0], // TODO: randomly re-pick
-          }
-          propsToSave.push('round')
-      }
-      this.saveRoom(...propsToSave)
-    },
   },
 }
 </script>
