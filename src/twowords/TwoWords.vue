@@ -161,20 +161,31 @@ import { nouns } from '../words/parts-of-speech'
 function makeNewRoom(name) {
   return {
     name,
-    state: 'START', // or "PREVIEW", "CLUE1", "GUESS1", "CLUE2", "GUESS2", "END"
+    state: 'CLUEING', // or "GUESSING", or "DONE"
     people: {},
     round: {
       /** Example:
-      card: {
-        from: 'Mountain'
-        to: 'Molehill'
-      },
-      target: 7, // from: 10 to 0, but only 9 to 1 are valid; 0 = shoot for moon
-      cluer: 'Austin',
-      clue1: 'My laundry pile'
-      guess1: 4,
-      clue2: 'Everest',
-      guess2: 9,
+      word: 'aardvark',
+      roles: {
+        Austin: 'CLUER',
+        Alex: 'CLUER',
+        Sinclair: 'GUESSER',
+      }
+      inputs: {
+        CLUEING: {
+          Austin: {
+            'Enter your clue': 'arthur',
+            'Submit clue!': true,
+          }
+          Alex: {...}
+        },
+        GUESSING: {
+          Sinclair: { 'Enter your guess': 'aardvark', 'Submit guess': true }
+        }
+        DONE: {
+          Austin: { 'Next stage': true }
+        }
+      }
       */
     },
 
@@ -210,23 +221,39 @@ export default {
   },
   data() {
     return {
-      testElements: [
-        { type: 'TEXT_INPUT', label: 'Type type type' },
-        {
-          type: 'BUTTON',
-          label: 'Submit button!',
+      stages: ['CLUEING', 'GUESSING', 'DONE'],
+      views: {
+        CLUEING: {
+          CLUER: [
+            { type: 'TEXT_INPUT', label: 'Enter your clue' },
+            { type: 'BUTTON', label: 'Submit clue!' },
+            { type: 'BREAK' },
+            { type: 'BUTTON', label: 'Skip' },
+            { type: 'TEXT', label: `You typed in: [[Enter your clue]]` },
+          ],
+          GUESSER: [{ type: 'TEXT', label: 'Waiting for clues...' }],
         },
-        { type: 'BREAK' },
-        {
-          type: 'BUTTON',
-          label: 'Or clear, maybe?',
+        GUESSING: {
+          CLUER: [{ type: 'TEXT', label: 'Waiting for GUESSER to guess...' }],
+          GUESSER: [
+            { type: 'TEXT_INPUT', label: 'Enter your guess' },
+            { type: 'BUTTON', label: 'Submit guess!' },
+          ],
         },
-        {
-          type: 'TEXT',
-          label: `You typed in: [[Type type type]]`,
+        DONE: {
+          CLUER: [
+            { type: 'TEXT', label: 'CLUER, you are now done.' },
+            { type: 'BUTTON', label: 'Next round' },
+          ],
+          GUESSER: [
+            { type: 'TEXT', label: 'GUESSER, you are now done.' },
+            { type: 'BUTTON', label: 'Next round' },
+          ],
         },
-      ],
-      testInputs: {},
+      },
+      round: {
+        inputs: {},
+      },
       // rules: {
       //   goal: {
       //     type: 'COLLAB',
@@ -247,6 +274,24 @@ export default {
       //     // or Eval: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval#never_use_eval!
       //   },
       // },
+      /*
+      Pseudocode for One Word game logic:
+      CLUEING:
+        Show input
+        Show submit button
+        WHEN all cluers submitted, then state = GUESSING
+          - Run on client side
+            - Idempotent
+      GUESSING:
+        Show unique words ***
+        Show input
+        Show submit button
+        WHEN guesser submitted, then state = DONE
+      DONE:
+        Show success or failure
+        show next button
+        WHEN next clicked, then state = CLUEING
+      */
     }
   },
   computed: {},
