@@ -44,12 +44,27 @@ export function listIncludes(list, word) {
 }
 
 // Extracts a node from an object tree by its path, like "redTeam.players"
+// Returns null/undefined when the node is missing.
 export function getIn(object, path) {
   let node = object
   for (const part of path.split('.')) {
-    node = node[part]
+    node = node && node[part]
   }
   return node
+}
+
+// Sets a value in the object tree, creating parent objects as necessary
+export function setIn(object, path, value) {
+  let node = object
+  const [last] = path.split('.').slice(-1)
+  const rest = path.split('.').slice(0, -1)
+  for (const part of rest) {
+    if (!node[part]) {
+      node[part] = {}
+    }
+    node = node[part]
+  }
+  node[last] = value
 }
 
 export function pickRandom(array, seed = '') {
