@@ -9,16 +9,6 @@
     </template>
 
     <div class="fullscreen">
-      <!-- <div v-if="room.state !== 'START'">
-        <h2 class="title">{{ room.round.card.from }}</h2>
-        <input
-          type="range"
-          orient="vertical"
-          v-model="room.round.guess1"
-          step="10"
-        />
-        <h2 class="title">{{ room.round.card.to }}</h2>
-      </div> -->
       <h1 class="subtitle">State: {{ room.state }}</h1>
       <h1 class="subtitle">Players: {{ room.players }}</h1>
 
@@ -61,7 +51,11 @@
       Controls:
       <button class="button" @click="nextStage">Next Stage</button>
       <button class="button" @click="resetRoom">Reset Room</button>
-      <ElementList :elements="testElements" :inputs="testInputs" />
+      <ElementList
+        :elements="testElements"
+        :inputs="testInputs"
+        :push-changes="pushChanges"
+      />
       inputs: {{ testInputs }}<br />
       peek: {{ peek }}
     </div>
@@ -241,20 +235,7 @@ export default {
           ],
           GUESSER: [{ type: 'TEXT', label: 'Waiting for clues...' }],
           // TODO: Remove collisions
-          // Or: coupld be computed check in the next entry
-          /*
-              Unresolved:
-              - What is the structure of inputs object?
-              - What is the query language for inputs?
-              - How can we store code to be executed with the Vue this context?
-                - Eval with `this`?
-                - Or maybe just pass Vue object into the eval'd code
-              - How does the computed vue function run here?
-                - Option 1: Callback on certain events
-                - Option 2: Vue-like computed dependency hook? Is this the same or different?
-                - Option 3: Every clock tick? Or 30ms delay? Game render-engine style
-
-              */
+          // Or: could be computed check in the next entry
           /*           rules: () => {
             if (inputs('CLUEING.@CLUER').every()) {
               this.room.round.state = 'GUESSING'
@@ -358,12 +339,9 @@ export default {
       // Expand query strings by replacing `@ROLE` with the actual roles
       // E.g. 'CLUEING.@CLUER' => ['CLUEING.Austin', 'CLUEING.Alex'] => ['cat', 'dog']
       const parts = query.split('\.').map(this.lookup)
-      console.log('parts', parts)
       return powerset(parts).map((array) =>
         getIn(this.room, `round.inputs.${array.join('.')}`)
       )
-      // TODO: TEST
-      // TODO: use getIn to extract actual input
     },
     lookup(part) {
       if (part.startsWith('@')) {
@@ -375,7 +353,11 @@ export default {
       }
       // Not @ROLE syntax, so just return the original string wrapped in an array
       return [part]
-      // TODO: TEST
+    },
+    async pushChanges() {
+      // Could also scope down with the element's label
+      const path = `round.inputs.${this.room.state}.${this.player.name}`
+      await this.saveRoom(path)
     },
   },
 }
