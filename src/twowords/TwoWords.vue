@@ -51,13 +51,18 @@
       Controls:
       <button class="button" @click="nextStage">Next Stage</button>
       <button class="button" @click="resetRoom">Reset Room</button>
-      <ElementList
-        :elements="testElements"
-        :inputs="testInputs"
-        :push-changes="pushChanges"
-      />
+      <br /><br />
+      <div class="box">
+        <ElementList
+          :elements="testElements"
+          :inputs="testInputs"
+          :push-changes="pushChanges"
+        />
+      </div>
       inputs: {{ testInputs }}<br />
-      peek: {{ peek }}
+      <div style="white-space: pre-wrap">
+        peek: {{ JSON.stringify(peek, null, 2) }}
+      </div>
     </div>
   </BigColumn>
 </template>
@@ -200,7 +205,7 @@ function makeNewRoom(name) {
 
 function onJoin(room, player) {
   // TODO: Handle role assignment in config
-  room.people[player.name].role = 'CLUER'
+  room.people[player.name].role = player.name === 'Austin' ? 'GUESSER' : 'CLUER'
 }
 
 export default {
@@ -230,18 +235,13 @@ export default {
             { type: 'TEXT_INPUT', label: 'Enter your clue' },
             { type: 'BUTTON', label: 'Submit clue!' },
             { type: 'BREAK' },
+            { type: 'BREAK' },
             { type: 'BUTTON', label: 'Skip' },
             { type: 'TEXT', label: `You typed in: [[Enter your clue]]` },
           ],
           GUESSER: [{ type: 'TEXT', label: 'Waiting for clues...' }],
           // TODO: Remove collisions
           // Or: could be computed check in the next entry
-          /*           rules: () => {
-            if (inputs('CLUEING.@CLUER').every()) {
-              this.room.round.state = 'GUESSING'
-            }
-          },
-    */
         },
         GUESSING: {
           CLUER: [{ type: 'TEXT', label: 'Waiting for GUESSER to guess...' }],
@@ -249,12 +249,6 @@ export default {
             { type: 'TEXT_INPUT', label: 'Enter your guess' },
             { type: 'BUTTON', label: 'Submit guess!' },
           ],
-          /* rules: () => {
-            if (inputs('GUESSING.@GUESSER').every()) {
-              this.room.round.state = 'DONE'
-              // TODO: Check for correct
-            }
-          }, */
         },
         DONE: {
           CLUER: [
@@ -318,9 +312,8 @@ export default {
   },
   computed: {
     testElements() {
-      // const role = this.room.people[this.player.name].role;
-      const role = 'CLUER'
-      return this.views[this.room.state][role]
+      const role = this.room.people[this.player.name]?.role
+      return this.views[this.room.state][role] || []
     },
     testInputs() {
       const path = `round.inputs.${this.room.state}.${this.player.name}`
@@ -330,7 +323,7 @@ export default {
       return getIn(this.room, path)
     },
     peek() {
-      return this.inputs('CLUEING.@CLUER.Submit clue!')
+      return this.inputs('CLUEING.@CLUER.Submit clue!').every(Boolean)
     },
   },
   methods: {
@@ -356,8 +349,33 @@ export default {
     },
     async pushChanges() {
       // Could also scope down with the element's label
-      const path = `round.inputs.${this.room.state}.${this.player.name}`
-      await this.saveRoom(path)
+      const changes = [`round.inputs.${this.room.state}.${this.player.name}`]
+
+      if (this.room.state === 'CLUEING') {
+        if (this.inputs('CLUEING.@CLUER.Submit clue!').every(Boolean)) {
+          this.room.state = 'GUESSING'
+          changes.push('state')
+          // TODO: check for collisions, etc
+        }
+      } else if (this.room.state === 'GUESSING') {
+        if (this.inputs('GUESSING.@GUESSER.Submit guess!').every(Boolean)) {
+          this.room.state = 'DONE'
+          changes.push('state')
+        }
+      } else if (this.room.state === 'DONE') {
+        const anyone = this.inputs('DONE.@CLUER.Next round').concat(
+          this.inputs('DONE.@GUESSER.Next round')
+        )
+        if (anyone.some(Boolean)) {
+          this.room.state = 'CLUEING'
+          this.room.history.push(this.room.round)
+          this.room.round = {}
+          changes.pop() // Remove the original input change; it's already in history
+          changes.push('state', 'history', 'round')
+        }
+      }
+
+      await this.saveRoom(...changes)
     },
   },
 }
