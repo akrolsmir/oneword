@@ -8,9 +8,14 @@ export default {
     TextInput,
     Button,
   },
-  // Array of JSON elements to convert to a working <div>,
-  // automatically tracking input values in the prop
-  props: ['elements', 'inputs'],
+  props: {
+    // Array of JSON elements to convert to a working <div>
+    elements: Array,
+    // Automatically tracks input models
+    inputs: Object,
+    // Callback to write changes to Firestore
+    pushChanges: Function,
+  },
   render() {
     return this.renderElements(this.elements)
   },
@@ -26,16 +31,18 @@ export default {
             label: element.label,
             // TODO: Combined key using both element type and input?
             modelValue: this.inputs[element.label],
-            'onUpdate:modelValue': (event) => {
+            'onUpdate:modelValue': async (event) => {
               this.inputs[element.label] = event
+              await this.pushChanges()
             },
           })
         case 'BUTTON':
           return h(Button, {
             label: element.label,
             modelValue: this.inputs[element.label],
-            'onUpdate:modelValue': (event) => {
+            'onUpdate:modelValue': async (event) => {
               this.inputs[element.label] = true
+              await this.pushChanges()
             },
           })
         case 'BREAK':
