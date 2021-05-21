@@ -351,29 +351,39 @@ export default {
       // Could also scope down with the element's label
       const changes = [`round.inputs.${this.room.state}.${this.player.name}`]
 
-      if (this.room.state === 'CLUEING') {
-        if (this.inputs('CLUEING.@CLUER.Submit clue!').every(Boolean)) {
-          this.room.state = 'GUESSING'
+      // Code should be scoped down to:
+      // this.room
+      // this.inputs
+      // changes => TODO this should just be a `setRoom(path, change)`
+      // Can also whitelist other primitives (e.g. Boolean)
+      const sandbox = { inputs: this.inputs, room: this.room, changes, Boolean }
+
+      const rules = {
+        CLUEING: `if (inputs('CLUEING.@CLUER.Submit clue!').every(Boolean)) {
+          room.state = 'GUESSING'
           changes.push('state')
           // TODO: check for collisions, etc
-        }
-      } else if (this.room.state === 'GUESSING') {
-        if (this.inputs('GUESSING.@GUESSER.Submit guess!').every(Boolean)) {
-          this.room.state = 'DONE'
+        }`,
+        GUESSING: `if (inputs('GUESSING.@GUESSER.Submit guess!').every(Boolean)) {
+          room.state = 'DONE'
           changes.push('state')
-        }
-      } else if (this.room.state === 'DONE') {
-        const anyone = this.inputs('DONE.@CLUER.Next round').concat(
-          this.inputs('DONE.@GUESSER.Next round')
+        }`,
+        DONE: `const anyone = inputs('DONE.@CLUER.Next round').concat(
+          inputs('DONE.@GUESSER.Next round')
         )
         if (anyone.some(Boolean)) {
-          this.room.state = 'CLUEING'
-          this.room.history.push(this.room.round)
-          this.room.round = {}
+          room.state = 'CLUEING'
+          room.history.push(room.round)
+          room.round = {}
           changes.pop() // Remove the original input change; it's already in history
           changes.push('state', 'history', 'round')
-        }
+        }`,
       }
+      const compiledRules = Object.fromEntries(
+        Object.entries(rules).map(([state, code]) => [state, compileCode(code)])
+      )
+
+      compiledRules[this.room.state](sandbox)
 
       await this.saveRoom(...changes)
     },
@@ -390,5 +400,26 @@ function powerset(parts) {
   const first = parts[0]
   const rest = powerset(parts.slice(1))
   return first.flatMap((f) => rest.map((r) => [f].concat(r)))
+}
+
+// Eval code, but only accessing constants from the provided sandbox
+// From https://blog.risingstack.com/writing-a-javascript-framework-sandboxed-code-evaluation/
+const sandboxProxies = new WeakMap()
+
+function compileCode(src) {
+  src = 'with (sandbox) {' + src + '}'
+  const code = new Function('sandbox', src)
+
+  const has = (target, key) => true
+  const get = (target, key) =>
+    key === Symbol.unscopables ? undefined : target[key]
+
+  return function (sandbox) {
+    if (!sandboxProxies.has(sandbox)) {
+      const sandboxProxy = new Proxy(sandbox, { has, get })
+      sandboxProxies.set(sandbox, sandboxProxy)
+    }
+    return code(sandboxProxies.get(sandbox))
+  }
 }
 </script>
