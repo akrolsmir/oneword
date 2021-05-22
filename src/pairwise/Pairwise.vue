@@ -257,12 +257,12 @@
       <!-- TODO consider adding limit of 10 players so games aren't too big? -->
       <!-- If there are enough players to play -->
       <div v-else>
-        <!-- If player does not have an entry in room's wordsAndClues, prompt to enter -->
-        <!-- This works because we don't re-enter state=CLUER_PICKING until wordsAndClues becomes empty (theoretically) -->
+        <!-- If player does not have an entry in room's wordsAndClues, prompt to submit word and clue-->
+        <!-- This works because we don't re-enter state=CLUER_PICKING until wordsAndClues becomes empty -->
         <div v-if="!room.wordsAndClues[player.name]">
-          <div class="box">
+          <div class="box clearfix">
             <h2 class="fancy has-text-centered" role="alert">
-              Pick a phrase among the following, and write a text clue that
+              Pick a phrase among the following, and construct a clue that
               describes it in the clue box!
               <br /><br />
               <button
@@ -276,13 +276,92 @@
               </button>
             </h2>
             <br />
-            <label class="label"
-              >Your clue
-              <span v-if="player.showPickClueWarning" class="has-text-danger">
-                (pick a pair AND write a clue!)
-              </span>
-            </label>
-            <div class="field has-addons">
+            <div class="tabs is-right">
+              <ul>
+                <li
+                  :class="{ 'is-active': !player.enablePictureClue }"
+                  v-on:click="toggleClueType('text')"
+                >
+                  <a>Text Clue</a>
+                </li>
+                <li
+                  :class="{ 'is-active': player.enablePictureClue }"
+                  v-on:click="toggleClueType('picture')"
+                >
+                  <a>Picture Clue</a>
+                </li>
+              </ul>
+            </div>
+            <div v-show="player.enablePictureClue" class="container">
+              <section>
+                <div class="row">
+                  <!-- <div class="two-thirds column"> -->
+                  <div ref="sketchpad"></div>
+                  <!-- </div> -->
+                  <!-- <div class="toolbox one-third column">
+                    <label for="line-color-input">Set Line Color</label>
+                    <input
+                      class="u-full-width"
+                      type="text"
+                      value="#000000"
+                      id="line-color-input"
+                    />
+                    <label for="line-size-input">Set Line Size</label>
+                    <input
+                      class="u-full-width"
+                      type="number"
+                      value="5"
+                      id="line-size-input"
+                    />
+                    <div class="row">
+                      <div class="one-half column">
+                        <button class="u-full-width" id="undo">Undo</button>
+                      </div>
+                      <div class="one-half column">
+                        <button class="u-full-width" id="redo">Redo</button>
+                      </div>
+                      <button class="u-full-width no-margin" id="clear">
+                        Clear
+                      </button>
+                      <div class="docs-section text-center">
+                        <p>Read and write sketchpad data</p>
+                        <div class="row">
+                          <div class="one-half column">
+                            <a
+                              class="button u-full-width"
+                              id="uploadJson"
+                              download="image.png"
+                              >Upload JSON</a
+                            >
+                            <input
+                              type="file"
+                              id="uploadJsonInput"
+                              style="position: fixed; top: -100em"
+                              accept="application/json"
+                            />
+                          </div>
+                          <div class="one-half column">
+                            <a
+                              class="button u-full-width"
+                              id="downloadJson"
+                              download="data.json"
+                              >Download JSON</a
+                            >
+                          </div>
+                          <a
+                            class="button u-full-width"
+                            id="downloadPng"
+                            download="image.png"
+                            >Download PNG</a
+                          >
+                        </div>
+                      </div> -->
+                  <!-- </div>
+                  </div> -->
+                </div>
+              </section>
+            </div>
+            <div v-show="!player.enablePictureClue">
               <div class="control is-expanded">
                 <input
                   class="input"
@@ -294,10 +373,19 @@
                   :disabled="!room.players.includes(player.name)"
                 />
               </div>
+            </div>
+            <span v-if="player.showPickClueWarning" class="has-text-danger">
+              (Pick a word pair AND construct a clue!)
+            </span>
+            <!-- todo: better alternative to visibility hidden -->
+            <span v-else style="visibility: hidden">
+              (Pick a word pair AND construct a clue!)
+            </span>
+            <div>
               <div class="control">
                 <!-- TODO: add tool tip to show why button is disabled https://wikiki.github.io/elements/tooltip/ -->
                 <button
-                  class="button"
+                  class="button is-pulled-right"
                   @click="submitClue"
                   :disabled="isClueSubmitDisabled()"
                 >
@@ -305,7 +393,6 @@
                 </button>
               </div>
             </div>
-            <div class="fancy small">Drawing-based clues coming soon!</div>
           </div>
         </div>
         <!-- After submitting clues, but not everyone has done so yet -->
@@ -327,13 +414,30 @@
         <div v-if="room.currentRound.clueGiver != player.name">
           <h2 class="fancy has-text-centered" role="alert">
             Your clue from {{ room.currentRound.clueGiver }} is:
-            <strong
-              >"{{
-                room.wordsAndClues[room.currentRound.clueGiver]
-                  ? room.wordsAndClues[room.currentRound.clueGiver].clue
-                  : 'did not write a clue :/'
-              }}"</strong
-            >
+            <div v-if="!room.wordsAndClues[room.currentRound.clueGiver]">
+              <strong> did not write a clue :/ </strong>
+            </div>
+            <div v-else>
+              <div
+                v-if="
+                  isDataURL(
+                    room.wordsAndClues[room.currentRound.clueGiver].clue
+                  )
+                "
+              >
+                <img
+                  v-bind:src="
+                    room.wordsAndClues[room.currentRound.clueGiver].clue
+                  "
+                  alt="Clue"
+                />
+              </div>
+              <div v-else>
+                <strong>
+                  {{ room.wordsAndClues[room.currentRound.clueGiver].clue }}
+                </strong>
+              </div>
+            </div>
           </h2>
           <br />
           <h2 class="has-text-centered" role="alert">
@@ -400,12 +504,20 @@
             Waiting for other players to toss in decoys based on your clue...
           </h2>
           <br />
-          <div class="has-text-centered">
-            <strong>{{
-              room.wordsAndClues[room.currentRound.clueGiver]
-                ? room.wordsAndClues[room.currentRound.clueGiver].clue
-                : 'did not write a clue :/'
-            }}</strong>
+          <div
+            v-if="
+              isDataURL(room.wordsAndClues[room.currentRound.clueGiver].clue)
+            "
+          >
+            <img
+              v-bind:src="room.wordsAndClues[room.currentRound.clueGiver].clue"
+              alt="Clue"
+            />
+          </div>
+          <div v-else>
+            <strong>
+              {{ room.wordsAndClues[room.currentRound.clueGiver].clue }}
+            </strong>
           </div>
           <h2 class="fancy has-text-centered" role="alert">
             <span
@@ -477,11 +589,23 @@
             Your clue from {{ room.currentRound.clueGiver }}:
           </h2>
           <div class="fancy has-text-centered newline">
-            {{
-              room.wordsAndClues[room.currentRound.clueGiver]
-                ? room.wordsAndClues[room.currentRound.clueGiver].clue
-                : 'did not write a clue :/'
-            }}
+            <div
+              v-if="
+                isDataURL(room.wordsAndClues[room.currentRound.clueGiver].clue)
+              "
+            >
+              <img
+                v-bind:src="
+                  room.wordsAndClues[room.currentRound.clueGiver].clue
+                "
+                alt="Clue"
+              />
+            </div>
+            <div v-else>
+              <strong>
+                {{ room.wordsAndClues[room.currentRound.clueGiver].clue }}
+              </strong>
+            </div>
           </div>
         </div>
       </div>
@@ -572,6 +696,8 @@ import {
 import { inject } from 'vue'
 import { randomWord } from '../words/lists'
 import { useRoom } from '../composables/useRoom'
+import Sketchpad from 'responsive-sketchpad'
+// import isPng from 'is-png';
 
 function makeNewRoom(name) {
   return {
@@ -612,11 +738,15 @@ function makeNewRoom(name) {
   }
 }
 
-function initializePlayerOnJoin(room, player) {
+function initializePlayerOnJoin(_room, player) {
+  // enable picture-based clues
+  player.enablePictureClue = false
+  // dummy sketchpad
+  player.sketchpad = ''
   // cache's player's choice for word on the player object, to reduce room update freq
   player.currentWord = ''
   // cache's player's choice for clue on the player object, to reduce room update freq
-  player.currentClue = ''
+  player.currentClue = '' /** player's clue can be either String or JSON */
   // whether to show pick pair AND write clue warning, used to guard clue submit
   player.showPickClueWarning = false
   // how many entries in the pairList to pick out real pair
@@ -653,6 +783,9 @@ export default {
     const roomHelpers = useRoom(user, makeNewRoom, initializePlayerOnJoin)
     return Object.assign(roomHelpers, { user })
   },
+  mounted() {
+    this.registerSketchPad()
+  },
   data() {
     return {
       showShareModal: false,
@@ -666,6 +799,8 @@ export default {
       if (state === 'CLUER_PICKING') {
         this.player.currentWord = ''
         this.player.currentClue = ''
+        // conditional ref element 'sketchpad' previously not rendered in vue-if/else
+        this.registerSketchPad()
       }
       if (state === 'TOSS_IN_DECOYS') {
         // reset decoys wordlist
@@ -677,6 +812,14 @@ export default {
         this.player.decoyAdj = ''
         this.player.decoyNoun = ''
       }
+    },
+    'room.players.length'(newLength, oldLength) {
+      // if player length didn't trigger re-render, then don't register `sketchpad`
+      if (oldLength >= 3 || newLength < 3) {
+        return
+      }
+      // conditional ref element 'sketchpad' previously not rendered in vue-if/else
+      this.registerSketchPad()
     },
   },
   computed: {
@@ -771,6 +914,16 @@ export default {
       // otherwise in TOSS_IN_DECOYS and GUESSING phase, guesser is the clueGiver
       return this.room.currentRound.clueGiver === playerName
     },
+    toggleClueType(type) {
+      if (type === 'text') {
+        this.player.enablePictureClue = false
+      }
+      if (type === 'picture') {
+        this.player.enablePictureClue = true
+      }
+      this.player.currentClue = ''
+      this.player.showPickClueWarning = ''
+    },
     isClueSubmitDisabled() {
       if (!this.room.players.includes(this.player.name)) {
         return true
@@ -779,13 +932,54 @@ export default {
     },
     async cluerSelectsWord(w) {
       this.player.currentWord = w
+      this.player.showPickClueWarning = false
+    },
+    // method simply registers the ref 'sketchpad' w/ Sketchpad component
+    registerSketchPad() {
+      // only register if `sketchpad` is conditionally rendered (dup logic as in template)
+      if (
+        this.room.currentRound.state !== 'CLUER_PICKING' ||
+        this.room.players.length < 3 ||
+        this.room.wordsAndClues[this.player.name]
+      ) {
+        return
+      }
+      // $nextTick ensures code is executed after the next DOM update cycle.
+      // https://stackoverflow.com/questions/53578419
+      this.$nextTick(function () {
+        if (this.$refs.sketchpad) {
+          // register a new sketchpad
+          this.player.sketchpad = new Sketchpad(this.$refs.sketchpad, {
+            backgroundColor: '#FFFFFF',
+            line: { size: 5 },
+            width: 500,
+            height: 350,
+          })
+        } else {
+          console.log('sketchpad does not exist')
+        }
+      })
     },
     async submitClue() {
-      // Show warning if attempting to submit w/ empty word and/or clue
-      if (!this.player.currentWord || !this.player.currentClue) {
+      // Show warning if clue giver hasn't picked a word yet
+      if (!this.player.currentWord) {
         this.player.showPickClueWarning = true
         return
       }
+
+      // Clue is picture based, allow empty sketchpad to be stringified
+      if (this.player.enablePictureClue) {
+        const picture = this.player.sketchpad.canvas.toDataURL('image/png')
+        this.player.currentClue = picture
+      }
+      // clue is text based, so check if it's empty and disallow if so
+      else {
+        if (!this.player.currentClue) {
+          this.player.showPickClueWarning = true
+          return
+        }
+      }
+
       // reset to false if previously it was true :)
       this.player.showPickClueWarning = false
 
@@ -828,6 +1022,10 @@ export default {
 
       // Store this for user profiles, but don't await for the result
       updateUserGame(this.user.id, this.room.name)
+    },
+    isDataURL(clue) {
+      const regex = /^\s*data:([a-z]+\/[a-z0-9-+.]+(;[a-z-]+=[a-z0-9-]+)?)?(;base64)?,([a-z0-9!$&',()*+;=\-._~:@\/?%\s]*)\s*$/i
+      return !!clue.match(regex)
     },
     isDecoySubmitDisabled() {
       if (!this.room.players.includes(this.player.name)) {
@@ -1136,5 +1334,12 @@ function nextClueGiver(lastGuesser, players) {
   overflow: hidden;
   transition: max-height 0.2s ease-out;
   background-color: #f1f1f1;
+}
+
+.clearfix::after {
+  content: ' ';
+  display: block;
+  height: 0;
+  clear: both;
 }
 </style>
