@@ -26,6 +26,7 @@
     "firebaseui": "^4.7.1",
     "fontawesome": "^5.6.3",
     "pluralize": "^8.0.0",
+    "responsive-sketchpad": "^1.2.2",
     "rxjs": "^6.6.7",
     "vue": "^3.0.5",
     "vue-router": "4",

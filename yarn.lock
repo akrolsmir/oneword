@@ -1784,6 +1784,11 @@ resolve@^1.19.0:
     is-core-module "^2.1.0"
     path-parse "^1.0.6"
 
+responsive-sketchpad@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/responsive-sketchpad/-/responsive-sketchpad-1.2.2.tgz#50938f1b4e56fcc5e2033f0b954aa4b99baa0a16"
+  integrity sha512-Qli/n6D+7vcIlUy+2gB0qDGO5o7VVvq/SU8ftYWquS3nKb7QNez69SDPgvCzLIjgXQCD/9ezJkhCGeGSjflezw==
+
 rollup@^2.38.5:
   version "2.42.0"
   resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.42.0.tgz#444ce20a45614099decdd786f2a6fcd6c2240b08"
