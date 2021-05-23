@@ -697,7 +697,6 @@ import { inject } from 'vue'
 import { randomWord } from '../words/lists'
 import { useRoom } from '../composables/useRoom'
 import Sketchpad from 'responsive-sketchpad'
-// import isPng from 'is-png';
 
 function makeNewRoom(name) {
   return {
@@ -746,7 +745,7 @@ function initializePlayerOnJoin(_room, player) {
   // cache's player's choice for word on the player object, to reduce room update freq
   player.currentWord = ''
   // cache's player's choice for clue on the player object, to reduce room update freq
-  player.currentClue = '' /** player's clue can be either String or JSON */
+  player.currentClue = '' /** player's clue can be either String or Sketchpad PNG */
   // whether to show pick pair AND write clue warning, used to guard clue submit
   player.showPickClueWarning = false
   // how many entries in the pairList to pick out real pair
