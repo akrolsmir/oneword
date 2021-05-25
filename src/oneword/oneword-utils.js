@@ -88,12 +88,13 @@ export function nextWord(history, category = 'nouns', customWordList = []) {
   let word
   let loops = 0
   do {
-    loops++
     if (loops > 10000) {
       return "You're out of custom words..."
     }
-    const seed = seedFromHistory(history)
+    // After the initial (0th) loop, keep updating seed to create new words
+    const seed = seedFromHistory(history) + (loops || '')
     word = randomWord(category, customWordList, seed)
+    loops++
   } while (history.map((round) => round.word).includes(word))
   return word
 }
