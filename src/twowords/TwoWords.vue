@@ -9,33 +9,44 @@
     </template>
 
     <div>
-      <h1 class="title">Game</h1>
-      <h2 class="subtitle">State: {{ room.state }}</h2>
-      <h2 class="subtitle">Players: {{ room.players }}</h2>
-
-      Controls:
-      <button class="button" @click="nextStage">Next Stage</button>
-      <button class="button" @click="resetRoom">Reset Room</button>
-      <br /><br />
-      <div class="box">
-        <ElementList
-          :elements="gameElements"
-          :inputs="gameInputs"
-          :push-changes="pushChanges"
-        />
-      </div>
-      inputs: {{ gameInputs }}<br />
-      <div style="white-space: pre-wrap">
-        peek: {{ JSON.stringify(peek, null, 2) }}
-      </div>
-
-      <label class="checkbox">
+      <label class="checkbox mb-4">
         <input type="checkbox" v-model="showEditor" />
         Show Editor</label
       >
 
-      <div v-show="showEditor" id="editor" class="mt-6">
+      <div id="game" v-if="!showEditor">
+        <h1 class="title">Game</h1>
+        <h2 class="subtitle">State: {{ room.state }}</h2>
+        <h2 class="subtitle">Players: {{ room.players }}</h2>
+
+        Controls:
+        <button class="button" @click="nextStage">Next Stage</button>
+        <button class="button" @click="resetRoom">Reset Room</button>
+        <br /><br />
+        <div class="box">
+          <ElementList
+            :elements="gameElements"
+            :inputs="gameInputs"
+            :push-changes="pushChanges"
+          />
+        </div>
+        inputs: {{ gameInputs }}<br />
+        <div style="white-space: pre-wrap">
+          peek: {{ JSON.stringify(peek, null, 2) }}
+        </div>
+      </div>
+
+      <div v-show="showEditor" id="editor">
         <h1 class="title">Editor</h1>
+
+        <span class="subtitle">Game Preview</span>
+        <div class="box">
+          <ElementList
+            :elements="editorElements"
+            :inputs="editorInputs"
+            :push-changes="() => {}"
+          />
+        </div>
 
         <label class="subtitle">Player Name</label>
         <input class="input mb-4" v-model="editor.player.name" />
@@ -59,15 +70,6 @@
         </div>
         <br />
         <br />
-        <span class="subtitle">Game Preview</span>
-        <div class="box">
-          <ElementList
-            :elements="editorElements"
-            :inputs="editorInputs"
-            :push-changes="() => {}"
-          />
-        </div>
-
         <label class="subtitle">Rules for {{ editor.state }}</label>
         <prism-editor
           class="my-editor"
@@ -271,7 +273,7 @@ if (anyone.some(Boolean)) {
 }`,
         },
       },
-      showEditor: true,
+      showEditor: false,
       editor: {
         state: 'CLUEING',
         role: 'CLUER',
