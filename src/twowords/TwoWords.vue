@@ -8,45 +8,9 @@
       />
     </template>
 
-    <div class="fullscreen">
+    <div>
       <h1 class="subtitle">State: {{ room.state }}</h1>
       <h1 class="subtitle">Players: {{ room.players }}</h1>
-
-      <div v-if="room.state === 'PREVIEW'">
-        Here are the two words on your spectrum! Ready to go?
-        <!-- Show both areas but not the target -->
-      </div>
-
-      <div v-if="room.state === 'CLUE1'">
-        <div v-if="player.name === room.round.cluer">
-          You are trying to clue your team! <br />
-          Target: {{ room.round.target }} <br />
-          Clue:
-          <input
-            class="input"
-            v-model="room.round.clue1"
-            placeholder="Give a clue"
-          />
-        </div>
-        <div v-else>Waiting for {{ room.round.cluer }} to give a clue...</div>
-        <!-- Show the target & an entry box for the cluer -->
-      </div>
-
-      <div v-if="room.state === 'GUESS2'">
-        <div v-if="player.name === room.round.cluer">
-          Waiting for your team to interpret the clue...
-        </div>
-        <div v-else>
-          Guess what {{ room.round.cluer }} meant by "{{ room.round.clue1 }}"
-        </div>
-        <!-- Show both areas but not the target -->
-      </div>
-
-      <div v-if="room.state === 'END'">
-        Your team guessed {{ room.round.clue1 }}, and the target was
-        {{ room.round.target }}
-        <!-- Show the result -->
-      </div>
 
       Controls:
       <button class="button" @click="nextStage">Next Stage</button>
@@ -71,19 +35,6 @@
 .background {
   background-color: #e0e7ff;
 }
-
-.fullscreen {
-  height: 100vh;
-}
-
-/* Vertical slider from https://stackoverflow.com/a/15935838 */
-input[type='range'][orient='vertical'] {
-  writing-mode: bt-lr; /* IE */
-  -webkit-appearance: slider-vertical; /* WebKit */
-  width: 8px;
-  height: 40vh;
-  padding: 0 5px;
-}
 </style>
 
 <script>
@@ -106,59 +57,6 @@ import {
   getIn,
 } from '../utils'
 import { nouns } from '../words/parts-of-speech'
-
-/**
- * metadata: {...}
- *
- * rules: {
- *   goal: {
- *     type: 'COLLAB' // or 'COMPETE' or 'TEAM'
- *     end: 'POINTS' // or 'ROUNDS'
- *     target: 30 // or 13 rounds
- *   },
- *   stages: ["PREVIEW", "CLUE1", "GUESS1", "CLUE2", "GUESS2", "END"],
- *   roles: {
- *      CLUER: '1'
- *      GUESSER: 'N'
- *      // TODO: different role assignments per player count, ala Avalon
- *   },
- *   nextRole: () => { JS code...}
- *   views: {
- *     CLUE1: {
- *       CLUER: { cluerView... }
- *       GUESSER: { guesserView... }
- *     }
- *     ...
- *     transition: () => { JS code... }
- *   }
- *   scoring: (player, history) => {
- *     for (round in history) => {
- *       round.inputs.CLUE1.CLUER == round.inputs.GUESS1.GUESSER
- *   or  round.inputs.CLUE1[player] == round.inputs.GUESS1
- *     }
- *   }
- * }
- *
- * // This is basically Streamlit
- * view: [
- *   // outputs...
- *   {
- *     type: TEXT
- *     content: "Hello {{ player }}. You are cluing for {{ word }}"
- *   }
- *   // inputs...
- *   {
- *     type: TEXT_INPUT,
- *     label: 'Submit your clue',
- *   }
- *   {
- *     type: BUTTON,
- *     label: 'Submit'
- *   }
- *   // Could combine into "SUBMIT_TEXT_INPUT" primitive
- * ]
- *
- */
 
 function makeNewRoom(name) {
   return {
@@ -240,8 +138,6 @@ export default {
             { type: 'TEXT', label: `You typed in: [[Enter your clue]]` },
           ],
           GUESSER: [{ type: 'TEXT', label: 'Waiting for clues...' }],
-          // TODO: Remove collisions
-          // Or: could be computed check in the next entry
         },
         GUESSING: {
           CLUER: [{ type: 'TEXT', label: 'Waiting for GUESSER to guess...' }],
@@ -259,29 +155,23 @@ export default {
             { type: 'TEXT', label: 'GUESSER, you are now done.' },
             { type: 'BUTTON', label: 'Next round' },
           ],
-          /* rules: () => {
-            if (inputs('DONE.@GUESSER', 'DONE.@CLUER').every()) {
-              this.room.round.state = 'CLUEING'
-              // TODO: Generate new word
-            }
-          }, */
         },
       },
       round: {
         inputs: {},
       },
-      // rules: {
-      //   goal: {
-      //     type: 'COLLAB',
-      //     end: 'ROUNDS',
-      //     target: 13,
-      //   },
-      //   stages: ['CLUEING', 'GUESSING', 'DONE'],
-      //   roles: {
-      //     CLUER: 1,
-      //     GUESSER: 'REST',
-      //   },
-      // },
+      rules: {
+        goal: {
+          type: 'COLLAB',
+          end: 'ROUNDS',
+          target: 13,
+        },
+        stages: ['CLUEING', 'GUESSING', 'DONE'],
+        roles: {
+          CLUER: 1,
+          GUESSER: 'REST',
+        },
+      },
       // transitions: {
       //   DONE: () => {
       //     // TODO: Generate new word, move random player
@@ -290,24 +180,6 @@ export default {
       //     // or Eval: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval#never_use_eval!
       //   },
       // },
-      /*
-      Pseudocode for One Word game logic:
-      CLUEING:
-        Show input
-        Show submit button
-        WHEN all cluers submitted, then state = GUESSING
-          - Run on client side
-            - Idempotent
-      GUESSING:
-        Show unique words ***
-        Show input
-        Show submit button
-        WHEN guesser submitted, then state = DONE
-      DONE:
-        Show success or failure
-        show next button
-        WHEN next clicked, then state = CLUEING
-      */
     }
   },
   computed: {
@@ -348,7 +220,7 @@ export default {
       return [part]
     },
     async pushChanges() {
-      // Could also scope down with the element's label
+      // Could also narrow down with the element's label
       const changes = [`round.inputs.${this.room.state}.${this.player.name}`]
 
       // Code should be scoped down to:
@@ -358,6 +230,8 @@ export default {
       // Can also whitelist other primitives (e.g. Boolean)
       const sandbox = { inputs: this.inputs, room: this.room, changes, Boolean }
 
+      // Rules should be evaluated initially, and when each input is changed
+      // NEXT: UI for each screen of the game, with a JS rules editor (and eval)
       const rules = {
         CLUEING: `if (inputs('CLUEING.@CLUER.Submit clue!').every(Boolean)) {
           room.state = 'GUESSING'
