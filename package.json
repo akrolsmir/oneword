@@ -26,10 +26,12 @@
     "firebaseui": "^4.7.1",
     "fontawesome": "^5.6.3",
     "pluralize": "^8.0.0",
+    "prismjs": "^1.23.0",
     "responsive-sketchpad": "^1.2.2",
     "rxjs": "^6.6.7",
     "vue": "^3.0.5",
     "vue-i18n": "^9.1.6",
+    "vue-prism-editor": "^2.0.0-alpha.2",
     "vue-router": "4",
     "vue-tippy": "^6.0.0-alpha.25",
     "vue3-carousel": "^0.1.15"
