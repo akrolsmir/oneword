@@ -9,8 +9,9 @@
     </template>
 
     <div>
-      <h1 class="subtitle">State: {{ room.state }}</h1>
-      <h1 class="subtitle">Players: {{ room.players }}</h1>
+      <h1 class="title">Game</h1>
+      <h2 class="subtitle">State: {{ room.state }}</h2>
+      <h2 class="subtitle">Players: {{ room.players }}</h2>
 
       Controls:
       <button class="button" @click="nextStage">Next Stage</button>
@@ -18,14 +19,52 @@
       <br /><br />
       <div class="box">
         <ElementList
-          :elements="testElements"
-          :inputs="testInputs"
+          :elements="gameElements"
+          :inputs="gameInputs"
           :push-changes="pushChanges"
         />
       </div>
-      inputs: {{ testInputs }}<br />
+      inputs: {{ gameInputs }}<br />
       <div style="white-space: pre-wrap">
         peek: {{ JSON.stringify(peek, null, 2) }}
+      </div>
+
+      <label class="checkbox">
+        <input type="checkbox" v-model="showEditor" />
+        Show Editor</label
+      >
+
+      <div v-show="showEditor" id="editor" class="mt-6">
+        <h1 class="title">Editor</h1>
+
+        <label class="subtitle">Player Name</label>
+        <input class="input mb-4" v-model="editor.player.name" />
+
+        <div class="select is-multiple mr-4">
+          <label class="subtitle">State</label>
+          <select v-model="editor.state" multiple>
+            <option v-for="state in rules.states" :key="state">
+              {{ state }}
+            </option>
+          </select>
+        </div>
+
+        <div class="select is-multiple">
+          <label class="subtitle">Role</label>
+          <select v-model="editor.role" multiple>
+            <option v-for="role in Object.keys(rules.roles)" :key="role">
+              {{ role }}
+            </option>
+          </select>
+        </div>
+
+        <div class="box mt-4">
+          <ElementList
+            :elements="editorElements"
+            :inputs="editorInputs"
+            :push-changes="() => {}"
+          />
+        </div>
       </div>
     </div>
   </BigColumn>
@@ -166,10 +205,18 @@ export default {
           end: 'ROUNDS',
           target: 13,
         },
-        stages: ['CLUEING', 'GUESSING', 'DONE'],
+        states: ['CLUEING', 'GUESSING', 'DONE'],
         roles: {
           CLUER: 1,
           GUESSER: 'REST',
+        },
+      },
+      showEditor: true,
+      editor: {
+        state: 'CLUEING',
+        role: 'CLUER',
+        player: {
+          name: 'Tester',
         },
       },
       // transitions: {
@@ -183,11 +230,11 @@ export default {
     }
   },
   computed: {
-    testElements() {
+    gameElements() {
       const role = this.room.people[this.player.name]?.role
       return this.views[this.room.state][role] || []
     },
-    testInputs() {
+    gameInputs() {
       const path = `round.inputs.${this.room.state}.${this.player.name}`
       if (!getIn(this.room, path)) {
         setIn(this.room, path, {})
@@ -195,7 +242,20 @@ export default {
       return getIn(this.room, path)
     },
     peek() {
-      return this.inputs('CLUEING.@CLUER.Submit clue!').every(Boolean)
+      // Just used for debugging
+      return {}
+      // return this.room.editor
+      // return this.inputs('CLUEING.@CLUER.Submit clue!').every(Boolean)
+    },
+    editorElements() {
+      return this.views[this.editor.state]?.[this.editor.role] || []
+    },
+    editorInputs() {
+      const path = `editor.inputs.${this.editor.state}.${this.editor.player.name}`
+      if (!getIn(this.room, path)) {
+        setIn(this.room, path, {})
+      }
+      return getIn(this.room, path)
     },
   },
   methods: {
