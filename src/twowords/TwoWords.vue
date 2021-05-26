@@ -70,12 +70,24 @@
         </div>
         <br />
         <br />
+        <label class="subtitle"
+          >View for {{ editor.state }}.{{ editor.role }}</label
+        >
+        <prism-editor
+          class="my-editor"
+          v-model="editorViewCode"
+          :highlight="highlighter"
+          line-numbers
+          readonly
+        ></prism-editor>
+        <br />
         <label class="subtitle">Rules for {{ editor.state }}</label>
         <prism-editor
           class="my-editor"
           v-model="rules.code[editor.state]"
           :highlight="highlighter"
           line-numbers
+          readonly
         ></prism-editor>
       </div>
     </div>
@@ -318,6 +330,9 @@ if (anyone.some(Boolean)) {
         setIn(this.room, path, {})
       }
       return getIn(this.room, path)
+    },
+    editorViewCode() {
+      return JSON.stringify(this.editorElements, null, 2)
     },
   },
   methods: {
