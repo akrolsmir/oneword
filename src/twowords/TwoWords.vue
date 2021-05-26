@@ -57,14 +57,24 @@
             </option>
           </select>
         </div>
-
-        <div class="box mt-4">
+        <br />
+        <br />
+        <span class="subtitle">Game Preview</span>
+        <div class="box">
           <ElementList
             :elements="editorElements"
             :inputs="editorInputs"
             :push-changes="() => {}"
           />
         </div>
+
+        <label class="subtitle">Rules for {{ editor.state }}</label>
+        <prism-editor
+          class="my-editor"
+          v-model="rules.code[editor.state]"
+          :highlight="highlighter"
+          line-numbers
+        ></prism-editor>
       </div>
     </div>
   </BigColumn>
@@ -74,9 +84,37 @@
 .background {
   background-color: #e0e7ff;
 }
+
+/* required class for vue-prism-editor */
+.my-editor {
+  /* we dont use `language-` classes anymore so thats why we need to add background and text color manually */
+  background: #ffffff;
+  color: #2d2d2d;
+
+  /* you must provide font-family font-size line-height. Example: */
+  font-family: Fira code, Fira Mono, Consolas, Menlo, Courier, monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 5px;
+}
+
+/* optional class for removing the outline */
+.prism-editor__textarea:focus {
+  outline: none;
+}
 </style>
 
 <script>
+// import Prism Editor
+import { PrismEditor } from 'vue-prism-editor'
+import 'vue-prism-editor/dist/prismeditor.min.css' // import the styles somewhere
+
+// import highlighting library (you can use any library you want just return html string)
+import { highlight, languages } from 'prismjs/components/prism-core'
+import 'prismjs/components/prism-clike'
+import 'prismjs/components/prism-javascript'
+import 'prismjs/themes/prism-tomorrow.css' // import syntax highlighting styles
+
 import { inject } from 'vue'
 import ElementList from './components/ElementList.vue'
 import BigColumn from '../components/BigColumn.vue'
@@ -153,6 +191,7 @@ export default {
     Nametag,
     ShareLink,
     ElementList,
+    PrismEditor,
   },
   setup() {
     const user = inject('currentUser')
@@ -210,6 +249,27 @@ export default {
           CLUER: 1,
           GUESSER: 'REST',
         },
+        code: {
+          CLUEING: `if (inputs('CLUEING.@CLUER.Submit clue!').every(Boolean)) {
+  room.state = 'GUESSING'
+  changes.push('state')
+  // TODO: check for collisions, etc
+}`,
+          GUESSING: `if (inputs('GUESSING.@GUESSER.Submit guess!').every(Boolean)) {
+  room.state = 'DONE'
+  changes.push('state')
+}`,
+          DONE: `const anyone = inputs('DONE.@CLUER.Next round').concat(
+  inputs('DONE.@GUESSER.Next round')
+)
+if (anyone.some(Boolean)) {
+  room.state = 'CLUEING'
+  room.history.push(room.round)
+  room.round = {}
+  changes.pop() // Remove the original input change; it's already in history
+  changes.push('state', 'history', 'round')
+}`,
+        },
       },
       showEditor: true,
       editor: {
@@ -259,6 +319,9 @@ export default {
     },
   },
   methods: {
+    highlighter(code) {
+      return highlight(code, languages.js) // languages.<insert language> to return html with markup
+    },
     sanitize,
     inputs(query) {
       // Expand query strings by replacing `@ROLE` with the actual roles
@@ -292,29 +355,11 @@ export default {
 
       // Rules should be evaluated initially, and when each input is changed
       // NEXT: UI for each screen of the game, with a JS rules editor (and eval)
-      const rules = {
-        CLUEING: `if (inputs('CLUEING.@CLUER.Submit clue!').every(Boolean)) {
-          room.state = 'GUESSING'
-          changes.push('state')
-          // TODO: check for collisions, etc
-        }`,
-        GUESSING: `if (inputs('GUESSING.@GUESSER.Submit guess!').every(Boolean)) {
-          room.state = 'DONE'
-          changes.push('state')
-        }`,
-        DONE: `const anyone = inputs('DONE.@CLUER.Next round').concat(
-          inputs('DONE.@GUESSER.Next round')
-        )
-        if (anyone.some(Boolean)) {
-          room.state = 'CLUEING'
-          room.history.push(room.round)
-          room.round = {}
-          changes.pop() // Remove the original input change; it's already in history
-          changes.push('state', 'history', 'round')
-        }`,
-      }
       const compiledRules = Object.fromEntries(
-        Object.entries(rules).map(([state, code]) => [state, compileCode(code)])
+        Object.entries(this.rules.code).map(([state, code]) => [
+          state,
+          compileCode(code),
+        ])
       )
 
       compiledRules[this.room.state](sandbox)
