@@ -30,7 +30,8 @@
     <div class="message">
       <div class="message-header has-text-weight-normal is-flex-wrap-wrap">
         <h1 class="fancy big">
-          Round {{ room.history.length + 1 }} of {{ totalRounds }}
+          {{ $t('message.hello') }} {{ room.history.length + 1 }} of
+          {{ totalRounds }}
         </h1>
         <a class="fancy" href="#" @click.prevent="showShareModal = true">{{
           room.name
@@ -719,8 +720,8 @@ export default {
       }
       // History is shown in reverse order, so we re-reverse the index
       const index = this.room.history.length - 1 - reverseIndex
-      this.room.history[index].markedCorrect = !this.room.history[index]
-        .markedCorrect
+      this.room.history[index].markedCorrect =
+        !this.room.history[index].markedCorrect
       // History is an array, so we overwrite the whole thing.
       // Note: Possible race condition with "Next Round"; could fix by object-ifying history
       await this.saveRoom('history')
@@ -760,8 +761,7 @@ export default {
     showSupporterModal() {
       this.$showModal({
         title: 'Want private rooms?',
-        text:
-          'Earn perks like private rooms, custom avatars, and more by becoming a supporter 😍',
+        text: 'Earn perks like private rooms, custom avatars, and more by becoming a supporter 😍',
         buttons: {
           okay: 'Okay!',
           cancel: 'Not now',
