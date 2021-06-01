@@ -14,6 +14,8 @@ import IncryptFrontPage from './incrypt/IncryptFrontPage.vue'
 import Incrypt from './incrypt/Incrypt.vue'
 import PairwiseFrontPage from './pairwise/PairwiseFrontPage.vue'
 import Pairwise from './pairwise/Pairwise.vue'
+import Ghost from './words/Ghost.vue'
+
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
@@ -69,6 +71,10 @@ const routes = [
     path: '/asplos-2021/:id',
     component: OneWord,
     meta: { title: 'ASPLOS 2021' },
+  },
+  {
+    path: '/ghost',
+    component: Ghost,
   },
 ]
 
