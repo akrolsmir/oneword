@@ -9,10 +9,15 @@
 
     <h1>
       Final word for "{{ typed }}": <b>{{ winner }}</b
-      >. {{ parityWinner }}
+      >. <span :class="color(winner)">{{ parityWinner }}</span>
     </h1>
     <h2>
-      Valid continuations: {{ Array.from(graph[typed] || []).join(', ') }}
+      Valid continuations:
+      <span
+        v-for="word in Array.from(graph[typed] || [])"
+        :class="color(winners[word])"
+        >{{ word }},
+      </span>
     </h2>
 
     <br /><br /><br />
@@ -123,6 +128,14 @@ export default {
       }
       const num = this.winner.length % 2 ? '2' : '1'
       return `P${num} wins!`
+    },
+  },
+  methods: {
+    color(word) {
+      if (!word) {
+        return 'has-text-grey'
+      }
+      return word.length % 2 ? 'has-text-danger' : 'has-text-link-dark'
     },
   },
 }
