@@ -135,7 +135,7 @@ export default {
       if (!word) {
         return 'has-text-grey'
       }
-      return word.length % 2 ? 'has-text-danger' : 'has-text-link-dark'
+      return word.length % 2 ? 'has-text-danger' : 'has-text-primary-dark'
     },
   },
 }
