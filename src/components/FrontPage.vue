@@ -2,8 +2,7 @@
   <BigColumn>
     <div>
       <!-- TODO: Make this show up automatically on Mondays -->
-      {{ isItMonday() }}
-      <span v-if = "seen">
+      <span v-if="todayIsMonday">
         <div class="notification is-info py-2 has-text-centered">
           <a
             target="_blank"
@@ -44,20 +43,11 @@ export default {
     GamesList,
     Sponsors,
   },
-  data(){
-    return{
-      seen: true
-    }
+  computed: {
+    todayIsMonday() {
+      var date = new Date()
+      return date.getDay() == 1 ? true : false
+    },
   },
-  methods:{
-    isItMonday(){
-      var date = new Date();
-      if(date.getDay() == 1){
-        this.seen = true;
-      }else{
-        this.seen = false;
-      }
-    }
-  }
 }
 </script>
