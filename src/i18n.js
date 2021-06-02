@@ -51,7 +51,7 @@ const messages = {
       guessHistory: "{guesser}{' guessed \"'}",
     },
   },
-  zh: {
+  zh_TW: {
     onewordGame: {
       Round: "{'第'}{roundnumber}{'回合，共'}{totalround}{'回合'}",
       invitation: '邀請朋友一起玩！',
@@ -104,7 +104,7 @@ const messages = {
 }
 
 export const i18n = createI18n({
-  locale: 'zh', // set locale
+  locale: 'en', // set locale
   fallbackLocale: 'en', // set fallback locale
   messages, // set locale messages
 })

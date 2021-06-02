@@ -80,6 +80,13 @@
 
       <div class="navbar-end">
         <div class="navbar-item">
+          <div class="locale-changer">
+            Language:
+            <select v-model="$i18n.locale">
+              <option value="en" selected>English</option>
+              <option value="zh_TW">繁體中文</option>
+            </select>
+          </div>
           <div class="buttons">
             <router-link v-if="user.id" to="/profile" class="button is-white"
               >Signed in as {{ user.name.split(' ')[0] }}!</router-link
