@@ -7,25 +7,33 @@ const messages = {
   zh_TW: zh_TW,
 }
 
-/*function loadLocaleMessages() {
-  const locales = require.context(
-    './locales',
-    true,
-    /[A-Za-z0-9-_,\s]+\.json$/i
-  )
-  const messages = {}
-  locales.keys().forEach((key) => {
-    const matched = key.match(/([A-Za-z0-9-_]+)\./i)
-    if (matched && matched.length > 1) {
-      const locale = matched[1]
-      messages[locale] = locales(key)
-    }
-  })
-  return messages
-}*/
+function getBrowserLocale(options = {}) {
+  const defaultOptions = { countryCodeOnly: false }
+  const opt = { ...defaultOptions, ...options }
+  const navigatorLocale =
+    navigator.languages !== undefined
+      ? navigator.languages[0]
+      : navigator.language
+  if (!navigatorLocale) {
+    return undefined
+  }
+  const trimmedLocale = opt.countryCodeOnly
+    ? navigatorLocale.trim().split(/-|_/)[0]
+    : navigatorLocale.trim()
+  return trimmedLocale
+}
+
+function getStartingLocale() {
+  const browserLocale = getBrowserLocale({ countryCodeOnly: true })
+  if (browserLocale == 'zh') {
+    return 'zh_TW'
+  } else {
+    return 'en'
+  }
+}
 
 export const i18n = createI18n({
-  locale: 'en', // set locale
+  locale: getStartingLocale(), // set locale
   fallbackLocale: 'en', // set fallback locale
   messages, // set locale messages
 })
