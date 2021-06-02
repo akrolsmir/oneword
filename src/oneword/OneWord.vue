@@ -15,9 +15,9 @@
         @background-click="showShareModal = false"
       >
         <div class="notification">
-          <label class="is-block mb-2"
-            >{{ $t('onewordGame.invitation') }} }}</label
-          >
+          <label class="is-block mb-2">{{
+            $t('onewordGame.invitation')
+          }}</label>
           <ShareLink />
           <button
             class="delete"
