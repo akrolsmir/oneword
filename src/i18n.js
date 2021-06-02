@@ -1,107 +1,28 @@
 import { createI18n } from 'vue-i18n'
+import en from './locales/en.json'
+import zh_TW from './locales/zh_TW.json'
 
 const messages = {
-  en: {
-    onewordGame: {
-      Round: "{'Round'}{roundnumber}{'of'}{totalround}",
-      invitation: 'Invite your friends to play!',
-      room: 'room',
-      publicroom: 'Public room',
-      privateroom: 'Private room',
-      sec: 'secs',
-      clue: 'Clue',
-      guess: 'Guess',
-      startTimers: 'Start Timers',
-      stopTimers: 'Stop Timers',
-      noTimers: 'No timers',
-      basicWordList: 'Basic Wordlists',
-      save: 'Save',
-      saved: 'Saved',
-      themedwordlists: 'Themed Wordlists',
-      forChampion: 'For champions!',
-      roomControl: 'Room Controls',
-      nextStage: 'Next Stage',
-      skipWord: 'Skip Word',
-      resetRoom: 'Reset Room',
-      transferMod: 'Transfer Mod',
-      becometheMod: 'Become the mod',
-      hideModtools: 'Hide mod tools',
-      showModtools: 'Show mod tools',
-      waitingText: 'Waiting for 3 players...',
-      yourTurnText: "It's your turn to guess! Waiting for clues...",
-      currentWordText: "{'The '}{wordCategory}{' for '}{guesser}{' is'}",
-      yourClue: 'Your clue',
-      submitted: 'Submitted',
-      submit: 'Submit',
-      similarclueText: 'This clue is too similar to the word',
-      realwordText: 'Are you sure this is a real word?',
-      guesserClues: "{'Your clues for the '}{wordCategory}{' are:'}",
-      yourGuess: 'Your Guess',
-      waitingGuesserText: "{'Waiting for '}{guesser}{' to guess...'}",
-      cluesforText: "{'The clues for '}{word}{' were:'}",
-      correctWordText: "{'Correct! The word was\"'}{word}{'\". Good job!'}",
-      wrongGuessText:
-        "{'Aww, '}{guesser}{' guessed \"'}{guessword}{'\", but it was \"'}{word}{'\"...'}",
-      markCorrect: '(Mark as correct)',
-      nextRound: 'Next Round',
-      spectatingText: 'You are currently spectating this game!',
-      joinGame: 'Join game',
-      backHome: 'Back to home',
-      history: 'History',
-      guessHistory: "{guesser}{' guessed \"'}",
-    },
-  },
-  zh_TW: {
-    onewordGame: {
-      Round: "{'第'}{roundnumber}{'回合，共'}{totalround}{'回合'}",
-      invitation: '邀請朋友一起玩！',
-      room: '房間',
-      publicroom: '公開房間',
-      privateroom: '私人房間',
-      sec: '秒',
-      clue: '提示',
-      guess: '猜題',
-      startTimers: '開始計時',
-      stopTimers: '停止計時',
-      noTimers: '無計時',
-      basicWordList: '基本詞彙表',
-      save: '存擋',
-      saved: '已存擋',
-      themedwordlists: '主題詞彙表',
-      forChampion: '贊助者限定！',
-      roomControl: '房間控制',
-      nextStage: '下一階段',
-      skipWord: '跳過此題',
-      resetRoom: '重置房間',
-      transferMod: '更換房主',
-      becometheMod: '成為房主',
-      hideModtools: '隱藏房主控制',
-      showModtools: '顯示房主控制',
-      waitingText: '正在等待3名玩家......',
-      yourTurnText: '該你猜題了！正在等待提示......',
-      currentWordText: "{guesser}{'要猜的'}{wordCategory}{'是'}",
-      yourClue: '你的提示',
-      submitted: '已送出',
-      submit: '送出',
-      similarclueText: '這個提示太接近答案了',
-      realwordText: '你確定有這個詞嗎？',
-      guesserClues: "{'關於'}{wordCategory}{'的提示有：'}",
-      yourGuess: '你的猜測',
-      waitingGuesserText: "{'正在等待'}{guesser}{'的猜題......'}",
-      cluesforText: "{'關於'}{word}{'的提示有：'}",
-      correctWordText: "{'回答正確！答案就是\"'}{word}{'\"！真棒！'}",
-      wrongGuessText:
-        "{'真可惜，'}{guesser}{'覺得答案是\"'}{guessword}{'\"，但正確答案是\"'}{word}{'\"......'}",
-      markCorrect: '標示為正確',
-      nextRound: '下一回合',
-      spectatingText: '你正處於觀察者模式！',
-      joinGame: '加入遊戲',
-      backHome: '返回首頁',
-      history: '歷史記錄',
-      guessHistory: "{guesser}{'猜是\"'}",
-    },
-  },
+  en: en,
+  zh_TW: zh_TW,
 }
+
+/*function loadLocaleMessages() {
+  const locales = require.context(
+    './locales',
+    true,
+    /[A-Za-z0-9-_,\s]+\.json$/i
+  )
+  const messages = {}
+  locales.keys().forEach((key) => {
+    const matched = key.match(/([A-Za-z0-9-_]+)\./i)
+    if (matched && matched.length > 1) {
+      const locale = matched[1]
+      messages[locale] = locales(key)
+    }
+  })
+  return messages
+}*/
 
 export const i18n = createI18n({
   locale: 'en', // set locale
