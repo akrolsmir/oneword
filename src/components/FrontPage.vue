@@ -45,8 +45,8 @@ export default {
   },
   computed: {
     todayIsMonday() {
-      var date = new Date()
-      return date.getDay() == 1 ? true : false
+      const today = new Date()
+      return today.getDay() == 1
     },
   },
 }
