@@ -117,5 +117,16 @@
       "okay": "成為支持者！",
       "cancel": "不是現在"
     }  
+  },
+  "loginModal":{
+    "signInText": "登入以開始！",
+    "signInGoogle": "Sign in with Google",
+    "google": "Google",
+    "or": "或",
+    "orplaywithoutText": "或以訪客模式遊玩",
+    "playwithoutText": "以訪客模式遊玩",
+    "gamehistorylost": "(你的遊戲記錄會消失)",
+    "back": "返回",
+    "continue": "繼續"
   }
 }

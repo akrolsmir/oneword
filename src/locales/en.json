@@ -117,5 +117,16 @@
       "okay": "Become a supporter!",
       "cancel": "Not now"
     }
+  },
+  "loginModal":{
+    "signInText": "Sign in to get started!",
+    "signInGoogle": "Sign in with Google",
+    "google": "Google",
+    "or": "OR",
+    "orplaywithoutText": "Or play without an account",
+    "playwithoutText": "Play without an account",
+    "gamehistorylost": "(Your game history will be lost)",
+    "back": "Back",
+    "continue": "Continue"
   }
 }
