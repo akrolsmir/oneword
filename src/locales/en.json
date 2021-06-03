@@ -95,5 +95,27 @@
     "introAfterJustone": ", a co-op word game for 3+ players.",
     "introForGame": "In each of the 13 rounds, come up with a one-word hint for the guesser...",
     "introForHint": "But beware: duplicate hints are discarded!"
+  },
+  "gameList":{
+    "welcomeText": "{'Hi, '}{user}{'! Room name:'}",
+    "createRoom": "Create Private Room",
+    "signIn": "Sign in to get started",
+    "openRooms": "Open Rooms",
+    "opetnRoomList": "{', with '}{players}",
+    "privateRoom": "Private Rooms",
+    "privateRoomList": "{'Private Room with '}{player}",
+    "andOthers": "{' and '}{playernumber}{' others'}",
+    "privateModal":{
+      "title": "This room is private 🔒",
+      "text": "To join, ask your teammates for the room name or link.\n\nTo make your own private room, become a supporter!",
+      "okay": "Become a supporter!",
+      "cancel": "Not now"
+    },
+    "createPrivateModal":{
+      "title": "To create a private room, become a supporter!",
+      "text": "You'll also get other perks, like a custom avatar~",
+      "okay": "Become a supporter!",
+      "cancel": "Not now"
+    }
   }
 }

@@ -95,5 +95,27 @@
     "introAfterJustone": "，一個適合三人以上遊玩的團隊合作文字遊戲。",
     "introForGame": "在這13回合中，每回合每人需要提供一個詞的提示給猜題者......",
     "introForHint": "但要注意：重複的提示會被抵消的喔！"
+  },
+  "gameList":{
+    "welcomeText": "{'嗨，'}{user}{'！房間名稱：'}",
+    "createRoom": "建立私人房間",
+    "signIn": "登入以開始",
+    "openRooms": "公開房間",
+    "opetnRoomList": "{'，與'}{players}",
+    "privateRoom": "私人房間",
+    "privateRoomList": "{'私人房間 與'}{player}",
+    "andOthers": "{'和其他'}{playernumber}{'人'}",
+    "privateModal":{
+      "title": "這是個私人房間🔒",
+      "text": "如果想加入，詢問你的朋友房間名稱或連結！\n想要建立自己的私人房間，就成為支持者吧！",
+      "okay": "成為支持者！",
+      "cancel": "不是現在"
+    },
+    "createPrivateModal":{
+      "title": "想要建立私人房間，就成為支持者吧！",
+      "text": "你也能享受其他特權，例如客製化頭貼～",
+      "okay": "成為支持者！",
+      "cancel": "不是現在"
+    }  
   }
 }
