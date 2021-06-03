@@ -1,9 +1,9 @@
 <template>
   <div>
-    <h2 class="fancy">Sponsors</h2>
-    We're grateful to be
+    <h2 class="fancy">{{ $t('sponsors.sponsors') }}</h2>
+    {{ $t('sponsors.gratefulText') }}
     <a href="./supporter" @click.prevent="referSupporter('sponsors')">
-      sponsored by</a
+      {{ $t('sponsors.sponsorBy') }}</a
     >:
     <div class="m-2 field is-grouped is-grouped-multiline">
       <a href="https://asplos-conference.org/"
@@ -22,7 +22,7 @@
         :user="{ email: 'telarian@gmail.com', supporter: 'SPONSOR' }"
       />
     </div>
-    Thanks for supporting One Word!
+    {{ $t('sponsors.thankyouNote') }}
   </div>
 </template>
 <script>
