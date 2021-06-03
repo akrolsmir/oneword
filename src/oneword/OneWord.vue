@@ -78,9 +78,9 @@
           <!-- Timers -->
           <span class="ml-1 mr-2 my-1 is-flex is-align-items-center">
             <template v-if="player.isMod">
-              <label for="clue-timer" class="is-size-7 is-flex-grow-1"
-                >{{ $t('onewordGame.clue') }}:</label
-              >
+              <label for="clue-timer" class="is-size-7 is-flex-grow-1">{{
+                $t('onewordGame.clue')
+              }}</label>
               <input
                 class="input is-small"
                 style="flex: 1 2 48px"
@@ -96,9 +96,9 @@
                 $t('onewordGame.sec')
               }}</span>
 
-              <label for="guess-timer" class="is-size-7 is-flex-grow-1"
-                >{{ $t('onewordGame.guess') }}:</label
-              >
+              <label for="guess-timer" class="is-size-7 is-flex-grow-1">{{
+                $t('onewordGame.guess')
+              }}</label>
               <input
                 class="input is-small"
                 style="flex: 1 2 48px"
@@ -124,13 +124,16 @@
             </template>
             <template v-else>
               <template v-if="room.timers.running">
-                <span v-if="room.timers.CLUEING" class="mx-2"
-                  >{{ $t(onewordGame.clue) }}: {{ room.timers.CLUEING }}s</span
-                >
+                <span v-if="room.timers.CLUEING" class="mx-2">{{
+                  $t('onewordGame.clueingTime', { time: room.timers.CLUEING })
+                }}</span>
                 <span v-if="room.timers.GUESSING" class="mx-2"
-                  >{{ $t(onewordGame.guess) }}:
-                  {{ room.timers.GUESSING }}s</span
-                >
+                  >{{
+                    $t('onewordGame.guessingTime', {
+                      time: room.timers.GUESSING,
+                    })
+                  }}
+                </span>
               </template>
               <span v-else class="mx-1">{{ $t('onewordGame.noTimers') }}</span>
             </template>
