@@ -2,15 +2,17 @@
   <BigColumn>
     <div>
       <!-- TODO: Make this show up automatically on Mondays -->
-      <!-- <div class="notification is-info py-2 has-text-centered">
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://discord.gg/AP7ssVPPCr"
-          >Join us on Discord</a
-        >
-        for our Weekly Game Nights: Monday at 6pm PT!
-      </div> -->
+      <span v-if="todayIsMonday">
+        <div class="notification is-info py-2 has-text-centered">
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://discord.gg/AP7ssVPPCr"
+            >Join us on Discord</a
+          >
+          for our Weekly Game Nights: Monday at 6pm PT!
+        </div>
+      </span>
       <div class="fancy big">Welcome!</div>
       This is an online game based on
       <a
@@ -40,6 +42,12 @@ export default {
     BigColumn,
     GamesList,
     Sponsors,
+  },
+  computed: {
+    todayIsMonday() {
+      const today = new Date()
+      return today.getDay() == 1
+    },
   },
 }
 </script>
