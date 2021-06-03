@@ -86,5 +86,14 @@
     "signUp": "註冊/登入",
     "supporter": "支持者",
     "becomeSupporter": "成為支持者！"
+  },
+  "frontPage":{
+    "joinUs": "在 Discord 上加入我們！",
+    "joinUsTime": "每週遊戲夜時間：週一 晚上六點 太平洋時間！",
+    "welcome": "歡迎！",
+    "introBeforeJustone": "這個線上遊戲啟發於",
+    "introAfterJustone": "，一個適合三人以上遊玩的團隊合作文字遊戲。",
+    "introForGame": "在這13回合中，每回合每人需要提供一個詞的提示給猜題者......",
+    "introForHint": "但要注意：重複的提示會被抵消的喔！"
   }
 }
