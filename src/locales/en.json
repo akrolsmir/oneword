@@ -74,5 +74,17 @@
     "message12": "You all must be cheating somehow, I just know it...",
     "message13": "Wow, that's hall of fame material right there. I am in awe.",
     "and": "and"
+  },
+  "navBar":{
+    "allGame": "All Games",
+    "new": "New!",
+    "discoverOther": "Discover other games...",
+    "swag": "Swag",
+    "designGame": "Design Your Own Game",
+    "language": "Language:",
+    "signInAs": "{'Signed in as '}{user}{'!'}",
+    "signUp": "Sign up",
+    "supporter": "Supporter",
+    "becomeSupporter": "Become a supporter!"
   }
 }

@@ -74,5 +74,17 @@
     "message12": "我不信！你們一定有作弊！",
     "message13": "哇，這根本是名人堂等級了吧！我甘拜下風！",
     "and": "和"
+  },
+  "navBar":{
+    "allGame": "所有遊戲",
+    "new": "新！",
+    "discoverOther": "查看其他遊戲...",
+    "swag": "周邊產品",
+    "designGame": "設計自己的遊戲",
+    "language": "語言：",
+    "signInAs": "{'以'}{user}{'的身份登入'}",
+    "signUp": "註冊/登入",
+    "supporter": "支持者",
+    "becomeSupporter": "成為支持者！"
   }
 }
