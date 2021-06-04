@@ -1,4 +1,10 @@
 {
+  "chatBox": {
+    "hide": "（隱藏）",
+    "hopOnDis": "或是上Discord來語音🎤",
+    "messageHide": "{length}{'條隱藏訊息'}",
+    "roomChat": "聊天室"
+  },
   "frontPage": {
     "introAfterJustone": "，一個適合三人以上遊玩的團隊合作文字遊戲。",
     "introBeforeJustone": "這個遊戲啟發於",
@@ -29,6 +35,11 @@
     "privateRoomList": "{'私人房間 與'}{player}",
     "signIn": "登入以開始",
     "welcomeText": "{'嗨，'}{user}{'！房間名稱：'}"
+  },
+  "linkFooter": {
+    "aboutUs": "關於我們",
+    "buyGame": "購買桌遊",
+    "joinDis": "在Discord上加入我們"
   },
   "loginModal": {
     "back": "返回",

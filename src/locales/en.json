@@ -1,4 +1,10 @@
 {
+  "chatBox": {
+    "hide": "(hide)",
+    "hopOnDis": "Or hop on our Discord for voice chat 🎤",
+    "messageHide": "{length}{' messages hidden'}",
+    "roomChat": "Room Chat"
+  },
   "frontPage": {
     "introAfterJustone": ", a co-op word game for 3+ players.",
     "introBeforeJustone": "This is an online game based on",
@@ -29,6 +35,11 @@
     "privateRoomList": "{'Private Room with '}{player}",
     "signIn": "Sign in to get started",
     "welcomeText": "{'Hi, '}{user}{'! Room name:'}"
+  },
+  "linkFooter": {
+    "aboutUs": "About us",
+    "buyGame": "Buy the board game",
+    "joinDis": "Join us on Discord"
   },
   "loginModal": {
     "back": "Back",

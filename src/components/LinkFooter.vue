@@ -3,7 +3,7 @@
     <p>
       <span
         ><router-link to="/about">
-          &thinsp; 👋&thinsp; About us
+          &thinsp; 👋&thinsp;{{ $t('linkFooter.aboutUs') }}
         </router-link></span
       >
 
@@ -13,13 +13,13 @@
           rel="noopener noreferrer"
           href="https://discord.gg/AP7ssVPPCr"
         >
-          &thinsp; 💬&thinsp; Join us on Discord
+          &thinsp; 💬&thinsp;{{ $t('linkFooter.joinDis') }}
         </a></span
       >
 
       <span
         ><a target="_blank" rel="noopener noreferrer" :href="amazon">
-          &thinsp; 🎲&thinsp; Buy the board game
+          &thinsp; 🎲&thinsp;{{ $t('linkFooter.buyGame') }}
         </a></span
       >
     </p>
