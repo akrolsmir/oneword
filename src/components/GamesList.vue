@@ -26,7 +26,7 @@
     <input
       class="button mt-2 mr-2 has-text-weight-bold"
       type="submit"
-      value="Enter Room"
+      :value="$t('gameList.enter')"
     />
     <button
       class="button is-warning mt-2"

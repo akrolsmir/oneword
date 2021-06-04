@@ -53,7 +53,7 @@
           <input
             ref="inputGuestName"
             class="input"
-            placeholder="Name"
+            :placeholder="$t('loginModal.name')"
             v-model="user.name"
             @keyup.enter="continueAsGuest"
           />

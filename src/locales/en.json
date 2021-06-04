@@ -41,7 +41,8 @@
     "privateRoom": "Private Rooms",
     "privateRoomList": "{'Private Room with '}{player}",
     "signIn": "Sign in to get started",
-    "welcomeText": "{'Hi, '}{user}{'! Room name:'}"
+    "welcomeText": "{'Hi, '}{user}{'! Room name:'}",
+    "enter": "Enter Room"
   },
   "linkFooter": {
     "aboutUs": "About us",
@@ -148,24 +149,24 @@
     "wrapUpText": "While you're here, check out two of our new games"
   },
   "profile": {
+    "afterGravatar": ".",
     "avatar": "Your Avatar",
     "become": "Become a",
     "becomeone": "Become one!",
+    "caresignIn": "Care to sign in?",
     "changeAvatar": "You can change your avatar on",
     "managesetting": "Manage your settings",
     "notsupporter": "You're not currently a supporter 😢",
     "signout": "Sign out",
+    "supporter": "supporter",
     "supporterSetting": "Supporter Settings",
     "thankbecomesupporter": "{'Thanks for being a One Word '}{supporter}{'!'}",
     "thankplayText": "Thanks for playing!",
     "thanksupporterText": "Thanks for being a supporter!",
     "toChange": "to change your avatar!",
-    "youHavent": "{'You haven't played '}{gametitle}{' yet...'}",
-    "yourGame": "Your Games",
     "welcome": "{'Hey there, '}{name}{'.'}",
-    "caresignIn": "Care to sign in?",
-    "supporter": "supporter",
-    "afterGravatar": "."
+    "youHavent": "{'You haven't played '}{gametitle}{' yet...'}",
+    "yourGame": "Your Games"
   },
   "shareLink": {
     "copied": "Copied!",
@@ -176,5 +177,11 @@
     "sponsorBy": "sponsored by",
     "sponsors": "Sponsors",
     "thankyouNote": "Thanks for supporting One Word!"
+  },
+  "supporter": {
+    "austinSayingHi": "Hi there! I'm Austin, the lead developer behind One Word. If you've been enjoying the game, consider becoming a supporter!",
+    "cantstophere": "Can't stop at just One Word?",
+    "explainCoverFee": "You'll be helping cover our server and development costs, and we offer some neat perks as well!",
+    "welcomeTitle": "Support One Word"
   }
 }

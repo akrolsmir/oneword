@@ -7,7 +7,7 @@
   },
   "chatBox": {
     "hide": "（隱藏）",
-    "hopOnDis": "或是上Discord來語音🎤",
+    "hopOnDis": "或是登入Discord來語音🎤",
     "messageHide": "{length}{'條隱藏訊息'}",
     "placeholder": "記得要保持友善～",
     "roomChat": "聊天室"
@@ -15,7 +15,7 @@
   "frontPage": {
     "introAfterJustone": "，一個適合三人以上遊玩的團隊合作文字遊戲。",
     "introBeforeJustone": "這個遊戲啟發於",
-    "introForGame": "在這13回合中，每回合每人需要提供一個詞的提示給猜題者......",
+    "introForGame": "在這13回合中，每回合每人需要提供一個字詞的提示給猜題者......",
     "introForHint": "但要注意：重複的提示會被抵消的喔！",
     "joinUs": "在 Discord 上加入我們！",
     "joinUsTime": "每週遊戲夜時間：週一 晚上六點 太平洋時間！",
@@ -30,6 +30,7 @@
       "title": "想要建立私人房間，就成為支持者吧！"
     },
     "createRoom": "建立私人房間",
+    "enter": "進入房間",
     "openRooms": "公開房間",
     "opetnRoomList": "{'，與'}{players}",
     "privateModal": {
@@ -176,5 +177,11 @@
     "sponsorBy": "贊助者",
     "sponsors": "贊助者",
     "thankyouNote": "謝謝你們的支持與鼓勵！"
+  },
+  "supporter": {
+    "austinSayingHi": "",
+    "cantstophere": "",
+    "explainCoverFee": "",
+    "welcomeTitle": ""
   }
 }

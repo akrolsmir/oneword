@@ -35,7 +35,7 @@
             class="input"
             v-model="inputText"
             @keyup.enter="submitLine"
-            placeholder="Please be nice~"
+            :placeholder="$t('chatBox.placeholder')"
           />
         </div>
         <div class="control">

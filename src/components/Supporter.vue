@@ -1,14 +1,12 @@
 <template>
   <BigColumn>
-    <h1>Support One Word</h1>
+    <h1>{{ $t('supporter.welcomeTitle') }}</h1>
     <article class="message container">
-      <div class="message-header">Can't stop at just One Word?</div>
+      <div class="message-header">{{ $t('supporter.cantstophere') }}</div>
       <div class="message-body">
-        Hi there! I'm Austin, the lead developer behind One Word. If you've been
-        enjoying the game, consider becoming a supporter!<br />
+        {{ $t('supporter.austinSayingHi') }}<br />
         <br />
-        You'll be helping cover our server and development costs, and we offer
-        some neat perks as well!<br />
+        {{ $t('supporter.explainCoverFee') }}<br />
         <br />
         <h2>Supporter</h2>
         All supporters get the ability to create private rooms &mdash; those are
