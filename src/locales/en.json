@@ -30,6 +30,7 @@
       "title": "To create a private room, become a supporter!"
     },
     "createRoom": "Create Private Room",
+    "enter": "Enter Room",
     "openRooms": "Open Rooms",
     "opetnRoomList": "{', with '}{players}",
     "privateModal": {
@@ -41,8 +42,7 @@
     "privateRoom": "Private Rooms",
     "privateRoomList": "{'Private Room with '}{player}",
     "signIn": "Sign in to get started",
-    "welcomeText": "{'Hi, '}{user}{'! Room name:'}",
-    "enter": "Enter Room"
+    "welcomeText": "{'Hi, '}{user}{'! Room name:'}"
   },
   "linkFooter": {
     "aboutUs": "About us",
@@ -180,8 +180,60 @@
   },
   "supporter": {
     "austinSayingHi": "Hi there! I'm Austin, the lead developer behind One Word. If you've been enjoying the game, consider becoming a supporter!",
+    "cancel": "You can cancel your support at any time -- and if you're unhappy for any reason, let us know and we'll provide a full refund.",
     "cantstophere": "Can't stop at just One Word?",
+    "champion": {
+      "becomeone": "Become a Champion! ($6/month)",
+      "description": "Become a Champion, and you'll get two new perks. First, you get the ability to override our scoring system and mark ANY guess as correct.",
+      "encourage": "Champion One Word!",
+      "getSupporter": "And of course, you'll get all the benefits that Supporters get: private rooms and a custom user avatar!",
+      "markCorrect": "You can mark it as correct!",
+      "markas": "Mark guesses as correct!",
+      "name": "Champion",
+      "speckled": "If you think \"speckled\" was close enough...",
+      "themed": "Themed word lists!",
+      "tryThese": "Tired of nouns, verbs, and adjectives? Try these!",
+      "unlockTheme": "You'll also unlock a bunch of specially-themed word lists to play with:",
+      "privateRoom": "Private Room"
+    },
     "explainCoverFee": "You'll be helping cover our server and development costs, and we offer some neat perks as well!",
+    "permonth": "/month",
+    "question": "As always, if you have any questions, or need help, get in touch at",
+    "ready": "Ready to support One Word?",
+    "sponsor": {
+      "becomeone": "Become a Sponsor! ($10/month)",
+      "custom": "Custom cosmetics!",
+      "description": "As a Sponsor of One Word, you'll be credited on our home page for EVERYONE to see.",
+      "encourage": "Sponsor us!",
+      "frontpage": "Frontpage Sponsor credit!",
+      "getallPrivelge": "And naturally, all the Supporter and Champion perks are yours as well. Private rooms! Correct guesses! Themed word lists! What are you waiting for?",
+      "name": "Sponsor",
+      "purple": "Purple, the color of royalty, emperors... and you!",
+      "purpleBorder": "Plus, you now get a *purple* border. One-up all the other supporters!",
+      "youthebest": "Really, you're the best.",
+      "wordList": "Themed word lists"
+    },
+    "supporter": {
+      "addfree": "Supporters also get priority support and an ad-free experience. Does that all sound good?",
+      "addfreeExp": "Ad-free experience",
+      "afterDescription": "those are rooms which are not visible from the home page, and are invite-only.",
+      "afterGravatar": " ",
+      "becomeone": "Become a Supporter! ($3/month)",
+      "configureAvatar": "Configure your avatar on",
+      "customAvatar": "Custom user avatar!",
+      "description": "All supporters get the ability to create private rooms",
+      "encourage": "Support us!",
+      "name": "Supporter",
+      "noRando": "No more randos crashing your family game",
+      "priority": "Priority support",
+      "privateRoom": "Private rooms!",
+      "unlockAvatar": "You'll also unlock a customizable user avatar with a shiny gold border. Rep your supporter status to all your friends!"
+    },
+    "testies": {
+      "fansays": "Here's what our fans have to say:",
+      "name": "Testimonials"
+    },
+    "thankyou": "Thanks, and happy cluing!",
     "welcomeTitle": "Support One Word"
   }
 }

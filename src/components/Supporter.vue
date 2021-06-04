@@ -8,9 +8,10 @@
         <br />
         {{ $t('supporter.explainCoverFee') }}<br />
         <br />
-        <h2>Supporter</h2>
-        All supporters get the ability to create private rooms &mdash; those are
-        rooms which are not visible from the home page, and are invite-only.<br />
+        <h2>{{ $t('supporter.supporter.name') }}</h2>
+        {{ $t('supporter.supporter.description') }} &mdash;{{
+          $t('supporter.supporter.afterDescription')
+        }}<br />
         <div class="promo-img">
           <img
             class="border"
@@ -18,10 +19,9 @@
             alt="Dropdown menu that Mods see when they are in a room. It has two options, Public and Private, and Private is selected."
           />
         </div>
-        <div class="caption">No more randos crashing your family game</div>
+        <div class="caption">{{ $t('supporter.supporter.noRando') }}</div>
         <br />
-        You'll also unlock a customizable user avatar with a shiny gold border.
-        Rep your supporter status to all your friends!<br />
+        {{ $t('supporter.supporter.unlockAvatar') }}<br />
         <div class="promo-img">
           <img
             class="border"
@@ -30,26 +30,25 @@
           />
         </div>
         <div class="caption">
-          Configure your avatar on
+          {{ $t('supporter.supporter.configureAvatar') }}
           <a href="https://en.gravatar.com/">Gravatar</a>
+          {{ $t('supporter.supporter.afterGravatar') }}
         </div>
-        Supporters also get priority support and an ad-free experience. Does
-        that all sound good?<br />
+        {{ $t('supporter.supporter.addfree') }}<br />
         <br />
         <div class="has-text-centered">
           <button
             class="button is-medium is-warning"
             @click="checkout('supporter')"
           >
-            Become a Supporter! ($3/month)
+            {{ $t('supporter.supporter.becomeone') }}
           </button>
         </div>
         <br />
         <br />
 
-        <h2>Champion</h2>
-        Become a Champion, and you'll get two new perks. First, you get the
-        ability to override our scoring system and mark ANY guess as correct.
+        <h2>{{ $t('supporter.champion.name') }}</h2>
+        {{ $t('supporter.champion.description') }}
         <div class="columns">
           <div class="column">
             <div class="promo-img">
@@ -60,7 +59,7 @@
               />
             </div>
             <div class="caption">
-              If you think "speckled" was close enough...
+              {{ $t('supporter.champion.speckled') }}
             </div>
           </div>
           <div class="column">
@@ -71,11 +70,12 @@
                 alt="The same game round, but now 'speckled' is marked as correct."
               />
             </div>
-            <div class="caption">You can mark it as correct!</div>
+            <div class="caption">
+              {{ $t('supporter.champion.markCorrect') }}
+            </div>
           </div>
         </div>
-        You'll also unlock a bunch of specially-themed word lists to play
-        with:<br />
+        {{ $t('supporter.champion.unlockTheme') }}<br />
         <div class="promo-img">
           <img
             class="border"
@@ -84,26 +84,24 @@
           />
         </div>
         <div class="caption">
-          Tired of nouns, verbs, and adjectives? Try these!
+          {{ $t('supporter.champion.tryThese') }}
         </div>
         <br />
-        And of course, you'll get all the benefits that Supporters get: private
-        rooms and a custom user avatar!<br />
+        {{ $t('supporter.champion.getSupporter') }}<br />
         <br />
         <div class="has-text-centered">
           <button
             class="button is-medium is-primary"
             @click="checkout('champion')"
           >
-            Become a Champion! ($6/month)
+            {{ $t('supporter.champion.becomeone') }}
           </button>
         </div>
         <br />
         <br />
 
-        <h2>Sponsor</h2>
-        As a Sponsor of One Word, you'll be credited on our home page for
-        EVERYONE to see.<br />
+        <h2>{{ $t('supporter.sponsor.name') }}</h2>
+        {{ $t('supporter.sponsor.description') }}<br />
         <div class="promo-img">
           <img
             class="border"
@@ -112,9 +110,9 @@
             alt="Frontpage listing of our sponsors"
           />
         </div>
-        <div class="caption">Really, you're the best.</div>
+        <div class="caption">{{ $t('supporter.sponsor.youthebest') }}</div>
         <br />
-        Plus, you now get a *purple* border. One-up all the other supporters!<br />
+        {{ $t('supporter.sponsor.purpleBorder') }}<br />
         <div class="promo-img">
           <img
             class="border"
@@ -123,26 +121,24 @@
           />
         </div>
         <div class="caption">
-          Purple, the color of royalty, emperors... and you!
+          {{ $t('supporter.sponsor.purple') }}
         </div>
         <br />
-        And naturally, all the Supporter and Champion perks are yours as well.
-        Private rooms! Correct guesses! Themed word lists! What are you waiting
-        for?<br />
+        {{ $t('supporter.sponsor.getallPrivelge') }}<br />
         <br />
         <div class="has-text-centered">
           <button
             class="button is-medium is-danger"
             @click="checkout('sponsor')"
           >
-            Become a Sponsor! ($10/month)
+            {{ $t('supporter.sponsor.becomeone') }}
           </button>
         </div>
         <br />
         <br />
 
-        <h2>Testimonials</h2>
-        Here's what our fans have to say:
+        <h2>{{ $t('supporter.testies.name') }}</h2>
+        {{ $t('supporter.testies.fansays') }}
         <br />
         <br />
         <div class="notification is-warning is-light">
@@ -188,14 +184,13 @@
         </div>
 
         <br />
-        <h2>Ready to support One Word?</h2>
-        You can cancel your support at any time -- and if you're unhappy for any
-        reason, let us know and we'll provide a full refund.<br /><br />
+        <h2>{{ $t('supporter.ready') }}</h2>
+        {{ $t('supporter.cancel') }}<br /><br />
 
-        As always, if you have any questions, or need help, get in touch at
+        {{ $t('supporter.question') }}
         <a href="mailto:austin@oneword.games">austin@oneword.games</a
-        >.<br /><br />
-        Thanks, and happy cluing!<br />
+        ><br /><br />
+        {{ $t('supporter.thankyou') }}<br />
       </div>
     </article>
 
@@ -203,18 +198,24 @@
 
     <div class="pricing-table container">
       <div class="pricing-plan">
-        <div class="plan-header">Supporter</div>
+        <div class="plan-header">{{ $t('supporter.supporter.name') }}</div>
         <div class="plan-price">
           <span class="plan-price-amount"
             ><span class="plan-price-currency">$</span
             >{{ planValues['supporter'] }}</span
-          >/month
+          >{{ $t('supporter.permonth') }}
         </div>
         <div class="plan-items">
-          <div class="plan-item"><b>Private rooms!</b></div>
-          <div class="plan-item"><b>Custom user avatar!</b></div>
-          <div class="plan-item">Priority support</div>
-          <div class="plan-item">Ad-free experience</div>
+          <div class="plan-item">
+            <b>{{ $t('supporter.supporter.privateRoom') }}</b>
+          </div>
+          <div class="plan-item">
+            <b>{{ $t('supporter.supporter.customAvatar') }}</b>
+          </div>
+          <div class="plan-item">{{ $t('supporter.supporter.priority') }}</div>
+          <div class="plan-item">
+            {{ $t('supporter.supporter.addfreeExp') }}
+          </div>
           <div class="plan-item">-</div>
           <div class="plan-item">-</div>
         </div>
@@ -223,53 +224,69 @@
             class="button is-fullwidth is-warning"
             @click="checkout('supporter')"
           >
-            Support us!
+            {{ $t('supporter.supporter.encourage') }}
           </button>
         </div>
       </div>
 
       <div class="pricing-plan is-active">
-        <div class="plan-header">Champion</div>
+        <div class="plan-header">{{ $t('supporter.champion.name') }}</div>
         <div class="plan-price">
           <span class="plan-price-amount"
             ><span class="plan-price-currency">$</span
             >{{ planValues['champion'] }}</span
-          >/month
+          >{{ $t('supporter.permonth') }}
         </div>
         <div class="plan-items">
-          <div class="plan-item"><b>Themed word lists!</b></div>
-          <div class="plan-item"><b>Mark guesses as correct!</b></div>
-          <div class="plan-item">Private rooms!</div>
-          <div class="plan-item">Priority support</div>
-          <div class="plan-item">Ad-free experience</div>
+          <div class="plan-item">
+            <b>{{ $t('supporter.champion.themed') }}</b>
+          </div>
+          <div class="plan-item">
+            <b>{{ $t('supporter.champion.markas') }}</b>
+          </div>
+          <div class="plan-item">
+            {{ $t('supporter.champion.privateRoom') }}
+          </div>
+          <div class="plan-item">{{ $t('supporter.supporter.priority') }}</div>
+          <div class="plan-item">
+            {{ $t('supporter.supporter.addfreeExp') }}
+          </div>
           <div class="plan-item">-</div>
         </div>
         <div class="plan-footer">
           <button class="button is-fullwidth" @click="checkout('champion')">
-            Champion One Word!
+            {{ $t('supporter.champion.encourage') }}
           </button>
         </div>
       </div>
 
       <div class="pricing-plan is-danger">
-        <div class="plan-header">Sponsor</div>
+        <div class="plan-header">{{ $t('supporter.sponsor.name') }}</div>
         <div class="plan-price">
           <span class="plan-price-amount"
             ><span class="plan-price-currency">$</span
             >{{ planValues['sponsor'] }}</span
-          >/month
+          >{{ $t('supporter.permonth') }}
         </div>
         <div class="plan-items">
-          <div class="plan-item"><b>Frontpage Sponsor credit!</b></div>
-          <div class="plan-item"><b>Custom cosmetics!</b></div>
-          <div class="plan-item">Themed word lists</div>
-          <div class="plan-item">Private rooms</div>
-          <div class="plan-item">Priority support</div>
-          <div class="plan-item">Ad-free experience</div>
+          <div class="plan-item">
+            <b>{{ $t('supporter.sponsor.frontpage') }}</b>
+          </div>
+          <div class="plan-item">
+            <b>{{ $t('supporter.sponsor.custom') }}</b>
+          </div>
+          <div class="plan-item">{{ $t('supporter.sponsor.wordList') }}</div>
+          <div class="plan-item">
+            {{ $t('supporter.champion.privateRoom') }}
+          </div>
+          <div class="plan-item">{{ $t('supporter.supporter.priority') }}</div>
+          <div class="plan-item">
+            {{ $t('supporter.supporter.addfreeExp') }}
+          </div>
         </div>
         <div class="plan-footer">
           <button class="button is-fullwidth" @click="checkout('sponsor')">
-            Sponsor us!
+            {{ $t('supporter.sponsor.encourage') }}
           </button>
         </div>
       </div>
