@@ -9,6 +9,7 @@
     "hide": "(hide)",
     "hopOnDis": "Or hop on our Discord for voice chat 🎤",
     "messageHide": "{length}{' messages hidden'}",
+    "placeholder": "Please be nice~",
     "roomChat": "Room Chat"
   },
   "frontPage": {
@@ -145,6 +146,30 @@
     "textForSupporters": "{'Hope you had fun, '}{name}{'! This is all made possible by supporters like you 😍'}",
     "wrapUp": "And that's a wrap!",
     "wrapUpText": "While you're here, check out two of our new games"
+  },
+  "profile": {
+    "avatar": "Your Avatar",
+    "become": "Become a",
+    "becomeone": "Become one!",
+    "changeAvatar": "You can change your avatar on",
+    "managesetting": "Manage your settings",
+    "notsupporter": "You're not currently a supporter 😢",
+    "signout": "Sign out",
+    "supporterSetting": "Supporter Settings",
+    "thankbecomesupporter": "{'Thanks for being a One Word '}{supporter}{'!'}",
+    "thankplayText": "Thanks for playing!",
+    "thanksupporterText": "Thanks for being a supporter!",
+    "toChange": "to change your avatar!",
+    "youHavent": "{'You haven't played '}{gametitle}{' yet...'}",
+    "yourGame": "Your Games",
+    "welcome": "{'Hey there, '}{name}{'.'}",
+    "caresignIn": "Care to sign in?",
+    "supporter": "supporter",
+    "afterGravatar": "."
+  },
+  "shareLink": {
+    "copied": "Copied!",
+    "copy": "Copy"
   },
   "sponsors": {
     "gratefulText": "We're grateful to be",

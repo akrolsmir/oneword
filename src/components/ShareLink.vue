@@ -19,7 +19,7 @@
         style="transition: background 0.1s ease"
         @click="copy"
       >
-        {{ isCopied ? 'Copied!' : 'Copy' }}
+        {{ isCopied ? $t('shareLink.copied') : $t('shareLink.copy') }}
       </button>
     </div>
   </div>

@@ -9,6 +9,7 @@
     "hide": "（隱藏）",
     "hopOnDis": "或是上Discord來語音🎤",
     "messageHide": "{length}{'條隱藏訊息'}",
+    "placeholder": "記得要保持友善～",
     "roomChat": "聊天室"
   },
   "frontPage": {
@@ -145,6 +146,30 @@
     "textForSupporters": "{name}{'，希望你有一個愉快的體驗！這一切都歸功於像你一樣的支持者😍'}",
     "wrapUp": "這樣就告一段落啦！",
     "wrapUpText": "趁這個難得的機會，來看看我們另外兩款新遊戲："
+  },
+  "profile": {
+    "afterGravatar": "更換你的頭貼。",
+    "avatar": "你的頭貼",
+    "become": "成為",
+    "becomeone": "成為支持者！",
+    "caresignIn": "要登入嗎？",
+    "changeAvatar": "你可以在",
+    "managesetting": "設定",
+    "notsupporter": "你目前還不是支持者喔😢",
+    "signout": "登出",
+    "supporter": "支持者",
+    "supporterSetting": "支持者設定",
+    "thankbecomesupporter": "{'感謝你成為One Word的'}{supporter}{'!'}",
+    "thankplayText": "謝謝你的遊玩！",
+    "thanksupporterText": "感謝您成為一名支持者！",
+    "toChange": "來更換你的頭貼！",
+    "welcome": "{'嘿，'}{name}{'。'}",
+    "youHavent": "{'你還未遊玩過'}{gametitle}{'喔...'}",
+    "yourGame": "你的遊戲"
+  },
+  "shareLink": {
+    "copied": "已複製！",
+    "copy": "複製"
   },
   "sponsors": {
     "gratefulText": "我們很高興能擁有以下",
