@@ -191,7 +191,7 @@
       "markas": "凌駕得分系統！",
       "name": "贊助者",
       "privateRoom": "私人房間",
-      "speckled": "如果你認為這些“瑕疵”可以忽略的話...",
+      "speckled": "如果你認為答案夠接近的話...",
       "themed": "主題詞彙表！",
       "tryThese": "玩膩名詞、動詞與形容詞了嗎？ 試試這些：",
       "unlockTheme": "你也能解鎖這些特殊主題詞彙表："
@@ -216,7 +216,7 @@
     "supporter": {
       "addfree": "支持者也將獲得優先客服與無廣告體驗。聽起來不錯吧？",
       "addfreeExp": "無廣告體驗",
-      "afterDescription": "這些房間將不會顯示在首頁上，並只能以連結邀請進入。",
+      "afterDescription": " 這些房間將不會顯示在首頁上，並只能以連結邀請進入。",
       "afterGravatar": "上變更你的頭貼",
       "becomeone": "成為一名支持者！（$3/月）",
       "configureAvatar": "你可以在",
