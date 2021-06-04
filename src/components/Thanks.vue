@@ -3,8 +3,8 @@
     <section class="hero is-primary is-bold">
       <div class="hero-body">
         <div class="container">
-          <h1 class="title">Thanks for your support!</h1>
-          <div class="subtitle">Seriously, you're the literal best.</div>
+          <h1 class="title">{{ $t('thanks.title') }}</h1>
+          <div class="subtitle">{{ $t('thanks.yourebest') }}</div>
         </div>
       </div>
     </section>
@@ -12,20 +12,20 @@
       <div class="message-body">
         <transition name="fade">
           <div v-cloak v-if="finished" key="1">
-            Your supporter benefits have just been granted!<br />
-            It means the world to us, that you enjoyed One Word this much.<br />
-            Again, from the bottom of my heart:<br />
+            {{ $t('thanks.granted') }}<br />
+            {{ $t('thanks.meansalot') }}<br />
+            {{ $t('thanks.heart') }}<br />
             <img src="/images/shen-gg.png" />
           </div>
           <div v-else key="2">
-            Now granting your benefits...
+            {{ $t('thanks.granting') }}
             <div class="loaderz">
               <div class="left"></div>
               <div class="mid"></div>
               <div class="right"></div>
             </div>
-            (If this takes more than a minute, something broke. Sadface.<br />
-            Ping austin@oneword.games and I'll get you sorted out.)
+            {{ $t('thanks.taketime') }}<br />
+            {{ $t('thanks.ping') }}
           </div>
         </transition>
       </div>

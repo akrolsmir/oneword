@@ -190,11 +190,11 @@
       "markCorrect": "You can mark it as correct!",
       "markas": "Mark guesses as correct!",
       "name": "Champion",
+      "privateRoom": "Private Room",
       "speckled": "If you think \"speckled\" was close enough...",
       "themed": "Themed word lists!",
       "tryThese": "Tired of nouns, verbs, and adjectives? Try these!",
-      "unlockTheme": "You'll also unlock a bunch of specially-themed word lists to play with:",
-      "privateRoom": "Private Room"
+      "unlockTheme": "You'll also unlock a bunch of specially-themed word lists to play with:"
     },
     "explainCoverFee": "You'll be helping cover our server and development costs, and we offer some neat perks as well!",
     "permonth": "/month",
@@ -210,8 +210,8 @@
       "name": "Sponsor",
       "purple": "Purple, the color of royalty, emperors... and you!",
       "purpleBorder": "Plus, you now get a *purple* border. One-up all the other supporters!",
-      "youthebest": "Really, you're the best.",
-      "wordList": "Themed word lists"
+      "wordList": "Themed word lists",
+      "youthebest": "Really, you're the best."
     },
     "supporter": {
       "addfree": "Supporters also get priority support and an ad-free experience. Does that all sound good?",
@@ -235,5 +235,15 @@
     },
     "thankyou": "Thanks, and happy cluing!",
     "welcomeTitle": "Support One Word"
+  },
+  "thanks": {
+    "granted": "Your supporter benefits have just been granted!",
+    "granting": "Now granting your benefits...",
+    "heart": "Again, from the bottom of my heart:",
+    "meansalot": "It means the world to us, that you enjoyed One Word this much.",
+    "ping": "Ping austin@oneword.games and I'll get you sorted out.)",
+    "taketime": "(If this takes more than a minute, something broke. Sadface.",
+    "title": "Thanks for your support!",
+    "yourebest": "Seriously, you're the literal best."
   }
 }

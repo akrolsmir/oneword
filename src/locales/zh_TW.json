@@ -235,5 +235,15 @@
     },
     "thankyou": "謝謝，祝你們提示愉快！",
     "welcomeTitle": "支持One Word"
+  },
+  "thanks": {
+    "granted": "你剛剛獲得你的支持者特權！",
+    "granting": "正在賦予你特權...",
+    "heart": "再一次誠心地感謝你：",
+    "meansalot": "這對我們意義重大，希望你能盡情享受One Word。",
+    "ping": "請聯絡 austin@oneword.games，我會幫你解決問題。）",
+    "taketime": "（如果這需要一分鐘以上的時間，代表某些東西出錯了。哭臉",
+    "title": "感謝您的支持！",
+    "yourebest": "說真的，你真的最棒了！"
   }
 }
