@@ -1,6 +1,6 @@
 <template>
   <BigColumn>
-    <h1 class="title">About Us</h1>
+    <h1 class="title">{{ $t('aboutUs.title') }}</h1>
     <article class="message container">
       <div class="message-body" style="border: none">
         <div class="field">
@@ -120,7 +120,7 @@
         <br /><br /><br />
 
         <div class="content">
-          With additional thanks to:
+          {{ $t('aboutUs.thank') }}
           <ul>
             <li>
               Alex Lien, Bryant Chang, and the rest of our Sat 5pm playtest
@@ -142,9 +142,9 @@
       </div>
     </article>
     <div style="height: 4em" class="has-text-centered">
-      Want to contribute? Contact us at
-      <a href="mailto:hello@oneword.games">hello@oneword.games</a>.<br />
-      <router-link to="/privacy">Privacy policy</router-link>
+      {{ $t('aboutUs.contribute') }}
+      <a href="mailto:hello@oneword.games">hello@oneword.games</a><br />
+      <router-link to="/privacy">{{ $t('aboutUs.privacy') }}</router-link>
     </div>
   </BigColumn>
 </template>

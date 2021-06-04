@@ -1,4 +1,10 @@
 {
+  "aboutUs": {
+    "contribute": "Want to contribute? Contact us at",
+    "privacy": "Privacy policy",
+    "thank": "With additional thanks to:",
+    "title": "About Us"
+  },
   "chatBox": {
     "hide": "(hide)",
     "hopOnDis": "Or hop on our Discord for voice chat 🎤",

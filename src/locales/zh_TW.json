@@ -1,4 +1,10 @@
 {
+  "aboutUs": {
+    "contribute": "想要盡一份力嗎？ 聯絡我們",
+    "privacy": "隱私權條款",
+    "thank": "還要感謝：",
+    "title": "關於我們"
+  },
   "chatBox": {
     "hide": "（隱藏）",
     "hopOnDis": "或是上Discord來語音🎤",
