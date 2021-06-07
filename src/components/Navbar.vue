@@ -95,8 +95,7 @@
 
       <div class="navbar-end">
         <div class="navbar-item">
-          <div class="locale-changer">
-            {{ $t('navBar.language') }}
+          <div class="locale-changer select">
             <select v-model="$i18n.locale">
               <option value="en" selected>English</option>
               <option value="zh_TW">繁體中文</option>
