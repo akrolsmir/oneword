@@ -7,6 +7,8 @@ const messages = {
   zh_TW: zh_TW,
 }
 
+// Locale detection taken from:
+// https://phrase.com/blog/posts/ultimate-guide-to-vue-localization-with-vue-i18n/#Detecting_the_Users_Preferred_Locale_in_the_Browser
 function getBrowserLocale(options = {}) {
   const defaultOptions = { countryCodeOnly: false }
   const opt = { ...defaultOptions, ...options }
