@@ -32,7 +32,7 @@
     "createRoom": "建立私人房間",
     "enter": "進入房間",
     "openRooms": "公開房間",
-    "opetnRoomList": "{'，與'}{players}",
+    "openRoomList": "{'，與'}{players}",
     "privateModal": {
       "cancel": "不是現在",
       "okay": "成為支持者！",

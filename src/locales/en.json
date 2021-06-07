@@ -32,7 +32,7 @@
     "createRoom": "Create Private Room",
     "enter": "Enter Room",
     "openRooms": "Open Rooms",
-    "opetnRoomList": "{', with '}{players}",
+    "openRoomList": "{', with '}{players}",
     "privateModal": {
       "cancel": "Not now",
       "okay": "Become a supporter!",

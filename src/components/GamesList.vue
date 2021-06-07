@@ -54,7 +54,7 @@
       <router-link :to="`${roomDirectory}${openRoom.name}`">
         <b>{{ openRoom.name }}</b></router-link
       >{{
-        $t('gameList.opetnRoomList', {
+        $t('gameList.openRoomList', {
           players: listPlayers(openRoom).join(', '),
         })
       }}
