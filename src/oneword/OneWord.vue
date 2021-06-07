@@ -15,7 +15,9 @@
         @background-click="showShareModal = false"
       >
         <div class="notification">
-          <label class="is-block mb-2">Invite your friends to play!</label>
+          <label class="is-block mb-2">{{
+            $t('onewordGame.invitation')
+          }}</label>
           <ShareLink />
           <button
             class="delete"
@@ -30,7 +32,12 @@
     <div class="message">
       <div class="message-header has-text-weight-normal is-flex-wrap-wrap">
         <h1 class="fancy big">
-          Round {{ room.history.length + 1 }} of {{ totalRounds }}
+          {{
+            $t('onewordGame.Round', {
+              roundnumber: room.history.length + 1,
+              totalround: totalRounds,
+            })
+          }}
         </h1>
         <a class="fancy" href="#" @click.prevent="showShareModal = true">{{
           room.name
@@ -50,24 +57,30 @@
             <div class="mx-1" v-if="player.isMod">
               <span class="select is-small">
                 <select v-model="room.public" @change="upsell('public')">
-                  <option :value="true">Public room</option>
-                  <option :value="false">Private room</option>
+                  <option :value="true">
+                    {{ $t('onewordGame.publicRoom') }}
+                  </option>
+                  <option :value="false">
+                    {{ $t('onewordGame.privateRoom') }}
+                  </option>
                 </select>
               </span>
             </div>
             <template v-else>
-              <span class="mx-2"
-                >{{ room.public ? 'Public' : 'Private' }} room</span
-              >
+              <span class="mx-2">{{
+                room.public
+                  ? $t('onewordGame.publicRoom')
+                  : $t('onewordGame.privateRoom')
+              }}</span>
             </template>
           </span>
 
           <!-- Timers -->
           <span class="ml-1 mr-2 my-1 is-flex is-align-items-center">
             <template v-if="player.isMod">
-              <label for="clue-timer" class="is-size-7 is-flex-grow-1"
-                >Clue:</label
-              >
+              <label for="clue-timer" class="is-size-7 is-flex-grow-1">{{
+                $t('onewordGame.clue')
+              }}</label>
               <input
                 class="input is-small"
                 style="flex: 1 2 48px"
@@ -79,11 +92,13 @@
                 v-model.number="room.timers.CLUEING"
                 :disabled="room.timers.running"
               />
-              <span class="is-size-7 mr-4 ml-1">secs</span>
+              <span class="is-size-7 mr-4 ml-1">{{
+                $t('onewordGame.sec')
+              }}</span>
 
-              <label for="guess-timer" class="is-size-7 is-flex-grow-1"
-                >Guess:</label
-              >
+              <label for="guess-timer" class="is-size-7 is-flex-grow-1">{{
+                $t('onewordGame.guess')
+              }}</label>
               <input
                 class="input is-small"
                 style="flex: 1 2 48px"
@@ -95,22 +110,32 @@
                 v-model.number="room.timers.GUESSING"
                 :disabled="room.timers.running"
               />
-              <span class="is-size-7 mr-4 ml-1">secs</span>
+              <span class="is-size-7 mr-4 ml-1">{{
+                $t('onewordGame.sec')
+              }}</span>
 
               <button class="button is-small" @click="toggleTimers">
-                {{ room.timers.running ? 'Stop' : 'Start' }} Timers
+                {{
+                  room.timers.running
+                    ? $t('onewordGame.stopTimers')
+                    : $t('onewordGame.startTimers')
+                }}
               </button>
             </template>
             <template v-else>
               <template v-if="room.timers.running">
-                <span v-if="room.timers.CLUEING" class="mx-2"
-                  >Clue: {{ room.timers.CLUEING }}s</span
-                >
+                <span v-if="room.timers.CLUEING" class="mx-2">{{
+                  $t('onewordGame.clueingTime', { time: room.timers.CLUEING })
+                }}</span>
                 <span v-if="room.timers.GUESSING" class="mx-2"
-                  >Guess: {{ room.timers.GUESSING }}s</span
-                >
+                  >{{
+                    $t('onewordGame.guessingTime', {
+                      time: room.timers.GUESSING,
+                    })
+                  }}
+                </span>
               </template>
-              <span v-else class="mx-1">No timers</span>
+              <span v-else class="mx-1">{{ $t('onewordGame.noTimers') }}</span>
             </template>
           </span>
 
@@ -134,7 +159,7 @@
       <div class="message-body" style="border-width: 0">
         <!-- Mod Categories -->
         <div v-if="showModTools">
-          <div class="label mt-0">Basic Wordlists</div>
+          <div class="label mt-0">{{ $t('onewordGame.basicWordList') }}</div>
           <span class="field is-grouped is-grouped-multiline my-1">
             <div class="control" v-for="category in BASIC_LISTS">
               <label class="capitalize checkbox">
@@ -171,7 +196,7 @@
               </div>
               <div class="control">
                 <button v-if="wordsSaved" class="button is-small" disabled>
-                  Saved
+                  {{ $t('onewordGame.saved') }}
                 </button>
                 <!-- TODO: set wordsSaved = true on @click. -->
                 <button
@@ -179,18 +204,20 @@
                   class="button is-small"
                   @click="saveRoom('customWords')"
                 >
-                  Save
+                  {{ $t('onewordGame.save') }}
                 </button>
               </div>
             </div>
           </div>
 
           <div class="label">
-            Themed Wordlists
+            {{ $t('onewordGame.themedWordlists') }}
             <a
               @click="referSupporter('themed_wordlist')"
               style="text-decoration: none"
-              ><span class="tag is-warning ml-2">For champions!</span></a
+              ><span class="tag is-warning ml-2">{{
+                $t('onewordGame.forChampion')
+              }}</span></a
             >
           </div>
           <div class="field is-grouped is-grouped-multiline my-1">
@@ -210,28 +237,28 @@
 
         <!-- Other Mod Tools -->
         <div v-if="showModTools">
-          <div class="label">Room Controls</div>
+          <div class="label">{{ $t('onewordGame.roomControl') }}</div>
           <div class="field has-addons is-inline-flex mb-6">
             <span class="control">
               <button class="button is-small" @click="nextStage">
-                Next Stage
+                {{ $t('onewordGame.nextStage') }}
               </button>
             </span>
             <span class="control">
               <button class="button is-small" @click="newRound(true)">
-                Skip Word
+                {{ $t('onewordGame.skipWord') }}
               </button>
             </span>
             <span v-if="user.isAdmin" class="control">
               <button class="button is-small" @click="resetRoom">
-                Reset Room
+                {{ $t('onewordGame.resetRoom') }}
               </button>
             </span>
           </div>
           <div class="field has-addons is-inline-flex">
             <span class="control">
               <button class="button is-small" @click="makeMod(newMod)">
-                Transfer Mod
+                {{ $t('onewordGame.transferMod') }}
               </button>
             </span>
             <span class="control">
@@ -269,12 +296,17 @@
             class="button is-ghost p-0"
             @click.prevent="makeMod(player.name)"
           >
-            Become the mod
+            {{ $t('onewordGame.becomeTheMod') }}
           </button>
         </div>
         <div v-else-if="player.isMod">
           <a href="#" @click.prevent="player.modTools = !player.modTools">
-            ({{ player.modTools ? 'Hide' : 'Show' }} mod tools)
+            ({{
+              player.modTools
+                ? $t('onewordGame.hideModtools')
+                : $t('onewordGame.showModtools')
+            }}
+            )
           </a>
         </div>
       </div>
@@ -290,24 +322,31 @@
     <!-- Input area (clueing) -->
     <div v-if="room.currentRound.state == 'CLUEING'">
       <div v-if="room.players.length < 3">
-        <h2 class="fancy" role="alert">Waiting for 3 players...</h2>
-        <p class="mt-5 mb-2">Invite your friends to play!</p>
+        <h2 class="fancy" role="alert">{{ $t('onewordGame.waitingText') }}</h2>
+        <p class="mt-5 mb-2">{{ $t('onewordGame.invitation') }}</p>
         <ShareLink />
       </div>
       <div v-else-if="room.currentRound.guesser == player.name">
         <h2 class="fancy" role="alert">
-          It's your turn to guess! Waiting for clues...
+          {{ $t('onewordGame.yourTurnText') }}
         </h2>
       </div>
       <div v-else>
         <div class="box">
           <h2 class="fancy has-text-centered" role="alert">
-            The {{ wordForWord(room.currentRound.category) }} for
-            {{ room.currentRound.guesser }} is<br />
+            {{
+              $t('onewordGame.currentWordText', {
+                wordCategory: wordForWord(room.currentRound.category),
+                guesser: room.currentRound.guesser,
+              })
+            }}
+            <br />
             <strong class="is-size-3">{{ room.currentRound.word }}</strong>
           </h2>
           <br />
-          <label class="label" for="hintInput">Your clue</label>
+          <label class="label" for="hintInput">{{
+            $t('onewordGame.yourClue')
+          }}</label>
           <div class="field has-addons">
             <div class="control is-expanded">
               <input
@@ -336,7 +375,9 @@
                 }"
               >
                 {{
-                  room.currentRound.clues[player.name] ? 'Submitted' : 'Submit'
+                  room.currentRound.clues[player.name]
+                    ? $t('onewordGame.submitted')
+                    : $t('onewordGame.submit')
                 }}
               </button>
             </div>
@@ -346,14 +387,14 @@
             role="alert"
             v-if="dupes(player.clue || '', room.currentRound.word)"
           >
-            This clue is too similar to the word
+            {{ $t('onewordGame.similarClueText') }}
           </div>
           <div
             class="notification is-danger"
             role="alert"
             v-else-if="hasSpecialCharacters(player.clue)"
           >
-            Are you sure this is a real word?
+            {{ $t('onewordGame.realWordText') }}
           </div>
         </div>
       </div>
@@ -364,13 +405,18 @@
       <div v-if="room.currentRound.guesser == player.name">
         <div class="box">
           <h2 class="fancy" role="alert">
-            Your clues for the
-            {{ wordForWord(room.currentRound.category) }} are:
+            {{
+              $t('onewordGame.guesserClues', {
+                wordCategory: wordForWord(room.currentRound.category),
+              })
+            }}
           </h2>
           <div class="fancy newline">
             {{ dedupe(room.currentRound.clues, false) }}
           </div>
-          <label class="label" for="guess-input">Your Guess</label>
+          <label class="label" for="guess-input">{{
+            $t('onewordGame.yourGuess')
+          }}</label>
           <div class="field has-addons">
             <div class="control is-expanded">
               <input
@@ -382,18 +428,29 @@
               />
             </div>
             <div class="control">
-              <button class="button" @click="submitGuess">Submit</button>
+              <button class="button" @click="submitGuess">
+                {{ $t('onewordGame.submit') }}
+              </button>
             </div>
           </div>
         </div>
       </div>
       <div v-else>
         <h2 class="fancy" role="alert">
-          Waiting for {{ room.currentRound.guesser }} to guess...
+          {{
+            $t('onewordGame.waitingGuesserText', {
+              guesser: room.currentRound.guesser,
+            })
+          }}
         </h2>
         <div class="fancy">
-          The clues for
-          <strong>{{ room.currentRound.word }}</strong> were:
+          {{
+            $t('onewordGame.cluesForText', {
+              word: room.currentRound.word,
+            })
+          }}
+          <!--The clues for
+          <strong>{{ room.currentRound.word }}</strong> were:-->
         </div>
         <div class="fancy newline">
           {{ dedupe(room.currentRound.clues) }}
@@ -405,14 +462,20 @@
     <div v-if="room.currentRound.state == 'DONE'">
       <div v-if="correct(room.currentRound)">
         <h2 class="fancy has-text-success" role="alert">
-          Correct! The word was "{{ room.currentRound.word }}". Good job!
+          {{
+            $t('onewordGame.correctWordText', { word: room.currentRound.word })
+          }}
         </h2>
       </div>
       <div v-else>
         <h2 class="fancy has-text-danger" role="alert">
-          Aww, {{ room.currentRound.guesser }} guessed "{{
-            room.currentRound.guess
-          }}", but it was "{{ room.currentRound.word }}"...
+          {{
+            $t('onewordGame.wrongGuessText', {
+              guesser: room.currentRound.guesser,
+              guessword: room.currentRound.guess,
+              word: room.currentRound.word,
+            })
+          }}
         </h2>
         <button
           v-if="!correct(room.currentRound)"
@@ -420,7 +483,7 @@
           style="height: inherit"
           @click.prevent="toggleRoundCorrect"
         >
-          (Mark as correct)
+          {{ $t('onewordGame.markCorrect') }}
         </button>
       </div>
       <div class="fancy newline">
@@ -435,7 +498,9 @@
         :supporter="user.isSupporter"
         @continue-game="newRound(false)"
       ></GameEnd>
-      <button v-else class="button" @click="newRound(false)">Next Round</button>
+      <button v-else class="button" @click="newRound(false)">
+        {{ $t('onewordGame.nextRound') }}
+      </button>
     </div>
     <br />
 
@@ -445,18 +510,22 @@
       class="notification is-info is-light"
       v-if="!user.canPlay || room.people[player.name]?.state === 'WATCHING'"
     >
-      <span class="subtitle">You are currently spectating this game!</span>
+      <span class="subtitle">{{ $t('onewordGame.spectatingText') }}</span>
       <div class="buttons mt-3">
         <button class="button is-primary" @click="enterRoom">
-          <strong>Join game</strong>
+          <strong>{{ $t('onewordGame.joinGame') }}</strong>
         </button>
-        <router-link class="button is-ghost" to="/">Back to home</router-link>
+        <router-link class="button is-ghost" to="/">{{
+          $t('onewordGame.backHome')
+        }}</router-link>
       </div>
     </div>
 
     <br />
     <!-- History -->
-    <h2 v-if="room.history.length > 0" class="fancy">History</h2>
+    <h2 v-if="room.history.length > 0" class="fancy">
+      {{ $t('onewordGame.history') }}
+    </h2>
     <template v-for="(round, i) in room.history.slice().reverse()">
       <div class="level mb-0">
         <div class="level-left">
@@ -475,7 +544,8 @@
             >
           </span>
           <p class="level-item" style="justify-content: flex-start">
-            {{ round.guesser }} guessed "<b
+            {{ $t('onewordGame.guessHistory', { guesser: round.guesser })
+            }}<b
               :class="correct(round) ? 'has-text-success' : 'has-text-danger'"
               >{{ round.guess }}</b
             >"
@@ -488,7 +558,7 @@
         style="height: inherit"
         @click="toggleHistoryCorrect(i)"
       >
-        (Mark as correct)
+        {{ $t('onewordGame.markCorrect') }}
       </button>
       <p class="newline mt-5">{{ dedupe(round.clues) }}</p>
       <br />
@@ -719,8 +789,8 @@ export default {
       }
       // History is shown in reverse order, so we re-reverse the index
       const index = this.room.history.length - 1 - reverseIndex
-      this.room.history[index].markedCorrect = !this.room.history[index]
-        .markedCorrect
+      this.room.history[index].markedCorrect =
+        !this.room.history[index].markedCorrect
       // History is an array, so we overwrite the whole thing.
       // Note: Possible race condition with "Next Round"; could fix by object-ifying history
       await this.saveRoom('history')
@@ -759,12 +829,11 @@ export default {
     },
     showSupporterModal() {
       this.$showModal({
-        title: 'Want private rooms?',
-        text:
-          'Earn perks like private rooms, custom avatars, and more by becoming a supporter 😍',
+        title: this.$t('onewordGame.showSupportModal.title'),
+        text: this.$t('onewordGame.showSupportModal.text'),
         buttons: {
-          okay: 'Okay!',
-          cancel: 'Not now',
+          okay: this.$t('onewordGame.showSupportModal.okayButton'),
+          cancel: this.$t('onewordGame.showSupportModal.cancel'),
         },
         callbacks: {
           okay: () => {
@@ -775,11 +844,11 @@ export default {
     },
     showChampionModal() {
       this.$showModal({
-        title: 'Mark this guess as correct?',
-        text: 'Unlock this perk by becoming a One Word champion 😍',
+        title: this.$t('onewordGame.showChampionModal.title'),
+        text: this.$t('onewordGame.showChampionModal.text'),
         buttons: {
-          okay: 'Okay!',
-          cancel: 'Not now',
+          okay: this.$t('onewordGame.showChampionModal.okayButton'),
+          cancel: this.$t('onewordGame.showChampionModal.cancel'),
         },
         callbacks: {
           okay: () => {
@@ -791,8 +860,12 @@ export default {
     showUniquifiedModal() {
       const oldName = this.player.name.split(' ').pop()
       this.$showModal({
-        title: `You are now "${this.player.name}"!`,
-        text: `Another "${oldName}" was already in this room...`,
+        title: this.$t('onewordGame.showUniquifiedModal.title', {
+          player: this.player.name,
+        }),
+        text: this.$t('onewordGame.showUniquifiedModal.text', {
+          player: oldName,
+        }),
       })
     },
     correct,

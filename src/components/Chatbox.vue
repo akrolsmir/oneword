@@ -1,9 +1,9 @@
 <template>
   <div class="block" style="overflow-wrap: break-word">
     <p>
-      <span class="fancy">Room Chat</span>
+      <span class="fancy">{{ $t('chatBox.roomChat') }}</span>
       <button v-if="!hidden" @click="hidden = true" class="button is-ghost">
-        (hide)
+        {{ $t('chatBox.hide') }}
       </button>
     </p>
     <button
@@ -11,7 +11,7 @@
       @click.prevent="hidden = false"
       class="button is-ghost px-0"
     >
-      {{ sortedLogs.length }} messages hidden
+      {{ $t('chatBox.messageHide', { length: sortedLogs.length }) }}
     </button>
     <div v-else>
       <div
@@ -35,7 +35,7 @@
             class="input"
             v-model="inputText"
             @keyup.enter="submitLine"
-            placeholder="Please be nice~"
+            :placeholder="$t('chatBox.placeholder')"
           />
         </div>
         <div class="control">
@@ -50,7 +50,7 @@
           rel="noopener noreferrer"
           href="https://discord.gg/AP7ssVPPCr"
         >
-          Or hop on our Discord for voice chat 🎤
+          {{ $t('chatBox.hopOnDis') }}
         </a>
       </div>
     </div>

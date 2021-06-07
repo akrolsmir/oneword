@@ -39,7 +39,9 @@
     >
       <div class="navbar-start">
         <div class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link" href="#" @click.prevent> All Games </a>
+          <a class="navbar-link" href="#" @click.prevent>
+            {{ $t('navBar.allGame') }}
+          </a>
           <div class="navbar-dropdown">
             <router-link class="navbar-item" to="/">One Word</router-link>
             <router-link class="navbar-item" to="/incrypt">Incrypt</router-link>
@@ -47,10 +49,16 @@
               Listorama
             </router-link>
             <router-link class="navbar-item" to="/storytime">
-              Storytime <span class="tag is-link is-light ml-1">New!</span>
+              Storytime
+              <span class="tag is-link is-light ml-1">{{
+                $t('navBar.new')
+              }}</span>
             </router-link>
             <router-link class="navbar-item" to="/pairwise">
-              Pairwise <span class="tag is-link is-light ml-1">New!</span>
+              Pairwise
+              <span class="tag is-link is-light ml-1">{{
+                $t('navBar.new')
+              }}</span>
             </router-link>
             <hr class="navbar-divider" />
             <a
@@ -59,33 +67,46 @@
               target="_blank"
               rel="noopener"
             >
-              Discover other games...
+              {{ $t('navBar.discoverOther') }}
             </a>
           </div>
         </div>
         <div class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link" href="#" @click.prevent> Swag </a>
+          <a class="navbar-link" href="#" @click.prevent>
+            {{ $t('navBar.swag') }}
+          </a>
           <div class="navbar-dropdown">
             <a
               class="navbar-item"
               href="https://teespring.com/oneword"
               target="_blank"
               rel="noopener"
-              >T-Shirts <span class="tag is-link is-light ml-1">New!</span></a
+              >T-Shirts
+              <span class="tag is-link is-light ml-1">{{
+                $t('navBar.new')
+              }}</span></a
             >
           </div>
         </div>
-        <a class="navbar-item" href="/platform">Design Your Own Game</a>
+        <a class="navbar-item" href="/platform">{{
+          $t('navBar.designGame')
+        }}</a>
       </div>
 
       <div class="navbar-end">
         <div class="navbar-item">
+          <div class="locale-changer select">
+            <select v-model="$i18n.locale">
+              <option value="en" selected>English</option>
+              <option value="zh_TW">繁體中文</option>
+            </select>
+          </div>
           <div class="buttons">
-            <router-link v-if="user.id" to="/profile" class="button is-white"
-              >Signed in as {{ user.name.split(' ')[0] }}!</router-link
-            >
+            <router-link v-if="user.id" to="/profile" class="button is-white">
+              {{ $t('navBar.signInAs', { user: user.name.split(' ')[0] }) }}
+            </router-link>
             <button v-else class="button is-light" @click="logIn">
-              Sign up
+              {{ $t('navBar.signUp') }}
             </button>
             <a
               href="/supporter"
@@ -93,7 +114,9 @@
               @click.prevent="referSupporter('navbar')"
             >
               <strong>{{
-                user.isSupporter ? 'Supporter' : 'Become a supporter!'
+                user.isSupporter
+                  ? $t('navBar.supporter')
+                  : $t('navBar.becomeSupporter')
               }}</strong>
             </a>
           </div>

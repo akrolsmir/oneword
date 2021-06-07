@@ -6,8 +6,10 @@ import 'tippy.js/dist/tippy.css'
 import './styles.scss'
 
 import { router } from './router'
+import { i18n } from './i18n'
 
 export const app = createApp(App)
+  .use(i18n)
   .use(router)
   .use(VueTippy, {
     directive: 'tippy',

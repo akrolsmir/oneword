@@ -1,37 +1,44 @@
 <template>
   <div>
-    <h1>And that's a wrap!</h1>
+    <h1>{{ $t('onewordGameEnd.wrapUp') }}</h1>
     <h1 class="mb-3">
-      While you're here, check out two of our new games
-      <a href="/storytime"> <strong> Storytime </strong> </a> and
-      <a href="/pairwise"> <strong> Pairwise </strong> </a>!
+      {{ $t('onewordGameEnd.wrapUpText') }}
+      <a href="/storytime"> <strong> Storytime </strong> </a
+      >{{ $t('onewordGameEnd.and') }}
+      <a href="/pairwise"> <strong> Pairwise </strong> </a
+      >{{ $t('onewordGameEnd.escalation') }}
     </h1>
 
     <canvas id="fireworks" style="width: 100%"></canvas>
 
-    <h2>Final score: {{ score }} correct / {{ roundsInGame }} rounds</h2>
-    ({{ MESSAGES[score] }})<br />
+    <h2>
+      {{
+        $t('onewordGameEnd.finalScoreText', {
+          score: score,
+          round: roundsInGame,
+        })
+      }}
+    </h2>
+    ({{ $t(MESSAGES[score]) }})<br />
     <br />
     <template v-if="supporter">
-      Hope you had fun, {{ name }}! This is all made possible by supporters like
-      you 😍<br />
+      {{ $t('onewordGameEnd.textForSupporters', { name: name }) }}<br />
     </template>
     <template v-else>
-      If you enjoyed One Word, consider becoming a supporter!<br />
-      You can earn nice perks like private rooms, while helping cover our server
-      costs.<br />
+      {{ $t('onewordGameEnd.textForSellingSupporter') }}<br />
+      {{ $t('onewordGameEnd.textForSupporterPrivilege') }}<br />
       <br />
       <a
         href="./supporter"
         @click.prevent="referSupporter('game_end')"
         class="button is-warning"
-        >Become a supporter!</a
+        >{{ $t('onewordGameEnd.becomeSupporter') }}</a
       ><br />
       <br />
     </template>
-    <a href="#" @click.prevent="continuePlaying"
-      >(Not done playing? Alright, click here to continue.)</a
-    >
+    <a href="#" @click.prevent="continuePlaying">{{
+      $t('onewordGameEnd.continuePlaying')
+    }}</a>
   </div>
 </template>
 
@@ -40,20 +47,20 @@ import { referSupporter } from '../firebase/network.js'
 import { startFireworks } from './fireworks.js'
 
 const MESSAGES = {
-  0: 'You do understand this is supposed to be a COOPERATIVE game, right?',
-  1: "At least you can't do much worse next time!",
-  2: 'Uh... Were you even trying?',
-  3: "Here's a tip: try not colliding so much.",
-  4: "Well, it's not the worst result I've ever seen...",
-  5: "Alright, now that you've warmed up, are you ready to play for real?",
-  6: 'Respectable attempt. Want to try again?',
-  7: "Okay... At least it's a lucky number?",
-  8: "Not bad! Now we're getting somewhere.",
-  9: 'Pretty good job -- but can you make it to double digits?',
-  10: 'Huh, color me impressed. Was it a fluke?',
-  11: 'You really dialed it to the next level. Try a harder category next time!',
-  12: 'You all must be cheating somehow, I just know it...',
-  13: "Wow, that's hall of fame material right there. I am in awe.",
+  0: 'onewordGameEnd.message0',
+  1: 'onewordGameEnd.message1',
+  2: 'onewordGameEnd.message2',
+  3: 'onewordGameEnd.message3',
+  4: 'onewordGameEnd.message4',
+  5: 'onewordGameEnd.message5',
+  6: 'onewordGameEnd.message6',
+  7: 'onewordGameEnd.message7',
+  8: 'onewordGameEnd.message8',
+  9: 'onewordGameEnd.message9',
+  10: 'onewordGameEnd.message10',
+  11: 'onewordGameEnd.message11',
+  12: 'onewordGameEnd.message12',
+  13: 'onewordGameEnd.message13',
 }
 
 export default {

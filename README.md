@@ -211,6 +211,7 @@ And... that's all you really need to get started with making your own game!
 
   - `Vetur` for Vue syntax highlighting
   - `Prettier` for format-on-save
+  - `i18n Ally` for text/translation display
 
     - Then open VSCode `Preferences: Open Settings (JSON)`, and add
 
@@ -225,6 +226,8 @@ And... that's all you really need to get started with making your own game!
     "[vue]": {
       "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
+    "i18n-ally.sortKeys": true,
+    "i18n-ally.keepFulfilled": true,
     ```
 
     - [In-depth setup instructions](https://www.robinwieruch.de/how-to-use-prettier-vscode)

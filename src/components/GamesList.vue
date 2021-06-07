@@ -4,7 +4,9 @@
     @submit.prevent="navigateToRoom()"
     method="POST"
   >
-    <label class="label mt-5">Hi, {{ user.displayName }}! Room name:</label>
+    <label class="label mt-5">{{
+      $t('gameList.welcomeText', { user: user.displayName })
+    }}</label>
 
     <div class="field has-addons">
       <div class="control is-expanded">
@@ -24,26 +26,26 @@
     <input
       class="button mt-2 mr-2 has-text-weight-bold"
       type="submit"
-      value="Enter Room"
+      :value="$t('gameList.enter')"
     />
     <button
       class="button is-warning mt-2"
       type="button"
       @click="createPrivateRoom"
     >
-      Create Private Room
+      {{ $t('gameList.createRoom') }}
     </button>
   </form>
   <template v-else>
     <br />
     <button class="button is-large is-success" @click="user.signIn">
-      Sign in to get started
+      {{ $t('gameList.signIn') }}
     </button>
   </template>
 
   <br /><br />
   <div v-cloak>
-    <h2 class="fancy">Open Rooms</h2>
+    <h2 class="fancy">{{ $t('gameList.openRooms') }}</h2>
     <p
       v-for="openRoom in allRooms"
       :class="{ halfOpacity: !isActive(openRoom) }"
@@ -51,21 +53,34 @@
     >
       <router-link :to="`${roomDirectory}${openRoom.name}`">
         <b>{{ openRoom.name }}</b></router-link
-      >, with {{ listPlayers(openRoom).join(', ') }} ({{
-        timeSince(openRoom.lastUpdateTime)
-      }})
+      >{{
+        $t('gameList.openRoomList', {
+          players: listPlayers(openRoom).join(', '),
+        })
+      }}
+      ({{ timeSince(openRoom.lastUpdateTime) }})
     </p>
-    <h2 class="fancy" v-if="privateRooms.length > 0">Private Rooms</h2>
+    <h2 class="fancy" v-if="privateRooms.length > 0">
+      {{ $t('gameList.privateRoom') }}
+    </h2>
     <p
       v-for="privateRoom in privateRooms"
       :class="{ halfOpacity: !isActive(privateRoom) }"
       :key="privateRoom.name"
     >
       <a href="#" @click.prevent="showPrivateModal">
-        <b>{{ 'Private room' }} with {{ listPlayers(privateRoom)[0] }}</b>
+        <b>{{
+          $t('gameList.privateRoomList', {
+            player: listPlayers(privateRoom)[0],
+          })
+        }}</b>
       </a>
       <span v-if="listPlayers(privateRoom).length > 1">
-        and {{ listPlayers(privateRoom).length }} others</span
+        {{
+          $t('gameList.andOthers', {
+            playernumber: listPlayers(privateRoom).length,
+          })
+        }}</span
       >
       ({{ timeSince(privateRoom.lastUpdateTime) }})
     </p>
@@ -160,12 +175,11 @@ export default {
     },
     showPrivateModal() {
       this.$showModal({
-        title: 'This room is private 🔒',
-        text:
-          'To join, ask your teammates for the room name or link.\n\nTo make your own private room, become a supporter!',
+        title: this.$t('gameList.privateModal.title'),
+        text: this.$t('gameList.privateModal.text'),
         buttons: {
-          okay: 'Become a supporter!',
-          cancel: 'Not now',
+          okay: this.$t('gameList.privateModal.okay'),
+          cancel: this.$t('gameList.privateModal.cancel'),
         },
         callbacks: {
           okay: () => {
@@ -176,11 +190,11 @@ export default {
     },
     showCreatePrivateModal() {
       this.$showModal({
-        title: 'To create a private room, become a supporter!',
-        text: "You'll also get other perks, like a custom avatar~",
+        title: this.$t('gameList.createPrivateModal.title'),
+        text: this.$t('gameList.createPrivateModal.text'),
         buttons: {
-          okay: 'Become a supporter!',
-          cancel: 'Not now',
+          okay: this.$t('gameList.createPrivateModal.okay'),
+          cancel: this.$t('gameList.createPrivateModal.cancel'),
         },
         callbacks: {
           okay: () => {

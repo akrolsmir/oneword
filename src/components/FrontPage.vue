@@ -8,23 +8,22 @@
             target="_blank"
             rel="noopener noreferrer"
             href="https://discord.gg/AP7ssVPPCr"
-            >Join us on Discord</a
+            >{{ $t('frontPage.joinUs') }}</a
           >
-          for our Weekly Game Nights: Monday at 6pm PT!
+          {{ $t('frontPage.joinUsTime') }}
         </div>
       </span>
-      <div class="fancy big">Welcome!</div>
-      This is an online game based on
+      <div class="fancy big">{{ $t('frontPage.welcome') }}</div>
+      {{ $t('frontPage.introBeforeJustone') }}
       <a
         target="_blank"
         rel="noopener noreferrer"
         href="https://amzn.to/2xV5lUm"
       >
         Just One</a
-      >, a co-op word game for 3+ players.<br />
-      In each of the 13 rounds, come up with a one-word hint for the
-      guesser...<br />
-      But beware: duplicate hints are discarded!<br />
+      >{{ $t('frontPage.introAfterJustone') }}<br />
+      {{ $t('frontPage.introForGame') }}<br />
+      {{ $t('frontPage.introForHint') }}<br />
     </div>
     <GamesList roomDirectory="/room/" />
     <Sponsors />

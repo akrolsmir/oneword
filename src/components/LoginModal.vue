@@ -4,7 +4,7 @@
     so there's a background click deadzone to the right/left -->
     <div class="box">
       <div class="has-text-centered" v-show="!guestMode">
-        <h2 class="fancy title mb-1">Sign in to get started!</h2>
+        <h2 class="fancy title mb-1">{{ $t('loginModal.signInText') }}</h2>
         <div
           id="android-google-signin"
           class="mt-4"
@@ -12,7 +12,12 @@
         >
           <!-- Copied the "Sign In with Google" button from FirebaseUI -->
           <button
-            class="firebaseui-idp-button mdl-button mdl-js-button mdl-button--raised firebaseui-idp-google firebaseui-id-idp-button"
+            class="
+              firebaseui-idp-button
+              mdl-button mdl-js-button
+              mdl-button--raised
+              firebaseui-idp-google firebaseui-id-idp-button
+            "
             data-provider-id="google.com"
             style="background-color: #ffffff"
             data-upgraded=",MaterialButton"
@@ -34,32 +39,34 @@
         <!-- <button class="button">Sign in with Googlexyz</button> -->
         <div id="firebaseui-auth-container"></div>
         <button class="button is-ghost is-small" @click.prevent="toGuestMode">
-          Or play without an account
+          {{ $t('loginModal.orPlayWithoutText') }}
         </button>
       </div>
       <div v-show="guestMode">
-        <h2 class="fancy title has-text-centered">Play without an account</h2>
+        <h2 class="fancy title has-text-centered">
+          {{ $t('loginModal.playWithoutText') }}
+        </h2>
         <h3 class="subtitle has-text-centered">
-          (Your game history will be lost!)
+          {{ $t('loginModal.gameHistoryLost') }}
         </h3>
         <div class="px-6">
           <input
             ref="inputGuestName"
             class="input"
-            placeholder="Name"
+            :placeholder="$t('loginModal.name')"
             v-model="user.name"
             @keyup.enter="continueAsGuest"
           />
           <div class="buttons my-3">
             <button class="button is-info is-light" @click="backToFirebase">
-              Back
+              {{ $t('loginModal.back') }}
             </button>
             <button
               class="button"
               :disabled="!user.name"
               @click="continueAsGuest"
             >
-              Continue
+              {{ $t('loginModal.continue') }}
             </button>
           </div>
         </div>
@@ -118,7 +125,8 @@ export default {
   data() {
     return {
       guestMode: false,
-      capacitorPlatform: Capacitor.getPlatform() /* "web", "ios", or "android" */,
+      capacitorPlatform:
+        Capacitor.getPlatform() /* "web", "ios", or "android" */,
     }
   },
   setup() {
