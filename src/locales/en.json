@@ -105,7 +105,23 @@
     "save": "Save",
     "saved": "Saved",
     "sec": "secs",
+    "showChampionModal": {
+      "cancel": "Not now",
+      "okayButton": "Okay!",
+      "text": "Unlock this perk by becoming a One Word champion 😍",
+      "title": "Mark this guess as correct?"
+    },
     "showModtools": "Show mod tools",
+    "showSupportModal": {
+      "cancel": "Not now",
+      "okayButton": "Okay!",
+      "text": "Earn perks like private rooms, custom avatars, and more by becoming a supporter 😍",
+      "title": "Want private rooms?"
+    },
+    "showUniquifiedModal": {
+      "text": "{'Another \"'}{player}{'\" was already in this room...'}",
+      "title": "{'You are now \"'}{player}{'\"!'}"
+    },
     "similarclueText": "This clue is too similar to the word",
     "skipWord": "Skip Word",
     "spectatingText": "You are currently spectating this game!",
@@ -147,6 +163,11 @@
     "textForSupporters": "{'Hope you had fun, '}{name}{'! This is all made possible by supporters like you 😍'}",
     "wrapUp": "And that's a wrap!",
     "wrapUpText": "While you're here, check out two of our new games"
+  },
+  "onewordUtil": {
+    "collision": "Collisions:",
+    "collisionluck": "(Uh, good luck.)",
+    "outofWord": "You're out of custom words..."
   },
   "profile": {
     "afterGravatar": ".",

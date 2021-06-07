@@ -829,11 +829,11 @@ export default {
     },
     showSupporterModal() {
       this.$showModal({
-        title: 'Want private rooms?',
-        text: 'Earn perks like private rooms, custom avatars, and more by becoming a supporter 😍',
+        title: this.$t('onewordGame.showSupportModal.title'),
+        text: this.$t('onewordGame.showSupportModal.text'),
         buttons: {
-          okay: 'Okay!',
-          cancel: 'Not now',
+          okay: this.$t('onewordGame.showSupportModal.okayButton'),
+          cancel: this.$t('onewordGame.showSupportModal.cancel'),
         },
         callbacks: {
           okay: () => {
@@ -844,11 +844,11 @@ export default {
     },
     showChampionModal() {
       this.$showModal({
-        title: 'Mark this guess as correct?',
-        text: 'Unlock this perk by becoming a One Word champion 😍',
+        title: this.$t('onewordGame.showChampionModal.title'),
+        text: this.$t('onewordGame.showChampionModal.text'),
         buttons: {
-          okay: 'Okay!',
-          cancel: 'Not now',
+          okay: this.$t('onewordGame.showChampionModal.okayButton'),
+          cancel: this.$t('onewordGame.showChampionModal.cancel'),
         },
         callbacks: {
           okay: () => {
@@ -860,8 +860,12 @@ export default {
     showUniquifiedModal() {
       const oldName = this.player.name.split(' ').pop()
       this.$showModal({
-        title: `You are now "${this.player.name}"!`,
-        text: `Another "${oldName}" was already in this room...`,
+        title: this.$t('onewordGame.showUniquifiedModal.title', {
+          player: this.player.name,
+        }),
+        text: this.$t('onewordGame.showUniquifiedModal.text', {
+          player: oldName,
+        }),
       })
     },
     correct,
