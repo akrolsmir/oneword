@@ -58,10 +58,10 @@
               <span class="select is-small">
                 <select v-model="room.public" @change="upsell('public')">
                   <option :value="true">
-                    {{ $t('onewordGame.publicroom') }}
+                    {{ $t('onewordGame.publicRoom') }}
                   </option>
                   <option :value="false">
-                    {{ $t('onewordGame.privateroom') }}
+                    {{ $t('onewordGame.privateRoom') }}
                   </option>
                 </select>
               </span>
@@ -69,8 +69,8 @@
             <template v-else>
               <span class="mx-2">{{
                 room.public
-                  ? $t('onewordGame.publicroom')
-                  : $t('onewordGame.privateroom')
+                  ? $t('onewordGame.publicRoom')
+                  : $t('onewordGame.privateRoom')
               }}</span>
             </template>
           </span>
@@ -211,7 +211,7 @@
           </div>
 
           <div class="label">
-            {{ $t('onewordGame.themedwordlists') }}
+            {{ $t('onewordGame.themedWordlists') }}
             <a
               @click="referSupporter('themed_wordlist')"
               style="text-decoration: none"
@@ -296,7 +296,7 @@
             class="button is-ghost p-0"
             @click.prevent="makeMod(player.name)"
           >
-            {{ $t('onewordGame.becometheMod') }}
+            {{ $t('onewordGame.becomeTheMod') }}
           </button>
         </div>
         <div v-else-if="player.isMod">
@@ -387,14 +387,14 @@
             role="alert"
             v-if="dupes(player.clue || '', room.currentRound.word)"
           >
-            {{ $t('onewordGame.similarclueText') }}
+            {{ $t('onewordGame.similarClueText') }}
           </div>
           <div
             class="notification is-danger"
             role="alert"
             v-else-if="hasSpecialCharacters(player.clue)"
           >
-            {{ $t('onewordGame.realwordText') }}
+            {{ $t('onewordGame.realWordText') }}
           </div>
         </div>
       </div>
@@ -445,7 +445,7 @@
         </h2>
         <div class="fancy">
           {{
-            $t('onewordGame.cluesforText', {
+            $t('onewordGame.cluesForText', {
               word: room.currentRound.word,
             })
           }}

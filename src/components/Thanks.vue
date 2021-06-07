@@ -4,7 +4,7 @@
       <div class="hero-body">
         <div class="container">
           <h1 class="title">{{ $t('thanks.title') }}</h1>
-          <div class="subtitle">{{ $t('thanks.yourebest') }}</div>
+          <div class="subtitle">{{ $t('thanks.youreBest') }}</div>
         </div>
       </div>
     </section>
@@ -13,7 +13,7 @@
         <transition name="fade">
           <div v-cloak v-if="finished" key="1">
             {{ $t('thanks.granted') }}<br />
-            {{ $t('thanks.meansalot') }}<br />
+            {{ $t('thanks.meansAlot') }}<br />
             {{ $t('thanks.heart') }}<br />
             <img src="/images/shen-gg.png" />
           </div>
@@ -24,7 +24,7 @@
               <div class="mid"></div>
               <div class="right"></div>
             </div>
-            {{ $t('thanks.taketime') }}<br />
+            {{ $t('thanks.takeTime') }}<br />
             {{ $t('thanks.ping') }}
           </div>
         </transition>

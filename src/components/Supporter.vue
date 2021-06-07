@@ -2,7 +2,7 @@
   <BigColumn>
     <h1>{{ $t('supporter.welcomeTitle') }}</h1>
     <article class="message container">
-      <div class="message-header">{{ $t('supporter.cantstophere') }}</div>
+      <div class="message-header">{{ $t('supporter.cantStopHere') }}</div>
       <div class="message-body">
         {{ $t('supporter.austinSayingHi') }}<br />
         <br />
@@ -34,14 +34,14 @@
           <a href="https://en.gravatar.com/">Gravatar</a>
           {{ $t('supporter.supporter.afterGravatar') }}
         </div>
-        {{ $t('supporter.supporter.addfree') }}<br />
+        {{ $t('supporter.supporter.adFree') }}<br />
         <br />
         <div class="has-text-centered">
           <button
             class="button is-medium is-warning"
             @click="checkout('supporter')"
           >
-            {{ $t('supporter.supporter.becomeone') }}
+            {{ $t('supporter.supporter.becomeOne') }}
           </button>
         </div>
         <br />
@@ -110,7 +110,7 @@
             alt="Frontpage listing of our sponsors"
           />
         </div>
-        <div class="caption">{{ $t('supporter.sponsor.youthebest') }}</div>
+        <div class="caption">{{ $t('supporter.sponsor.youTheBest') }}</div>
         <br />
         {{ $t('supporter.sponsor.purpleBorder') }}<br />
         <div class="promo-img">
@@ -124,7 +124,7 @@
           {{ $t('supporter.sponsor.purple') }}
         </div>
         <br />
-        {{ $t('supporter.sponsor.getallPrivelge') }}<br />
+        {{ $t('supporter.sponsor.getAllPrivilege') }}<br />
         <br />
         <div class="has-text-centered">
           <button
@@ -138,7 +138,7 @@
         <br />
 
         <h2>{{ $t('supporter.testies.name') }}</h2>
-        {{ $t('supporter.testies.fansays') }}
+        {{ $t('supporter.testies.fanSays') }}
         <br />
         <br />
         <div class="notification is-warning is-light">
@@ -203,7 +203,7 @@
           <span class="plan-price-amount"
             ><span class="plan-price-currency">$</span
             >{{ planValues['supporter'] }}</span
-          >{{ $t('supporter.permonth') }}
+          >{{ $t('supporter.perMonth') }}
         </div>
         <div class="plan-items">
           <div class="plan-item">
@@ -214,7 +214,7 @@
           </div>
           <div class="plan-item">{{ $t('supporter.supporter.priority') }}</div>
           <div class="plan-item">
-            {{ $t('supporter.supporter.addfreeExp') }}
+            {{ $t('supporter.supporter.adFreeExp') }}
           </div>
           <div class="plan-item">-</div>
           <div class="plan-item">-</div>
@@ -235,21 +235,21 @@
           <span class="plan-price-amount"
             ><span class="plan-price-currency">$</span
             >{{ planValues['champion'] }}</span
-          >{{ $t('supporter.permonth') }}
+          >{{ $t('supporter.perMonth') }}
         </div>
         <div class="plan-items">
           <div class="plan-item">
             <b>{{ $t('supporter.champion.themed') }}</b>
           </div>
           <div class="plan-item">
-            <b>{{ $t('supporter.champion.markas') }}</b>
+            <b>{{ $t('supporter.champion.markAs') }}</b>
           </div>
           <div class="plan-item">
             {{ $t('supporter.champion.privateRoom') }}
           </div>
           <div class="plan-item">{{ $t('supporter.supporter.priority') }}</div>
           <div class="plan-item">
-            {{ $t('supporter.supporter.addfreeExp') }}
+            {{ $t('supporter.supporter.adFreeExp') }}
           </div>
           <div class="plan-item">-</div>
         </div>
@@ -266,7 +266,7 @@
           <span class="plan-price-amount"
             ><span class="plan-price-currency">$</span
             >{{ planValues['sponsor'] }}</span
-          >{{ $t('supporter.permonth') }}
+          >{{ $t('supporter.perMonth') }}
         </div>
         <div class="plan-items">
           <div class="plan-item">
@@ -281,7 +281,7 @@
           </div>
           <div class="plan-item">{{ $t('supporter.supporter.priority') }}</div>
           <div class="plan-item">
-            {{ $t('supporter.supporter.addfreeExp') }}
+            {{ $t('supporter.supporter.adFreeExp') }}
           </div>
         </div>
         <div class="plan-footer">

@@ -39,15 +39,15 @@
         <!-- <button class="button">Sign in with Googlexyz</button> -->
         <div id="firebaseui-auth-container"></div>
         <button class="button is-ghost is-small" @click.prevent="toGuestMode">
-          {{ $t('loginModal.orplaywithoutText') }}
+          {{ $t('loginModal.orPlayWithoutText') }}
         </button>
       </div>
       <div v-show="guestMode">
         <h2 class="fancy title has-text-centered">
-          {{ $t('loginModal.playwithoutText') }}
+          {{ $t('loginModal.playWithoutText') }}
         </h2>
         <h3 class="subtitle has-text-centered">
-          {{ $t('loginModal.gamehistorylost') }}
+          {{ $t('loginModal.gameHistoryLost') }}
         </h3>
         <div class="px-6">
           <input

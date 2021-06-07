@@ -68,7 +68,7 @@ export function dedupe(clues, showCollisions = true) {
         cluers.join(' & ') + (showCollisions ? ` - ${clue}` : '')
     )
     .sort()
-  let result = showCollisions ? '' : this.$t('onewordUtil.collisionluck')
+  let result = showCollisions ? '' : this.$t('onewordUtil.collisionLuck')
   if (deduped.length > 0) {
     result = `${deduped.join('\n')}`
   }

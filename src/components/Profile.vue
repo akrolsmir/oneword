@@ -5,19 +5,19 @@
         <div class="container">
           <h1 class="title">
             {{ $t('profile.welcome', { name: displayName }) }}
-            {{ user.id ? '' : $t('profile.caresignIn') }}
+            {{ user.id ? '' : $t('profile.careSignIn') }}
           </h1>
           <h2 class="subtitle" v-if="user.isSupporter">
-            {{ $t('profile.thanksupporterText') }}
+            {{ $t('profile.thankSupporterText') }}
           </h2>
-          <h2 class="subtitle" v-else>{{ $t('profile.thankplayText') }}</h2>
+          <h2 class="subtitle" v-else>{{ $t('profile.thankPlayText') }}</h2>
         </div>
       </div>
     </section>
     <br />
     <div v-if="this.user.id" class="buttons">
       <button class="button" @click="logout">
-        {{ $t('profile.signout') }}
+        {{ $t('profile.signOut') }}
       </button>
       <!-- TODO: Change name button? -->
     </div>
@@ -59,16 +59,16 @@
     <h2 class="title">{{ $t('profile.supporterSetting') }}</h2>
     <div v-if="user.isSupporter">
       {{
-        $t('profile.thankbecomesupporter', { supporter: user.supporterString })
+        $t('profile.thankBecomeSupporter', { supporter: user.supporterString })
       }}
       <br />
       <!-- TODO: also include on Supporter page -->
       <button class="button is-ghost p-0" @click.prevent="launchCustomerPortal">
-        {{ $t('profile.managesetting') }}
+        {{ $t('profile.manageSetting') }}
       </button>
     </div>
     <div v-else>
-      {{ $t('profile.notsupporter') }} <br />
+      {{ $t('profile.notSupporter') }} <br />
       <!-- TODO: Could set up referral tracking -->
       <router-link to="/supporter" class="button is-warning">{{
         $t('profile.becomeone')
