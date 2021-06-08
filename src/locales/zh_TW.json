@@ -59,12 +59,10 @@
     "back": "返回",
     "continue": "繼續",
     "gameHistoryLost": "(你的遊戲記錄會消失)",
-    "google": "Google",
     "name": "名稱",
     "or": "或",
     "orPlayWithoutText": "或以訪客模式遊玩",
     "playWithoutText": "以訪客模式遊玩",
-    "signInGoogle": "Sign in with Google",
     "signInText": "登入以開始！"
   },
   "navBar": {

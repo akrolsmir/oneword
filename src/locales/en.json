@@ -59,12 +59,10 @@
     "back": "Back",
     "continue": "Continue",
     "gameHistoryLost": "(Your game history will be lost)",
-    "google": "Google",
     "name": "Name",
     "or": "OR",
     "orPlayWithoutText": "Or play without an account",
     "playWithoutText": "Play without an account",
-    "signInGoogle": "Sign in with Google",
     "signInText": "Sign in to get started!"
   },
   "navBar": {
