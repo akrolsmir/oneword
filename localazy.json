@@ -1,0 +1,18 @@
+{
+
+    "writeKey": "a8615587923373811551-9486b2668b5436d46b8f13f3934de7442efd2cbd07e6ee926dba3d50766ca90a",
+    "readKey": "a8615587923373811551-c58d301cb55d5f8202887891c4003cf48360ec7727752d2632e735835e319f21",
+    
+    "upload": {  
+      "type": "json",
+      "files": "src/locales/en.json"         
+    },
+    
+    "download": {
+      "langAliases": {
+        "zh-Hant-TW": "zh_TW"
+      },
+      "files": "src/locales/${lang}.json"
+    }
+    
+  }
