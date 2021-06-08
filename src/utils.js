@@ -1,6 +1,8 @@
 import { formatDistanceToNow } from 'date-fns'
+import { en, zhTW } from 'date-fns/locale'
 import { singular, plural as pluralur } from 'pluralize'
 import { seededRandom } from './vendor/rng'
+import { i18n } from './i18n'
 
 // Compile these regexes for performance
 const RE_MATCH_LETTER_DASH = /[^\p{L}-]/gu // dash, or letter in any language
@@ -45,7 +47,16 @@ export function listIncludes(list, word) {
 }
 
 export function timeSince(millis) {
-  return formatDistanceToNow(new Date(millis), { addSuffix: true })
+  let setLocale
+  if (this.$i18n.locale == 'zh_TW') {
+    setLocale = zhTW
+  } else {
+    setLocale = en
+  }
+  return formatDistanceToNow(new Date(millis), {
+    addSuffix: true,
+    locale: setLocale,
+  })
 }
 
 // Extracts a node from an object tree by its path, like "redTeam.players"
