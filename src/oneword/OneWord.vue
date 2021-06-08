@@ -592,7 +592,7 @@ import {
   nextGuesser,
   nextWord,
 } from './oneword-utils.js'
-import { pickRandom } from '../utils.js'
+import { pickRandom, wordsMatch } from '../utils.js'
 import {
   randomWord,
   BASIC_LISTS,
@@ -804,7 +804,7 @@ export default {
           ? this.room.currentRound.guesser
           : nextGuesser(this.room.currentRound.guesser, this.room.players),
         guess: '',
-        word: nextWord(this.room.history, category, this.customWordList),
+        word: nextWord(this.room.history, category, this.customWordList, this.$t),
         clues: {},
         category,
       }

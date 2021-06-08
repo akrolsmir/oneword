@@ -84,12 +84,17 @@ export function nextGuesser(lastGuesser, players) {
   return players[nextIndex]
 }
 
-export function nextWord(history, category = 'nouns', customWordList = []) {
+export function nextWord(
+  history,
+  category = 'nouns',
+  customWordList = [],
+  t = null
+) {
   let word
   let loops = 0
   do {
     if (loops > 10000) {
-      return "You're out of custom words..."
+      return t('onewordUtil.outOfWord')
     }
     // After the initial (0th) loop, keep updating seed to create new words
     const seed = seedFromHistory(history) + (loops || '')
