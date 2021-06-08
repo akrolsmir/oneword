@@ -31,8 +31,8 @@
     },
     "createRoom": "Create Private Room",
     "enter": "Enter Room",
-    "openRooms": "Open Rooms",
     "openRoomList": "{', with '}{players}",
+    "openRooms": "Open Rooms",
     "privateModal": {
       "cancel": "Not now",
       "okay": "Become a supporter!",
@@ -48,6 +48,12 @@
     "aboutUs": "About us",
     "buyGame": "Buy the board game",
     "joinDis": "Join us on Discord"
+  },
+  "list": {
+    "noun": {
+      "name": "Nouns",
+      "inline": "word"
+    }
   },
   "loginModal": {
     "back": "Back",
@@ -208,8 +214,8 @@
       "description": "Become a Champion, and you'll get two new perks. First, you get the ability to override our scoring system and mark ANY guess as correct.",
       "encourage": "Champion One Word!",
       "getSupporter": "And of course, you'll get all the benefits that Supporters get: private rooms and a custom user avatar!",
-      "markCorrect": "You can mark it as correct!",
       "markAs": "Mark guesses as correct!",
+      "markCorrect": "You can mark it as correct!",
       "name": "Champion",
       "privateRoom": "Private Room",
       "speckled": "If you think \"speckled\" was close enough...",

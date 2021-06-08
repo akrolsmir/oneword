@@ -31,8 +31,8 @@
     },
     "createRoom": "建立私人房間",
     "enter": "進入房間",
-    "openRooms": "公開房間",
     "openRoomList": "{'，與'}{players}",
+    "openRooms": "公開房間",
     "privateModal": {
       "cancel": "不是現在",
       "okay": "成為支持者！",
@@ -48,6 +48,12 @@
     "aboutUs": "關於我們",
     "buyGame": "購買桌遊",
     "joinDis": "在Discord上加入我們"
+  },
+  "list": {
+    "noun": {
+      "inline": "詞",
+      "name": "名詞"
+    }
   },
   "loginModal": {
     "back": "返回",
@@ -208,8 +214,8 @@
       "description": "成為一名贊助者，你將會獲得兩個特權。首先，你可以凌駕我們的分數計算系統，並將任何猜測標示為正確。",
       "encourage": "贊助One Word！",
       "getSupporter": "當然，你將獲得所有支持者的特權，像是：私人房間與自訂頭貼！",
-      "markCorrect": "你可以將其標示為正確！",
       "markAs": "凌駕得分系統！",
+      "markCorrect": "你可以將其標示為正確！",
       "name": "贊助者",
       "privateRoom": "私人房間",
       "speckled": "如果你認為答案夠接近的話...",
