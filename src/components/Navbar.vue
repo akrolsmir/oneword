@@ -78,7 +78,7 @@
 
       <div class="navbar-end">
         <div class="navbar-item">
-          <div class="locale-changer select">
+          <div class="locale-changer select pr-2">
             <select v-model="$i18n.locale">
               <option value="en" selected>English</option>
               <option value="zh_TW">繁體中文</option>
