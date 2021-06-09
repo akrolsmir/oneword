@@ -1,52 +1,8 @@
 <template>
   <BigColumn :showPanes="true">
     <template #right-pane>
-      <Chatbox
-        v-model="room.chatlog"
-        :name="player.name"
-        :room-id="room.name"
-      />
-    </template>
-
-    <div>
-      <label class="checkbox mb-4">
-        <input type="checkbox" v-model="showEditor" />
-        Show Editor</label
-      >
-
-      <div id="game" v-if="!showEditor">
-        <h1 class="title">Game</h1>
-        <h2 class="subtitle">State: {{ room.state }}</h2>
-        <h2 class="subtitle">Players: {{ room.players }}</h2>
-
-        Controls:
-        <button class="button" @click="nextStage">Next Stage</button>
-        <button class="button" @click="resetRoom">Reset Room</button>
-        <br /><br />
-        <div class="box">
-          <ElementList
-            :elements="gameElements"
-            :inputs="gameInputs"
-            :push-changes="pushChanges"
-          />
-        </div>
-        inputs: {{ gameInputs }}<br />
-        <div style="white-space: pre-wrap">
-          peek: {{ JSON.stringify(peek, null, 2) }}
-        </div>
-      </div>
-
       <div v-show="showEditor" id="editor">
         <h1 class="title">Editor</h1>
-
-        <span class="subtitle">Game Preview</span>
-        <div class="box">
-          <ElementList
-            :elements="editorElements"
-            :inputs="editorInputs"
-            :push-changes="() => {}"
-          />
-        </div>
 
         <label class="subtitle">Player Name</label>
         <input class="input mb-4" v-model="editor.player.name" />
@@ -89,6 +45,46 @@
           line-numbers
           readonly
         ></prism-editor>
+      </div>
+    </template>
+
+    <div>
+      <label class="checkbox mb-4">
+        <input type="checkbox" v-model="showEditor" />
+        Show Editor</label
+      >
+
+      <div id="game" v-if="!showEditor">
+        <h1 class="title">Game</h1>
+        <h2 class="subtitle">State: {{ room.state }}</h2>
+        <h2 class="subtitle">Players: {{ room.players }}</h2>
+
+        Controls:
+        <button class="button" @click="nextStage">Next Stage</button>
+        <button class="button" @click="resetRoom">Reset Room</button>
+        <br /><br />
+        <div class="box">
+          <ElementList
+            :elements="gameElements"
+            :inputs="gameInputs"
+            :push-changes="pushChanges"
+          />
+        </div>
+        inputs: {{ gameInputs }}<br />
+        <div style="white-space: pre-wrap">
+          peek: {{ JSON.stringify(peek, null, 2) }}
+        </div>
+      </div>
+
+      <div v-if="showEditor">
+        <span class="subtitle">Game Preview</span>
+        <div class="box">
+          <ElementList
+            :elements="editorElements"
+            :inputs="editorInputs"
+            :push-changes="() => {}"
+          />
+        </div>
       </div>
     </div>
   </BigColumn>
@@ -285,7 +281,7 @@ if (anyone.some(Boolean)) {
 }`,
         },
       },
-      showEditor: false,
+      showEditor: true,
       editor: {
         state: 'CLUEING',
         role: 'CLUER',
