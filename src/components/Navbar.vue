@@ -71,23 +71,6 @@
             </a>
           </div>
         </div>
-        <div class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link" href="#" @click.prevent>
-            {{ $t('navBar.swag') }}
-          </a>
-          <div class="navbar-dropdown">
-            <a
-              class="navbar-item"
-              href="https://teespring.com/oneword"
-              target="_blank"
-              rel="noopener"
-              >T-Shirts
-              <span class="tag is-link is-light ml-1">{{
-                $t('navBar.new')
-              }}</span></a
-            >
-          </div>
-        </div>
         <a class="navbar-item" href="/platform">{{
           $t('navBar.designGame')
         }}</a>
