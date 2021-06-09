@@ -1,3 +1,20 @@
+<style>
+.draggable {
+  margin: 6px;
+  transition: all 0.1s ease-in-out;
+}
+
+.draggable:hover {
+  cursor: move;
+  box-shadow: 0px 0px 6px 4px brown;
+}
+
+.draggable:focus {
+  cursor: move;
+  box-shadow: 0px 0px 6px 4px green;
+}
+</style>
+
 <script>
 import { h } from 'vue'
 import TextInput from './TextInput.vue'
@@ -15,6 +32,8 @@ export default {
     inputs: Object,
     // Callback to write changes to Firestore
     pushChanges: Function,
+    // Whether to make this list editable
+    editing: Boolean,
   },
   render() {
     return this.renderElements(this.elements)
@@ -24,10 +43,20 @@ export default {
       return h('div', elements.map(this.renderElement))
     },
 
+    /*
+      TODO:
+      - Create a "selected" class like mmm.page, with a tooltip for modifying its attributes
+      - OR add a pane to modify its attributes
+      
+      - Create a draggable interface
+        - Just use Vue ondrag? no library? like v-craft
+        - OR literally dragging wysiwyg like mmm.page; arbitrary positioning
+    */
     renderElement(element) {
       switch (element.type) {
         case 'TEXT_INPUT':
           return h(TextInput, {
+            class: { draggable: true },
             label: element.label,
             // TODO: Combined key using both element type and input?
             modelValue: this.inputs[element.label],
@@ -39,6 +68,7 @@ export default {
         case 'BUTTON':
           return h(Button, {
             label: element.label,
+            class: { draggable: true },
             modelValue: this.inputs[element.label],
             'onUpdate:modelValue': async (event) => {
               this.inputs[element.label] = true
@@ -51,7 +81,7 @@ export default {
           // return h('h2', {}, this.interpolate(element.label))
           return h(
             'h2',
-            { class: { subtitle: true } },
+            { class: { subtitle: true, draggable: true } },
             this.interpolate(element.label)
           )
       }
