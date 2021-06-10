@@ -16,6 +16,7 @@ import PairwiseFrontPage from './pairwise/PairwiseFrontPage.vue'
 import Pairwise from './pairwise/Pairwise.vue'
 import TwoWordsFrontPage from './twowords/TwoWordsFrontPage.vue'
 import TwoWords from './twowords/TwoWords.vue'
+import TwoCraft from './twowords/TwoCraft.vue'
 
 import { createRouter, createWebHistory } from 'vue-router'
 
@@ -79,6 +80,7 @@ const routes = [
     meta: { title: 'Two Words' },
   },
   { path: '/twowords/:id', component: TwoWords, meta: { title: 'Two Words' } },
+  { path: '/twocraft', component: TwoCraft, meta: { title: 'Two Craft' } },
 ]
 
 export const router = createRouter({
