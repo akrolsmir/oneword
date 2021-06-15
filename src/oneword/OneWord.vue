@@ -182,7 +182,7 @@
                 <textarea
                   class="textarea is-small mb-2"
                   :class="{ 'is-primary': wordsSaved }"
-                  placeholder='Input your own word list e.g. "sneezy, phylum, europe, sloth, guacamole, data, colossus"...'
+                  :placeholder="$t('onewordGame.customPlaceholder')"
                   v-model="room.customWords"
                   @input="wordsSaved = false"
                 ></textarea>
@@ -804,7 +804,12 @@ export default {
           ? this.room.currentRound.guesser
           : nextGuesser(this.room.currentRound.guesser, this.room.players),
         guess: '',
-        word: nextWord(this.room.history, category, this.customWordList, this.$t),
+        word: nextWord(
+          this.room.history,
+          category,
+          this.customWordList,
+          this.$t
+        ),
         clues: {},
         category,
       }

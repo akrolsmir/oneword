@@ -1,5 +1,6 @@
 import { pickRandom } from '../utils'
 import { nouns, verbs, adjectives, compounds } from './parts-of-speech'
+import { nouns_zh } from './words_zh'
 import {
   pokemonGen1,
   lolChampions,
@@ -38,6 +39,7 @@ export const WORD_LISTS = {
   countries: { name: 'Countries', inline: 'country', words: countries },
   // Filler so `WORD_LISTS['custom'].name` doesn't break
   custom: { name: 'Custom', inline: 'custom word', words: [] },
+  nouns_zh: { name: '名詞', inline: '詞', words: nouns_zh },
 }
 
 export const BASIC_LISTS = [
@@ -47,6 +49,7 @@ export const BASIC_LISTS = [
   'compounds',
   'countries',
   'custom',
+  'nouns_zh',
 ]
 export const VIDEO_GAME_LISTS = [
   'pokemonGen1',

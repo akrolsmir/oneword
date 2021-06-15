@@ -90,6 +90,7 @@
     "cluesForText": "{'The clues for '}{word}{' were:'}",
     "correctWordText": "{'Correct! The word was\"'}{word}{'\". Good job!'}",
     "currentWordText": "{'The '}{wordCategory}{' for '}{guesser}{' is'}",
+    "customPlaceholder": "Input your own word list e.g. \"sneezy, phylum, europe, sloth, guacamole, data, colossus\"...",
     "forChampion": "For champions!",
     "guess": "Guess:",
     "guessHistory": "{guesser}{' guessed \"'}",
