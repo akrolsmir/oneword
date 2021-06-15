@@ -4,16 +4,20 @@
     <Editor component="div" class="container" :resolverMap="resolverMap">
       <div class="columns">
         <div class="column">
-          Setting Panel
+          Settings Panel below:
+          <SettingsPanel />
           <div class="setting-panel"></div>
         </div>
         <div class="column">
           Preview Panel
           <Frame component="div" class="preview-panel">
             <Canvas component="Container">
-              <Paragraph content="demo One" />
-              <Paragraph content="demo Two" />
-              <Paragraph content="demo Three" />
+              <Paragraph content="Heyo~" />
+              <Paragraph content="There comes a danger up in this club," />
+              <Paragraph
+                content="When we get started and we ain't gonna stop..."
+              />
+              <Paragraph content="We gonna turn it up til it gets too hot." />
             </Canvas>
           </Frame>
         </div>
@@ -22,10 +26,27 @@
   </div>
 </template>
 
+<style>
+/* Show a blue box around selected node, and green box on hover */
+.cf-node-selected {
+  box-shadow: 0px 0px 6px 4px rgba(55, 144, 216, 0.459);
+}
+
+[draggable='true'] {
+  transition: all 0.1s ease-in-out;
+}
+
+[draggable='true']:hover {
+  box-shadow: 0px 0px 6px 4px rgba(0, 128, 0, 0.432);
+  cursor: move;
+}
+</style>
+
 <script>
 import { Canvas, Editor, Frame } from './v-craft/index'
 import Container from './components/CraftDiv.vue'
 import Paragraph from './components/CraftParagraph.vue'
+import SettingsPanel from './components/SettingsPanel.vue'
 
 export default {
   name: 'App',
@@ -34,6 +55,7 @@ export default {
     Editor,
     Frame,
     Paragraph,
+    SettingsPanel,
   },
   data() {
     return {

@@ -3,6 +3,8 @@
 </template>
 
 <script>
+import ParagraphSetting from './ParagraphSetting.vue'
+
 export default {
   props: {
     content: String,
@@ -13,6 +15,9 @@ export default {
     tag: 'Paragraph',
     defaultProps: {
       content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+    },
+    settings: {
+      ParagraphSetting,
     },
   },
 }
