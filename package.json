@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "scripts": {
     "start": "vite",
-    "dev": "vite",
+    "dev": "vite --open",
     "build": "vite build",
     "serve": "vite preview",
     "analytics": "streamlit run analytics/streamlit/streamlit_app.py",
