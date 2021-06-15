@@ -13,10 +13,13 @@
     "roomChat": "Room Chat"
   },
   "frontPage": {
-    "introAfterJustone": ", a co-op word game for 3+ players.",
-    "introBeforeJustone": "This is an online game based on",
-    "introForGame": "In each of the 13 rounds, come up with a one-word hint for the guesser...",
-    "introForHint": "But beware: duplicate hints are discarded!",
+    "intro": {
+      "jsutoneIntro2": ", a co-op word game for 3+ players.",
+      "justoneIntro0": "This is an online game based on",
+      "justoneIntro1": "Just One",
+      "justoneIntro3": "In each of the 13 rounds, come up with a one-word hint for the guesser...",
+      "justoneIntro4": "But beware: duplicate hints are discarded!"
+    },
     "joinUs": "Join us on Discord!",
     "joinUsTime": "for our Weekly Game Nights: Monday at 6pm PT!",
     "welcome": "Welcome!"
@@ -51,8 +54,8 @@
   },
   "list": {
     "noun": {
-      "name": "Nouns",
-      "inline": "word"
+      "inline": "word",
+      "name": "Nouns"
     }
   },
   "loginModal": {
@@ -174,21 +177,26 @@
     "outOfWord": "You're out of custom words..."
   },
   "profile": {
-    "afterGravatar": ".",
     "avatar": "Your Avatar",
-    "become": "Become a",
+    "becomeSupporter": {
+      "message0": "Become a",
+      "message1": "supporter",
+      "message2": "to change your avatar!"
+    },
     "becomeone": "Become one!",
     "careSignIn": "Care to sign in?",
-    "changeAvatar": "You can change your avatar on",
+    "changeAvatar": {
+      "message0": "You can change your avatar on",
+      "message1": "Gravatar",
+      "message2": "."
+    },
     "manageSetting": "Manage your settings",
     "notSupporter": "You're not currently a supporter 😢",
     "signOut": "Sign out",
-    "supporter": "supporter",
     "supporterSetting": "Supporter Settings",
     "thankBecomeSupporter": "{'Thanks for being a One Word '}{supporter}{'!'}",
     "thankPlayText": "Thanks for playing!",
     "thankSupporterText": "Thanks for being a supporter!",
-    "toChange": "to change your avatar!",
     "welcome": "{'Hey there, '}{name}{'.'}",
     "youHavent": "{'You haven't played '}{gametitle}{' yet...'}",
     "yourGame": "Your Games"
@@ -241,12 +249,17 @@
     "supporter": {
       "adFree": "Supporters also get priority support and an ad-free experience. Does that all sound good?",
       "adFreeExp": "Ad-free experience",
-      "afterDescription": "those are rooms which are not visible from the home page, and are invite-only.",
-      "afterGravatar": " ",
       "becomeOne": "Become a Supporter! ($3/month)",
-      "configureAvatar": "Configure your avatar on",
+      "configureAvatar": {
+        "message0": "Configure your avatar on",
+        "message1": "Gravatar",
+        "message2": ""
+      },
       "customAvatar": "Custom user avatar!",
-      "description": "All supporters get the ability to create private rooms",
+      "description": {
+        "message0": "All supporters get the ability to create private rooms",
+        "message1": "those are rooms which are not visible from the home page, and are invite-only."
+      },
       "encourage": "Support us!",
       "name": "Supporter",
       "noRando": "No more randos crashing your family game",
@@ -266,8 +279,10 @@
     "granting": "Now granting your benefits...",
     "heart": "Again, from the bottom of my heart:",
     "meansAlot": "It means the world to us, that you enjoyed One Word this much.",
-    "ping": "Ping austin@oneword.games and I'll get you sorted out.)",
-    "takeTime": "(If this takes more than a minute, something broke. Sadface.",
+    "somethingWentWrong": {
+      "message0": "(If this takes more than a minute, something broke. Sadface.",
+      "message1": "Ping austin@oneword.games and I'll get you sorted out.)"
+    },
     "title": "Thanks for your support!",
     "youreBest": "Seriously, you're the literal best."
   }

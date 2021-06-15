@@ -9,8 +9,8 @@
         {{ $t('supporter.explainCoverFee') }}<br />
         <br />
         <h2>{{ $t('supporter.supporter.name') }}</h2>
-        {{ $t('supporter.supporter.description') }} &mdash;{{
-          $t('supporter.supporter.afterDescription')
+        {{ $t('supporter.supporter.description.message0') }} &mdash;{{
+          $t('supporter.supporter.description.message1')
         }}<br />
         <div class="promo-img">
           <img
@@ -30,9 +30,11 @@
           />
         </div>
         <div class="caption">
-          {{ $t('supporter.supporter.configureAvatar') }}
-          <a href="https://en.gravatar.com/">Gravatar</a>
-          {{ $t('supporter.supporter.afterGravatar') }}
+          {{ $t('supporter.supporter.configureAvatar.message0') }}
+          <a href="https://en.gravatar.com/">{{
+            $t('supporter.supporter.configureAvatar.message1')
+          }}</a>
+          {{ $t('supporter.supporter.configureAvatar.message2') }}
         </div>
         {{ $t('supporter.supporter.adFree') }}<br />
         <br />

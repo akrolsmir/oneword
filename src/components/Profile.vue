@@ -28,13 +28,18 @@
     <Nametag :user="user" :name="displayName" />
     <br />
     <p v-if="user.isSupporter">
-      {{ $t('profile.changeAvatar') }}
-      <a href="https://en.gravatar.com/">Gravatar</a>.
+      {{ $t('profile.changeAvatar.message0') }}
+      <a href="https://en.gravatar.com/">{{
+        $t('profile.changeAvatar.message1')
+      }}</a
+      >{{ $t('profile.changeAvatar.message2') }}
     </p>
     <p v-else>
-      {{ $t('profile.become') }}
-      <a href="./supporter?refer=profile">{{ $t('profile.supporter') }}</a>
-      {{ $t('profile.toChange') }}
+      {{ $t('profile.becomeSupporter.message0') }}
+      <a href="./supporter?refer=profile">{{
+        $t('profile.becomeSupporter.message1')
+      }}</a>
+      {{ $t('profile.becomeSupporter.message2') }}
     </p>
     <br />
 
