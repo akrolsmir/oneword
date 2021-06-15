@@ -10,12 +10,10 @@
         <div class="column">
           Preview Panel
           <Frame component="div" class="preview-panel">
-            <Canvas
-              component="Container"
-              class="canvas-class"
-              style="color: red"
-            >
-              <Paragraph content="demo text" />
+            <Canvas component="Container">
+              <Paragraph content="demo One" />
+              <Paragraph content="demo Two" />
+              <Paragraph content="demo Three" />
             </Canvas>
           </Frame>
         </div>
@@ -29,8 +27,6 @@ import { Canvas, Editor, Frame } from './v-craft/index'
 import Container from './components/CraftDiv.vue'
 import Paragraph from './components/CraftParagraph.vue'
 
-// Hm, Editor seems to be broken. Maybe cuz Vue2 => Vue3?
-// Doesn't look too hard to port v-craft to Vue3
 export default {
   name: 'App',
   components: {

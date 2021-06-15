@@ -10,6 +10,7 @@ export default {
   // We introduce a craft config attribute in vue's component option,
   // that can define the default props of our page element.
   craft: {
+    tag: 'Paragraph',
     defaultProps: {
       content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     },

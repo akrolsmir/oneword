@@ -27,14 +27,16 @@ function getCraftConfig(componentName, props, editor) {
 }
 
 function createNodeFromVNode(editor, vnode, parentNode = null) {
-  if (!vnode.componentOptions) {
-    return null
-  }
+  // In Vue2 => Vue3, componentName (aka 'tag') is gone from VNodes...
+  // Vue2: https://github.com/vuejs/vue-next/blob/master/packages/runtime-core/src/vnode.ts
+  // Vue3: https://github.com/vuejs/vue/blob/dev/types/vnode.d.ts
+  // Hack for now: Add "craft.tag" in each custom component's .vue definition
+  const componentName = vnode.type.craft.tag
+  let props = vnode.props
 
-  const componentName = vnode.componentOptions.tag
-  let props = vnode.componentOptions.propsData
-
-  if (componentName === 'Canvas' && vnode.data.attrs) {
+  if (componentName === 'Canvas' && vnode.data?.attrs) {
+    // Always skipped cuz no vnode.data.attrs, I think...
+    // TODO: Investigate, what was data.attrs? Was it important?
     props = { ...props, ...vnode.data.attrs }
   }
 
@@ -54,7 +56,7 @@ function createNodeFromVNode(editor, vnode, parentNode = null) {
     addition
   )
 
-  const vnodeChildren = vnode.componentOptions.children
+  const vnodeChildren = vnode.children?.default()
   const children = vnodeChildren
     ? vnodeChildren
         .map((childVNode) => createNodeFromVNode(editor, childVNode, node))

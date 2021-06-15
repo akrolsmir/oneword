@@ -10,5 +10,8 @@ export default {
     component: String,
   },
   inject: ['editor'],
+  craft: {
+    tag: 'Canvas',
+  },
 }
 </script>
