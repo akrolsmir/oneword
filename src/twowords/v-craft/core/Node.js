@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
+import { nanoid } from 'nanoid'
 
 class Node {
   constructor(
@@ -15,7 +16,7 @@ class Node {
     this.children = children
     this.rules = rules
     this.addition = addition
-    this.uuid = uuidv4()
+    this.uuid = nanoid()
   }
 
   setProps(change) {
