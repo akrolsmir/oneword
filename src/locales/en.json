@@ -14,9 +14,9 @@
   },
   "frontPage": {
     "intro": {
-      "justoneIntro2": ", a co-op word game for 3+ players.",
       "justoneIntro0": "This is an online game based on",
       "justoneIntro1": "Just One",
+      "justoneIntro2": ", a co-op word game for 3+ players.",
       "justoneIntro3": "In each of the 13 rounds, come up with a one-word hint for the guesser...",
       "justoneIntro4": "But beware: duplicate hints are discarded!"
     },
@@ -220,12 +220,12 @@
       "description": "Become a Champion, and you'll get two new perks. First, you get the ability to override our scoring system and mark ANY guess as correct.",
       "encourage": "Champion One Word!",
       "getSupporter": "And of course, you'll get all the benefits that Supporters get: private rooms and a custom user avatar!",
+      "img0": "An example game round, where Amey guessed 'speckled' but the word was 'spot'.",
+      "img1": "The same game round, but now 'speckled' is marked as correct.",
+      "img2": "Some different word lists to play with, like Countries and Pokemon.",
       "markAs": "Mark guesses as correct!",
       "markCorrect": "You can mark it as correct!",
       "name": "Champion",
-      "img0" : "An example game round, where Amey guessed 'speckled' but the word was 'spot'.",
-      "img1" : "The same game round, but now 'speckled' is marked as correct.",
-      "img2" : "Some different word lists to play with, like Countries and Pokemon.",
       "privateRoom": "Private Room",
       "speckled": "If you think \"speckled\" was close enough...",
       "themed": "Themed word lists!",
@@ -241,10 +241,10 @@
       "custom": "Custom cosmetics!",
       "description": "As a Sponsor of One Word, you'll be credited on our home page for EVERYONE to see.",
       "encourage": "Sponsor us!",
-      "img0" : "Frontpage listing of our sponsors",
-      "img1" : "Austin's profile picture and username, but it looks so divine that the other names pale in comparison",
       "frontpage": "Frontpage Sponsor credit!",
       "getAllPrivilege": "And naturally, all the Supporter and Champion perks are yours as well. Private rooms! Correct guesses! Themed word lists! What are you waiting for?",
+      "img0": "Frontpage listing of our sponsors",
+      "img1": "Austin's profile picture and username, but it looks so divine that the other names pale in comparison",
       "name": "Sponsor",
       "purple": "Purple, the color of royalty, emperors... and you!",
       "purpleBorder": "Plus, you now get a *purple* border. One-up all the other supporters!",
@@ -266,8 +266,8 @@
         "message1": "those are rooms which are not visible from the home page, and are invite-only."
       },
       "encourage": "Support us!",
-      "img0" : "Dropdown menu that Mods see when they are in a room. It has two options, Public and Private, and Private is selected.",
-      "img1" : "Austin's profile picture and username in the the list of players in a room, but Austin's name looks better than the rest.",
+      "img0": "Dropdown menu that Mods see when they are in a room. It has two options, Public and Private, and Private is selected.",
+      "img1": "Austin's profile picture and username in the the list of players in a room, but Austin's name looks better than the rest.",
       "name": "Supporter",
       "noRando": "No more randos crashing your family game",
       "priority": "Priority support",
@@ -275,8 +275,12 @@
       "unlockAvatar": "You'll also unlock a customizable user avatar with a shiny gold border. Rep your supporter status to all your friends!"
     },
     "testies": {
+      "emily": "\"Our team at work loved playing One Word earlier this week in our weekly coffee social over zoom! I had played this game before in real life and I found your virtual version to be even easier to use because the words come up automatically and there's less transition time... You have fans on our team and we can't wait to play again!\" -Emily",
+      "eric": "\"I'm a 5th/6th grade Language Arts teacher in Ohio, and have been using the game/your site as a reward for students who get all their virtual assignments done... Thanks for your time and effort on this awesome project.\" -Eric",
       "fanSays": "Here's what our fans have to say:",
-      "name": "Testimonials"
+      "harrison": "\"As a totally blind person I've been looking for games that I can play... Last Sunday, I had a play test with Sinclair, and those changes were made incredibly quickly. I played a few rounds this morning, and it was a much more enjoyable experience, and I believe in supporting developers who help their players. Thank you again.\" -Harrison",
+      "name": "Testimonials",
+      "sandy": "\"We’ve been doing weekly Zoom game nights with extended family and this will be a great addition. It’s great for our large age range and really nice for older relatives who appreciate that you can play at your own pace.\" -Sandy"
     },
     "thankyou": "Thanks, and happy cluing!",
     "welcomeTitle": "Support One Word"

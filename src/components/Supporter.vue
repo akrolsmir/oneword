@@ -16,7 +16,7 @@
           <img
             class="border"
             src="https://i.imgur.com/An4biWa.png"
-            :alt="parent.$t('supporter.supporter.img0')"
+            :alt="$t('supporter.supporter.img0')"
           />
         </div>
         <div class="caption">{{ $t('supporter.supporter.noRando') }}</div>
@@ -26,7 +26,7 @@
           <img
             class="border"
             src="https://i.imgur.com/vrTBWpd.png"
-            :alt="parent.$t('supporter.supporter.img1')"
+            :alt="$t('supporter.supporter.img1')"
           />
         </div>
         <div class="caption">
@@ -57,7 +57,7 @@
               <img
                 class="border"
                 src="/images/spot-bad.png"
-                :alt="parent.$t('supporter.champion.img0')"
+                :alt="$t('supporter.champion.img0')"
               />
             </div>
             <div class="caption">
@@ -69,7 +69,7 @@
               <img
                 class="border"
                 src="/images/spot-good.png"
-                :alt="parent.$t('supporter.champion.img1')"
+                :alt="$t('supporter.champion.img1')"
               />
             </div>
             <div class="caption">
@@ -82,7 +82,7 @@
           <img
             class="border"
             src="/images/themed-lists.png"
-            :alt="parent.$t('supporter.champion.img2')"
+            :alt="$t('supporter.champion.img2')"
           />
         </div>
         <div class="caption">
@@ -109,7 +109,7 @@
             class="border"
             width="299"
             src="/images/sponsors.png"
-            :alt="parent.$t('supporter.sponsor.img0')"
+            :alt="$t('supporter.sponsor.img0')"
           />
         </div>
         <div class="caption">{{ $t('supporter.sponsor.youTheBest') }}</div>
@@ -119,7 +119,7 @@
           <img
             class="border"
             src="https://i.imgur.com/cK90MQ0.png"
-            :alt="parent.$t('supporter.sponsor.img1')"
+            :alt="$t('supporter.sponsor.img1')"
           />
         </div>
         <div class="caption">
@@ -144,24 +144,13 @@
         <br />
         <br />
         <div class="notification is-warning is-light">
-          "As a totally blind person I've been looking for games that I can
-          play... Last Sunday, I had a play test with Sinclair, and those
-          changes were made incredibly quickly. I played a few rounds this
-          morning, and it was a much more enjoyable experience, and I believe in
-          supporting developers who help their players. Thank you again."
-          -Harrison
+          {{ $t('supporter.testies.harrison') }}
         </div>
         <div class="notification is-warning is-light">
-          "We’ve been doing weekly Zoom game nights with extended family and
-          this will be a great addition. It’s great for our large age range and
-          really nice for older relatives who appreciate that you can play at
-          your own pace." -Sandy
+          {{ $t('supporter.testies.sandy') }}
         </div>
         <div class="notification is-warning is-light">
-          "I'm a 5th/6th grade Language Arts teacher in Ohio, and have been
-          using the game/your site as a reward for students who get all their
-          virtual assignments done... Thanks for your time and effort on this
-          awesome project." -Eric
+          {{ $t('supporter.testies.eric') }}
         </div>
         <!-- <div class="notification is-warning is-light">
           "I am over the moon that I can play one of my favorite games remotely, thanks to you!
@@ -177,12 +166,7 @@
           And thanks for creating this game! Super fun :)" -Anita
         </div> -->
         <div class="notification is-warning is-light">
-          "Our team at work loved playing One Word earlier this week in our
-          weekly coffee social over zoom! I had played this game before in real
-          life and I found your virtual version to be even easier to use because
-          the words come up automatically and there's less transition time...
-          You have fans on our team and we can't wait to play again!"<br />
-          -Emily
+          {{ $t('supporter.testies.emily') }}
         </div>
 
         <br />
