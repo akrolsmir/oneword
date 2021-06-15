@@ -16,7 +16,7 @@
           <img
             class="border"
             src="https://i.imgur.com/An4biWa.png"
-            alt="Dropdown menu that Mods see when they are in a room. It has two options, Public and Private, and Private is selected."
+            :alt="parent.$t('supporter.supporter.img0')"
           />
         </div>
         <div class="caption">{{ $t('supporter.supporter.noRando') }}</div>
@@ -26,7 +26,7 @@
           <img
             class="border"
             src="https://i.imgur.com/vrTBWpd.png"
-            alt="Austin's profile picture and username in the the list of players in a room, but Austin's name looks better than the rest."
+            :alt="parent.$t('supporter.supporter.img1')"
           />
         </div>
         <div class="caption">
@@ -57,7 +57,7 @@
               <img
                 class="border"
                 src="/images/spot-bad.png"
-                alt="An example game round, where Amey guessed 'speckled' but the word was 'spot'."
+                :alt="parent.$t('supporter.champion.img0')"
               />
             </div>
             <div class="caption">
@@ -69,7 +69,7 @@
               <img
                 class="border"
                 src="/images/spot-good.png"
-                alt="The same game round, but now 'speckled' is marked as correct."
+                :alt="parent.$t('supporter.champion.img1')"
               />
             </div>
             <div class="caption">
@@ -82,7 +82,7 @@
           <img
             class="border"
             src="/images/themed-lists.png"
-            alt="Some different word lists to play with, like Countries and Pokemon."
+            :alt="parent.$t('supporter.champion.img2')"
           />
         </div>
         <div class="caption">
@@ -109,7 +109,7 @@
             class="border"
             width="299"
             src="/images/sponsors.png"
-            alt="Frontpage listing of our sponsors"
+            :alt="parent.$t('supporter.sponsor.img0')"
           />
         </div>
         <div class="caption">{{ $t('supporter.sponsor.youTheBest') }}</div>
@@ -119,7 +119,7 @@
           <img
             class="border"
             src="https://i.imgur.com/cK90MQ0.png"
-            alt="Austin's profile picture and username, but it looks so divine that the other names pale in comparison"
+            :alt="parent.$t('supporter.sponsor.img1')"
           />
         </div>
         <div class="caption">
