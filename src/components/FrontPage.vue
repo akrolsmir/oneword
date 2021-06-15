@@ -21,7 +21,7 @@
         href="https://amzn.to/2xV5lUm"
       >
         {{ $t('frontPage.intro.justoneIntro1') }}</a
-      >{{ $t('frontPage.intro.jsutoneIntro2') }}<br />
+      >{{ $t('frontPage.intro.justoneIntro2') }}<br />
       {{ $t('frontPage.intro.justoneIntro3') }}<br />
       {{ $t('frontPage.intro.justoneIntro4') }}<br />
     </div>
