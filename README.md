@@ -96,6 +96,42 @@ You'll need:
 - While setting up, needed `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer` (see [link](https://github.com/nodejs/node-gyp/issues/569))
 - OAuth client ID: `340753176141-k38315g3fgbnfq3avasgq05dmg9evjj2.apps.googleusercontent.com` (see [reference](https://developers.google.com/identity/sign-in/ios/start-integrating#add_a_url_scheme_to_your_project))
 
+## Localization Workflow
+
+[Vue i18n](https://vue-i18n.intlify.dev/) is a library that lets our UI change
+between English and other languages.
+
+[Localazy](https://localazy.com/p/oneword) is a website that allows people to add
+translations without needing to code.
+
+### Adding a string to the i18n system
+
+0. In `src/locales/en.json`, add a key and its English value
+1. In the codebase, replace the English value with `{{ $t('key') }}`
+2. Run `$ yarn localazy upload` to tell Localazy about the new key
+
+### Adding translations from VSCode
+
+0. In `src/locales/{LANG}.json`, add the translation fo the English value
+1. Run `$ yarn localazy upload existing` to upload the translation
+
+### Adding translations from the Web UI
+
+0. Add the new language from the [Localazy UI](https://localazy.com/p/oneword#languages)
+
+   ![](https://i.imgur.com/tSuafXL.png)
+
+1. On the [main translations page](https://localazy.com/p/oneword), go to "Start Translating" from the dropdown
+
+   ![](https://i.imgur.com/mqc6qln.png)
+
+2. Translate the words using the UI
+3. Click the green Publish button:
+
+   ![](https://i.imgur.com/Zcksprn.png)
+
+4. Run `yarn localazy download` to get the translated JSON file
+
 # Appendix
 
 ## Tech stack
@@ -109,6 +145,7 @@ One Word is built on top of:
 - [Firebase Auth](https://firebase.google.com/docs/auth) for login
 - [Stripe](https://stripe.com/) for payments
 - [Mailjet](https://www.mailjet.com/) for marketing & transactional emails
+- [Vue i18n](https://vue-i18n.intlify.dev/) and [Localazy](https://localazy.com/) for localization
 
 ## Architecture
 

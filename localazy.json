@@ -4,7 +4,18 @@
 
   "upload": {
     "type": "json",
-    "files": "src/locales/en.json"
+    "files": [
+      {
+        "pattern": "src/locales/en.json",
+        "lang": "inherited"
+      },
+      {
+        "group": "existing",
+        "pattern": "src/locales/*.json",
+        "excludes": ["src/locales/en.json"],
+        "lang": "${autodetectLang}"
+      }
+    ]
   },
 
   "download": {

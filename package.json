@@ -50,6 +50,7 @@
     "vue3-carousel": "???"
   },
   "devDependencies": {
+    "@localazy/cli": "^1.4.5",
     "@vitejs/plugin-vue": "^1.1.4",
     "@vue/compiler-sfc": "^3.0.5",
     "cordova-res": "^0.15.3",
