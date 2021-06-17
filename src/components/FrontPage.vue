@@ -14,16 +14,16 @@
         </div>
       </span>
       <div class="fancy big">{{ $t('frontPage.welcome') }}</div>
-      {{ $t('frontPage.introBeforeJustone') }}
+      {{ $t('frontPage.intro.justoneIntro0') }}
       <a
         target="_blank"
         rel="noopener noreferrer"
         href="https://amzn.to/2xV5lUm"
       >
-        Just One</a
-      >{{ $t('frontPage.introAfterJustone') }}<br />
-      {{ $t('frontPage.introForGame') }}<br />
-      {{ $t('frontPage.introForHint') }}<br />
+        {{ $t('frontPage.intro.justoneIntro1') }}</a
+      >{{ $t('frontPage.intro.justoneIntro2') }}<br />
+      {{ $t('frontPage.intro.justoneIntro3') }}<br />
+      {{ $t('frontPage.intro.justoneIntro4') }}<br />
     </div>
     <GamesList roomDirectory="/room/" />
     <Sponsors />

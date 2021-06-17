@@ -1,11 +1,12 @@
 import { formatDistanceToNow } from 'date-fns'
+import { en, zhTW } from 'date-fns/locale'
 import { singular, plural as pluralur } from 'pluralize'
 import { seededRandom } from './vendor/rng'
 
 // Compile these regexes for performance
 const RE_MATCH_LETTER_DASH = /[^\p{L}-]/gu // dash, or letter in any language
 const RE_MATCH_WHITESPACE = /\s/g
-const RE_MATCH_LOWER_ALPHA = /[^a-z]/g
+const RE_MATCH_LETTER = /[^\p{L}]/gu
 
 // Turns "This is @NOT okay" to "this-is-not-okay
 // Good for making URLs from user input (TODO: try foreign chars)
@@ -23,8 +24,8 @@ const cache = { single: {}, plural: {} }
 // "Dr. Mario" matches "dr mario", and "Dogs" matches "dog"
 // Good for validating whether a user's input is correct
 export function wordsMatch(word1, word2) {
-  const w1 = word1.toLowerCase().replace(RE_MATCH_LOWER_ALPHA, '')
-  const w2 = word2.toLowerCase().replace(RE_MATCH_LOWER_ALPHA, '')
+  const w1 = word1.toLowerCase().replace(RE_MATCH_LETTER, '')
+  const w2 = word2.toLowerCase().replace(RE_MATCH_LETTER, '')
   function single(word) {
     return cache.single[word] || (cache.single[word] = singular(word))
   }
@@ -45,7 +46,16 @@ export function listIncludes(list, word) {
 }
 
 export function timeSince(millis) {
-  return formatDistanceToNow(new Date(millis), { addSuffix: true })
+  let setLocale
+  if (this.$i18n.locale == 'zh_TW') {
+    setLocale = zhTW
+  } else {
+    setLocale = en
+  }
+  return formatDistanceToNow(new Date(millis), {
+    addSuffix: true,
+    locale: setLocale,
+  })
 }
 
 // Extracts a node from an object tree by its path, like "redTeam.players"

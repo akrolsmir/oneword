@@ -13,10 +13,13 @@
     "roomChat": "Room Chat"
   },
   "frontPage": {
-    "introAfterJustone": ", a co-op word game for 3+ players.",
-    "introBeforeJustone": "This is an online game based on",
-    "introForGame": "In each of the 13 rounds, come up with a one-word hint for the guesser...",
-    "introForHint": "But beware: duplicate hints are discarded!",
+    "intro": {
+      "justoneIntro0": "This is an online game based on",
+      "justoneIntro1": "Just One",
+      "justoneIntro2": ", a co-op word game for 3+ players.",
+      "justoneIntro3": "In each of the 13 rounds, come up with a one-word hint for the guesser...",
+      "justoneIntro4": "But beware: duplicate hints are discarded!"
+    },
     "joinUs": "Join us on Discord!",
     "joinUsTime": "for our Weekly Game Nights: Monday at 6pm PT!",
     "welcome": "Welcome!"
@@ -31,8 +34,8 @@
     },
     "createRoom": "Create Private Room",
     "enter": "Enter Room",
-    "openRooms": "Open Rooms",
     "openRoomList": "{', with '}{players}",
+    "openRooms": "Open Rooms",
     "privateModal": {
       "cancel": "Not now",
       "okay": "Become a supporter!",
@@ -49,16 +52,20 @@
     "buyGame": "Buy the board game",
     "joinDis": "Join us on Discord"
   },
+  "list": {
+    "noun": {
+      "inline": "word",
+      "name": "Nouns"
+    }
+  },
   "loginModal": {
     "back": "Back",
     "continue": "Continue",
     "gameHistoryLost": "(Your game history will be lost)",
-    "google": "Google",
     "name": "Name",
     "or": "OR",
     "orPlayWithoutText": "Or play without an account",
     "playWithoutText": "Play without an account",
-    "signInGoogle": "Sign in with Google",
     "signInText": "Sign in to get started!"
   },
   "navBar": {
@@ -83,6 +90,7 @@
     "cluesForText": "{'The clues for '}{word}{' were:'}",
     "correctWordText": "{'Correct! The word was\"'}{word}{'\". Good job!'}",
     "currentWordText": "{'The '}{wordCategory}{' for '}{guesser}{' is'}",
+    "customPlaceholder": "Input your own word list e.g. \"sneezy, phylum, europe, sloth, guacamole, data, colossus\"...",
     "forChampion": "For champions!",
     "guess": "Guess:",
     "guessHistory": "{guesser}{' guessed \"'}",
@@ -170,21 +178,26 @@
     "outOfWord": "You're out of custom words..."
   },
   "profile": {
-    "afterGravatar": ".",
     "avatar": "Your Avatar",
-    "become": "Become a",
+    "becomeSupporter": {
+      "message0": "Become a",
+      "message1": "supporter",
+      "message2": "to change your avatar!"
+    },
     "becomeone": "Become one!",
     "careSignIn": "Care to sign in?",
-    "changeAvatar": "You can change your avatar on",
+    "changeAvatar": {
+      "message0": "You can change your avatar on",
+      "message1": "Gravatar",
+      "message2": "."
+    },
     "manageSetting": "Manage your settings",
     "notSupporter": "You're not currently a supporter 😢",
     "signOut": "Sign out",
-    "supporter": "supporter",
     "supporterSetting": "Supporter Settings",
     "thankBecomeSupporter": "{'Thanks for being a One Word '}{supporter}{'!'}",
     "thankPlayText": "Thanks for playing!",
     "thankSupporterText": "Thanks for being a supporter!",
-    "toChange": "to change your avatar!",
     "welcome": "{'Hey there, '}{name}{'.'}",
     "youHavent": "{'You haven't played '}{gametitle}{' yet...'}",
     "yourGame": "Your Games"
@@ -208,8 +221,11 @@
       "description": "Become a Champion, and you'll get two new perks. First, you get the ability to override our scoring system and mark ANY guess as correct.",
       "encourage": "Champion One Word!",
       "getSupporter": "And of course, you'll get all the benefits that Supporters get: private rooms and a custom user avatar!",
-      "markCorrect": "You can mark it as correct!",
+      "img0": "An example game round, where Amey guessed 'speckled' but the word was 'spot'.",
+      "img1": "The same game round, but now 'speckled' is marked as correct.",
+      "img2": "Some different word lists to play with, like Countries and Pokemon.",
       "markAs": "Mark guesses as correct!",
+      "markCorrect": "You can mark it as correct!",
       "name": "Champion",
       "privateRoom": "Private Room",
       "speckled": "If you think \"speckled\" was close enough...",
@@ -228,6 +244,8 @@
       "encourage": "Sponsor us!",
       "frontpage": "Frontpage Sponsor credit!",
       "getAllPrivilege": "And naturally, all the Supporter and Champion perks are yours as well. Private rooms! Correct guesses! Themed word lists! What are you waiting for?",
+      "img0": "Frontpage listing of our sponsors",
+      "img1": "Austin's profile picture and username, but it looks so divine that the other names pale in comparison",
       "name": "Sponsor",
       "purple": "Purple, the color of royalty, emperors... and you!",
       "purpleBorder": "Plus, you now get a *purple* border. One-up all the other supporters!",
@@ -237,13 +255,20 @@
     "supporter": {
       "adFree": "Supporters also get priority support and an ad-free experience. Does that all sound good?",
       "adFreeExp": "Ad-free experience",
-      "afterDescription": "those are rooms which are not visible from the home page, and are invite-only.",
-      "afterGravatar": " ",
       "becomeOne": "Become a Supporter! ($3/month)",
-      "configureAvatar": "Configure your avatar on",
+      "configureAvatar": {
+        "message0": "Configure your avatar on",
+        "message1": "Gravatar",
+        "message2": ""
+      },
       "customAvatar": "Custom user avatar!",
-      "description": "All supporters get the ability to create private rooms",
+      "description": {
+        "message0": "All supporters get the ability to create private rooms",
+        "message1": "those are rooms which are not visible from the home page, and are invite-only."
+      },
       "encourage": "Support us!",
+      "img0": "Dropdown menu that Mods see when they are in a room. It has two options, Public and Private, and Private is selected.",
+      "img1": "Austin's profile picture and username in the the list of players in a room, but Austin's name looks better than the rest.",
       "name": "Supporter",
       "noRando": "No more randos crashing your family game",
       "priority": "Priority support",
@@ -251,8 +276,12 @@
       "unlockAvatar": "You'll also unlock a customizable user avatar with a shiny gold border. Rep your supporter status to all your friends!"
     },
     "testies": {
+      "emily": "\"Our team at work loved playing One Word earlier this week in our weekly coffee social over zoom! I had played this game before in real life and I found your virtual version to be even easier to use because the words come up automatically and there's less transition time... You have fans on our team and we can't wait to play again!\" -Emily",
+      "eric": "\"I'm a 5th/6th grade Language Arts teacher in Ohio, and have been using the game/your site as a reward for students who get all their virtual assignments done... Thanks for your time and effort on this awesome project.\" -Eric",
       "fanSays": "Here's what our fans have to say:",
-      "name": "Testimonials"
+      "harrison": "\"As a totally blind person I've been looking for games that I can play... Last Sunday, I had a play test with Sinclair, and those changes were made incredibly quickly. I played a few rounds this morning, and it was a much more enjoyable experience, and I believe in supporting developers who help their players. Thank you again.\" -Harrison",
+      "name": "Testimonials",
+      "sandy": "\"We’ve been doing weekly Zoom game nights with extended family and this will be a great addition. It’s great for our large age range and really nice for older relatives who appreciate that you can play at your own pace.\" -Sandy"
     },
     "thankyou": "Thanks, and happy cluing!",
     "welcomeTitle": "Support One Word"
@@ -262,8 +291,10 @@
     "granting": "Now granting your benefits...",
     "heart": "Again, from the bottom of my heart:",
     "meansAlot": "It means the world to us, that you enjoyed One Word this much.",
-    "ping": "Ping austin@oneword.games and I'll get you sorted out.)",
-    "takeTime": "(If this takes more than a minute, something broke. Sadface.",
+    "somethingWentWrong": {
+      "message0": "(If this takes more than a minute, something broke. Sadface.",
+      "message1": "Ping austin@oneword.games and I'll get you sorted out.)"
+    },
     "title": "Thanks for your support!",
     "youreBest": "Seriously, you're the literal best."
   }

@@ -13,10 +13,13 @@
     "roomChat": "聊天室"
   },
   "frontPage": {
-    "introAfterJustone": "，一個適合三人以上遊玩的團隊合作文字遊戲。",
-    "introBeforeJustone": "這個遊戲啟發於",
-    "introForGame": "在這13回合中，每回合每人需要提供一個字詞的提示給猜題者......",
-    "introForHint": "但要注意：重複的提示會被抵消的喔！",
+    "intro": {
+      "justoneIntro0": "這個遊戲啟發於",
+      "justoneIntro1": "Just One",
+      "justoneIntro2": "，一個適合三人以上遊玩的團隊合作文字遊戲。",
+      "justoneIntro3": "在這13回合中，每回合每人需要提供一個字詞的提示給猜題者......",
+      "justoneIntro4": "但要注意：重複的提示會被抵消的喔！"
+    },
     "joinUs": "在 Discord 上加入我們！",
     "joinUsTime": "每週遊戲夜時間：週一 晚上六點 太平洋時間！",
     "welcome": "歡迎！"
@@ -31,8 +34,8 @@
     },
     "createRoom": "建立私人房間",
     "enter": "進入房間",
-    "openRooms": "公開房間",
     "openRoomList": "{'，與'}{players}",
+    "openRooms": "公開房間",
     "privateModal": {
       "cancel": "不是現在",
       "okay": "成為支持者！",
@@ -49,16 +52,20 @@
     "buyGame": "購買桌遊",
     "joinDis": "在Discord上加入我們"
   },
+  "list": {
+    "noun": {
+      "inline": "詞",
+      "name": "名詞"
+    }
+  },
   "loginModal": {
     "back": "返回",
     "continue": "繼續",
     "gameHistoryLost": "(你的遊戲記錄會消失)",
-    "google": "Google",
     "name": "名稱",
     "or": "或",
     "orPlayWithoutText": "或以訪客模式遊玩",
     "playWithoutText": "以訪客模式遊玩",
-    "signInGoogle": "Sign in with Google",
     "signInText": "登入以開始！"
   },
   "navBar": {
@@ -170,21 +177,26 @@
     "outOfWord": "沒有更多自訂詞彙了喔......"
   },
   "profile": {
-    "afterGravatar": "更換你的頭貼。",
     "avatar": "你的頭貼",
-    "become": "成為",
+    "becomeSupporter": {
+      "message0": "成為",
+      "message1": "支持者",
+      "message2": "來更換你的頭貼！"
+    },
     "becomeone": "成為支持者！",
     "careSignIn": "要登入嗎？",
-    "changeAvatar": "你可以在",
+    "changeAvatar": {
+      "message0": "你可以在",
+      "message1": "Gravatar",
+      "message2": "更換你的頭貼。"
+    },
     "manageSetting": "設定",
     "notSupporter": "你目前還不是支持者喔😢",
     "signOut": "登出",
-    "supporter": "支持者",
     "supporterSetting": "支持者設定",
     "thankBecomeSupporter": "{'感謝你成為One Word的'}{supporter}{'!'}",
     "thankPlayText": "謝謝你的遊玩！",
     "thankSupporterText": "感謝您成為一名支持者！",
-    "toChange": "來更換你的頭貼！",
     "welcome": "{'嘿，'}{name}{'。'}",
     "youHavent": "{'你還未遊玩過'}{gametitle}{'喔...'}",
     "yourGame": "你的遊戲"
@@ -208,8 +220,11 @@
       "description": "成為一名贊助者，你將會獲得兩個特權。首先，你可以凌駕我們的分數計算系統，並將任何猜測標示為正確。",
       "encourage": "贊助One Word！",
       "getSupporter": "當然，你將獲得所有支持者的特權，像是：私人房間與自訂頭貼！",
-      "markCorrect": "你可以將其標示為正確！",
+      "img0": "",
+      "img1": "",
+      "img2": "",
       "markAs": "凌駕得分系統！",
+      "markCorrect": "你可以將其標示為正確！",
       "name": "贊助者",
       "privateRoom": "私人房間",
       "speckled": "如果你認為答案夠接近的話...",
@@ -228,6 +243,8 @@
       "encourage": "凌駕我們！",
       "frontpage": "於首頁特別感謝！",
       "getAllPrivilege": "理所當然，你將能享受所有支持者與贊助者的特權。私人房間！凌駕得分系統！主題詞彙表！你還在等什麼？",
+      "img0": "",
+      "img1": "",
       "name": "凌駕者",
       "purple": "紫色，代表著忠誠、帝王...和你！",
       "purpleBorder": "而且，你將會獲得＊紫色＊的顯示框。區分你與其他支持者！",
@@ -237,13 +254,20 @@
     "supporter": {
       "adFree": "支持者也將獲得優先客服與無廣告體驗。聽起來不錯吧？",
       "adFreeExp": "無廣告體驗",
-      "afterDescription": " 這些房間將不會顯示在首頁上，並只能以連結邀請進入。",
-      "afterGravatar": "上變更你的頭貼",
       "becomeOne": "成為一名支持者！（$3/月）",
-      "configureAvatar": "你可以在",
+      "configureAvatar": {
+        "message0": "你可以在",
+        "message1": "Gravatar",
+        "message2": "上變更你的頭貼"
+      },
       "customAvatar": "自訂頭貼！",
-      "description": "所有支持者將可以建立私人房間",
+      "description": {
+        "message0": "所有支持者將可以建立私人房間",
+        "message1": " 這些房間將不會顯示在首頁上，並只能以連結邀請進入。"
+      },
       "encourage": "支持我們！",
+      "img0": "",
+      "img1": "",
       "name": "支持者",
       "noRando": "不會再有陌生路人闖入你的房間",
       "priority": "優先客服",
@@ -251,8 +275,12 @@
       "unlockAvatar": "你也將解鎖金色顯示框。向朋友炫耀你的支持者身份吧！"
     },
     "testies": {
+      "emily": "\"Our team at work loved playing One Word earlier this week in our weekly coffee social over zoom! I had played this game before in real life and I found your virtual version to be even easier to use because the words come up automatically and there's less transition time... You have fans on our team and we can't wait to play again!\" -Emily",
+      "eric": "\"I'm a 5th/6th grade Language Arts teacher in Ohio, and have been using the game/your site as a reward for students who get all their virtual assignments done... Thanks for your time and effort on this awesome project.\" -Eric",
       "fanSays": "以下是我們粉絲想說的話：",
-      "name": "感言"
+      "harrison": "\"As a totally blind person I've been looking for games that I can play... Last Sunday, I had a play test with Sinclair, and those changes were made incredibly quickly. I played a few rounds this morning, and it was a much more enjoyable experience, and I believe in supporting developers who help their players. Thank you again.\" -Harrison",
+      "name": "感言",
+      "sandy": "\"We’ve been doing weekly Zoom game nights with extended family and this will be a great addition. It’s great for our large age range and really nice for older relatives who appreciate that you can play at your own pace.\" -Sandy"
     },
     "thankyou": "謝謝，祝你們提示愉快！",
     "welcomeTitle": "支持One Word"
@@ -262,8 +290,10 @@
     "granting": "正在賦予你特權...",
     "heart": "再一次誠心地感謝你：",
     "meansAlot": "這對我們意義重大，希望你能盡情享受One Word。",
-    "ping": "請聯絡 austin@oneword.games，我會幫你解決問題。）",
-    "takeTime": "（如果這需要一分鐘以上的時間，代表某些東西出錯了。哭臉",
+    "somethingWentWrong": {
+      "message0": "（如果這需要一分鐘以上的時間，代表某些東西出錯了。哭臉",
+      "message1": "請聯絡 austin@oneword.games，我會幫你解決問題。）"
+    },
     "title": "感謝您的支持！",
     "youreBest": "說真的，你真的最棒了！"
   }

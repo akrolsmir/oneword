@@ -35,7 +35,7 @@ function getStartingLocale() {
 }
 
 export const i18n = createI18n({
-  locale: getStartingLocale(), // set locale
-  fallbackLocale: 'en', // set fallback locale
-  messages, // set locale messages
+  locale: getStartingLocale(),
+  fallbackLocale: 'en',
+  messages,
 })

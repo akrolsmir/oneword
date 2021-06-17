@@ -24,8 +24,8 @@
               <div class="mid"></div>
               <div class="right"></div>
             </div>
-            {{ $t('thanks.takeTime') }}<br />
-            {{ $t('thanks.ping') }}
+            {{ $t('thanks.somethingWentWrong.message0') }}<br />
+            {{ $t('thanks.somethingWentWrong.message1') }}
           </div>
         </transition>
       </div>
