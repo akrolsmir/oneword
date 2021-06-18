@@ -14,6 +14,8 @@ import IncryptFrontPage from './incrypt/IncryptFrontPage.vue'
 import Incrypt from './incrypt/Incrypt.vue'
 import PairwiseFrontPage from './pairwise/PairwiseFrontPage.vue'
 import Pairwise from './pairwise/Pairwise.vue'
+import WordmineFrontPage from './wordmine/WordmineFrontPage.vue'
+import Wordmine from './wordmine/Wordmine.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
@@ -70,6 +72,12 @@ const routes = [
     component: OneWord,
     meta: { title: 'ASPLOS 2021' },
   },
+  {
+    path: '/wordmine',
+    component: WordmineFrontPage,
+    meta: { title: 'Wordmine' },
+  },
+  { path: '/wordmine/:id', component: Wordmine, meta: { title: 'Wordmine' } },
 ]
 
 export const router = createRouter({
