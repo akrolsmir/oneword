@@ -46,15 +46,15 @@ export function listIncludes(list, word) {
 }
 
 export function timeSince(millis) {
-  let setLocale
+  /*let setLocale
   if (this.$i18n.locale == 'zh_TW') {
     setLocale = zhTW
   } else {
     setLocale = en
-  }
+  }*/
   return formatDistanceToNow(new Date(millis), {
     addSuffix: true,
-    locale: setLocale,
+    //locale: setLocale,
   })
 }
 
