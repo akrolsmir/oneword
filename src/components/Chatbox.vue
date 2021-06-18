@@ -94,6 +94,7 @@ export default {
     }
   },
   methods: {
+    timeSince,
     submitLine() {
       this.pushLine(this.inputText)
       // Don't await for pushLine; just clear the line immediately
@@ -117,7 +118,7 @@ export default {
       )
     },
     formatTime(timestamp) {
-      return timeSince(timestamp)
+      return this.timeSince(timestamp)
     },
   },
   computed: {

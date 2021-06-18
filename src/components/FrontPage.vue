@@ -1,7 +1,6 @@
 <template>
   <BigColumn>
     <div>
-      <!-- TODO: Make this show up automatically on Mondays -->
       <span v-if="todayIsMonday">
         <div class="notification is-info py-2 has-text-centered">
           <a
