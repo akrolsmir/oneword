@@ -17,7 +17,7 @@
         >Master Word</a
       >, a cooperative word game for 3-5 players.<br />
     </div>
-    <GamesList roomDirectory="/listorama/" />
+    <GamesList roomDirectory="/wordmine/" />
     <br /><br />
   </BigColumn>
 </template>
