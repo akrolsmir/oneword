@@ -1,5 +1,3 @@
-import { formatDistanceToNow } from 'date-fns'
-import { en, zhTW } from 'date-fns/locale'
 import { singular, plural as pluralur } from 'pluralize'
 import { seededRandom } from './vendor/rng'
 
@@ -43,19 +41,6 @@ export function wordsMatch(word1, word2) {
 
 export function listIncludes(list, word) {
   return list.some((w) => wordsMatch(w, word))
-}
-
-export function timeSince(millis) {
-  let setLocale = en
-  if (this.$i18n.locale) {
-    if (this.$i18n.locale == 'zh_TW') {
-      setLocale = zhTW
-    }
-  }
-  return formatDistanceToNow(new Date(millis), {
-    addSuffix: true,
-    locale: setLocale,
-  })
 }
 
 // Extracts a node from an object tree by its path, like "redTeam.players"

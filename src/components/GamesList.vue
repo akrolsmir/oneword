@@ -90,7 +90,8 @@
 <script>
 import { inject } from 'vue'
 import { listRooms, referSupporter } from '../firebase/network'
-import { sanitize, timeSince } from '../utils'
+import { sanitize } from '../utils'
+import { timeSince } from '../i18n'
 import { randomWord } from '../words/lists'
 import { listPlayers } from '../oneword/oneword-utils'
 
