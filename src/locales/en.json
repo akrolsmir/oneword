@@ -199,7 +199,7 @@
     "thankPlayText": "Thanks for playing!",
     "thankSupporterText": "Thanks for being a supporter!",
     "welcome": "{'Hey there, '}{name}{'.'}",
-    "youHavent": "{'You haven't played '}{gametitle}{' yet...'}",
+    "youHavent": "{'You haven\\'t played '}{gametitle}{' yet...'}",
     "yourGame": "Your Games"
   },
   "shareLink": {
