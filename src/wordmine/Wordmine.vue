@@ -30,12 +30,20 @@
         <div class="card m-2 p-4">
           <template v-if="room.state === 'ASKING' && agent === player.name">
             Type your clue:<br />
-            <input class="input" v-model="room.round.clues[agent]" />
+            <input
+              class="input"
+              v-model="player.clue"
+              @input="debouncedSubmitClue"
+            />
           </template>
         </div>
 
+        <!-- Note: Would be cool to see a countdown to the 7th word -->
         <!-- History -->
-        <div class="card m-2 p-4" v-for="round in room.history">
+        <div
+          class="card m-2 p-4"
+          v-for="round in room.history.slice().reverse()"
+        >
           <template v-if="agent === room.spy">
             Correct: {{ round.correct }}
           </template>
@@ -130,7 +138,14 @@ export default {
     this.debouncedSubmitClue = debounce(this.submitClue, 300)
   },
   data() {},
-  watch: {},
+  watch: {
+    'room.state'(state) {
+      // Reset past entries when the round moves forward.
+      if (state === 'GUIDING') {
+        this.player.clue = ''
+      }
+    },
+  },
   computed: {
     agents() {
       return this.room.players.filter((name) => name !== this.room.spy)
