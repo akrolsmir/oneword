@@ -85,7 +85,7 @@
 <script>
 import { inject } from 'vue'
 import { customerPortal, firebaseLogout } from '../firebase/network.js'
-import { timeSince } from '../utils.js'
+import { timeSince } from '../i18n.js'
 import BigColumn from './BigColumn.vue'
 
 import Nametag from './Nametag.vue'

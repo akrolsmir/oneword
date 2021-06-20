@@ -1,9 +1,11 @@
 import { createI18n } from 'vue-i18n'
-import en from './locales/en.json'
+import en_US from './locales/en.json'
 import zh_TW from './locales/zh_TW.json'
+import { formatDistanceToNow } from 'date-fns'
+import { en, zhTW } from 'date-fns/locale'
 
 const messages = {
-  en: en,
+  en: en_US,
   zh_TW: zh_TW,
 }
 
@@ -32,6 +34,19 @@ function getStartingLocale() {
   } else {
     return 'en'
   }
+}
+
+export function timeSince(millis) {
+  let setLocale = en
+  if (i18n.global.locale) {
+    if (i18n.global.locale == 'zh_TW') {
+      setLocale = zhTW
+    }
+  }
+  return formatDistanceToNow(new Date(millis), {
+    addSuffix: true,
+    locale: setLocale,
+  })
 }
 
 export const i18n = createI18n({

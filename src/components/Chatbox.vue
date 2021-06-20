@@ -59,7 +59,7 @@
 
 <script>
 import { updateRoom } from '../firebase/network'
-import { timeSince } from '../utils'
+import { timeSince } from '../i18n'
 
 export default {
   props: {
