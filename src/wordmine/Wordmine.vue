@@ -11,7 +11,7 @@
       />
     </template> -->
 
-    <!-- Header -->
+    <!-- Heading -->
     <div class="card m-2 p-4">
       Category: {{ room.card.category }}<br />
       <span @click="becomeSpy">Spy</span>: {{ room.spy }}<br />
@@ -20,14 +20,17 @@
       <div v-if="player.name === room.spy">
         The passcode is "{{ room.card.word }}"<br />
         <button class="button" @click="newRound">Next Round</button>
+        <button class="button" @click="toGuiding">To Guiding</button>
         <button class="button is-danger" @click="resetRoom">Reset game</button>
       </div>
     </div>
 
+    <h2 class="title">Round {{ room.history.length + 1 }}, {{ room.state }}</h2>
+
+    <!-- Current Round -->
     <div class="columns">
-      <div class="column" v-for="agent in room.players">
-        <!-- Current Round -->
-        <div class="card m-2 p-4">
+      <div class="column" v-for="agent in agents">
+        <div class="card p-4">
           <template v-if="room.state === 'ASKING' && agent === player.name">
             Type your clue:<br />
             <input
@@ -37,21 +40,33 @@
             />
           </template>
         </div>
-
-        <!-- Note: Would be cool to see a countdown to the 7th word -->
-        <!-- History -->
-        <div
-          class="card m-2 p-4"
-          v-for="round in room.history.slice().reverse()"
-        >
-          <template v-if="agent === room.spy">
-            Correct: {{ round.correct }}
+      </div>
+      <div class="column">
+        <div class="card p-4 has-background-grey-dark has-text-grey-light">
+          <template v-if="room.state === 'GUIDING' && player.name === room.spy">
+            {{ '👍'.repeat(room.round.correct) || '❌' }}
+            <br />
+            <button class="button is-small" @click="lessCorrect">➖</button>
+            <button class="button is-small" @click="moreCorrect">➕</button>
           </template>
+        </div>
+      </div>
+    </div>
 
-          <template v-else>
+    <!-- Note: Would be cool to see a countdown to the 7th word -->
+    <!-- History rows -->
+    <div v-for="round in room.history.slice().reverse()">
+      <div class="columns">
+        <div class="column" v-for="agent in agents">
+          <div class="card p-4">
             {{ agent }}'s clue:<br />
             <h2 class="subtitle">{{ round.clues[agent] }}</h2>
-          </template>
+          </div>
+        </div>
+        <div class="column">
+          <div class="card p-4 has-background-grey-dark has-text-grey-light">
+            {{ '👍'.repeat(round.correct) || '❌' }}
+          </div>
         </div>
       </div>
     </div>
@@ -65,6 +80,17 @@
 </style>
 
 <script>
+/*
+TODOs to MVP
+- Agent ability to guess the password instead
+- 90 sec timer
+
+Then:
+- Consistent theming
+- Support 2 clues when exactly 2 agents
+- Mobile gameplay?
+*/
+
 import { inject } from 'vue'
 import BigColumn from '../components/BigColumn.vue'
 import Chatbox from '../components/Chatbox.vue'
@@ -152,6 +178,10 @@ export default {
     },
   },
   methods: {
+    toGuiding() {
+      this.room.state = 'GUIDING'
+      this.saveRoom('state')
+    },
     newRound() {
       this.room.history.push(this.room.round)
       this.room.round = {
@@ -169,6 +199,17 @@ export default {
     becomeSpy() {
       this.room.spy = this.player.name
       this.saveRoom('spy')
+    },
+    moreCorrect() {
+      this.room.round.correct = Math.min(
+        this.room.round.correct + 1,
+        this.agents.length
+      )
+      this.saveRoom('room')
+    },
+    lessCorrect() {
+      this.room.round.correct = Math.max(0, this.room.round.correct - 1)
+      this.saveRoom('room')
     },
   },
 }
