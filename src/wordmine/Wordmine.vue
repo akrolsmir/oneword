@@ -12,7 +12,7 @@
     </template> -->
 
     <!-- Heading -->
-    <div class="card m-2 p-4">
+    <div class="card p-4 mb-4">
       Category: {{ room.card.category }}<br />
       <span @click="becomeSpy">Spy</span>: {{ room.spy }}<br />
       Agents: {{ agents.join(', ') }}<br />
@@ -48,10 +48,23 @@
             <br />
             <button class="button is-small" @click="lessCorrect">➖</button>
             <button class="button is-small" @click="moreCorrect">➕</button>
+            <button class="button is-small" @click="newRound">Submit</button>
           </template>
         </div>
       </div>
     </div>
+
+    <!-- Dummy div to prevent layout from shifting when Timer appears -->
+    <div style="height: 24px" v-if="room.state === 'GUIDING'"></div>
+    <Timer
+      style="margin: 0 auto"
+      class="timer mb-2"
+      ref="timer"
+      :length="room.timerLength"
+      :on-finish="toGuiding"
+      v-if="room.state === 'ASKING' && room.timerLength > 0"
+      :key="room.round.state"
+    ></Timer>
 
     <!-- Note: Would be cool to see a countdown to the 7th word -->
     <!-- History rows -->
