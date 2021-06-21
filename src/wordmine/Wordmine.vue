@@ -27,6 +27,23 @@
 
     <h2 class="title">Round {{ room.history.length + 1 }}, {{ room.state }}</h2>
     <h2 class="subtitle">{{ instructions }}</h2>
+    <template v-if="room.state === 'ASKING' && playerRole === 'AGENT'">
+      <button
+        v-if="room.round.defuses[player.name]"
+        class="button is-info is-small"
+        @click="defusePassword(false)"
+      >
+        Give a clue instead
+      </button>
+      <button
+        v-else
+        class="button is-danger is-small"
+        @click="defusePassword(true)"
+      >
+        Guess the password instead
+      </button>
+      <br /><br />
+    </template>
 
     <!-- Hm... maybe should still be columns.
     Agents can see what everyone is writing
@@ -40,7 +57,7 @@
     <!-- Current Round -->
     <div class="columns">
       <div class="column" v-for="agent in agents">
-        <div class="card p-4">
+        <div class="card p-4" :class="{ defuse: room.round.defuses[agent] }">
           <template v-if="room.state === 'ASKING'">
             <!-- TODO: suggest a random adjective -->
             <input
@@ -95,7 +112,7 @@
     <div v-for="round in room.history.slice().reverse()">
       <div class="columns">
         <div class="column" v-for="agent in agents">
-          <div class="card p-4">
+          <div class="card p-4" :class="{ defuse: round.defuses[agent] }">
             <h2 class="subtitle">{{ round.clues[agent] || '🤷' }}</h2>
             <span class="is-size-7">{{ agent }}</span>
           </div>
@@ -116,6 +133,10 @@
 <style scoped>
 .background {
   background-color: #ffece0;
+}
+
+.defuse {
+  box-shadow: 0 0 8px 5px tomato;
 }
 </style>
 
@@ -218,6 +239,9 @@ export default {
     agents() {
       return this.room.players.filter((name) => name !== this.room.spy)
     },
+    playerRole() {
+      return this.room.spy === this.player.name ? 'SPY' : 'AGENT'
+    },
     instructions() {
       const rules = {
         AGENT: {
@@ -229,8 +253,7 @@ export default {
           GUIDING: 'Give 1 thumb up for each correct clue!',
         },
       }
-      const role = this.room.spy === this.player.name ? 'SPY' : 'AGENT'
-      return rules[role][this.room.state]
+      return rules[this.playerRole][this.room.state]
     },
   },
   methods: {
@@ -266,6 +289,10 @@ export default {
     lessCorrect() {
       this.room.round.correct = Math.max(0, this.room.round.correct - 1)
       this.saveRoom('room')
+    },
+    defusePassword(value) {
+      this.room.round.defuses[this.player.name] = value
+      this.saveRoom(`round.defuses.${this.player.name}`)
     },
   },
 }
