@@ -27,29 +27,51 @@
 
     <h2 class="title">Round {{ room.history.length + 1 }}, {{ room.state }}</h2>
 
+    <!-- Hm... maybe should still be columns.
+    Agents can see what everyone is writing
+    And so can the agent
+    Rules of Online Board Games:
+    - Share as much board state as possible
+    - Keep people unblocked to keep them engaged
+    - Downtime is the enemy
+     -->
+
     <!-- Current Round -->
     <div class="columns">
       <div class="column" v-for="agent in agents">
         <div class="card p-4">
-          <template v-if="room.state === 'ASKING' && agent === player.name">
-            Type your clue:<br />
+          <template v-if="room.state === 'ASKING'">
+            <!-- TODO: suggest a random adjective -->
             <input
+              v-if="agent === player.name"
               class="input"
+              placeholder="Write a clue"
               v-model="player.clue"
               @input="debouncedSubmitClue"
             />
+            <h2 v-else class="subtitle">
+              {{ room.round.clues[agent] || '...' }}
+            </h2>
           </template>
+          <template v-else>
+            <h2 class="subtitle">{{ room.round.clues[agent] || '🤷' }}</h2>
+          </template>
+          <span class="is-size-7">{{ agent }}</span>
         </div>
       </div>
       <div class="column">
-        <div class="card p-4 has-background-grey-dark has-text-grey-light">
-          <template v-if="room.state === 'GUIDING' && player.name === room.spy">
+        <div
+          class="card p-4 has-background-grey-dark has-text-grey-light"
+          v-if="room.state === 'GUIDING'"
+        >
+          <template v-if="player.name === room.spy">
             {{ '👍'.repeat(room.round.correct) || '❌' }}
             <br />
             <button class="button is-small" @click="lessCorrect">➖</button>
             <button class="button is-small" @click="moreCorrect">➕</button>
             <button class="button is-small" @click="newRound">Submit</button>
           </template>
+          <template v-else> Waiting for the spy to answer... </template>
         </div>
       </div>
     </div>
@@ -58,7 +80,7 @@
     <div style="height: 24px" v-if="room.state === 'GUIDING'"></div>
     <Timer
       style="margin: 0 auto"
-      class="timer mb-2"
+      class="timer mb-4"
       ref="timer"
       :length="room.timerLength"
       :on-finish="toGuiding"
@@ -72,13 +94,14 @@
       <div class="columns">
         <div class="column" v-for="agent in agents">
           <div class="card p-4">
-            {{ agent }}'s clue:<br />
-            <h2 class="subtitle">{{ round.clues[agent] }}</h2>
+            <h2 class="subtitle">{{ round.clues[agent] || '🤷' }}</h2>
+            <span class="is-size-7">{{ agent }}</span>
           </div>
         </div>
         <div class="column">
           <div class="card p-4 has-background-grey-dark has-text-grey-light">
-            {{ '👍'.repeat(round.correct) || '❌' }}
+            {{ '👍'.repeat(round.correct) || '❌' }}<br />
+            <span class="is-size-7">{{ room.spy }}</span>
           </div>
         </div>
       </div>
@@ -96,11 +119,12 @@
 /*
 TODOs to MVP
 - Agent ability to guess the password instead
-- 90 sec timer
+- Spy ability to mark one card as correct
 
 Then:
 - Consistent theming
 - Support 2 clues when exactly 2 agents
+- Writing the answer in clue should lose the game
 - Mobile gameplay?
 */
 
