@@ -26,6 +26,7 @@
     </div>
 
     <h2 class="title">Round {{ room.history.length + 1 }}, {{ room.state }}</h2>
+    <h2 class="subtitle">{{ instructions }}</h2>
 
     <!-- Hm... maybe should still be columns.
     Agents can see what everyone is writing
@@ -128,6 +129,7 @@ Then:
 - Consistent theming
 - Support 2 clues when exactly 2 agents
 - Writing the answer in clue should lose the game
+- Support hovering over cards, and then marking them right/wrong
 - Mobile gameplay?
 */
 
@@ -215,6 +217,20 @@ export default {
   computed: {
     agents() {
       return this.room.players.filter((name) => name !== this.room.spy)
+    },
+    instructions() {
+      const rules = {
+        AGENT: {
+          ASKING: 'Ask your spy about a clue!',
+          GUIDING: 'Your spy is deciding how many are right...',
+        },
+        SPY: {
+          ASKING: 'Your agents are submitting their clues...',
+          GUIDING: 'Give 1 thumb up for each correct clue!',
+        },
+      }
+      const role = this.room.spy === this.player.name ? 'SPY' : 'AGENT'
+      return rules[role][this.room.state]
     },
   },
   methods: {
