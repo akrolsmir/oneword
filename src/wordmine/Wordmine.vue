@@ -65,8 +65,9 @@
           v-if="room.state === 'GUIDING'"
         >
           <template v-if="player.name === room.spy">
-            {{ '👍'.repeat(room.round.correct) || '❌' }}
-            <br />
+            <h2 class="subtitle">
+              {{ '👍'.repeat(room.round.correct) || '❌' }}
+            </h2>
             <button class="button is-small" @click="lessCorrect">➖</button>
             <button class="button is-small" @click="moreCorrect">➕</button>
             <button class="button is-small" @click="newRound">Submit</button>
@@ -100,7 +101,9 @@
         </div>
         <div class="column">
           <div class="card p-4 has-background-grey-dark has-text-grey-light">
-            {{ '👍'.repeat(round.correct) || '❌' }}<br />
+            <h2 class="subtitle">
+              {{ '👍'.repeat(round.correct) || '❌' }}
+            </h2>
             <span class="is-size-7">{{ room.spy }}</span>
           </div>
         </div>
