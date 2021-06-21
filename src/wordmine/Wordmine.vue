@@ -74,7 +74,9 @@
           <template v-else>
             <h2 class="subtitle">{{ room.round.clues[agent] || '🤷' }}</h2>
           </template>
-          <span class="is-size-7">{{ agent }}</span>
+          <span class="is-size-7">{{
+            agent + (room.round.defuses[agent] ? ' - Password Guess!' : '')
+          }}</span>
         </div>
       </div>
       <div class="column">
@@ -114,7 +116,9 @@
         <div class="column" v-for="agent in agents">
           <div class="card p-4" :class="{ defuse: round.defuses[agent] }">
             <h2 class="subtitle">{{ round.clues[agent] || '🤷' }}</h2>
-            <span class="is-size-7">{{ agent }}</span>
+            <span class="is-size-7">{{
+              agent + (round.defuses[agent] ? ' - Password Guess!' : '')
+            }}</span>
           </div>
         </div>
         <div class="column">
@@ -143,10 +147,11 @@
 <script>
 /*
 TODOs to MVP
-- Agent ability to guess the password instead
-- Spy ability to mark one card as correct
+- Batch of words to play with
 
 Then:
+- Spy ability to mark one card as correct?
+- Grade passwords automatically
 - Consistent theming
 - Support 2 clues when exactly 2 agents
 - Writing the answer in clue should lose the game
