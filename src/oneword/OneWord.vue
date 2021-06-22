@@ -728,7 +728,9 @@ export default {
       return WORD_LISTS[category].inline
     },
     hasSpecialCharacters(word) {
-      return /[\s~`!@#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?()\._]/g.test(word)
+      return /[\s~`!@#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?()\._？：。，、！]/g.test(
+        word
+      )
     },
     async submitClue() {
       this.player.clue = this.player.clue.toLowerCase().trim()
