@@ -159,6 +159,8 @@ Then:
 - Mobile gameplay?
 */
 
+import { createMachine, interpret } from 'xstate'
+import { useMachine } from '@xstate/vue'
 import { inject } from 'vue'
 import BigColumn from '../components/BigColumn.vue'
 import Chatbox from '../components/Chatbox.vue'
@@ -175,6 +177,57 @@ import {
   orderedEntries,
   pickFromBag,
 } from '../utils'
+
+const allAsked = (context, event) => {
+  return context
+}
+
+/* Questions:
+- Where is the state machine being run? 
+  - On the cloud?
+  - On each player's computer?
+    - If so, how do different clients stay in sync?
+
+- One Word model:
+  - Game state is a single JSON object
+  - Views are a pure function of that state
+  - Clients manipulate this JSON:
+    - Clicking a button calls JS code that runs and manipulates the state
+    - State changes are pushed to firestore
+    - All clients get the updates immediately
+
+- Project X model:
+  - User state, 
+ */
+const gameMachine = createMachine({
+  id: 'gamestate',
+  initial: 'ASKING',
+  states: {
+    ASKING: {
+      on: {
+        ALL_ASKED: { target: 'GUIDING' },
+        RIGHT_PASSWORD: { target: 'WON' },
+        ROUND_EIGHT: { target: 'LOST' },
+      },
+    },
+    GUIDING: {
+      on: {
+        GUIDED: { target: 'ASKING' },
+      },
+    },
+    // CHOOSING: {}
+    LOST: {
+      type: 'final',
+    },
+    WON: {
+      type: 'final',
+    },
+  },
+})
+
+const gameService = interpret(gameMachine).onTransition((state) =>
+  console.log(state.value)
+)
 
 function makeNewRoom(name) {
   return {
@@ -225,11 +278,14 @@ export default {
   setup() {
     const user = inject('currentUser')
     const roomHelpers = useRoom(user, makeNewRoom)
+    const { state, send } = useMachine(gameMachine)
     roomHelpers.player.timerLength = 90
-    return Object.assign(roomHelpers, { user })
+    return Object.assign(roomHelpers, { user, state, send })
+    // TODO: why not: return { ...roomHelpers, user, state, send }
   },
   created() {
     this.debouncedSubmitClue = debounce(this.submitClue, 300)
+    window.vueApp = this
   },
   data() {},
   watch: {

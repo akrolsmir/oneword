@@ -17,6 +17,7 @@
     "@capacitor/core": "^3.0.0-rc.0",
     "@capacitor/ios": "^3.0.0-rc.0",
     "@stripe/stripe-js": "^1.12.1",
+    "@xstate/vue": "^0.5.0",
     "animate.css": "^4.1.1",
     "bulma": "^0.9.1",
     "bulma-pricingtable": "^0.2.0",
@@ -32,7 +33,8 @@
     "vue-i18n": "^9.1.6",
     "vue-router": "4",
     "vue-tippy": "^6.0.0-alpha.25",
-    "vue3-carousel": "^0.1.15"
+    "vue3-carousel": "^0.1.15",
+    "xstate": "^4.20.0"
   },
   "dependenciesUnpackedSize": {
     "overall": "850kb, measured 2020-03-01",
