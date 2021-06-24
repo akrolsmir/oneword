@@ -385,7 +385,11 @@
           <div
             class="notification is-danger"
             role="alert"
-            v-if="dupes(player.clue || '', room.currentRound.word)"
+            v-if="
+              dupes(player.clue || '', room.currentRound.word) ||
+              (WORD_LISTS[room.currentRound.category].tag == 'zh' &&
+                dupes_zh(player.clue || '', room.currentRound.word))
+            "
           >
             {{ $t('onewordGame.similarClueText') }}
           </div>
@@ -588,6 +592,7 @@ import {
   isEnd,
   score,
   dupes,
+  dupes_zh,
   dedupe,
   nextGuesser,
   nextWord,
@@ -723,6 +728,7 @@ export default {
   methods: {
     referSupporter,
     dupes,
+    dupes_zh,
     dedupe,
     wordForWord(category) {
       return WORD_LISTS[category].inline
