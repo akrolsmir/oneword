@@ -400,6 +400,16 @@
           >
             {{ $t('onewordGame.realWordText') }}
           </div>
+          <div
+            class="notification is-danger"
+            role="alert"
+            v-else-if="
+              WORD_LISTS[room.currentRound.category].tag == 'zh' &&
+              player.clue.length > 4
+            "
+          >
+            {{ $t('onewordGame.tooLong') }}
+          </div>
         </div>
       </div>
     </div>
