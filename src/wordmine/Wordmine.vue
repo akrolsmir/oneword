@@ -13,19 +13,22 @@
 
     <!-- Heading -->
     <div class="card p-4 mb-4">
-      Category: {{ room.card.category }}<br />
+      <h1 class="title">Category: {{ room.card.category }}</h1>
       <span @click="becomeSpy">Spy</span>: {{ room.spy }}<br />
       Agents: {{ agents.join(', ') }}<br />
 
       <div v-if="player.name === room.spy">
         The passcode is "{{ room.card.word }}"<br />
+        <input class="input" v-model="room.card.word" />
+        <input class="input" v-model="room.card.category" />
+        <button class="button" @click="saveRoom('card')">Update Card</button>
         <button class="button" @click="newRound">Next Round</button>
         <button class="button" @click="toGuiding">To Guiding</button>
         <button class="button is-danger" @click="resetRoom">Reset game</button>
       </div>
     </div>
 
-    <h2 class="title">Round {{ room.history.length + 1 }}, {{ room.state }}</h2>
+    <h2 class="title">Round {{ room.history.length + 1 }}: {{ room.state }}</h2>
     <h2 class="subtitle">{{ instructions }}</h2>
     <template v-if="room.state === 'ASKING' && playerRole === 'AGENT'">
       <button
