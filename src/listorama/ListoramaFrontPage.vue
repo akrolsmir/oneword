@@ -14,7 +14,7 @@
         >Listography</a
       >, a party game for 3+ players.<br />
     </div>
-    <GamesList roomDirectory="/listorama/" />
+    <GamesList roomDirectory="/listorama/" gameName="Listorama" />
     <br /><br />
   </BigColumn>
 </template>

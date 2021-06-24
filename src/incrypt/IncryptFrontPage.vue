@@ -13,7 +13,11 @@
       Too complex? Your own team won't get the message 🤦‍♀️<br />
       Too simple? The other team will intercept it! 👻<br />
     </div>
-    <GamesList roomDirectory="/incrypt/" :activeFunc="notStarted" />
+    <GamesList
+      roomDirectory="/incrypt/"
+      :activeFunc="notStarted"
+      gameName="Incrypt"
+    />
     <Sponsors />
     <br /><br />
   </BigColumn>

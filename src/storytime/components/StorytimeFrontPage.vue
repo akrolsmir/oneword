@@ -29,7 +29,7 @@
         directly. -Sinclair
       </div>
     </div>
-    <GamesList roomDirectory="/storytime/" />
+    <GamesList roomDirectory="/storytime/" gameName="Storytime" />
     <Sponsors />
     <br /><br />
   </BigColumn>

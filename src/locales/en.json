@@ -44,7 +44,7 @@
     },
     "privateRoom": "Private Rooms",
     "privateRoomList": "{'Private Room with '}{player}",
-    "signIn": "Sign in to get started",
+    "signIn": "Play {gameName}!",
     "welcomeText": "{'Hi, '}{user}{'! Room name:'}"
   },
   "linkFooter": {

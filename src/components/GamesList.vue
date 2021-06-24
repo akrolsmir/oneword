@@ -39,7 +39,7 @@
   <template v-else>
     <br />
     <button class="button is-large is-success" @click="user.signIn">
-      {{ $t('gameList.signIn') }}
+      {{ $t('gameList.signIn', { gameName }) }}
     </button>
   </template>
 
@@ -102,6 +102,10 @@ function recentRoom(room) {
 
 export default {
   props: {
+    gameName: {
+      type: String,
+      default: 'this game',
+    },
     roomDirectory: String,
     // Used to determine which rooms look good to go into
     activeFunc: {

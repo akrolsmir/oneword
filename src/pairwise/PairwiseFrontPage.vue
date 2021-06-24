@@ -15,7 +15,7 @@
       But beware: If your clue is either too obvious or too off the wall, your
       friends will get ahead!<br />
     </div>
-    <GamesList roomDirectory="/pairwise/" />
+    <GamesList roomDirectory="/pairwise/" gameName="Pairwise" />
     <Sponsors />
     <br /><br />
   </BigColumn>
