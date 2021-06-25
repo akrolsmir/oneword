@@ -26,6 +26,9 @@
           <h2 class="subtitle mt-6">Settings</h2>
           <SettingsPanel />
 
+          <h2 class="subtitle mt-6">Export</h2>
+          <CraftExport />
+
           <hr />
         </div>
         <div class="column">
@@ -71,6 +74,7 @@ import Flex from './components/CraftFlex.vue'
 import Button from './components/CraftButton.vue'
 import Input from './components/CraftInput.vue'
 import SettingsPanel from './components/SettingsPanel.vue'
+import CraftExport from './components/CraftExport.vue'
 
 export default {
   name: 'App',
@@ -84,6 +88,7 @@ export default {
     Flex,
     SettingsPanel,
     Blueprint,
+    CraftExport,
   },
   data() {
     return {
