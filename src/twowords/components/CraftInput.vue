@@ -3,6 +3,8 @@
 </template>
 
 <script>
+import LabelSetting from './LabelSetting.vue'
+
 export default {
   props: {
     label: String,
@@ -11,6 +13,9 @@ export default {
     tag: 'Input',
     defaultProps: {
       label: 'Write something...',
+    },
+    settings: {
+      LabelSetting,
     },
   },
 }
