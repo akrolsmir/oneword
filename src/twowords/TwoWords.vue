@@ -29,22 +29,10 @@
         <label class="subtitle"
           >View for {{ editor.state }}.{{ editor.role }}</label
         >
-        <prism-editor
-          class="my-editor"
-          v-model="editorViewCode"
-          :highlight="highlighter"
-          line-numbers
-          readonly
-        ></prism-editor>
+        <TwoPrism v-model="editorViewCode" />
         <br />
         <label class="subtitle">Rules for {{ editor.state }}</label>
-        <prism-editor
-          class="my-editor"
-          v-model="rules.code[editor.state]"
-          :highlight="highlighter"
-          line-numbers
-          readonly
-        ></prism-editor>
+        <TwoPrism v-model="rules.code[editor.state]" />
       </div>
     </template>
 
@@ -94,38 +82,11 @@
 .background {
   background-color: #e0e7ff;
 }
-
-/* required class for vue-prism-editor */
-.my-editor {
-  /* we dont use `language-` classes anymore so thats why we need to add background and text color manually */
-  background: #ffffff;
-  color: #2d2d2d;
-
-  /* you must provide font-family font-size line-height. Example: */
-  font-family: Fira code, Fira Mono, Consolas, Menlo, Courier, monospace;
-  font-size: 14px;
-  line-height: 1.5;
-  padding: 5px;
-}
-
-/* optional class for removing the outline */
-.prism-editor__textarea:focus {
-  outline: none;
-}
 </style>
 
 <script>
-// import Prism Editor
-import { PrismEditor } from 'vue-prism-editor'
-import 'vue-prism-editor/dist/prismeditor.min.css' // import the styles somewhere
-
-// import highlighting library (you can use any library you want just return html string)
-import { highlight, languages } from 'prismjs/components/prism-core'
-import 'prismjs/components/prism-clike'
-import 'prismjs/components/prism-javascript'
-import 'prismjs/themes/prism-tomorrow.css' // import syntax highlighting styles
-
 import { inject } from 'vue'
+import TwoPrism from './TwoPrism.vue'
 import ElementList from './components/ElementList.vue'
 import BigColumn from '../components/BigColumn.vue'
 import Chatbox from '../components/Chatbox.vue'
@@ -201,7 +162,7 @@ export default {
     Nametag,
     ShareLink,
     ElementList,
-    PrismEditor,
+    TwoPrism,
   },
   setup() {
     const user = inject('currentUser')
@@ -332,9 +293,6 @@ if (anyone.some(Boolean)) {
     },
   },
   methods: {
-    highlighter(code) {
-      return highlight(code, languages.js) // languages.<insert language> to return html with markup
-    },
     sanitize,
     inputs(query) {
       // Expand query strings by replacing `@ROLE` with the actual roles
