@@ -3,12 +3,17 @@
     <Editor component="div" class="container" :resolverMap="resolverMap">
       <div class="columns">
         <div class="column">
-          Settings Panel below:
-          <SettingsPanel />
+          <h2 class="subtitle">Components</h2>
 
           <!-- For each component, create a draggable Blueprint -->
           <template
-            v-for="item in ['Paragraph', 'Container', 'Button', 'Input']"
+            v-for="item in [
+              'Paragraph',
+              'Button',
+              'Input',
+              'Container',
+              'Flex',
+            ]"
           >
             <Blueprint component="button" class="button is-dark m-2">
               {{ item }}
@@ -18,10 +23,13 @@
             </Blueprint>
           </template>
 
+          <h2 class="subtitle mt-6">Settings</h2>
+          <SettingsPanel />
+
           <hr />
         </div>
         <div class="column">
-          Preview Panel
+          <h2 class="subtitle">Preview</h2>
           <Frame component="div" class="preview-panel">
             <Canvas component="Container">
               <Paragraph content="Heyo~" />
@@ -42,7 +50,7 @@
 <style>
 /* Show a blue box around selected node, and green box on hover */
 .cf-node-selected {
-  box-shadow: 0px 0px 6px 4px rgba(55, 144, 216, 0.459);
+  box-shadow: 0px 0px 4px 4px rgba(55, 144, 216, 0.459);
 }
 
 [draggable='true'] {
@@ -50,7 +58,7 @@
 }
 
 [draggable='true']:hover {
-  box-shadow: 0px 0px 6px 4px rgba(0, 128, 0, 0.432);
+  box-shadow: 0px 0px 4px 4px rgba(0, 128, 0, 0.432);
   cursor: move;
 }
 </style>
@@ -59,6 +67,7 @@
 import { Canvas, Editor, Frame, Blueprint } from './v-craft/index'
 import Container from './components/CraftDiv.vue'
 import Paragraph from './components/CraftParagraph.vue'
+import Flex from './components/CraftFlex.vue'
 import Button from './components/CraftButton.vue'
 import Input from './components/CraftInput.vue'
 import SettingsPanel from './components/SettingsPanel.vue'
@@ -72,6 +81,7 @@ export default {
     Paragraph,
     Button,
     Input,
+    Flex,
     SettingsPanel,
     Blueprint,
   },
@@ -83,6 +93,7 @@ export default {
         Paragraph,
         Button,
         Input,
+        Flex,
       },
     }
   },
