@@ -14,6 +14,7 @@ import IncryptFrontPage from './incrypt/IncryptFrontPage.vue'
 import Incrypt from './incrypt/Incrypt.vue'
 import PairwiseFrontPage from './pairwise/PairwiseFrontPage.vue'
 import Pairwise from './pairwise/Pairwise.vue'
+import Multiplay from './admin/Multiplay.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
@@ -69,6 +70,11 @@ const routes = [
     path: '/asplos-2021/:id',
     component: OneWord,
     meta: { title: 'ASPLOS 2021' },
+  },
+  {
+    path: '/multiplay/:game/:id',
+    component: Multiplay,
+    meta: { title: 'Multiplay' },
   },
 ]
 
