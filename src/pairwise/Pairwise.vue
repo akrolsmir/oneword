@@ -785,6 +785,7 @@ function initializePlayerOnJoin(_room, player) {
   player.pairList = []
   // how many options (of adj, verb etc) to construct decoy
   player.choicesPerDecoyCategory = 7
+  player.decoyWordsRefreshCount = 3
   // decoy adj & list
   player.decoyAdj = ''
   player.decoyAdjList = []
