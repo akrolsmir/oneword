@@ -460,6 +460,22 @@
               >
                 {{ word }}
               </button>
+              <br />
+              <br />
+              <div class="has-text-centered">
+                <button
+                  class="button is-small is-info is-outlined"
+                  @click="refreshDecoyAdjectivesList"
+                  :disabled="player.decoyAdjectivesRefreshCount === 0"
+                >
+                  <span>
+                    <strong class="fa-stack-1x">
+                      Refresh Adjectives x
+                      {{ player.decoyAdjectivesRefreshCount }}
+                    </strong>
+                  </span>
+                </button>
+              </div>
             </div>
             <div class="column has-text-centered">
               <strong> Nouns </strong>
@@ -473,23 +489,23 @@
               >
                 {{ word }}
               </button>
+              <br />
+              <br />
+              <div class="has-text-centered">
+                <button
+                  class="button is-small is-info is-outlined"
+                  @click="refreshDecoyNounsList"
+                  :disabled="player.decoyNounsRefreshCount === 0"
+                >
+                  <span>
+                    <strong class="fa-stack-1x">
+                      Refresh Nouns x {{ player.decoyNounsRefreshCount }}
+                    </strong>
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
-          <div class="has-text-centered">
-            <button
-              class="button is-info is-outlined"
-              @click="refreshDecoyWordLists"
-              :disabled="player.decoyWordsRefreshCount === 0"
-            >
-              <span
-                >Refresh Words
-                <strong class="fa-stack-1x">
-                  x {{ player.decoyWordsRefreshCount }}
-                </strong>
-              </span>
-            </button>
-          </div>
-          <br />
           <div class="has-text-centered">
             <strong> Your decoy phrase: </strong>
             <span v-if="player.decoyAdj || player.decoyNoun">
@@ -773,9 +789,11 @@ function initializePlayerOnJoin(_room, player) {
   // decoy adj & list
   player.decoyAdj = ''
   player.decoyAdjList = []
+  player.decoyAdjectivesRefreshCount = 3
   // decoy noun & list
   player.decoyNoun = ''
   player.decoyNounList = []
+  player.decoyNounsRefreshCount = 3
   // TODO: extract out to common generatePlayerWordPairs()
   while (player.pairList.length < player.choicesOfWordPairs) {
     player.pairList.push(randomWord('adjectives') + '-' + randomWord('nouns'))
@@ -1059,10 +1077,13 @@ export default {
       update[`currentRound.allWords.${this.player.name}`] = w
       await updateRoom(this.room, update)
     },
-    async refreshDecoyWordLists() {
-      this.player.decoyAdjList = this.generateDecoyWordList('adjectives')
+    refreshDecoyNounsList() {
       this.player.decoyNounList = this.generateDecoyWordList('nouns')
-      this.player.decoyWordsRefreshCount -= 1
+      this.player.decoyNounsRefreshCount -= 1
+    },
+    refreshDecoyAdjectivesList() {
+      this.player.decoyAdjList = this.generateDecoyWordList('adjectives')
+      this.player.decoyAdjectivesRefreshCount -= 1
     },
     async submitDecoy() {
       await this.saveWordToAllWordsThisRound(
