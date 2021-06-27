@@ -464,14 +464,14 @@
               <br />
               <div class="has-text-centered">
                 <button
-                  class="button small is-info is-outlined"
+                  class="button is-small is-info is-outlined"
                   @click="refreshDecoyAdjectivesList"
                   :disabled="player.decoyAdjectivesRefreshCount === 0"
                 >
-                  <span
-                    >Refresh Adjectives
+                  <span>
                     <strong class="fa-stack-1x">
-                      x {{ player.decoyAdjectivesRefreshCount }}
+                      Refresh Adjectives x
+                      {{ player.decoyAdjectivesRefreshCount }}
                     </strong>
                   </span>
                 </button>
@@ -493,14 +493,13 @@
               <br />
               <div class="has-text-centered">
                 <button
-                  class="button small is-info is-outlined"
+                  class="button is-small is-info is-outlined"
                   @click="refreshDecoyNounsList"
                   :disabled="player.decoyNounsRefreshCount === 0"
                 >
-                  <span
-                    >Refresh Nouns
+                  <span>
                     <strong class="fa-stack-1x">
-                      x {{ player.decoyNounsRefreshCount }}
+                      Refresh Nouns x {{ player.decoyNounsRefreshCount }}
                     </strong>
                   </span>
                 </button>
