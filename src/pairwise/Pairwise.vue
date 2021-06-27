@@ -461,7 +461,6 @@
                 {{ word }}
               </button>
             </div>
-
             <div class="column has-text-centered">
               <strong> Nouns </strong>
               <br /><br />
@@ -477,9 +476,24 @@
             </div>
           </div>
           <div class="has-text-centered">
-            Your decoy phrase:
+            <button
+              class="button is-info is-outlined"
+              @click="refreshDecoyWordLists"
+              :disabled="player.decoyWordsRefreshCount === 0"
+            >
+              <span
+                >Refresh Words
+                <strong class="fa-stack-1x">
+                  x {{ player.decoyWordsRefreshCount }}
+                </strong>
+              </span>
+            </button>
+          </div>
+          <br />
+          <div class="has-text-centered">
+            <strong> Your decoy phrase: </strong>
             <span v-if="player.decoyAdj || player.decoyNoun">
-              <strong>"{{ player.decoyAdj }}-{{ player.decoyNoun }}"</strong>
+              "{{ player.decoyAdj }}-{{ player.decoyNoun }}"
             </span>
             <br />
             <br />
@@ -745,7 +759,8 @@ function initializePlayerOnJoin(_room, player) {
   // cache's player's choice for word on the player object, to reduce room update freq
   player.currentWord = ''
   // cache's player's choice for clue on the player object, to reduce room update freq
-  player.currentClue = '' /** player's clue can be either String or Sketchpad PNG */
+  player.currentClue =
+    '' /** player's clue can be either String or Sketchpad PNG */
   // whether to show pick pair AND write clue warning, used to guard clue submit
   player.showPickClueWarning = false
   // how many entries in the pairList to pick out real pair
@@ -754,6 +769,7 @@ function initializePlayerOnJoin(_room, player) {
   player.pairList = []
   // how many options (of adj, verb etc) to construct decoy
   player.choicesPerDecoyCategory = 7
+  player.decoyWordsRefreshCount = 3
   // decoy adj & list
   player.decoyAdj = ''
   player.decoyAdjList = []
@@ -1043,6 +1059,11 @@ export default {
       update[`currentRound.allWords.${this.player.name}`] = w
       await updateRoom(this.room, update)
     },
+    async refreshDecoyWordLists() {
+      this.player.decoyAdjList = this.generateDecoyWordList('adjectives')
+      this.player.decoyNounList = this.generateDecoyWordList('nouns')
+      this.player.decoyWordsRefreshCount -= 1
+    },
     async submitDecoy() {
       await this.saveWordToAllWordsThisRound(
         this.player.decoyAdj + '-' + this.player.decoyNoun
@@ -1140,6 +1161,8 @@ export default {
         this.room.wordsAndClues = {}
         this.room.currentRound.state = 'CLUER_PICKING'
         this.room.currentRound.allWords = {}
+        // Also reset players refresh count
+        this.players.decoyWordsRefreshCount = 3
       }
 
       this.room.lastUpdateTime = Date.now()
