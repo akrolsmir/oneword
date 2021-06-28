@@ -36,12 +36,12 @@ export function dupes_zh(clue1, clue2) {
   if (clue1 == clue2) {
     return true
   }
-  if (
-    clue1.length >= 1 &&
-    clue2.length >= 1 &&
-    (clue1.includes(clue2) || clue2.includes(clue1))
-  ) {
-    return true
+  if (clue1.length >= 1 && clue2.length >= 1) {
+    for (let i = 0; i < clue2.length; i++) {
+      if (clue1.includes(clue2[i])) {
+        return true
+      }
+    }
   }
   return false
 }
