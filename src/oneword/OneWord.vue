@@ -368,7 +368,9 @@
                 :disabled="
                   !room.players.includes(player.name) ||
                   dupes(player.clue || '', room.currentRound.word) ||
-                  hasSpecialCharacters(player.clue)
+                  hasSpecialCharacters(player.clue) ||
+                  (WORD_LISTS[room.currentRound.category].tag == 'zh' &&
+                    dupes_zh(player.clue || '', room.currentRound.word))
                 "
                 :class="{
                   'is-primary': room.currentRound.clues[player.name],
