@@ -55,6 +55,9 @@ function roomDb() {
   if (window.location.pathname.startsWith('/asplos-2021')) {
     return 'oneword-asplos'
   }
+  if (window.location.pathname.startsWith('/sketchmatch')) {
+    return 'sketchmatch'
+  }
   return 'rooms'
 }
 

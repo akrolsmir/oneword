@@ -15,6 +15,8 @@ import Incrypt from './incrypt/Incrypt.vue'
 import PairwiseFrontPage from './pairwise/PairwiseFrontPage.vue'
 import Pairwise from './pairwise/Pairwise.vue'
 import Multiplay from './admin/Multiplay.vue'
+import SketchmatchFrontPage from './sketchmatch/SketchmatchFrontPage.vue'
+import Sketchmatch from './sketchmatch/Sketchmatch.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
@@ -75,6 +77,16 @@ const routes = [
     path: '/multiplay/:game/:id',
     component: Multiplay,
     meta: { title: 'Multiplay' },
+  },
+  {
+    path: '/sketchmatch',
+    component: SketchmatchFrontPage,
+    meta: { title: 'sketchmatch' },
+  },
+  {
+    path: '/sketchmatch/:id',
+    component: Sketchmatch,
+    meta: { title: 'Sketchmatch' },
   },
 ]
 
