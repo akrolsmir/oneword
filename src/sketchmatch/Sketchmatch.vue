@@ -1,16 +1,7 @@
 <!-- Rules: https://www.scorpionmasque.com/sites/scorpionmasque.com/files/mw_rules_en_28sep2020.pdf -->
 
 <template>
-  <BigColumn :showPanes="true">
-    <!-- Chatbox temporarily broken due to $i18n missing -->
-    <!-- <template #right-pane>
-      <Chatbox
-        v-model="room.chatlog"
-        :name="player.name"
-        :room-id="room.name"
-      />
-    </template> -->
-
+  <BigColumn>
     <!-- Header -->
     <div class="card m-2 p-4">
       Category: {{ room.card.category }}<br />
@@ -31,6 +22,7 @@
           <template v-if="room.state === 'ASKING' && agent === player.name">
             Type your clue:<br />
             <input class="input" v-model="room.round.clues[agent]" />
+            <Sketchpad />
           </template>
         </div>
 
@@ -52,7 +44,7 @@
 
 <style scoped>
 .background {
-  background-color: #ffece0;
+  background-color: rgb(201, 224, 178);
 }
 </style>
 
@@ -63,6 +55,7 @@ import Chatbox from '../components/Chatbox.vue'
 import Timer from '../components/Timer.vue'
 import Nametag from '../components/Nametag.vue'
 import ShareLink from '../components/ShareLink.vue'
+import Sketchpad from './Sketchpad.vue'
 import { useRoom } from '../composables/useRoom.js'
 import {
   debounce,
@@ -118,6 +111,7 @@ export default {
     Timer,
     Nametag,
     ShareLink,
+    Sketchpad,
   },
   setup() {
     const user = inject('currentUser')
