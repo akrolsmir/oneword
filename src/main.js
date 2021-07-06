@@ -7,10 +7,12 @@ import './styles.scss'
 
 import { router } from './router'
 import { i18n } from './i18n'
+import { store } from './sketchmatch/SketchStore'
 
 export const app = createApp(App)
   .use(i18n)
   .use(router)
+  .use(store)
   .use(VueTippy, {
     directive: 'tippy',
     defaultProps: {

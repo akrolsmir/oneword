@@ -52,6 +52,22 @@ export function getIn(object, path) {
   return node
 }
 
+// Writes a value to a particular spot in the object, creating empty obj as necessary
+// Assumes object is defined
+export function setIn(object, path, value) {
+  // Base case
+  if (!path.includes('.')) {
+    object[path] = value
+    return
+  }
+
+  // Create the next child obj if necessary
+  const [next, ...rest] = path.split('.')
+  object[next] = object[next] || {}
+  // Recurse!
+  setIn(object[next], rest.join('.'), value)
+}
+
 export function pickRandom(array, seed = '') {
   const rand = seed ? seededRandom(seed) : Math.random()
   return array[Math.floor(rand * array.length)]

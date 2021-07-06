@@ -33,7 +33,13 @@ export default {
       // TODO: instead serialize as sketchpad.toJSON, sketchpad.loadJSON ?
       // Pros: More compact, cons: need to convert again to PNG
       const dataUrl = this.sketchpad.canvas.toDataURL('image/png')
-      console.log(dataUrl)
+      this.$store.commit({
+        type: 'input', // This is a player-entered diff, vs game-generated
+        path: 'round.DRAWING.Austin', // combination of game round, player name, and input label
+        // Skip input label in v0
+        // player: '...', ''', // Or could be split out.
+        value: dataUrl, // The actual value getting written to Firebase
+      })
       return dataUrl
     },
   },

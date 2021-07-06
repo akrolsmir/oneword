@@ -4,39 +4,23 @@
   <BigColumn>
     <!-- Header -->
     <div class="card m-2 p-4">
-      Category: {{ room.card.category }}<br />
-      <span @click="becomeSpy">Spy</span>: {{ room.spy }}<br />
-      Agents: {{ agents.join(', ') }}<br />
-
-      <div v-if="player.name === room.spy">
-        The passcode is "{{ room.card.word }}"<br />
-        <button class="button" @click="newRound">Next Round</button>
-        <button class="button is-danger" @click="resetRoom">Reset game</button>
-      </div>
+      <button class="button" @click="newRound">Next Round</button>
+      <button class="button is-danger" @click="resetRoom">Reset game</button>
     </div>
 
     <div class="columns">
       <div class="column" v-for="agent in room.players">
         <!-- Current Round -->
         <div class="card m-2 p-4">
-          <template v-if="room.state === 'ASKING' && agent === player.name">
-            Type your clue:<br />
-            <input class="input" v-model="room.round.clues[agent]" />
+          <template v-if="room.state === 'DRAWING'">
+            <h2 class="subtitle">Word: {{ room.round.words[player.name] }}</h2>
+            Draw something
             <Sketchpad />
           </template>
         </div>
 
         <!-- History -->
-        <div class="card m-2 p-4" v-for="round in room.history">
-          <template v-if="agent === room.spy">
-            Correct: {{ round.correct }}
-          </template>
-
-          <template v-else>
-            {{ agent }}'s clue:<br />
-            <h2 class="subtitle">{{ round.clues[agent] }}</h2>
-          </template>
-        </div>
+        <div class="card m-2 p-4" v-for="round in room.history"></div>
       </div>
     </div>
   </BigColumn>
@@ -57,14 +41,8 @@ import Nametag from '../components/Nametag.vue'
 import ShareLink from '../components/ShareLink.vue'
 import Sketchpad from './Sketchpad.vue'
 import { useRoom } from '../composables/useRoom.js'
-import {
-  debounce,
-  listIncludes,
-  pickRandom,
-  sanitize,
-  orderedEntries,
-  pickFromBag,
-} from '../utils'
+import { debounce } from '../utils'
+import { listenRoom } from '../firebase/network'
 
 function makeNewRoom(name) {
   return {
@@ -121,6 +99,11 @@ export default {
   },
   created() {
     this.debouncedSubmitClue = debounce(this.submitClue, 300)
+    // Write updates to Vuex store instead of local room
+    this.$store.commit('loadFirestore', this.room)
+    listenRoom(this.room.id, (room) => {
+      this.$store.commit('loadFirestore', room)
+    })
   },
   watch: {},
   computed: {
@@ -130,13 +113,15 @@ export default {
   },
   methods: {
     newRound() {
+      // TODO: this.roomCopy should be a computed version of vue store
+      // Question: can we do all this without Vuex?
       this.room.history.push(this.room.round)
       this.room.round = {
         clues: {},
         defuses: {},
         correct: 0,
       }
-      this.room.state = 'ASKING'
+      this.room.state = 'DRAWING'
       this.saveRoom('state', 'history', 'round')
     },
     submitClue() {
