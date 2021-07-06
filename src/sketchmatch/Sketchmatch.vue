@@ -1,4 +1,4 @@
-<!-- Rules: https://www.scorpionmasque.com/sites/scorpionmasque.com/files/mw_rules_en_28sep2020.pdf -->
+<!-- Subtext Rules: https://www.ultraboardgames.com/subtext/game-rules.php -->
 
 <template>
   <BigColumn>
@@ -69,33 +69,33 @@ import {
 function makeNewRoom(name) {
   return {
     name,
-    state: 'ASKING', // "START", "ASKING", "GUIDING",
-    rounds: 7,
+    state: 'DRAWING', // "DRAWING", "GUESSING", "DONE",
+    rounds: 8, // Depends on # players. 2x for 4-5p, 1x for 6-8p
     people: {
-      // TODO: Roles: 1 x SPY, N x AGENT
-    },
-    spy: 'Caustic',
-    card: {
-      category: 'Animal',
-      word: 'tiger',
+      // TODO: Roles: 1x TEACHER, 1x PET, Nx STUDENT
     },
     round: {
-      /** Example: */
-      clues: {
-        Austin: 'lion',
-        Boston: 'fuzzy',
+      teacher: 'Austin',
+      // Alternatively: Could be grouped by player?
+      words: {
+        Austin: 'snail',
+        Boston: 'table',
+        Caustic: 'soup',
+        Dustin: 'snail',
       },
-      defuses: {
-        Austin: true,
+      DRAWING: {
+        Austin: '...',
       },
-      correct: 1,
-      highlight: 'Boston',
+      // TODO: some kind of shuffled ordering?
+      GUESSING: {
+        Austin: 'Dustin',
+        Boston: 'Caustic',
+        Caustic: 'Dustin',
+        Dustin: 'Dustin',
+        // Note: not that interesting to guess your own;
+        // Maybe PET should try to guess the most popular other answer?
+      },
     },
-    /*
-      player: {
-        clue, // TODO: should this be directly on ROOM, or a PLAYER copy?
-      }
-    */
     history: [],
     invalidEntries: {},
     timerLength: 90,
@@ -122,7 +122,6 @@ export default {
   created() {
     this.debouncedSubmitClue = debounce(this.submitClue, 300)
   },
-  data() {},
   watch: {},
   computed: {
     agents() {
