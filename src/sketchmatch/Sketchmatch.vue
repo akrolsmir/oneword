@@ -12,15 +12,15 @@
       <div class="column" v-for="agent in room.players">
         <!-- Current Round -->
         <div class="card m-2 p-4">
-          <template v-if="room.state === 'DRAWING'">
-            <h2 class="subtitle">Word: {{ room.round.words[player.name] }}</h2>
+          <template v-if="roomx.state === 'DRAWING'">
+            <h2 class="subtitle">Word: {{ roomx.round.words[player.name] }}</h2>
             Draw something
             <Sketchpad />
           </template>
         </div>
 
         <!-- History -->
-        <div class="card m-2 p-4" v-for="round in room.history"></div>
+        <div class="card m-2 p-4" v-for="round in roomx.history"></div>
       </div>
     </div>
   </BigColumn>
@@ -99,37 +99,44 @@ export default {
   },
   created() {
     this.debouncedSubmitClue = debounce(this.submitClue, 300)
-    // Write updates to Vuex store instead of local room
-    this.$store.commit('loadFirestore', this.room)
-    listenRoom(this.room.id, (room) => {
-      this.$store.commit('loadFirestore', room)
-    })
   },
-  watch: {},
+  watch: {
+    'room.name'() {
+      // Write updates to Vuex store instead of local room
+      this.$store.commit('loadFirestore', this.room)
+      listenRoom(this.room.name, (room) => {
+        this.$store.commit('loadFirestore', room)
+      })
+    },
+  },
   computed: {
-    agents() {
-      return this.room.players.filter((name) => name !== this.room.spy)
+    roomx() {
+      // Vuex version of room
+      // Question: can we do all this without Vuex?
+      return this.$store.state.roomStore || {}
     },
   },
   methods: {
     newRound() {
-      // TODO: this.roomCopy should be a computed version of vue store
-      // Question: can we do all this without Vuex?
-      this.room.history.push(this.room.round)
-      this.room.round = {
+      this.roomx.history.push(this.roomx.round)
+      // Hm, can't just modify roomx. Supposed to use a mutation, I think
+      // This is a pretty annoying extra layer. What could we do instead?
+      // 1. Write to roomx and call a "sync" function that auto pushes
+      // 2. Maybe this is okay, most inputs are now handled automatically
+      this.roomx.round = {
         clues: {},
         defuses: {},
         correct: 0,
       }
-      this.room.state = 'DRAWING'
+      this.roomx.state = 'DRAWING'
       this.saveRoom('state', 'history', 'round')
     },
     submitClue() {
-      this.room.round.clues[this.player.name] = this.player.clue
+      this.roomx.round.clues[this.player.name] = this.player.clue
       this.saveRoom(`round.clues.${this.player.name}`)
     },
     becomeSpy() {
-      this.room.spy = this.player.name
+      this.roomx.spy = this.player.name
       this.saveRoom('spy')
     },
   },

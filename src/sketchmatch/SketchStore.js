@@ -24,7 +24,7 @@ export const store = createStore({
   actions: {},
 })
 
-// Room is basically the store today
+// roomStore should be the new source of truth for a room
 // Mutations aren't so defined, rather, components directly manipulate room obj
 // State should track all player inputs over time
 
