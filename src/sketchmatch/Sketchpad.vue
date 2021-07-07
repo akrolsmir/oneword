@@ -8,6 +8,12 @@
 import Sketchpad from 'responsive-sketchpad'
 
 export default {
+  props: {
+    path: {
+      type: String,
+      default: '',
+    },
+  },
   mounted() {
     this.registerSketchPad()
   },
@@ -35,8 +41,8 @@ export default {
       const dataUrl = this.sketchpad.canvas.toDataURL('image/png')
       this.$store.commit({
         type: 'input', // This is a player-entered diff, vs game-generated
-        path: 'round.DRAWING.Austin', // combination of game round, player name, and input label
-        // Skip input label in v0
+        path: this.path, // combination of game round, player name, and input label
+        // e.g. 'round.DRAWING.Austin' (skip input label in v0)
         // player: '...', ''', // Or could be split out.
         value: dataUrl, // The actual value getting written to Firebase
       })

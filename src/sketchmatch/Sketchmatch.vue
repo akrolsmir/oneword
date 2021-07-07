@@ -15,7 +15,7 @@
           <template v-if="roomx.state === 'DRAWING'">
             <h2 class="subtitle">Word: {{ roomx.round.words[player.name] }}</h2>
             Draw something
-            <Sketchpad />
+            <Sketchpad :path="`round.${roomx.state}.${agent}`" />
           </template>
         </div>
 
