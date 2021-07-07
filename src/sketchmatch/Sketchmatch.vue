@@ -4,7 +4,9 @@
   <BigColumn>
     <!-- Header -->
     <div class="card m-2 p-4">
-      <button class="button" @click="newRound">Next Round</button>
+      {{ room.players }}<br />
+      <button class="button" @click="newRound">New Round</button>
+      <button class="button" @click="toGuessing">To: GUESSING</button>
       <button class="button is-danger" @click="resetRoom">Reset game</button>
     </div>
 
@@ -13,9 +15,14 @@
         <!-- Current Round -->
         <div class="card m-2 p-4">
           <template v-if="roomx.state === 'DRAWING'">
-            <h2 class="subtitle">Word: {{ roomx.round.words[player.name] }}</h2>
+            <h2 class="subtitle">
+              {{ agent }}'s Word: {{ roomx.round.words[agent] }}
+            </h2>
             Draw something
             <Sketchpad :path="`round.${roomx.state}.${agent}`" />
+          </template>
+          <template v-if="roomx.state === 'GUESSING'">
+            <img :src="roomx.round.DRAWING[agent]" alt="Clue" />
           </template>
         </div>
 
@@ -43,6 +50,7 @@ import Sketchpad from './Sketchpad.vue'
 import { useRoom } from '../composables/useRoom.js'
 import { debounce } from '../utils'
 import { listenRoom } from '../firebase/network'
+import { randomWord } from '../words/lists'
 
 function makeNewRoom(name) {
   return {
@@ -75,7 +83,6 @@ function makeNewRoom(name) {
       },
     },
     history: [],
-    invalidEntries: {},
     timerLength: 90,
     public: true,
     lastUpdateTime: Date.now(),
@@ -104,6 +111,8 @@ export default {
     'room.name'() {
       // Write updates to Vuex store instead of local room
       this.$store.commit('loadFirestore', this.room)
+      // FIXME: Updates aren't coming in, because this triggers
+      // BEFORE useRoom's listenRoom and thus gets overwritten
       listenRoom(this.room.name, (room) => {
         this.$store.commit('loadFirestore', room)
       })
@@ -117,19 +126,19 @@ export default {
     },
   },
   methods: {
+    toGuessing() {
+      this.updatex({ state: 'GUESSING' })
+    },
     newRound() {
-      this.roomx.history.push(this.roomx.round)
-      // Hm, can't just modify roomx. Supposed to use a mutation, I think
-      // This is a pretty annoying extra layer. What could we do instead?
-      // 1. Write to roomx and call a "sync" function that auto pushes
-      // 2. Maybe this is okay, most inputs are now handled automatically
-      this.roomx.round = {
-        clues: {},
-        defuses: {},
-        correct: 0,
+      const history = [...this.roomx.history, this.roomx.round]
+      const round = {
+        words: {
+          Austin: randomWord(),
+          Boston: 'gold',
+        },
       }
-      this.roomx.state = 'DRAWING'
-      this.saveRoom('state', 'history', 'round')
+      const state = 'DRAWING'
+      this.updatex({ history, round, state })
     },
     submitClue() {
       this.roomx.round.clues[this.player.name] = this.player.clue
@@ -138,6 +147,9 @@ export default {
     becomeSpy() {
       this.roomx.spy = this.player.name
       this.saveRoom('spy')
+    },
+    updatex(changes) {
+      this.$store.commit('updateState', changes)
     },
   },
 }

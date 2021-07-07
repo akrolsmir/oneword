@@ -8,6 +8,7 @@ export const store = createStore({
       roomStore: {}, // Synced to Firebase room
     }
   },
+  // Mutations directly, synchronously modify the state
   mutations: {
     input(state, { path, value }) {
       // Optimistically update the local room state
@@ -15,12 +16,21 @@ export const store = createStore({
       // Also push the changes to Firestore
       /* no await */ updateRoom(state.roomStore, { [path]: value })
     },
+    // Changes is an object of { path1: value1, path2: value2...}
+    // Fairly similar to Firebase's update(); or our own updateRoom()
+    updateState(state, changes) {
+      Object.entries(changes).map(([path, value]) =>
+        setIn(state.roomStore, path, value)
+      )
+      /* no await */ updateRoom(state.roomStore, changes)
+    },
     // nextRound(state) {},
     loadFirestore(state, firestoreJson) {
       state.roomStore = firestoreJson
-      // TODO: need to hook up to listenRoom
     },
   },
+  // Actions asynchronously call mutations to modify state
+  // Question: ...do we want these?
   actions: {},
 })
 
