@@ -2,7 +2,7 @@
   "aboutUs": {
     "contribute": "想要盡一份力嗎？ 聯絡我們",
     "privacy": "隱私權條款",
-    "thank": "還要感謝：",
+    "thank": "特別感謝：",
     "title": "關於我們"
   },
   "chatBox": {
@@ -192,7 +192,7 @@
       "message1": "Gravatar",
       "message2": "更換你的頭貼。"
     },
-    "manageSetting": "設定",
+    "manageSetting": "管理你的設定",
     "notSupporter": "你目前還不是支持者喔😢",
     "signOut": "登出",
     "supporterSetting": "支持者設定",

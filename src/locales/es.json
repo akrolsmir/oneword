@@ -1,0 +1,302 @@
+{
+  "aboutUs": {
+    "contribute": "¿Quieres contribuir? Contacta con nosotros en",
+    "privacy": "Política de privacidad",
+    "thank": "Gracias adicionales a:",
+    "title": "Acerca de nosotros"
+  },
+  "chatBox": {
+    "hide": "(hide)",
+    "hopOnDis": "O sube a nuestra Discord para chat de voz 🎤",
+    "messageHide": "{length} {'mensajes ocultos'}",
+    "placeholder": "Por favor, respeta a los otros.~",
+    "roomChat": "Chat para la sala"
+  },
+  "frontPage": {
+    "intro": {
+      "justoneIntro0": "This is an online game based on",
+      "justoneIntro1": "Just One",
+      "justoneIntro2": ", a co-op word game for 3+ players.",
+      "justoneIntro3": "In each of the 13 rounds, come up with a one-word hint for the guesser...",
+      "justoneIntro4": "But beware: duplicate hints are discarded!"
+    },
+    "joinUs": "Disfrútate con nosotros en Discord!",
+    "joinUsTime": "Para Nuestra noche de juegos cada lunes a las 18 horas, zona de tiempo pacífico de los Estados Unidos.",
+    "welcome": "Welcome!"
+  },
+  "gameList": {
+    "andOthers": "{' and '}{playernumber}{' others'}",
+    "createPrivateModal": {
+      "cancel": "Not now",
+      "okay": "Apóyanos!",
+      "text": "También conseguirás otras ventajas, por ejemplo un imagen personalizado.",
+      "title": "Para crear una sala privada, apóyanos!"
+    },
+    "createRoom": "Crear una sala privada",
+    "enter": "Entrar en una sala",
+    "openRoomList": "{', con'} {players}",
+    "openRooms": "Salas abiertas",
+    "privateModal": {
+      "cancel": "Not now",
+      "okay": "Become a supporter!",
+      "text": "Para entrar, pide el nombre de la sala o el enlace de tus compañeros.  \n\nPara crear una sala privada,\nApóyanos!",
+      "title": "Esta sala es privada. 🔒"
+    },
+    "privateRoom": "Salas privadas",
+    "privateRoomList": "{'Sala privada con '}{player}",
+    "signIn": "Play {gameName}!",
+    "welcomeText": "{'Hola, '}{user}{'! nombre de la sala:'}"
+  },
+  "linkFooter": {
+    "aboutUs": "About us",
+    "buyGame": "Comprar el juego de mesa físico.",
+    "joinDis": "Disfrútate con nosotros en Discord!"
+  },
+  "list": {
+    "noun": {
+      "inline": "word",
+      "name": "Nouns"
+    }
+  },
+  "loginModal": {
+    "back": "Back",
+    "continue": "Continue",
+    "gameHistoryLost": "Perderás tu historia de juegos.",
+    "name": "Name",
+    "or": "OR",
+    "orPlayWithoutText": "O juega sin una cuenta",
+    "playWithoutText": "Juega sin una cuenta",
+    "signInText": "Sign in to get started!"
+  },
+  "navBar": {
+    "allGame": "All Games",
+    "becomeSupporter": "Become a supporter!",
+    "designGame": "Diseña tu propio juego",
+    "discoverOther": "Descubre otros juegos",
+    "language": "Language:",
+    "new": "New!",
+    "signInAs": "{'Te has entrado como '}{user}{'!'}",
+    "signUp": "Sign up",
+    "supporter": "Supporter",
+    "swag": "Swag"
+  },
+  "onewordGame": {
+    "Round": "{'ronda '}{roundnumber}{' de '}{totalround}",
+    "backHome": "Back to home",
+    "basicWordList": "Listas de palabras básicas",
+    "becomeTheMod": "Sé el moderador!",
+    "clue": "Pista:",
+    "clueingTime": "{'Pista: '}{time}{' s'}",
+    "cluesForText": "{'Las pistas para '}{word}{' eran:'}",
+    "correctWordText": "{'Correcto! La palabra era\"'}{word}{'\". Bien hecho!'}",
+    "currentWordText": "{'El '}{wordCategory}{' para '}{guesser}{' es'}",
+    "customPlaceholder": "Input your own word list e.g. \"sneezy, phylum, europe, sloth, guacamole, data, colossus\"...",
+    "forChampion": "Para campeones!",
+    "guess": "suposicion:",
+    "guessHistory": "{guesser}{' ha adivinado \"'}",
+    "guesserClues": "{'Tus pistas para el '}{wordCategory}{' son:'}",
+    "guessingTime": "{'suposición:'}{time}{'s'}",
+    "hideModtools": "Ocultar controles del moderador",
+    "history": "History",
+    "invitation": "Invitar a tus amigos a jugar.",
+    "joinGame": "Entrar en un juego",
+    "markCorrect": "Marcar como correcto.",
+    "nextRound": "Ronda siguiente",
+    "nextStage": "Etapa siguiente",
+    "noTimers": "Ningún temporizador",
+    "privateRoom": "Sala privada",
+    "publicRoom": "Sala abierta",
+    "realWordText": "Estás seguro que es una palabra real?",
+    "resetRoom": "Reiniciar sala",
+    "room": "room",
+    "roomControl": "Controles de la sala",
+    "save": "Save",
+    "saved": "Saved",
+    "sec": "secs",
+    "showChampionModal": {
+      "cancel": "Not now",
+      "okayButton": "Okay!",
+      "text": "Si nos apoyas como campeón, tendrás esta ventaja.",
+      "title": "Marcar esta suposición como correcto?"
+    },
+    "showModtools": "Mostrar controles de moderador",
+    "showSupportModal": {
+      "cancel": "Not now",
+      "okayButton": "Okay!",
+      "text": "Si nos apoyas, ganarás ventajas como salas privadas, imágenes personalizados, y más",
+      "title": "Quieres salas privadas?"
+    },
+    "showUniquifiedModal": {
+      "text": "{'Un otro \"'}{player}{'\" era ya en esta sala...'}",
+      "title": "{'Ahora eres \"'}{player}{'\"!'}"
+    },
+    "similarClueText": "Esta pista es demasiada semejante a la palabra.",
+    "skipWord": "Otra palabra",
+    "spectatingText": "Actualmente estás observando este juego.",
+    "startTimers": "Empezar temporizadores",
+    "stopTimers": "Parar temporizadores",
+    "submit": "Submit",
+    "submitted": "Submitted",
+    "themedWordlists": "Listas de palabras con tema",
+    "tooLong": "This clue is too long",
+    "transferMod": "Transferir moderador",
+    "waitingGuesserText": "{'Esperando a '}{guesser}{' adivinar...'}",
+    "waitingText": "Esperando tres jugadores",
+    "wrongGuessText": "{'Aww, '}{guesser}{' ha adivinado \"'}{guessword}{'\", pero la palabra era \"'}{word}{'\"...'}",
+    "yourClue": "Tu pista",
+    "yourGuess": "Tu suposición",
+    "yourTurnText": "Te toca adivinar. Esperando pistas."
+  },
+  "onewordGameEnd": {
+    "and": "and",
+    "becomeSupporter": "Become a supporter!",
+    "continuePlaying": "No quieres terminar el juego? Bueno. Haz click aquí para continuar.",
+    "escalation": "!",
+    "finalScoreText": "{'Punto final: '}{score}{' correcto / '}{round}{' rondas'}",
+    "message0": "Entiendes que este juego es un juego cooperativo, no?",
+    "message1": "Al menos no puedes hacer peor la próxima vez.",
+    "message10": "Ah! Estoy impresionado. Era un error?",
+    "message11": "Has conseguido el nivel siguiente. Prueba una categoría más difícil la próxima vez.",
+    "message12": "Estáis haciendo trampa, lo sé!",
+    "message13": "Es maravilloso. Estoy emocionado. ",
+    "message2": "Um, estabas provando?",
+    "message3": "Here's a tip: try not colliding so much.",
+    "message4": "Well, it's not the worst result I've ever seen...",
+    "message5": "Alright, now that you've warmed up, are you ready to play for real?",
+    "message6": "Respectable attempt. Want to try again?",
+    "message7": "Okay... At least it's a lucky number?",
+    "message8": "Not bad! Now we're getting somewhere.",
+    "message9": "Pretty good job -- but can you make it to double digits?",
+    "textForSellingSupporter": "If you enjoyed One Word, consider becoming a supporter!",
+    "textForSupporterPrivilege": "You can earn nice perks like private rooms, while helping cover our server costs.",
+    "textForSupporters": "{'Hope you had fun, '}{name}{'! This is all made possible by supporters like you 😍'}",
+    "wrapUp": "And that's a wrap!",
+    "wrapUpText": "While you're here, check out two of our new games"
+  },
+  "onewordUtil": {
+    "collision": "Collisions:",
+    "collisionLuck": "(Uh, good luck.)",
+    "outOfWord": "You're out of custom words..."
+  },
+  "profile": {
+    "avatar": "Your Avatar",
+    "becomeSupporter": {
+      "message0": "Become a",
+      "message1": "supporter",
+      "message2": "to change your avatar!"
+    },
+    "becomeone": "Become one!",
+    "careSignIn": "Care to sign in?",
+    "changeAvatar": {
+      "message0": "You can change your avatar on",
+      "message1": "Gravatar",
+      "message2": "."
+    },
+    "manageSetting": "Manage your settings",
+    "notSupporter": "You're not currently a supporter 😢",
+    "signOut": "Sign out",
+    "supporterSetting": "Supporter Settings",
+    "thankBecomeSupporter": "{'Thanks for being a One Word '}{supporter}{'!'}",
+    "thankPlayText": "Thanks for playing!",
+    "thankSupporterText": "Thanks for being a supporter!",
+    "welcome": "{'Hey there, '}{name}{'.'}",
+    "youHavent": "{'You haven\\'t played '}{gametitle}{' yet...'}",
+    "yourGame": "Your Games"
+  },
+  "shareLink": {
+    "copied": "Copied!",
+    "copy": "Copy"
+  },
+  "sponsors": {
+    "gratefulText": "We're grateful to be",
+    "sponsorBy": "sponsored by",
+    "sponsors": "Sponsors",
+    "thankyouNote": "Thanks for supporting One Word!"
+  },
+  "supporter": {
+    "austinSayingHi": "Hi there! I'm Austin, the lead developer behind One Word. If you've been enjoying the game, consider becoming a supporter!",
+    "cancel": "You can cancel your support at any time -- and if you're unhappy for any reason, let us know and we'll provide a full refund.",
+    "cantStopHere": "Can't stop at just One Word?",
+    "champion": {
+      "becomeone": "Become a Champion! ($6/month)",
+      "description": "Become a Champion, and you'll get two new perks. First, you get the ability to override our scoring system and mark ANY guess as correct.",
+      "encourage": "Champion One Word!",
+      "getSupporter": "And of course, you'll get all the benefits that Supporters get: private rooms and a custom user avatar!",
+      "img0": "An example game round, where Amey guessed 'speckled' but the word was 'spot'.",
+      "img1": "The same game round, but now 'speckled' is marked as correct.",
+      "img2": "Some different word lists to play with, like Countries and Pokemon.",
+      "markAs": "Mark guesses as correct!",
+      "markCorrect": "You can mark it as correct!",
+      "name": "Champion",
+      "privateRoom": "Private Room",
+      "speckled": "If you think \"speckled\" was close enough...",
+      "themed": "Themed word lists!",
+      "tryThese": "Tired of nouns, verbs, and adjectives? Try these!",
+      "unlockTheme": "You'll also unlock a bunch of specially-themed word lists to play with:"
+    },
+    "explainCoverFee": "You'll be helping cover our server and development costs, and we offer some neat perks as well!",
+    "perMonth": "/month",
+    "question": "As always, if you have any questions, or need help, get in touch at",
+    "ready": "Ready to support One Word?",
+    "sponsor": {
+      "becomeone": "Become a Sponsor! ($10/month)",
+      "custom": "Custom cosmetics!",
+      "description": "As a Sponsor of One Word, you'll be credited on our home page for EVERYONE to see.",
+      "encourage": "Sponsor us!",
+      "frontpage": "Frontpage Sponsor credit!",
+      "getAllPrivilege": "And naturally, all the Supporter and Champion perks are yours as well. Private rooms! Correct guesses! Themed word lists! What are you waiting for?",
+      "img0": "Frontpage listing of our sponsors",
+      "img1": "Austin's profile picture and username, but it looks so divine that the other names pale in comparison",
+      "name": "Sponsor",
+      "purple": "Purple, the color of royalty, emperors... and you!",
+      "purpleBorder": "Plus, you now get a *purple* border. One-up all the other supporters!",
+      "wordList": "Themed word lists",
+      "youTheBest": "Really, you're the best."
+    },
+    "supporter": {
+      "adFree": "Supporters also get priority support and an ad-free experience. Does that all sound good?",
+      "adFreeExp": "Ad-free experience",
+      "becomeOne": "Become a Supporter! ($3/month)",
+      "configureAvatar": {
+        "message0": "Configure your avatar on",
+        "message1": "Gravatar",
+        "message2": ""
+      },
+      "customAvatar": "Custom user avatar!",
+      "description": {
+        "message0": "All supporters get the ability to create private rooms",
+        "message1": "those are rooms which are not visible from the home page, and are invite-only."
+      },
+      "encourage": "Support us!",
+      "img0": "Dropdown menu that Mods see when they are in a room. It has two options, Public and Private, and Private is selected.",
+      "img1": "Austin's profile picture and username in the the list of players in a room, but Austin's name looks better than the rest.",
+      "name": "Supporter",
+      "noRando": "No more randos crashing your family game",
+      "priority": "Priority support",
+      "privateRoom": "Private rooms!",
+      "unlockAvatar": "You'll also unlock a customizable user avatar with a shiny gold border. Rep your supporter status to all your friends!"
+    },
+    "testies": {
+      "emily": "\"Our team at work loved playing One Word earlier this week in our weekly coffee social over zoom! I had played this game before in real life and I found your virtual version to be even easier to use because the words come up automatically and there's less transition time... You have fans on our team and we can't wait to play again!\" -Emily",
+      "eric": "\"I'm a 5th/6th grade Language Arts teacher in Ohio, and have been using the game/your site as a reward for students who get all their virtual assignments done... Thanks for your time and effort on this awesome project.\" -Eric",
+      "fanSays": "Here's what our fans have to say:",
+      "harrison": "\"As a totally blind person I've been looking for games that I can play... Last Sunday, I had a play test with Sinclair, and those changes were made incredibly quickly. I played a few rounds this morning, and it was a much more enjoyable experience, and I believe in supporting developers who help their players. Thank you again.\" -Harrison",
+      "name": "Testimonials",
+      "sandy": "\"We’ve been doing weekly Zoom game nights with extended family and this will be a great addition. It’s great for our large age range and really nice for older relatives who appreciate that you can play at your own pace.\" -Sandy"
+    },
+    "thankyou": "Thanks, and happy cluing!",
+    "welcomeTitle": "Support One Word"
+  },
+  "thanks": {
+    "granted": "Your supporter benefits have just been granted!",
+    "granting": "Now granting your benefits...",
+    "heart": "Again, from the bottom of my heart:",
+    "meansAlot": "It means the world to us, that you enjoyed One Word this much.",
+    "somethingWentWrong": {
+      "message0": "(If this takes more than a minute, something broke. Sadface.",
+      "message1": "Ping austin@oneword.games and I'll get you sorted out.)"
+    },
+    "title": "Thanks for your support!",
+    "youreBest": "Seriously, you're the literal best."
+  }
+}

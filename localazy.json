@@ -20,7 +20,8 @@
 
   "download": {
     "langAliases": {
-      "zh-Hant-TW": "zh_TW"
+      "zh-Hant-TW": "zh_TW",
+      "zh-Hans-CN": "zh_CN"
     },
     "files": "src/locales/${lang}.json"
   }
