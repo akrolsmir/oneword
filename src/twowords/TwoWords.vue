@@ -105,6 +105,7 @@ import {
   getIn,
 } from '../utils'
 import { nouns } from '../words/parts-of-speech'
+import { twoWordsRules } from './game-template'
 
 function makeNewRoom(name) {
   return {
@@ -175,73 +176,10 @@ export default {
   },
   data() {
     return {
-      stages: ['CLUEING', 'GUESSING', 'DONE'],
-      views: {
-        CLUEING: {
-          CLUER: [
-            { type: 'TEXT_INPUT', label: 'Enter your clue' },
-            { type: 'BUTTON', label: 'Submit clue!' },
-            { type: 'BREAK' },
-            { type: 'BREAK' },
-            { type: 'BUTTON', label: 'Skip' },
-            { type: 'TEXT', label: `You typed in: [[Enter your clue]]` },
-          ],
-          GUESSER: [{ type: 'TEXT', label: 'Waiting for clues...' }],
-        },
-        GUESSING: {
-          CLUER: [{ type: 'TEXT', label: 'Waiting for GUESSER to guess...' }],
-          GUESSER: [
-            { type: 'TEXT_INPUT', label: 'Enter your guess' },
-            { type: 'BUTTON', label: 'Submit guess!' },
-          ],
-        },
-        DONE: {
-          CLUER: [
-            { type: 'TEXT', label: 'CLUER, you are now done.' },
-            { type: 'BUTTON', label: 'Next round' },
-          ],
-          GUESSER: [
-            { type: 'TEXT', label: 'GUESSER, you are now done.' },
-            { type: 'BUTTON', label: 'Next round' },
-          ],
-        },
-      },
       round: {
         inputs: {},
       },
-      rules: {
-        goal: {
-          type: 'COLLAB',
-          end: 'ROUNDS',
-          target: 13,
-        },
-        states: ['CLUEING', 'GUESSING', 'DONE'],
-        roles: {
-          CLUER: 1,
-          GUESSER: 'REST',
-        },
-        code: {
-          CLUEING: `if (inputs('CLUEING.@CLUER.Submit clue!').every(Boolean)) {
-  room.state = 'GUESSING'
-  changes.push('state')
-  // TODO: check for collisions, etc
-}`,
-          GUESSING: `if (inputs('GUESSING.@GUESSER.Submit guess!').every(Boolean)) {
-  room.state = 'DONE'
-  changes.push('state')
-}`,
-          DONE: `const anyone = inputs('DONE.@CLUER.Next round').concat(
-  inputs('DONE.@GUESSER.Next round')
-)
-if (anyone.some(Boolean)) {
-  room.state = 'CLUEING'
-  room.history.push(room.round)
-  room.round = {}
-  changes.pop() // Remove the original input change; it's already in history
-  changes.push('state', 'history', 'round')
-}`,
-        },
-      },
+      rules: twoWordsRules,
       showEditor: true,
       editor: {
         state: 'CLUEING',
