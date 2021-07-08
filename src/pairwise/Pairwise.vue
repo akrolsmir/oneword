@@ -1002,7 +1002,18 @@ export default {
 
       // Clue is picture based, allow empty sketchpad to be stringified
       if (this.player.enablePictureClue) {
-        const picture = this.player.sketchpad.canvas.toDataURL('image/png')
+        if (!this.player.sketchpad) {
+          return console.log(
+            'sketchpad does not exist: ' + JSON.stringify(this.player.sketchpad)
+          )
+        }
+        if (!this.player.sketchpad.toDataURL) {
+          return console.log(
+            'sketchpad toDataUrl does not exist: ' +
+              JSON.stringify(this.player.sketchpad)
+          )
+        }
+        const picture = this.player.sketchpad.toDataURL('image/png')
         this.player.currentClue = picture
       }
       // clue is text based, so check if it's empty and disallow if so
