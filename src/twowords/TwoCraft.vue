@@ -13,6 +13,7 @@
               'Input',
               'Container',
               'Flex',
+              'Sketchpad',
             ]"
           >
             <Blueprint component="button" class="button is-dark m-2">
@@ -73,6 +74,7 @@ import Paragraph from './components/CraftParagraph.vue'
 import Flex from './components/CraftFlex.vue'
 import Button from './components/CraftButton.vue'
 import Input from './components/CraftInput.vue'
+import Sketchpad from './components/CraftSketchpad.vue'
 import SettingsPanel from './components/SettingsPanel.vue'
 import CraftExport from './components/CraftExport.vue'
 import { inject } from '@vue/runtime-core'
@@ -99,6 +101,7 @@ export default {
     Button,
     Input,
     Flex,
+    Sketchpad,
     SettingsPanel,
     Blueprint,
     CraftExport,
@@ -112,6 +115,7 @@ export default {
         Button,
         Input,
         Flex,
+        Sketchpad,
       },
     }
   },
