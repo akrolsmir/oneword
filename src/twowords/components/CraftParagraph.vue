@@ -1,5 +1,5 @@
 <template>
-  <p>{{ content }}</p>
+  <p>{{ $interpolatex(content) }}</p>
 </template>
 
 <script>
@@ -9,6 +9,7 @@ export default {
   props: {
     content: String,
   },
+  inject: ['$interpolatex'],
   // We introduce a craft config attribute in vue's component option,
   // that can define the default props of our page element.
   craft: {

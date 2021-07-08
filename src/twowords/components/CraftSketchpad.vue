@@ -6,14 +6,13 @@
 
 <script>
 import Sketchpad from 'responsive-sketchpad'
-import { sanitize } from '../../utils'
 import LabelSetting from './LabelSetting.vue'
 
 export default {
   props: {
     label: String,
   },
-  inject: ['$roomx', '$updatex'],
+  inject: ['$inputx'],
   mounted() {
     this.registerSketchPad()
   },
@@ -39,9 +38,7 @@ export default {
       // TODO: instead serialize as sketchpad.toJSON, sketchpad.loadJSON ?
       // Pros: More compact, cons: need to convert again to PNG
       const dataUrl = this.sketchpad.canvas.toDataURL('image/png')
-      this.$updatex({
-        [`round.${this.$roomx.state}.Austin.${sanitize(this.label)}`]: dataUrl,
-      })
+      this.$inputx(this.label, dataUrl)
     },
   },
   craft: {

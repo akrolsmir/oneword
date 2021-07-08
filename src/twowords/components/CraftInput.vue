@@ -8,14 +8,14 @@
 </template>
 
 <script>
-import { debounce, sanitize } from '../../utils'
+import { debounce } from '../../utils'
 import LabelSetting from './LabelSetting.vue'
 
 export default {
   props: {
     label: String,
   },
-  inject: ['$roomx', '$updatex'],
+  inject: ['$inputx'],
   data() {
     return { value: '' }
   },
@@ -24,10 +24,7 @@ export default {
   },
   methods: {
     onInput() {
-      this.$updatex({
-        [`round.${this.$roomx.state}.Austin.${sanitize(this.label)}`]:
-          this.value,
-      })
+      this.$inputx(this.label, this.value)
     },
   },
   craft: {

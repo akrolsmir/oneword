@@ -115,6 +115,7 @@ export function useRoom(user, makeNewRoom, onJoin = undefined) {
     }
   }
 
+  const $playerx = inject('$playerx')
   function uniquify(name) {
     player.name = name
     // Skip uniquify popup when entering from ?player=Spartacus
@@ -132,6 +133,7 @@ export function useRoom(user, makeNewRoom, onJoin = undefined) {
       } while (!input)
       player.name = input
     }
+    $playerx.name = player.name
   }
 
   async function joinGame(alsoUpload = true) {
