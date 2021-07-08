@@ -1183,7 +1183,7 @@ export default {
         this.room.currentRound.state = 'CLUER_PICKING'
         this.room.currentRound.allWords = {}
         // Also reset players refresh count
-        this.players.decoyWordsRefreshCount = 3
+        this.player.decoyWordsRefreshCount = 3
       }
 
       this.room.lastUpdateTime = Date.now()
