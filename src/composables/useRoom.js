@@ -1,4 +1,4 @@
-import { computed, onBeforeMount, reactive } from 'vue'
+import { computed, inject, onBeforeMount, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   getRoom,
@@ -51,10 +51,12 @@ export function useRoom(user, makeNewRoom, onJoin = undefined) {
     players: computed(() => listPlayers(room.people)),
   })
 
+  const $setx = inject('$setx')
   function loadFrom(newRoom) {
     // Strip out computed functions. They're readonly, but this prevents a console warning.
     delete newRoom.players
     Object.assign(room, newRoom)
+    $setx(room)
   }
 
   const router = useRouter()
