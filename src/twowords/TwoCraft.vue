@@ -75,6 +75,19 @@ import Button from './components/CraftButton.vue'
 import Input from './components/CraftInput.vue'
 import SettingsPanel from './components/SettingsPanel.vue'
 import CraftExport from './components/CraftExport.vue'
+import { inject } from '@vue/runtime-core'
+import { useRoom } from '../composables/useRoom'
+
+function makeNewRoom(name) {
+  return {
+    name,
+    state: 'CLUEING', // or "GUESSING", or "DONE"
+    round: {},
+    history: [],
+    public: true,
+    lastUpdateTime: Date.now(),
+  }
+}
 
 export default {
   name: 'App',
@@ -101,6 +114,12 @@ export default {
         Flex,
       },
     }
+  },
+  setup() {
+    const user = inject('currentUser')
+    const roomHelpers = useRoom(user, makeNewRoom)
+    roomHelpers.player.timerLength = 90
+    return Object.assign(roomHelpers, { user })
   },
 }
 </script>

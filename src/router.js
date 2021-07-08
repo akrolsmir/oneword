@@ -81,6 +81,7 @@ const routes = [
   },
   { path: '/twowords/:id', component: TwoWords, meta: { title: 'Two Words' } },
   { path: '/twocraft', component: TwoCraft, meta: { title: 'Two Craft' } },
+  { path: '/twocraft/:id', component: TwoCraft, meta: { title: 'Two Craft' } },
 ]
 
 export const router = createRouter({
