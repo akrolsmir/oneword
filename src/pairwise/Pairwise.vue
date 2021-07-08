@@ -295,69 +295,33 @@
             <div v-show="player.enablePictureClue" class="container">
               <section>
                 <div class="row">
-                  <!-- <div class="two-thirds column"> -->
-                  <div ref="sketchpad"></div>
-                  <!-- </div> -->
-                  <!-- <div class="toolbox one-third column">
-                    <label for="line-color-input">Set Line Color</label>
-                    <input
-                      class="u-full-width"
-                      type="text"
-                      value="#000000"
-                      id="line-color-input"
-                    />
-                    <label for="line-size-input">Set Line Size</label>
-                    <input
-                      class="u-full-width"
-                      type="number"
-                      value="5"
-                      id="line-size-input"
-                    />
-                    <div class="row">
-                      <div class="one-half column">
-                        <button class="u-full-width" id="undo">Undo</button>
-                      </div>
-                      <div class="one-half column">
-                        <button class="u-full-width" id="redo">Redo</button>
-                      </div>
-                      <button class="u-full-width no-margin" id="clear">
-                        Clear
+                  <div class="columns">
+                    <div class="column is-one-third">
+                      <button
+                        class="button is-small is-fullwidth"
+                        v-on:click="player.sketchpad.undo()"
+                      >
+                        <strong> UNDO </strong>
                       </button>
-                      <div class="docs-section text-center">
-                        <p>Read and write sketchpad data</p>
-                        <div class="row">
-                          <div class="one-half column">
-                            <a
-                              class="button u-full-width"
-                              id="uploadJson"
-                              download="image.png"
-                              >Upload JSON</a
-                            >
-                            <input
-                              type="file"
-                              id="uploadJsonInput"
-                              style="position: fixed; top: -100em"
-                              accept="application/json"
-                            />
-                          </div>
-                          <div class="one-half column">
-                            <a
-                              class="button u-full-width"
-                              id="downloadJson"
-                              download="data.json"
-                              >Download JSON</a
-                            >
-                          </div>
-                          <a
-                            class="button u-full-width"
-                            id="downloadPng"
-                            download="image.png"
-                            >Download PNG</a
-                          >
-                        </div>
-                      </div> -->
-                  <!-- </div>
-                  </div> -->
+                    </div>
+                    <div class="column is-one-third">
+                      <button
+                        class="button is-small is-fullwidth"
+                        v-on:click="player.sketchpad.clear()"
+                      >
+                        <strong> CLEAR </strong>
+                      </button>
+                    </div>
+                    <div class="column is-one-third">
+                      <button
+                        class="button is-small is-fullwidth"
+                        v-on:click="player.sketchpad.redo()"
+                      >
+                        <strong> REDO </strong>
+                      </button>
+                    </div>
+                  </div>
+                  <div ref="sketchpad"></div>
                 </div>
               </section>
             </div>
@@ -993,6 +957,7 @@ export default {
         }
       })
     },
+
     async submitClue() {
       // Show warning if clue giver hasn't picked a word yet
       if (!this.player.currentWord) {
