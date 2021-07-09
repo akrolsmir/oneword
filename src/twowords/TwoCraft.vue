@@ -1,6 +1,11 @@
 <template>
   <div id="app" class="pt-4">
-    <Editor component="div" class="container" :resolverMap="resolverMap">
+    <Editor
+      ref="editor"
+      component="div"
+      class="container"
+      :resolverMap="resolverMap"
+    >
       <div class="columns">
         <div class="column">
           <h2 class="subtitle">Components</h2>
@@ -24,13 +29,13 @@
             </Blueprint>
           </template>
 
-          <h2 class="subtitle mt-6">Settings</h2>
+          <h2 class="subtitle">Settings</h2>
           <SettingsPanel />
 
-          <h2 class="subtitle mt-6">Export</h2>
+          <h2 class="subtitle">Export</h2>
           <CraftExport />
 
-          <h2 class="subtitle mt-6">Roomx</h2>
+          <h2 class="subtitle">Roomx</h2>
           <TwoPrism v-model="roomString" />
 
           <hr />
@@ -48,6 +53,42 @@
               <Button label="Heyo!" />
             </Canvas>
           </Frame>
+
+          <!-- Display a layout based on a specific state and role -->
+          <div class="control">
+            <h2 class="subtitle">State</h2>
+            <template v-for="state in $roomx.rules.states" :key="state">
+              <label class="radio">
+                <input
+                  type="radio"
+                  name="state"
+                  :value="state"
+                  v-model="editor.state"
+                />
+                {{ state }}</label
+              >
+              <br />
+            </template>
+          </div>
+
+          <div class="control">
+            <h2 class="subtitle">Role</h2>
+            <template v-for="role in $roomx.rules.roles" :key="role">
+              <label class="radio">
+                <input
+                  type="radio"
+                  name="role"
+                  :value="role"
+                  v-model="editor.role"
+                />
+                {{ role }}</label
+              >
+              <br />
+            </template>
+          </div>
+
+          <!-- TODO: Autosave instead of having to click this -->
+          <button class="button" @click="saveLayout">Save Layout</button>
         </div>
       </div>
     </Editor>
@@ -68,6 +109,11 @@
   box-shadow: 0px 0px 4px 4px rgba(0, 128, 0, 0.432);
   cursor: move;
 }
+
+.subtitle {
+  margin-bottom: 0.5rem !important;
+  margin-top: 2rem;
+}
 </style>
 
 <script>
@@ -83,6 +129,34 @@ import CraftExport from './components/CraftExport.vue'
 import { inject } from '@vue/runtime-core'
 import { useRoom } from '../composables/useRoom'
 import TwoPrism from './TwoPrism.vue'
+import { nanoid } from 'nanoid'
+
+function emptyLayout() {
+  return `[
+    {
+      "componentName": "Canvas",
+      "props": {
+        "component": "Container"
+      },
+      "children": [
+      ],
+      "addition": {},
+      "uuid": "${nanoid()}"
+    }
+  ]`
+}
+
+function buildLayouts(states, roles) {
+  const fromRoles = () =>
+    Object.fromEntries(roles.map((r) => [r, emptyLayout()]))
+
+  return Object.fromEntries(states.map((s) => [s, fromRoles()]))
+}
+
+const rules = {
+  states: ['DRAWING', 'GUESSING', 'DONE'],
+  roles: ['CLUER', 'GUESSER'],
+}
 
 function makeNewRoom(name) {
   return {
@@ -92,6 +166,9 @@ function makeNewRoom(name) {
     history: [],
     public: true,
     lastUpdateTime: Date.now(),
+
+    layouts: buildLayouts(rules.states, rules.roles),
+    rules,
   }
 }
 
@@ -122,14 +199,37 @@ export default {
         Flex,
         Sketchpad,
       },
+      editor: {
+        state: rules.states[0],
+        role: rules.roles[0],
+      },
     }
   },
-  inject: ['$roomx'],
+  inject: ['$roomx', '$updatex'],
   setup() {
     const user = inject('currentUser')
     const roomHelpers = useRoom(user, makeNewRoom)
     roomHelpers.player.timerLength = 90
     return Object.assign(roomHelpers, { user })
+  },
+  watch: {
+    'editor.state'() {
+      const layout = this.$roomx.layouts[this.editor.state][this.editor.role]
+      this.$refs.editor.editor.import(layout)
+    },
+    'editor.role'() {
+      // TODO deduplicate
+      const layout = this.$roomx.layouts[this.editor.state][this.editor.role]
+      this.$refs.editor.editor.import(layout)
+    },
+  },
+  methods: {
+    saveLayout() {
+      const layoutString = this.$refs.editor.editor.export()
+      this.$updatex({
+        [`layouts.${this.editor.state}.${this.editor.role}`]: layoutString,
+      })
+    },
   },
   computed: {
     roomString() {
