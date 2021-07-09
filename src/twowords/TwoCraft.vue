@@ -30,6 +30,9 @@
           <h2 class="subtitle mt-6">Export</h2>
           <CraftExport />
 
+          <h2 class="subtitle mt-6">Roomx</h2>
+          <TwoPrism v-model="roomString" />
+
           <hr />
         </div>
         <div class="column">
@@ -79,6 +82,7 @@ import SettingsPanel from './components/SettingsPanel.vue'
 import CraftExport from './components/CraftExport.vue'
 import { inject } from '@vue/runtime-core'
 import { useRoom } from '../composables/useRoom'
+import TwoPrism from './TwoPrism.vue'
 
 function makeNewRoom(name) {
   return {
@@ -105,6 +109,7 @@ export default {
     SettingsPanel,
     Blueprint,
     CraftExport,
+    TwoPrism,
   },
   data() {
     return {
@@ -119,11 +124,24 @@ export default {
       },
     }
   },
+  inject: ['$roomx'],
   setup() {
     const user = inject('currentUser')
     const roomHelpers = useRoom(user, makeNewRoom)
     roomHelpers.player.timerLength = 90
     return Object.assign(roomHelpers, { user })
+  },
+  computed: {
+    roomString() {
+      function truncator(key, value) {
+        if (typeof value === 'string' && value.length > 80) {
+          return value.substring(0, 80) + '...'
+        }
+        return value
+      }
+
+      return JSON.stringify(this.$roomx, truncator, 2)
+    },
   },
 }
 </script>
