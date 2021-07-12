@@ -63,7 +63,7 @@
                   type="radio"
                   name="state"
                   :value="state"
-                  v-model="editor.state"
+                  v-model="local.state"
                 />
                 {{ state }}</label
               >
@@ -79,7 +79,7 @@
                   type="radio"
                   name="role"
                   :value="role"
-                  v-model="editor.role"
+                  v-model="local.role"
                 />
                 {{ role }}</label
               >
@@ -89,6 +89,10 @@
 
           <!-- TODO: Autosave instead of having to click this -->
           <button class="button" @click="saveLayout">Save Layout</button>
+
+          <!-- Where the per-state logic resides -->
+          <h2 class="subtitle">Logic for {{ local.state }}</h2>
+          <TwoPrism v-model="$roomx.code[local.state]" />
         </div>
       </div>
     </Editor>
@@ -153,6 +157,11 @@ function buildLayouts(states, roles) {
   return Object.fromEntries(states.map((s) => [s, fromRoles()]))
 }
 
+function buildCode(states) {
+  const emptyCode = `// TODO: Fill this in`
+  return Object.fromEntries(states.map((s) => [s, emptyCode]))
+}
+
 const rules = {
   states: ['DRAWING', 'GUESSING', 'DONE'],
   roles: ['CLUER', 'GUESSER'],
@@ -169,6 +178,7 @@ function makeNewRoom(name) {
 
     layouts: buildLayouts(rules.states, rules.roles),
     rules,
+    code: buildCode(rules.states),
   }
 }
 
@@ -199,9 +209,10 @@ export default {
         Flex,
         Sketchpad,
       },
-      editor: {
+      local: {
         state: rules.states[0],
         role: rules.roles[0],
+        code: buildCode(rules.states),
       },
     }
   },
@@ -213,13 +224,13 @@ export default {
     return Object.assign(roomHelpers, { user })
   },
   watch: {
-    'editor.state'() {
-      const layout = this.$roomx.layouts[this.editor.state][this.editor.role]
+    'local.state'() {
+      const layout = this.$roomx.layouts[this.local.state][this.local.role]
       this.$refs.editor.editor.import(layout)
     },
-    'editor.role'() {
+    'local.role'() {
       // TODO deduplicate
-      const layout = this.$roomx.layouts[this.editor.state][this.editor.role]
+      const layout = this.$roomx.layouts[this.local.state][this.local.role]
       this.$refs.editor.editor.import(layout)
     },
   },
@@ -227,7 +238,7 @@ export default {
     saveLayout() {
       const layoutString = this.$refs.editor.editor.export()
       this.$updatex({
-        [`layouts.${this.editor.state}.${this.editor.role}`]: layoutString,
+        [`layouts.${this.local.state}.${this.local.role}`]: layoutString,
       })
     },
   },
@@ -235,7 +246,7 @@ export default {
     roomString() {
       function truncator(key, value) {
         if (typeof value === 'string' && value.length > 80) {
-          return value.substring(0, 80) + '...'
+          return value.substring(0, 40) + '...'
         }
         return value
       }
