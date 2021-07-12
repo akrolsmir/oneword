@@ -1,5 +1,6 @@
 import { singular, plural as pluralur } from 'pluralize'
 import { seededRandom } from './vendor/rng'
+import { isEqual } from 'lodash'
 
 // Compile these regexes for performance
 const RE_MATCH_LETTER_DASH = /[^\p{L}-]/gu // dash, or letter in any language
@@ -100,4 +101,38 @@ export function orderedEntries(object) {
   return Object.entries(object)
     .sort(([k1, v1], [k2, v2]) => k1.localeCompare(k2))
     .map(([k, v]) => [v, k]) // Swap so entries come before keys
+}
+
+// Find the deep properties of o2 that are new/changed from o1
+// e.g. diffs({a: 1, c: 3}, {a: 1, b: {c: 2}}) => {b: {c: 2}}
+// Adapted from https://stackoverflow.com/a/37396358/1222351
+export function objectDiff(o1, o2) {
+  const result = {}
+  for (const key of Object.keys(o2)) {
+    const v1 = o1?.[key] // Allow o1 to be undefined
+    const v2 = o2[key]
+    if (!isEqual(v1, v2)) {
+      result[key] = typeof value === 'object' ? objectDiff(v1, v2) : v2
+    }
+  }
+  return result
+}
+
+// Consolidate a nested object into a single flat object, for Firestore update
+// e.g. {a: {b: 3}} => {'a.b': 3}
+// TODO handles arrays wrongly. flattenPaths({a: [1]}) => {a.0: 1}
+export function flattenPaths(object) {
+  const result = {}
+  for (const [key, value] of Object.entries(object)) {
+    if (typeof value === 'object') {
+      // Recurse on non-array objects
+      for (const [k, v] of Object.entries(flattenPaths(value))) {
+        result[`${key}.${k}`] = v
+      }
+    } else {
+      // Base case
+      result[key] = value
+    }
+  }
+  return result
 }

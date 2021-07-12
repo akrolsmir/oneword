@@ -1,6 +1,7 @@
-import { reactive, readonly } from 'vue'
-import { setRoom, updateRoom } from '../firebase/network'
-import { getIn, sanitize } from '../utils'
+import { cloneDeep, isEmpty } from 'lodash'
+import { reactive, watch } from 'vue'
+import { updateRoom } from '../firebase/network'
+import { flattenPaths, getIn, objectDiff, sanitize } from '../utils'
 
 export function useStore() {
   // $roomx is the same as this.room; eventually, deprecate the latter
@@ -16,7 +17,6 @@ export function useStore() {
   // All writes to $roomx
   function $updatex(changes) {
     Object.entries(changes).map(([path, value]) => setIn($roomx, path, value))
-    /* no await */ updateRoom($roomx, changes)
   }
 
   function $setx(room) {
@@ -40,8 +40,25 @@ export function useStore() {
     return text.replace(/\[\[(.+?)\]\]/, replacer)
   }
 
+  // Whenever props of roomx change, push the corresponding change to Firestore
+  // From https://v3.vuejs.org/guide/reactivity-computed-watchers.html#watching-reactive-objects
+  watch(
+    () => cloneDeep($roomx),
+    (roomx, prev) => {
+      // Identify the new paths in this room -- to scope down Firestore push
+      const changes = flattenPaths(objectDiff(prev, roomx))
+      if (!(isEmpty(changes) || 'name' in changes)) {
+        // If there are no changes, we just got back from a Firestore pull
+        // If the room name changed, we swapped from initial zero state
+        // So only push when  1. There are changes and 2. the room name is the same
+        /* no await */ updateRoom(roomx, changes)
+        // TODO: Can we debounce changes here, instead of per-input?
+      }
+    }
+  )
+
   return {
-    $roomx: readonly($roomx),
+    $roomx,
     $updatex,
     $setx,
     $playerx,
