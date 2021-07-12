@@ -36,7 +36,7 @@
           <CraftExport />
 
           <h2 class="subtitle">Roomx</h2>
-          <TwoPrism v-model="roomString" />
+          <TwoPrism v-model="roomString" :readonly="true" />
 
           <hr />
         </div>

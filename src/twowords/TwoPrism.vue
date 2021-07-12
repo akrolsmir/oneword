@@ -1,11 +1,18 @@
+<!-- Note: vue-prism-editor throws out a lot of warnings like:
+Component emitted event "update:modelValue" but it is neither declared in the emits option nor as an "onUpdate:modelValue" prop.
+Could fix upstream to silence them... -->
+
 <template>
-  <prism-editor
-    class="my-editor"
-    v-model="modelValue"
-    :highlight="highlighter"
-    line-numbers
-    readonly
-  ></prism-editor>
+  <div>
+    <prism-editor
+      class="my-editor"
+      :model-value="modelValue"
+      @input="$emit('update:modelValue', $event.target.value)"
+      :highlight="highlighter"
+      line-numbers
+      :readonly="readonly"
+    ></prism-editor>
+  </div>
 </template>
 
 <style>
@@ -43,7 +50,7 @@ export default {
   components: {
     PrismEditor,
   },
-  props: ['modelValue'],
+  props: ['modelValue', 'readonly'],
   emits: ['update:modelValue'],
   methods: {
     highlighter(code) {
