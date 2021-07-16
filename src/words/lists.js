@@ -39,7 +39,7 @@ export const WORD_LISTS = {
   countries: { name: 'Countries', inline: 'country', words: countries },
   // Filler so `WORD_LISTS['custom'].name` doesn't break
   custom: { name: 'Custom', inline: 'custom word', words: [] },
-  nouns_zh: { name: '名詞', inline: '詞', words: nouns_zh },
+  nouns_zh: { name: '名詞', inline: '詞', words: nouns_zh, tag: 'zh' },
 }
 
 export const BASIC_LISTS = [

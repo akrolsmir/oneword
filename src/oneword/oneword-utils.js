@@ -32,6 +32,20 @@ export function dupes(clue1, clue2) {
   return false
 }
 
+export function dupes_zh(clue1, clue2) {
+  if (clue1 == clue2) {
+    return true
+  }
+  if (clue1.length >= 1 && clue2.length >= 1) {
+    for (const c of clue2) {
+      if (clue1.includes(c)) {
+        return true
+      }
+    }
+  }
+  return false
+}
+
 // Return whether the candidate is a dupe of any of the existing clues.
 export function anyDupes(clues, candidate) {
   return clues.some((c) => dupes(c, candidate))
