@@ -49,6 +49,9 @@ function roomDb() {
   if (window.location.pathname.startsWith('/incrypt')) {
     return 'incrypt'
   }
+  if (window.location.pathname.startsWith('/insider')) {
+    return 'insider'
+  }
   if (window.location.pathname.startsWith('/pairwise')) {
     return 'pairwise'
   }
