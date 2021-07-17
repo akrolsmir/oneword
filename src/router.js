@@ -12,6 +12,8 @@ import StorytimeFrontPage from './storytime/components/StorytimeFrontPage.vue'
 import Storytime from './storytime/Storytime.vue'
 import IncryptFrontPage from './incrypt/IncryptFrontPage.vue'
 import Incrypt from './incrypt/Incrypt.vue'
+import InsiderFrontPage from './insider/InsiderFrontPage.vue'
+import Insider from './insider/Insider.vue'
 import PairwiseFrontPage from './pairwise/PairwiseFrontPage.vue'
 import Pairwise from './pairwise/Pairwise.vue'
 import Multiplay from './admin/Multiplay.vue'
@@ -55,6 +57,8 @@ const routes = [
   },
   { path: '/incrypt', component: IncryptFrontPage, meta: { title: 'Incrypt' } },
   { path: '/incrypt/:id', component: Incrypt, meta: { title: 'Incrypt' } },
+  { path: '/insider', component: InsiderFrontPage, meta: { title: 'insider' } },
+  { path: '/insider/:id', component: Insider, meta: { title: 'insider' } },
   {
     path: '/pairwise',
     component: PairwiseFrontPage,
