@@ -137,6 +137,7 @@
     "stopTimers": "Stop Timers",
     "submit": "Submit",
     "submitted": "Submitted",
+    "tooLong": "This clue is too long",
     "themedWordlists": "Themed Wordlists",
     "transferMod": "Transfer Mod",
     "waitingGuesserText": "{'Waiting for '}{guesser}{' to guess...'}",

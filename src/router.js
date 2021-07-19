@@ -18,7 +18,7 @@ import TwoWordsFrontPage from './twowords/TwoWordsFrontPage.vue'
 import TwoWords from './twowords/TwoWords.vue'
 import TwoCraft from './twowords/TwoCraft.vue'
 import TwoPreview from './twowords/TwoPreview.vue'
-
+import Multiplay from './admin/Multiplay.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
@@ -87,6 +87,11 @@ const routes = [
     path: '/twopreview/:id',
     component: TwoPreview,
     meta: { title: 'Two Preview' },
+  },
+  {
+    path: '/multiplay/:game/:id',
+    component: Multiplay,
+    meta: { title: 'Multiplay' },
   },
 ]
 

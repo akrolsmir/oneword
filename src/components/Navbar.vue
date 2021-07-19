@@ -8,6 +8,7 @@
   />
 
   <nav
+    v-if="navbarShown"
     class="navbar is-fixed-top"
     role="navigation"
     aria-label="main navigation"
@@ -116,6 +117,9 @@ import { inject } from 'vue'
 export default {
   components: {
     LoginModal,
+  },
+  props: {
+    navbarShown: Boolean,
   },
   data() {
     return {

@@ -6,12 +6,12 @@
     @background-click="showStandardModal = false"
     @cancel="showStandardModal = false"
   />
-  <Navbar ref="navbar" />
+  <Navbar ref="navbar" :navbarShown="navbarShown" />
   <router-view />
 </template>
 
 <script>
-import { provide } from 'vue'
+import { provide, ref } from 'vue'
 import AnimatedModal from './components/AnimatedModal.vue'
 import Navbar from './components/Navbar.vue'
 import { useStore } from './composables/useStore'
@@ -32,11 +32,19 @@ export default {
     },
   },
   setup() {
+    // Provide a way for pages to hide the navbar
+    const navbarShown = ref(true)
+    const showNavbar = (value) => {
+      navbarShown.value = value
+      document.body.className = navbarShown.value ? 'has-navbar-fixed-top' : ''
+    }
+    provide('showNavbar', showNavbar)
+
     const { user } = useUser()
     // Best practice would be to make currentUser readonly, and export an update function.
     provide('currentUser', user)
 
-    return { user }
+    return { user, showNavbar, navbarShown }
   },
   provide: {
     ...useStore(),

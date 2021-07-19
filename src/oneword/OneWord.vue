@@ -368,7 +368,9 @@
                 :disabled="
                   !room.players.includes(player.name) ||
                   dupes(player.clue || '', room.currentRound.word) ||
-                  hasSpecialCharacters(player.clue)
+                  hasSpecialCharacters(player.clue) ||
+                  (WORD_LISTS[room.currentRound.category].tag == 'zh' &&
+                    dupes_zh(player.clue || '', room.currentRound.word))
                 "
                 :class="{
                   'is-primary': room.currentRound.clues[player.name],
@@ -385,7 +387,11 @@
           <div
             class="notification is-danger"
             role="alert"
-            v-if="dupes(player.clue || '', room.currentRound.word)"
+            v-if="
+              dupes(player.clue || '', room.currentRound.word) ||
+              (WORD_LISTS[room.currentRound.category].tag == 'zh' &&
+                dupes_zh(player.clue || '', room.currentRound.word))
+            "
           >
             {{ $t('onewordGame.similarClueText') }}
           </div>
@@ -395,6 +401,16 @@
             v-else-if="hasSpecialCharacters(player.clue)"
           >
             {{ $t('onewordGame.realWordText') }}
+          </div>
+          <div
+            class="notification is-danger"
+            role="alert"
+            v-else-if="
+              WORD_LISTS[room.currentRound.category].tag == 'zh' &&
+              player.clue.length > 4
+            "
+          >
+            {{ $t('onewordGame.tooLong') }}
           </div>
         </div>
       </div>
@@ -588,6 +604,7 @@ import {
   isEnd,
   score,
   dupes,
+  dupes_zh,
   dedupe,
   nextGuesser,
   nextWord,
@@ -723,6 +740,7 @@ export default {
   methods: {
     referSupporter,
     dupes,
+    dupes_zh,
     dedupe,
     wordForWord(category) {
       return WORD_LISTS[category].inline
