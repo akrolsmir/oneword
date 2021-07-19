@@ -32,9 +32,6 @@
           <h2 class="subtitle">Settings</h2>
           <SettingsPanel />
 
-          <h2 class="subtitle">Export</h2>
-          <CraftExport />
-
           <h2 class="subtitle">Roomx</h2>
           <TwoPrism v-model="roomString" :readonly="true" />
 
@@ -53,6 +50,9 @@
               <Button label="Heyo!" />
             </Canvas>
           </Frame>
+          <router-link :to="`/twopreview/${room.name}`"
+            >Preview game</router-link
+          >
 
           <!-- Display a layout based on a specific state and role -->
           <div class="control">
@@ -118,6 +118,10 @@
   margin-bottom: 0.5rem !important;
   margin-top: 2rem;
 }
+
+html {
+  background-color: #e0e7ff;
+}
 </style>
 
 <script>
@@ -170,7 +174,7 @@ const rules = {
 function makeNewRoom(name) {
   return {
     name,
-    state: 'CLUEING', // or "GUESSING", or "DONE"
+    state: 'DRAWING', // or "GUESSING", or "DONE"
     round: {},
     history: [],
     public: true,

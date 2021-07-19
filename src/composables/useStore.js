@@ -85,7 +85,7 @@ function compute(room) {
   } catch (e) {
     // TODO: Map stack trace to user's code? And surface to user.
     console.error(`Error with computing: ${e}`)
-    console.log('Code was:', room.code[room.state])
+    console.log('Code was:', room.code?.[room.state])
   }
 }
 
