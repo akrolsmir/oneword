@@ -228,14 +228,8 @@ export default {
     return Object.assign(roomHelpers, { user })
   },
   watch: {
-    'local.state'() {
-      const layout = this.$roomx.layouts[this.local.state][this.local.role]
-      this.$refs.editor.editor.import(layout)
-    },
-    'local.role'() {
-      // TODO deduplicate
-      const layout = this.$roomx.layouts[this.local.state][this.local.role]
-      this.$refs.editor.editor.import(layout)
+    currentLayout() {
+      this.$refs.editor.editor.import(this.currentLayout)
     },
   },
   methods: {
@@ -247,6 +241,9 @@ export default {
     },
   },
   computed: {
+    currentLayout() {
+      return this.$roomx.layouts[this.local.state][this.local.role] || []
+    },
     roomString() {
       function truncator(key, value) {
         if (typeof value === 'string' && value.length > 80) {
