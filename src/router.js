@@ -17,6 +17,7 @@ import Pairwise from './pairwise/Pairwise.vue'
 import TwoWordsFrontPage from './twowords/TwoWordsFrontPage.vue'
 import TwoWords from './twowords/TwoWords.vue'
 import TwoCraft from './twowords/TwoCraft.vue'
+import TwoAbsolute from './twowords/TwoAbsolute.vue'
 import TwoPreview from './twowords/TwoPreview.vue'
 import Multiplay from './admin/Multiplay.vue'
 import { createRouter, createWebHistory } from 'vue-router'
@@ -87,6 +88,16 @@ const routes = [
     path: '/twopreview/:id',
     component: TwoPreview,
     meta: { title: 'Two Preview' },
+  },
+  {
+    path: '/twoabsolute',
+    component: TwoAbsolute,
+    meta: { title: 'Two Absolute' },
+  },
+  {
+    path: '/twoabsolute/:id',
+    component: TwoAbsolute,
+    meta: { title: 'Two Absolute' },
   },
   {
     path: '/multiplay/:game/:id',
