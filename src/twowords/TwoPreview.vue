@@ -23,7 +23,7 @@
   </BigColumn>
 </template>
 
-<style>
+<style scoped>
 .background {
   background-color: #e0e7ff;
 }

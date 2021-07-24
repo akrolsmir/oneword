@@ -31,9 +31,7 @@ import { useRoute } from 'vue-router'
 
 // Hide the Navbar since each multiplay window already has it
 const showNavbar = inject('showNavbar')
-onMounted(() => {
-  showNavbar(false)
-})
+onMounted(() => showNavbar(false))
 
 const route = useRoute()
 const game = route.params.game

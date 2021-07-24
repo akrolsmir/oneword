@@ -99,7 +99,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
 /* Show a blue box around selected node, and green box on hover */
 .cf-node-selected {
   box-shadow: 0px 0px 4px 4px rgba(55, 144, 216, 0.459);
@@ -119,7 +119,7 @@
   margin-top: 2rem;
 }
 
-html {
+#app {
   background-color: #e0e7ff;
 }
 </style>
@@ -134,7 +134,7 @@ import Input from './components/CraftInput.vue'
 import Sketchpad from './components/CraftSketchpad.vue'
 import SettingsPanel from './components/SettingsPanel.vue'
 import CraftExport from './components/CraftExport.vue'
-import { inject } from '@vue/runtime-core'
+import { inject, onMounted } from '@vue/runtime-core'
 import { useRoom } from '../composables/useRoom'
 import TwoPrism from './TwoPrism.vue'
 import { nanoid } from 'nanoid'
@@ -222,6 +222,9 @@ export default {
   },
   inject: ['$roomx', '$updatex'],
   setup() {
+    const showNavbar = inject('showNavbar')
+    onMounted(() => showNavbar(false))
+
     const user = inject('currentUser')
     const roomHelpers = useRoom(user, makeNewRoom)
     roomHelpers.player.timerLength = 90

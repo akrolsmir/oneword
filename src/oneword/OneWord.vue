@@ -901,6 +901,10 @@ export default {
 </script>
 
 <style scoped>
+.background {
+  background-color: #fffbeb;
+}
+
 .newline {
   white-space: pre-wrap;
 }
