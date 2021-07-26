@@ -1,16 +1,11 @@
 <template>
   <div id="app" class="pt-4">
-    <Editor
-      ref="editor"
-      component="div"
-      class="container"
-      :resolverMap="resolverMap"
-    >
-      <div class="columns">
-        <div class="column">
+    <Editor ref="editor" component="div" :resolverMap="resolverMap">
+      <div class="columns is-gapless">
+        <div class="column is-narrow mx-2">
           <h2 class="subtitle">Components</h2>
 
-          <!-- For each component, create a draggable Blueprint -->
+          <!-- Left: For each component, create a draggable Blueprint -->
           <template
             v-for="item in [
               'Paragraph',
@@ -21,40 +16,49 @@
               'Sketchpad',
             ]"
           >
-            <Blueprint component="button" class="button is-dark m-2">
+            <Blueprint component="button" class="button is-dark is-fullwidth">
               {{ item }}
               <template v-slot:blueprint>
                 <Canvas :component="item" />
               </template>
             </Blueprint>
+            <br />
           </template>
+        </div>
 
-          <h2 class="subtitle">Settings</h2>
-          <SettingsPanel />
+        <!-- Center: Main editor area -->
+        <div class="column is-8 mx-2">
+          <h2 class="subtitle">Role: {{ local.role }}</h2>
+          <!-- For each state, create a screen -->
+          <div class="columns">
+            <div class="column" v-for="state in $roomx.rules.states">
+              <p class="has-text-centered">{{ state }}</p>
+              <Frame component="div">
+                <Canvas component="Container">
+                  <Paragraph content="Heyo~" />
+                  <Paragraph content="There comes a danger up in this club," />
+                  <Paragraph
+                    content="When we get started and we ain't gonna stop..."
+                  />
+                  <Paragraph
+                    content="We gonna turn it up til it gets too hot."
+                  />
+                  <Button label="Heyo!" />
+                </Canvas>
+              </Frame>
+            </div>
+          </div>
 
           <h2 class="subtitle">Roomx</h2>
           <TwoPrism v-model="roomString" :readonly="true" />
-
-          <hr />
         </div>
-        <div class="column">
-          <h2 class="subtitle">Preview</h2>
-          <Frame component="div" class="preview-panel">
-            <Canvas component="Container">
-              <Paragraph content="Heyo~" />
-              <Paragraph content="There comes a danger up in this club," />
-              <Paragraph
-                content="When we get started and we ain't gonna stop..."
-              />
-              <Paragraph content="We gonna turn it up til it gets too hot." />
-              <Button label="Heyo!" />
-            </Canvas>
-          </Frame>
-          <router-link :to="`/twopreview/${room.name}`"
-            >Preview game</router-link
-          >
 
-          <!-- Display a layout based on a specific state and role -->
+        <!-- Right: Settings, options, misc controls -->
+        <div class="column is-3 mx-2">
+          <h2 class="subtitle">Settings</h2>
+          <SettingsPanel />
+
+          <!-- Select a specific state and role. TODO remove -->
           <div class="control">
             <h2 class="subtitle">State</h2>
             <template v-for="state in $roomx.rules.states" :key="state">
@@ -99,7 +103,7 @@
   </div>
 </template>
 
-<style scoped>
+<style>
 /* Show a blue box around selected node, and green box on hover */
 .cf-node-selected {
   box-shadow: 0px 0px 4px 4px rgba(55, 144, 216, 0.459);
@@ -121,6 +125,11 @@
 
 #app {
   background-color: #e0e7ff;
+  /* Boilerplate to full-screen this div */
+  margin: 0;
+  height: 100%;
+  position: relative;
+  overflow: auto;
 }
 </style>
 

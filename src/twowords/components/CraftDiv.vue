@@ -8,5 +8,6 @@
 div {
   padding: 30px;
   outline: 1px dashed gray;
+  background-color: #e5e7eb;
 }
 </style>
