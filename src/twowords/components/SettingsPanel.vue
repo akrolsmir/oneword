@@ -16,6 +16,10 @@
         :is="component"
         :node="selectedNode"
       ></component>
+
+      <button class="button is-danger is-small mt-2" @click="removeSelected">
+        Delete
+      </button>
     </div>
   </div>
 </template>
@@ -33,6 +37,9 @@ export default {
       }
 
       return this.editor.getSettings(this.selectedNode)
+    },
+    removeSelected() {
+      return this.editor.removeNode(this.selectedNode)
     },
   },
   methods: {

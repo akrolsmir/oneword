@@ -28,11 +28,13 @@
 
         <!-- Center: Main editor area -->
         <div class="column is-8 mx-2">
-          <select v-model="local.canvas">
-            <option>LAYOUT</option>
-            <option>LOGIC</option>
-            <option>PLAYTEST</option>
-          </select>
+          <div class="select">
+            <select v-model="local.canvas">
+              <option>LAYOUT</option>
+              <option>LOGIC</option>
+              <option>PLAYTEST</option>
+            </select>
+          </div>
 
           <template v-if="local.canvas === 'LAYOUT'">
             <h2 class="subtitle">Role: {{ local.role }}</h2>
@@ -60,20 +62,17 @@
             </div>
           </template>
 
-          <!-- <h2 class="subtitle">Roomx</h2>
-          <TwoPrism v-model="roomString" :readonly="true" /> -->
-
           <template v-if="local.canvas === 'LOGIC'">
             <div class="columns">
               <div class="column">
                 <h2 class="subtitle">Layout for {{ local.state }}</h2>
-                <Frame component="div"></Frame>
+                <Frame component="div" :frame-id="local.state"></Frame>
               </div>
               <div class="column">
                 <!-- Where the per-state logic resides -->
                 <h2 class="subtitle">Logic for {{ local.state }}</h2>
-                <TwoPrism v-model="$roomx.code[local.state]" />
-                <button class="button">Save Code</button>
+                <TwoPrism v-model="local.code[local.state]" />
+                <button class="button" @click="saveCode">Save Code</button>
               </div>
             </div>
           </template>
@@ -89,6 +88,9 @@
               </div>
             </div>
           </template>
+
+          <h2 class="subtitle">Roomx</h2>
+          <TwoPrism v-model="roomString" :readonly="true" />
         </div>
 
         <!-- Right: Settings, options, misc controls -->
@@ -290,6 +292,13 @@ export default {
       for (const state of rules.states) {
         updates[`layouts.${state}.${this.local.role}`] =
           this.$refs.editor.editor.export(state)
+      }
+      this.$updatex(updates)
+    },
+    saveCode() {
+      const updates = {}
+      for (const state of rules.states) {
+        updates[`code.${state}`] = this.local.code[state]
       }
       this.$updatex(updates)
     },
