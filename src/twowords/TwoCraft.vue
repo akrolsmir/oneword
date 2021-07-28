@@ -28,29 +28,67 @@
 
         <!-- Center: Main editor area -->
         <div class="column is-8 mx-2">
-          <h2 class="subtitle">Role: {{ local.role }}</h2>
-          <!-- For each state, create a screen -->
-          <div class="columns">
-            <div class="column" v-for="state in $roomx.rules.states">
-              <p class="has-text-centered">{{ state }}</p>
-              <Frame component="div" :frame-id="state">
-                <Canvas component="Container">
-                  <Paragraph content="Heyo~" />
-                  <Paragraph content="There comes a danger up in this club," />
-                  <Paragraph
-                    content="When we get started and we ain't gonna stop..."
-                  />
-                  <Paragraph
-                    content="We gonna turn it up til it gets too hot."
-                  />
-                  <Button label="Heyo!" />
-                </Canvas>
-              </Frame>
-            </div>
-          </div>
+          <select v-model="local.canvas">
+            <option>LAYOUT</option>
+            <option>LOGIC</option>
+            <option>PLAYTEST</option>
+          </select>
 
-          <h2 class="subtitle">Roomx</h2>
-          <TwoPrism v-model="roomString" :readonly="true" />
+          <template v-if="local.canvas === 'LAYOUT'">
+            <h2 class="subtitle">Role: {{ local.role }}</h2>
+            <!-- For each state, create a screen -->
+            <div class="columns">
+              <div class="column" v-for="state in $roomx.rules.states">
+                <p class="has-text-centered">{{ state }}</p>
+                <!-- TODO remove temp hack setting DONE to DEFAULT -->
+                <Frame component="div" :frame-id="state">
+                  <Canvas component="Container">
+                    <Paragraph content="Heyo~" />
+                    <Paragraph
+                      content="There comes a danger up in this club,"
+                    />
+                    <Paragraph
+                      content="When we get started and we ain't gonna stop..."
+                    />
+                    <Paragraph
+                      content="We gonna turn it up til it gets too hot."
+                    />
+                    <Button label="Heyo!" />
+                  </Canvas>
+                </Frame>
+              </div>
+            </div>
+          </template>
+
+          <!-- <h2 class="subtitle">Roomx</h2>
+          <TwoPrism v-model="roomString" :readonly="true" /> -->
+
+          <template v-if="local.canvas === 'LOGIC'">
+            <div class="columns">
+              <div class="column">
+                <h2 class="subtitle">Layout for {{ local.state }}</h2>
+                <Frame component="div"></Frame>
+              </div>
+              <div class="column">
+                <!-- Where the per-state logic resides -->
+                <h2 class="subtitle">Logic for {{ local.state }}</h2>
+                <TwoPrism v-model="$roomx.code[local.state]" />
+                <button class="button">Save Code</button>
+              </div>
+            </div>
+          </template>
+
+          <template v-if="local.canvas === 'PLAYTEST'">
+            <div class="columns">
+              <div
+                class="column"
+                v-for="player in ['Alpha', 'Beta', 'Charlie', 'Delta']"
+              >
+                <h2 class="subtitle has-text-centered">{{ player }}</h2>
+                <Frame component="div"></Frame>
+              </div>
+            </div>
+          </template>
         </div>
 
         <!-- Right: Settings, options, misc controls -->
@@ -93,10 +131,6 @@
 
           <!-- TODO: Autosave instead of having to click this -->
           <button class="button" @click="saveLayouts">Save Layouts</button>
-
-          <!-- Where the per-state logic resides -->
-          <h2 class="subtitle">Logic for {{ local.state }}</h2>
-          <TwoPrism v-model="$roomx.code[local.state]" />
         </div>
       </div>
     </Editor>
@@ -226,6 +260,7 @@ export default {
         state: rules.states[0],
         role: rules.roles[0],
         code: buildCode(rules.states),
+        canvas: 'LAYOUT',
       },
     }
   },
