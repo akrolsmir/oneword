@@ -9,6 +9,7 @@ class Editor {
     this.draggedNode = null
     this.indicator = new Indicator()
     this.enabled = true
+    this.screens = { DEFAULT: [] }
 
     this.setTopLevelNodes(nodes)
     this.setResolverMap(resolverMap)
@@ -39,7 +40,7 @@ class Editor {
   }
 
   setTopLevelNodes(nodes) {
-    this.nodes = nodes
+    this.screens['DEFAULT'] = nodes
     this.initializeNodeMap(nodes)
   }
 
@@ -82,16 +83,18 @@ class Editor {
     return this.getCraftConfig(node).settings || {}
   }
 
-  export() {
-    const nodesData = this.nodes.map((node) => node.serialize())
+  export(screen = 'DEFAULT') {
+    const nodesData = this.screens[screen].map((node) => node.serialize())
 
     return JSON.stringify(nodesData)
   }
 
-  import(plainNodesData) {
+  import(plainNodesData, screen = 'DEFAULT') {
     try {
       const nodesData = JSON.parse(plainNodesData)
-      this.nodes = nodesData.map((data) => Node.unserialize(this, data))
+      this.screens[screen] = nodesData.map((data) =>
+        Node.unserialize(this, data)
+      )
     } catch {
       throw new Error('The input is not valid.')
     }

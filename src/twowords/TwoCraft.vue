@@ -33,7 +33,7 @@
           <div class="columns">
             <div class="column" v-for="state in $roomx.rules.states">
               <p class="has-text-centered">{{ state }}</p>
-              <Frame component="div">
+              <Frame component="div" :screen="state">
                 <Canvas component="Container">
                   <Paragraph content="Heyo~" />
                   <Paragraph content="There comes a danger up in this club," />
@@ -92,7 +92,7 @@
           </div>
 
           <!-- TODO: Autosave instead of having to click this -->
-          <button class="button" @click="saveLayout">Save Layout</button>
+          <button class="button" @click="saveLayouts">Save Layouts</button>
 
           <!-- Where the per-state logic resides -->
           <h2 class="subtitle">Logic for {{ local.state }}</h2>
@@ -241,15 +241,22 @@ export default {
   },
   watch: {
     currentLayout() {
-      this.$refs.editor.editor.import(this.currentLayout)
+      for (const state of rules.states) {
+        this.$refs.editor.editor.import(
+          this.$roomx.layouts[state][this.local.role],
+          state
+        )
+      }
     },
   },
   methods: {
-    saveLayout() {
-      const layoutString = this.$refs.editor.editor.export()
-      this.$updatex({
-        [`layouts.${this.local.state}.${this.local.role}`]: layoutString,
-      })
+    saveLayouts() {
+      const updates = {}
+      for (const state of rules.states) {
+        updates[`layouts.${state}.${this.local.role}`] =
+          this.$refs.editor.editor.export(state)
+      }
+      this.$updatex(updates)
     },
   },
   computed: {

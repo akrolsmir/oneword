@@ -1,6 +1,10 @@
 <template>
   <component :is="component">
-    <Node v-for="node in editor.nodes" :key="node.uuid" :node="node" />
+    <Node
+      v-for="node in editor.screens[screen]"
+      :key="node.uuid"
+      :node="node"
+    />
     <Indicator :indicator="editor.indicator" />
   </component>
 </template>
@@ -17,6 +21,11 @@ export default {
   },
   props: {
     component: [Object, String],
+    // A string key to identify which of the editor's screens to show
+    screen: {
+      type: String,
+      default: 'DEFAULT',
+    },
   },
   inject: ['editor'],
   created() {
@@ -24,7 +33,10 @@ export default {
       throw new Error('<Frame/> must be wrapped with <Editor/>.')
     }
 
-    if (this.editor.nodes.length === 0) {
+    // Show the Frame's slot contents, if Editor has nothing cached.
+    const isNullOrEmpty = (arr) => !arr || arr.length == 0
+    let screenContents = this.editor.screens[this.screen]
+    if (isNullOrEmpty(screenContents)) {
       const nodes = this.createNodesFromSlots()
       this.editor.setTopLevelNodes(nodes)
     }
