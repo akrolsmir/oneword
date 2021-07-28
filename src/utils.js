@@ -121,6 +121,7 @@ export function objectDiff(o1, o2) {
 // Consolidate a nested object into a single flat object, for Firestore update
 // e.g. {a: {b: 3}} => {'a.b': 3}
 // TODO handles arrays wrongly. flattenPaths({a: [1]}) => {a.0: 1}
+// This will break e.g. round history in One Word
 export function flattenPaths(object) {
   const result = {}
   for (const [key, value] of Object.entries(object)) {
