@@ -45,8 +45,9 @@ export function useStore() {
   watch(
     () => cloneDeep($roomx),
     (roomx, prev) => {
+      // NOTE: seems to be causing update loops; disable for now
       // Run game logic and update room as appropriate
-      compute(roomx)
+      // compute(roomx)
 
       // Identify the new paths in this room -- to scope down Firestore push
       const changes = flattenPaths(objectDiff(prev, roomx))
@@ -114,10 +115,11 @@ export function setIn(object, path, value) {
 
 // Eval code, but only accessing constants from the provided sandbox
 // From https://blog.risingstack.com/writing-a-javascript-framework-sandboxed-code-evaluation/
-// TODO: What happens if they infinite loop? What if they close the loop?
+// TODO: What happens if they infinite loop? What if they close the sandbox?
 // e.g. `} alert('hi')` totally breaks
 // Maybe solve with iframes and postMessage?
 // See: https://medium.com/zendesk-engineering/sandboxing-javascript-e4def55e855e
+// Maybe solve with a sandbox library: https://github.com/asvd/jailed
 const sandboxProxies = new WeakMap()
 
 function compileCode(src) {
