@@ -9,7 +9,9 @@ class Editor {
     this.draggedNode = null
     this.indicator = new Indicator()
     this.enabled = true
-    this.screens = { DEFAULT: [] }
+    // Keep track of which node tree corresponds to each Frame
+    // (A node tree is a list of top-level Node objects)
+    this.frames = { DEFAULT: [] }
 
     this.setTopLevelNodes(nodes)
     this.setResolverMap(resolverMap)
@@ -40,7 +42,7 @@ class Editor {
   }
 
   setTopLevelNodes(nodes) {
-    this.screens['DEFAULT'] = nodes
+    this.frames['DEFAULT'] = nodes
     this.initializeNodeMap(nodes)
   }
 
@@ -83,16 +85,16 @@ class Editor {
     return this.getCraftConfig(node).settings || {}
   }
 
-  export(screen = 'DEFAULT') {
-    const nodesData = this.screens[screen].map((node) => node.serialize())
+  export(frameId = 'DEFAULT') {
+    const nodesData = this.frames[frameId].map((node) => node.serialize())
 
     return JSON.stringify(nodesData)
   }
 
-  import(plainNodesData, screen = 'DEFAULT') {
+  import(plainNodesData, frameId = 'DEFAULT') {
     try {
       const nodesData = JSON.parse(plainNodesData)
-      this.screens[screen] = nodesData.map((data) =>
+      this.frames[frameId] = nodesData.map((data) =>
         Node.unserialize(this, data)
       )
     } catch {

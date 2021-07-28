@@ -33,7 +33,7 @@
           <div class="columns">
             <div class="column" v-for="state in $roomx.rules.states">
               <p class="has-text-centered">{{ state }}</p>
-              <Frame component="div" :screen="state">
+              <Frame component="div" :frame-id="state">
                 <Canvas component="Container">
                   <Paragraph content="Heyo~" />
                   <Paragraph content="There comes a danger up in this club," />

@@ -1,7 +1,7 @@
 <template>
   <component :is="component">
     <Node
-      v-for="node in editor.screens[screen]"
+      v-for="node in editor.frames[frameId]"
       :key="node.uuid"
       :node="node"
     />
@@ -21,8 +21,8 @@ export default {
   },
   props: {
     component: [Object, String],
-    // A string key to identify which of the editor's screens to show
-    screen: {
+    // A string key to identify which of the editor's frames to show
+    frameId: {
       type: String,
       default: 'DEFAULT',
     },
@@ -35,8 +35,8 @@ export default {
 
     // Show the Frame's slot contents, if Editor has nothing cached.
     const isNullOrEmpty = (arr) => !arr || arr.length == 0
-    let screenContents = this.editor.screens[this.screen]
-    if (isNullOrEmpty(screenContents)) {
+    const frame = this.editor.frames[this.frameId]
+    if (isNullOrEmpty(frame)) {
       const nodes = this.createNodesFromSlots()
       this.editor.setTopLevelNodes(nodes)
     }
