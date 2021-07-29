@@ -84,13 +84,13 @@
                 v-for="player in ['Alpha', 'Beta', 'Charlie', 'Delta']"
               >
                 <h2 class="subtitle has-text-centered">{{ player }}</h2>
-                <Frame component="div"></Frame>
+                <Frame component="div" :frame-id="local.state"></Frame>
               </div>
             </div>
           </template>
 
-          <h2 class="subtitle">Roomx</h2>
-          <TwoPrism v-model="roomString" :readonly="true" />
+          <!-- <h2 class="subtitle">Roomx</h2>
+          <TwoPrism v-model="roomString" :readonly="true" /> -->
         </div>
 
         <!-- Right: Settings, options, misc controls -->
@@ -115,7 +115,7 @@
             </template>
           </div>
 
-          <div class="control">
+          <!-- <div class="control">
             <h2 class="subtitle">Role</h2>
             <template v-for="role in $roomx.rules.roles" :key="role">
               <label class="radio">
@@ -129,7 +129,7 @@
               >
               <br />
             </template>
-          </div>
+          </div> -->
 
           <!-- TODO: Autosave instead of having to click this -->
           <button class="button" @click="saveLayouts">Save Layouts</button>

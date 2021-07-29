@@ -1,6 +1,6 @@
 <template>
   <div class="setting-panel">
-    <label class="checkbox">
+    <!-- <label class="checkbox">
       <input
         :checked="editor.enabled"
         @change="toggleState"
@@ -8,7 +8,7 @@
         id="editorState"
       />
       Editable</label
-    >
+    > -->
     <div v-if="settings" class="settings">
       <component
         v-for="(component, name) in settings"
