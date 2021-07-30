@@ -63,16 +63,15 @@
           </template>
 
           <template v-if="local.canvas === 'LOGIC'">
-            <div class="columns">
-              <div class="column">
-                <h2 class="subtitle">Layout for {{ local.state }}</h2>
-                <Frame component="div" :frame-id="local.state"></Frame>
+            <div class="columns" v-for="state in $roomx.rules.states">
+              <div class="column is-5">
+                <h2 class="subtitle">Layout for {{ state }}</h2>
+                <Frame component="div" :frame-id="state"></Frame>
               </div>
               <div class="column">
                 <!-- Where the per-state logic resides -->
-                <h2 class="subtitle">Logic for {{ local.state }}</h2>
-                <TwoPrism v-model="local.code[local.state]" />
-                <button class="button" @click="saveCode">Save Code</button>
+                <h2 class="subtitle">Logic for {{ state }}</h2>
+                <TwoPrism v-model="local.code[state]" />
               </div>
             </div>
           </template>
@@ -81,16 +80,20 @@
             <div class="columns">
               <div
                 class="column"
-                v-for="player in ['Alpha', 'Beta', 'Charlie', 'Delta']"
+                v-for="name in ['Alpha', 'Beta', 'Charlie', 'Delta']"
               >
-                <h2 class="subtitle has-text-centered">{{ player }}</h2>
-                <Frame component="div" :frame-id="local.state"></Frame>
+                <h2 class="subtitle has-text-centered">{{ name }}</h2>
+                <Frame
+                  component="div"
+                  :frame-id="local.state"
+                  @mouseover="setPlayerx(name)"
+                ></Frame>
               </div>
             </div>
           </template>
 
-          <!-- <h2 class="subtitle">Roomx</h2>
-          <TwoPrism v-model="roomString" :readonly="true" /> -->
+          <h2 class="subtitle">Roomx</h2>
+          <TwoPrism v-model="roomString" :readonly="true" />
         </div>
 
         <!-- Right: Settings, options, misc controls -->
@@ -132,7 +135,15 @@
           </div> -->
 
           <!-- TODO: Autosave instead of having to click this -->
-          <button class="button" @click="saveLayouts">Save Layouts</button>
+          <button class="button is-primary is-light m-1" @click="saveLayouts">
+            Save Layouts</button
+          ><br />
+          <button class="button is-primary is-light m-1" @click="saveCode">
+            Save Code</button
+          ><br />
+          <button class="button is-primary is-light m-1" @click="resetRound">
+            Reset Round</button
+          ><br />
         </div>
       </div>
     </Editor>
@@ -231,17 +242,22 @@ function makeNewRoom(name) {
   }
 }
 
+const resolverMap = {
+  Canvas,
+  Container,
+  Paragraph,
+  Button,
+  Input,
+  Flex,
+  Sketchpad,
+}
+
 export default {
   name: 'App',
   components: {
-    Canvas,
+    ...resolverMap,
     Editor,
     Frame,
-    Paragraph,
-    Button,
-    Input,
-    Flex,
-    Sketchpad,
     SettingsPanel,
     Blueprint,
     CraftExport,
@@ -249,15 +265,7 @@ export default {
   },
   data() {
     return {
-      resolverMap: {
-        Canvas,
-        Container,
-        Paragraph,
-        Button,
-        Input,
-        Flex,
-        Sketchpad,
-      },
+      resolverMap,
       local: {
         state: rules.states[0],
         role: rules.roles[0],
@@ -266,7 +274,7 @@ export default {
       },
     }
   },
-  inject: ['$roomx', '$updatex'],
+  inject: ['$roomx', '$updatex', '$playerx'],
   setup() {
     const showNavbar = inject('showNavbar')
     onMounted(() => showNavbar(false))
@@ -276,13 +284,23 @@ export default {
     roomHelpers.player.timerLength = 90
     return Object.assign(roomHelpers, { user })
   },
+  // We use watches instead of computed functions, to invoke Editor's methods
   watch: {
     currentLayout() {
+      // Sync up local with $roomx when the user changes the state
       for (const state of rules.states) {
         this.$refs.editor.editor.import(
           this.$roomx.layouts[state][this.local.role],
           state
         )
+        this.local.code = this.$roomx.code
+      }
+    },
+    'local.canvas'() {
+      if (this.local.canvas == 'PLAYTEST') {
+        this.$refs.editor.editor.disable()
+      } else {
+        this.$refs.editor.editor.enable()
       }
     },
   },
@@ -302,6 +320,15 @@ export default {
       }
       this.$updatex(updates)
     },
+    resetRound() {
+      this.$roomx.round = {}
+      this.$roomx.state = 'DRAWING'
+    },
+    setPlayerx(name) {
+      // TODO: @mouseover hack ignores tab focus
+      // Also, need People to match up somehow (ideally with roles)
+      this.$playerx.name = name
+    },
   },
   computed: {
     currentLayout() {
@@ -314,8 +341,9 @@ export default {
         }
         return value
       }
-
-      return JSON.stringify(this.$roomx, truncator, 2)
+      // Return an object showing only these fields
+      const mask = ({ state, round }) => ({ state, round })
+      return JSON.stringify(mask(this.$roomx), truncator, 2)
     },
   },
 }

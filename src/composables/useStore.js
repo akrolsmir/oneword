@@ -45,9 +45,10 @@ export function useStore() {
   watch(
     () => cloneDeep($roomx),
     (roomx, prev) => {
-      // NOTE: seems to be causing update loops; disable for now
       // Run game logic and update room as appropriate
-      // compute(roomx)
+      // NOTE: seems to be causing update loops in normal games; test + fix
+      // before merging into master
+      compute(roomx)
 
       // Identify the new paths in this room -- to scope down Firestore push
       const changes = flattenPaths(objectDiff(prev, roomx))
@@ -78,6 +79,7 @@ function compute(room) {
       inputs: (query) => inputs(room, query),
       room,
       Boolean,
+      console,
     }
     // Just compile the rule that we need:
     const compiled = compileCode(room.code[room.state])
@@ -86,7 +88,7 @@ function compute(room) {
   } catch (e) {
     // TODO: Map stack trace to user's code? And surface to user.
     console.error(`Error with computing: ${e}`)
-    console.log('Code was:', room.code?.[room.state])
+    console.error('Code was:', room.code?.[room.state])
   }
 }
 
@@ -124,7 +126,6 @@ const sandboxProxies = new WeakMap()
 
 function compileCode(src) {
   src = `with (sandbox) {\n${src}\n}`
-  console.log(src)
   const code = new Function('sandbox', src)
 
   const has = (target, key) => true
@@ -147,7 +148,6 @@ function inputs(room, query) {
   const r = powerset(parts).map((array) =>
     getIn(room, `round.${array.join('.')}`)
   )
-  console.log('query', query, 'result', r)
   return r
 }
 
@@ -155,9 +155,12 @@ function lookup(room, part) {
   if (part.startsWith('@')) {
     // Return all players with this role
     const role = part.slice(1)
-    return Object.entries(room.people)
-      .map(([name, entry]) => (entry.role === role ? name : ''))
-      .filter(Boolean)
+    // For now, return everyone in the room
+    return Object.keys(room.people)
+    // TODO: reenable
+    // return Object.entries(room.people)
+    //   .map(([name, entry]) => (entry.role === role ? name : ''))
+    //   .filter(Boolean)
   }
   // Not @ROLE syntax, so just return the original string wrapped in an array
   return [part]
