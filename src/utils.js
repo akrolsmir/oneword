@@ -1,6 +1,6 @@
 import { singular, plural as pluralur } from 'pluralize'
 import { seededRandom } from './vendor/rng'
-import { isEqual } from 'lodash'
+import { isEmpty, isEqual } from 'lodash'
 
 // Compile these regexes for performance
 const RE_MATCH_LETTER_DASH = /[^\p{L}-]/gu // dash, or letter in any language
@@ -120,13 +120,11 @@ export function objectDiff(o1, o2) {
 
 // Consolidate a nested object into a single flat object, for Firestore update
 // e.g. {a: {b: 3}} => {'a.b': 3}
-// TODO handles arrays wrongly. flattenPaths({a: [1]}) => {a.0: 1}
-// This will break e.g. round history in One Word
 export function flattenPaths(object) {
   const result = {}
   for (const [key, value] of Object.entries(object)) {
-    if (typeof value === 'object') {
-      // Recurse on non-array objects
+    if (typeof value === 'object' && !isEmpty(value) && !Array.isArray(value)) {
+      // Recurse on non-array, non-empty objects
       for (const [k, v] of Object.entries(flattenPaths(value))) {
         result[`${key}.${k}`] = v
       }
