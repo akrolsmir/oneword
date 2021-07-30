@@ -115,7 +115,6 @@ export function useRoom(user, makeNewRoom, onJoin = undefined) {
     }
   }
 
-  const $playerx = inject('$playerx')
   function uniquify(name) {
     player.name = name
     // Skip uniquify popup when entering from ?player=Spartacus
@@ -133,11 +132,12 @@ export function useRoom(user, makeNewRoom, onJoin = undefined) {
       } while (!input)
       player.name = input
     }
-    $playerx.name = player.name
   }
 
+  const $playerx = inject('$playerx')
   async function joinGame(alsoUpload = true) {
     uniquify(user.displayName || 'Anon')
+    $playerx.name = player.name
     room.people[player.name] = {
       id: user.id,
       supporter: user.supporter,
