@@ -92,7 +92,7 @@
             </div>
           </template>
 
-          <h2 class="subtitle">Roomx</h2>
+          <h2 class="subtitle">Game data</h2>
           <TwoPrism v-model="roomString" :readonly="true" />
         </div>
 
@@ -142,7 +142,7 @@
             Save Code</button
           ><br />
           <button class="button is-primary is-light m-1" @click="resetRound">
-            Reset Round</button
+            Reset game data</button
           ><br />
         </div>
       </div>
