@@ -85,7 +85,7 @@
                 <h2 class="subtitle has-text-centered">{{ name }}</h2>
                 <Frame
                   component="div"
-                  :frame-id="local.state"
+                  :frame-id="$roomx.state"
                   @mouseover="setPlayerx(name)"
                 ></Frame>
               </div>
@@ -101,49 +101,41 @@
           <h2 class="subtitle">Settings</h2>
           <SettingsPanel />
 
-          <!-- Select a specific state and role. TODO remove -->
-          <div class="control">
-            <h2 class="subtitle">State</h2>
-            <template v-for="state in $roomx.rules.states" :key="state">
-              <label class="radio">
-                <input
-                  type="radio"
-                  name="state"
-                  :value="state"
-                  v-model="local.state"
-                />
-                {{ state }}</label
-              >
-              <br />
-            </template>
-          </div>
+          <template v-if="local.canvas === 'LAYOUT'">
+            <!-- TODO: Autosave instead of having to click this -->
+            <button class="button is-primary is-light m-1" @click="saveLayouts">
+              Save Layouts</button
+            ><br />
+          </template>
 
-          <!-- <div class="control">
-            <h2 class="subtitle">Role</h2>
-            <template v-for="role in $roomx.rules.roles" :key="role">
-              <label class="radio">
-                <input
-                  type="radio"
-                  name="role"
-                  :value="role"
-                  v-model="local.role"
-                />
-                {{ role }}</label
-              >
-              <br />
-            </template>
-          </div> -->
+          <template v-if="local.canvas === 'LOGIC'">
+            <button class="button is-primary is-light m-1" @click="saveCode">
+              Save Code</button
+            ><br />
+          </template>
 
-          <!-- TODO: Autosave instead of having to click this -->
-          <button class="button is-primary is-light m-1" @click="saveLayouts">
-            Save Layouts</button
-          ><br />
-          <button class="button is-primary is-light m-1" @click="saveCode">
-            Save Code</button
-          ><br />
-          <button class="button is-primary is-light m-1" @click="resetRound">
-            Reset game data</button
-          ><br />
+          <template v-if="local.canvas === 'PLAYTEST'">
+            <!-- Jump to a specific state. -->
+            <div class="control">
+              <h2 class="subtitle">State</h2>
+              <template v-for="state in $roomx.rules.states" :key="state">
+                <label class="radio">
+                  <input
+                    type="radio"
+                    name="state"
+                    :value="state"
+                    v-model="$roomx.state"
+                  />
+                  {{ state }}</label
+                >
+                <br />
+              </template>
+            </div>
+
+            <button class="button is-primary is-light m-1" @click="resetRound">
+              Reset game data</button
+            ><br />
+          </template>
         </div>
       </div>
     </Editor>
