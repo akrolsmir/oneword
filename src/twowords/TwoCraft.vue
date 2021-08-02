@@ -16,7 +16,7 @@
               'Sketchpad',
             ]"
           >
-            <Blueprint component="button" class="button is-dark is-fullwidth">
+            <Blueprint component="div" class="blueprint">
               {{ item }}
               <template v-slot:blueprint>
                 <Canvas :component="item" />
@@ -160,6 +160,12 @@
 .subtitle {
   margin-bottom: 0.5rem !important;
   margin-top: 2rem;
+}
+
+div.blueprint {
+  text-align: center;
+  outline: 1px dashed gray;
+  padding: 0.25rem;
 }
 
 #app {

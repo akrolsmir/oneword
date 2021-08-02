@@ -7,7 +7,7 @@
 <style lang="scss" scoped>
 div.flex {
   padding: 30px;
-  outline: 1px dashed gray;
+  outline: 1px solid gray;
   display: flex;
 }
 </style>
