@@ -17,7 +17,7 @@
             ]"
           >
             <Blueprint component="div" class="blueprint">
-              {{ item }}
+              {{ COMPONENT_NAMES[item] || item }}
               <template v-slot:blueprint>
                 <Canvas :component="item" />
               </template>
@@ -225,6 +225,15 @@ const rules = {
   roles: ['CLUER', 'GUESSER'],
 }
 
+const COMPONENT_NAMES = {
+  Paragraph: 'Text',
+  Button: 'Button',
+  Input: 'Text Input',
+  Container: 'Vertical Box',
+  Flex: 'Horizontal Box',
+  Sketchpad: 'Sketchpad',
+}
+
 function makeNewRoom(name) {
   return {
     name,
@@ -264,6 +273,7 @@ export default {
   data() {
     return {
       resolverMap,
+      COMPONENT_NAMES,
       local: {
         state: rules.states[0],
         role: rules.roles[0],
