@@ -103,13 +103,16 @@
 
           <template v-if="local.canvas === 'LAYOUT'">
             <!-- TODO: Autosave instead of having to click this -->
-            <button class="button is-primary is-light m-1" @click="saveLayouts">
+            <button
+              class="button is-primary is-light mt-6"
+              @click="saveLayouts"
+            >
               Save Layouts</button
             ><br />
           </template>
 
           <template v-if="local.canvas === 'LOGIC'">
-            <button class="button is-primary is-light m-1" @click="saveCode">
+            <button class="button is-primary is-light mt-6" @click="saveCode">
               Save Code</button
             ><br />
           </template>
@@ -132,9 +135,14 @@
               </template>
             </div>
 
-            <button class="button is-primary is-light m-1" @click="resetRound">
+            <button class="button is-primary is-light mt-6" @click="resetRound">
               Reset game data</button
             ><br />
+
+            <input class="input mt-6" v-model="local.duplicateName" />
+            <button class="button" @click="duplicateRoom(local.duplicateName)">
+              Duplicate as "{{ local.duplicateName }}"
+            </button>
           </template>
         </div>
       </div>
@@ -192,6 +200,8 @@ import { inject, onMounted } from '@vue/runtime-core'
 import { useRoom } from '../composables/useRoom'
 import TwoPrism from './TwoPrism.vue'
 import { nanoid } from 'nanoid'
+import cloneDeep from 'lodash/cloneDeep'
+import { setRoom } from '../firebase/network'
 
 function emptyLayout() {
   return `[
@@ -279,6 +289,7 @@ export default {
         role: rules.roles[0],
         code: buildCode(rules.states),
         canvas: 'LAYOUT',
+        duplicateName: 'game-copy',
       },
     }
   },
@@ -336,6 +347,13 @@ export default {
       // TODO: @mouseover hack ignores tab focus
       // Also, need People to match up somehow (ideally with roles)
       this.$playerx.name = name
+    },
+    async duplicateRoom(duplicateName) {
+      const newRoom = cloneDeep(this.$roomx)
+      newRoom.name = duplicateName
+      await setRoom(newRoom)
+      // Navigate to the new room
+      this.$router.push(`/twocraft/${duplicateName}`)
     },
   },
   computed: {
