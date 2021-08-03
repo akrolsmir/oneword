@@ -46,6 +46,7 @@ export default {
         Container: 'Vertical Box',
         Flex: 'Horizontal Box',
         Sketchpad: 'Sketchpad',
+        Image: 'Image',
       },
     }
   },

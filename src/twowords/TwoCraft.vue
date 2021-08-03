@@ -9,6 +9,7 @@
           <template
             v-for="item in [
               'Paragraph',
+              'Image',
               'Button',
               'Input',
               'Container',
@@ -192,6 +193,7 @@ import Container from './components/CraftDiv.vue'
 import Paragraph from './components/CraftParagraph.vue'
 import Flex from './components/CraftFlex.vue'
 import Button from './components/CraftButton.vue'
+import Image from './components/CraftImage.vue'
 import Input from './components/CraftInput.vue'
 import Sketchpad from './components/CraftSketchpad.vue'
 import SettingsPanel from './components/SettingsPanel.vue'
@@ -242,6 +244,7 @@ const COMPONENT_NAMES = {
   Container: 'Vertical Box',
   Flex: 'Horizontal Box',
   Sketchpad: 'Sketchpad',
+  Image: 'Image',
 }
 
 function makeNewRoom(name) {
@@ -267,6 +270,7 @@ const resolverMap = {
   Input,
   Flex,
   Sketchpad,
+  Image,
 }
 
 export default {
