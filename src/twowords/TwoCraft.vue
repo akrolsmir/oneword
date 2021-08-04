@@ -385,7 +385,8 @@ export default {
         return value
       }
       // Return an object showing only these fields
-      const mask = ({ state, round }) => ({ state, round })
+      // const mask = ({ state, round }) => ({ state, round })
+      const mask = (object) => object
       return JSON.stringify(mask(this.$roomx), truncator, 2)
     },
   },

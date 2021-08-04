@@ -33,38 +33,29 @@
   <button class="button is-success">Publish</button>
 
   <div class="columns">
-    <div class="column">
-      <label class="label">Phases</label>
+    <div class="column" v-for="listName in ['states', 'roles']">
+      <label class="label">{{ listName }}</label>
       <div class="content">
         <ol>
-          <li v-for="state in room.rules.states">{{ state }} (❌)</li>
+          <li v-for="item in room.rules[listName]">
+            {{ item }} (<a @click="remove(listName, item)">❌</a>)
+          </li>
         </ol>
       </div>
 
       <div class="field has-addons">
         <div class="control">
-          <input type="text" class="input" placeholder="New Phase" />
+          <input
+            type="text"
+            class="input"
+            placeholder="New item"
+            v-model="local[listName]"
+          />
         </div>
         <div class="control">
-          <button class="button">➕</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="column">
-      <label class="label">Roles</label>
-      <div class="content">
-        <ol>
-          <li v-for="role in room.rules.roles">{{ role }} (❌)</li>
-        </ol>
-      </div>
-
-      <div class="field has-addons">
-        <div class="control">
-          <input type="text" class="input" placeholder="New Role" />
-        </div>
-        <div class="control">
-          <button class="button">➕</button>
+          <button class="button" @click="add(listName, local[listName])">
+            ➕
+          </button>
         </div>
       </div>
     </div>
@@ -84,5 +75,24 @@
 <script>
 export default {
   props: ['room'],
+  data() {
+    return {
+      local: {
+        state: '',
+        role: '',
+      },
+    }
+  },
+  methods: {
+    // TODO: New states shouldn't null-ify
+    add(listName, item) {
+      this.room.rules[listName].push(item)
+      this.local[listName] = ''
+    },
+    remove(listName, item) {
+      const filtered = this.room.rules[listName].filter((i) => i != item)
+      this.room.rules[listName] = filtered
+    },
+  },
 }
 </script>
