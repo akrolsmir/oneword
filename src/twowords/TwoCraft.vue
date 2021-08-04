@@ -17,7 +17,11 @@
               'Sketchpad',
             ]"
           >
-            <Blueprint component="div" class="blueprint">
+            <Blueprint
+              component="div"
+              class="blueprint"
+              v-tippy="{ content: 'Drag me 👉' }"
+            >
               {{ COMPONENT_NAMES[item] || item }}
               <template v-slot:blueprint>
                 <Canvas :component="item" />
