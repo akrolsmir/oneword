@@ -2,9 +2,7 @@
   <div id="app" class="pt-4">
     <Editor ref="editor" component="div" :resolverMap="resolverMap">
       <div class="columns is-gapless">
-        <div class="column is-narrow mx-2">
-          <h2 class="subtitle">Components</h2>
-
+        <div class="column is-narrow mx-2 mt-6">
           <!-- Left: For each component, create a draggable Blueprint -->
           <template
             v-for="item in [
@@ -38,68 +36,71 @@
             :titles="['LAYOUT', 'LOGIC', 'PLAYTEST']"
           />
 
-          <template v-if="local.canvas === 'LAYOUT'">
-            <!-- For each state, create a screen -->
-            <div class="columns">
-              <div class="column" v-for="state in $roomx.rules.states">
-                <p class="has-text-centered">{{ state }} Screen</p>
-                <!-- TODO remove temp hack setting DONE to DEFAULT -->
-                <Frame component="div" :frame-id="state">
-                  <Canvas component="Container">
-                    <Paragraph content="Heyo~" />
-                    <Paragraph
-                      content="There comes a danger up in this club,"
-                    />
-                    <Paragraph
-                      content="When we get started and we ain't gonna stop..."
-                    />
-                    <Paragraph
-                      content="We gonna turn it up til it gets too hot."
-                    />
-                    <Button label="Heyo!" />
-                  </Canvas>
-                </Frame>
+          <div class="main-area">
+            <template v-if="local.canvas === 'LAYOUT'">
+              <!-- For each state, create a screen -->
+              <div class="columns">
+                <div class="column" v-for="state in $roomx.rules.states">
+                  <p class="has-text-centered">{{ state }} Screen</p>
+                  <!-- TODO remove temp hack setting DONE to DEFAULT -->
+                  <Frame component="div" :frame-id="state">
+                    <Canvas component="Container">
+                      <Paragraph content="Heyo~" />
+                      <Paragraph
+                        content="There comes a danger up in this club,"
+                      />
+                      <Paragraph
+                        content="When we get started and we ain't gonna stop..."
+                      />
+                      <Paragraph
+                        content="We gonna turn it up til it gets too hot."
+                      />
+                      <Button label="Heyo!" />
+                    </Canvas>
+                  </Frame>
+                </div>
               </div>
-            </div>
-          </template>
+            </template>
 
-          <template v-if="local.canvas === 'LOGIC'">
-            <div class="columns" v-for="state in $roomx.rules.states">
-              <div class="column is-5">
-                <h2 class="subtitle">Layout for {{ state }}</h2>
-                <Frame component="div" :frame-id="state"></Frame>
+            <template v-if="local.canvas === 'LOGIC'">
+              <div class="columns" v-for="state in $roomx.rules.states">
+                <div class="column is-5">
+                  <h2 class="subtitle">Layout for {{ state }}</h2>
+                  <Frame component="div" :frame-id="state"></Frame>
+                </div>
+                <div class="column">
+                  <!-- Where the per-state logic resides -->
+                  <h2 class="subtitle">Logic for {{ state }}</h2>
+                  <TwoPrism v-model="local.code[state]" />
+                </div>
               </div>
-              <div class="column">
-                <!-- Where the per-state logic resides -->
-                <h2 class="subtitle">Logic for {{ state }}</h2>
-                <TwoPrism v-model="local.code[state]" />
-              </div>
-            </div>
-          </template>
+            </template>
 
-          <template v-if="local.canvas === 'PLAYTEST'">
-            <div class="columns">
-              <div
-                class="column"
-                v-for="name in ['Alpha', 'Beta', 'Charlie', 'Delta']"
-              >
-                <h2 class="subtitle has-text-centered">{{ name }}</h2>
-                <Frame
-                  component="div"
-                  :frame-id="$roomx.state"
-                  @mouseover="setPlayerx(name)"
-                ></Frame>
+            <template v-if="local.canvas === 'PLAYTEST'">
+              <div class="columns">
+                <div
+                  class="column"
+                  v-for="name in ['Alpha', 'Beta', 'Charlie', 'Delta']"
+                >
+                  <h2 class="subtitle has-text-centered">{{ name }}</h2>
+                  <Frame
+                    component="div"
+                    :frame-id="$roomx.state"
+                    @mouseover="setPlayerx(name)"
+                  ></Frame>
+                </div>
               </div>
-            </div>
-          </template>
+            </template>
 
-          <h2 class="subtitle">Game data</h2>
-          <TwoPrism v-model="roomString" :readonly="true" />
+            <template v-if="local.canvas !== 'LAYOUT'">
+              <h2 class="subtitle">Game data</h2>
+              <TwoPrism v-model="roomString" :readonly="true" />
+            </template>
+          </div>
         </div>
 
         <!-- Right: Settings, options, misc controls -->
-        <div class="column is-3 mx-2">
-          <h2 class="subtitle">Settings</h2>
+        <div class="column is-3 mx-2 mt-6">
           <SettingsPanel />
 
           <template v-if="local.canvas === 'LAYOUT'">
@@ -178,12 +179,18 @@ div.blueprint {
 }
 
 #app {
-  background-color: #e0e7ff;
+  background-color: #f3f4f6; /* Tailwind Gray 100  */
   /* Boilerplate to full-screen this div */
   margin: 0;
   height: 100%;
   position: relative;
   overflow: auto;
+}
+
+.main-area {
+  background-color: lightgray;
+  padding: 1rem;
+  height: 100%;
 }
 </style>
 
