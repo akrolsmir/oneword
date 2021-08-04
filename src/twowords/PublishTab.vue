@@ -33,7 +33,7 @@
   <button class="button is-success">Publish</button>
 
   <div class="columns">
-    <div class="column" v-for="listName in ['states', 'roles']">
+    <div class="column" v-for="listName in ['states', 'roles', 'testers']">
       <label class="label">{{ listName }}</label>
       <div class="content">
         <ol>
@@ -59,9 +59,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Placeholder column -->
-    <div class="column"></div>
   </div>
 </template>
 

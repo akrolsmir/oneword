@@ -78,10 +78,7 @@
 
             <template v-if="local.canvas === 'PLAYTEST'">
               <div class="columns">
-                <div
-                  class="column"
-                  v-for="name in ['Alpha', 'Beta', 'Charlie', 'Delta']"
-                >
+                <div class="column" v-for="name in $roomx.rules.testers">
                   <h2 class="subtitle has-text-centered">{{ name }}</h2>
                   <Frame
                     component="div"
@@ -246,6 +243,7 @@ function buildCode(states) {
 const rules = {
   states: ['DRAWING', 'GUESSING', 'DONE'],
   roles: ['CLUER', 'GUESSER'],
+  testers: ['Alpha', 'Beta', 'Charlie', 'Delta'],
 }
 
 const COMPONENT_NAMES = {

@@ -155,8 +155,8 @@ function lookup(room, part) {
   if (part.startsWith('@')) {
     // Return all players with this role
     const role = part.slice(1)
-    // TESTING: Return the 4 test users
-    return ['Alpha', 'Beta', 'Charlie', 'Delta']
+    // TESTING: Return the test users
+    return room.rules.testers
 
     // TESTING: Return everyone in the room
     // return Object.keys(room.people)
