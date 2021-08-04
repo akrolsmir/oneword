@@ -116,6 +116,9 @@
             <button class="button is-primary is-light mt-6" @click="saveCode">
               Save Code</button
             ><br />
+
+            <h2 class="subtitle">Docs</h2>
+            <TwoPrism :modelValue="docString" :readonly="true" />
           </template>
 
           <template v-if="local.canvas === 'PLAYTEST'">
@@ -212,6 +215,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import { setRoom } from '../firebase/network'
 import BulmaTabs from './BulmaTabs.vue'
 import PublishTab from './PublishTab.vue'
+import { docString } from './docs'
 
 function emptyLayout() {
   return `[
@@ -306,6 +310,7 @@ export default {
         canvas: 'LAYOUT',
         duplicateName: 'game-copy',
       },
+      docString,
     }
   },
   inject: ['$roomx', '$updatex', '$playerx'],
