@@ -33,20 +33,16 @@
 
         <!-- Center: Main editor area -->
         <div class="column is-8 mx-2">
-          <div class="select">
-            <select v-model="local.canvas">
-              <option>LAYOUT</option>
-              <option>LOGIC</option>
-              <option>PLAYTEST</option>
-            </select>
-          </div>
+          <BulmaTabs
+            v-model="local.canvas"
+            :titles="['LAYOUT', 'LOGIC', 'PLAYTEST']"
+          />
 
           <template v-if="local.canvas === 'LAYOUT'">
-            <h2 class="subtitle">Role: {{ local.role }}</h2>
             <!-- For each state, create a screen -->
             <div class="columns">
               <div class="column" v-for="state in $roomx.rules.states">
-                <p class="has-text-centered">{{ state }}</p>
+                <p class="has-text-centered">{{ state }} Screen</p>
                 <!-- TODO remove temp hack setting DONE to DEFAULT -->
                 <Frame component="div" :frame-id="state">
                   <Canvas component="Container">
@@ -208,6 +204,7 @@ import TwoPrism from './TwoPrism.vue'
 import { nanoid } from 'nanoid'
 import cloneDeep from 'lodash/cloneDeep'
 import { setRoom } from '../firebase/network'
+import BulmaTabs from './BulmaTabs.vue'
 
 function emptyLayout() {
   return `[
@@ -287,6 +284,7 @@ export default {
     Blueprint,
     CraftExport,
     TwoPrism,
+    BulmaTabs,
   },
   data() {
     return {
