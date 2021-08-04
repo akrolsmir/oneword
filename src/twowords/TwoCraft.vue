@@ -33,7 +33,7 @@
         <div class="column is-8 mx-2">
           <BulmaTabs
             v-model="local.canvas"
-            :titles="['LAYOUT', 'LOGIC', 'PLAYTEST']"
+            :titles="['LAYOUT', 'LOGIC', 'PLAYTEST', 'PUBLISH']"
           />
 
           <div class="main-area">
@@ -90,11 +90,13 @@
                   ></Frame>
                 </div>
               </div>
-            </template>
 
-            <template v-if="local.canvas !== 'LAYOUT'">
               <h2 class="subtitle">Game data</h2>
               <TwoPrism v-model="roomString" :readonly="true" />
+            </template>
+
+            <template v-if="local.canvas === 'PUBLISH'">
+              <PublishTab :room="$roomx" />
             </template>
           </div>
         </div>
@@ -212,6 +214,7 @@ import { nanoid } from 'nanoid'
 import cloneDeep from 'lodash/cloneDeep'
 import { setRoom } from '../firebase/network'
 import BulmaTabs from './BulmaTabs.vue'
+import PublishTab from './PublishTab.vue'
 
 function emptyLayout() {
   return `[
@@ -292,6 +295,7 @@ export default {
     CraftExport,
     TwoPrism,
     BulmaTabs,
+    PublishTab,
   },
   data() {
     return {
