@@ -38,7 +38,7 @@
       <div class="content">
         <ol>
           <li v-for="item in room.rules[listName]">
-            {{ item }} (<a @click="remove(listName, item)">❌</a>)
+            {{ item }} <a @click="remove(listName, item)">❌</a>
           </li>
         </ol>
       </div>
