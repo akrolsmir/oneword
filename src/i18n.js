@@ -1,12 +1,16 @@
 import { createI18n } from 'vue-i18n'
 import en_US from './locales/en.json'
+import es from './locales/es.json'
 import zh_TW from './locales/zh_TW.json'
+import zh_CN from './locales/zh_CN.json'
 import { formatDistanceToNow } from 'date-fns'
-import { en, zhTW } from 'date-fns/locale'
+import { en, zhCN, zhTW } from 'date-fns/locale'
 
 const messages = {
+  es,
   en: en_US,
   zh_TW: zh_TW,
+  zh_CN: zh_CN,
 }
 
 // Locale detection taken from:
@@ -29,8 +33,10 @@ function getBrowserLocale(options = {}) {
 
 function getStartingLocale() {
   const browserLocale = getBrowserLocale({ countryCodeOnly: true })
-  if (browserLocale == 'zh') {
+  if (browserLocale === 'zh') {
     return 'zh_TW'
+  } else if (browserLocale === 'es') {
+    return 'es'
   } else {
     return 'en'
   }
@@ -41,6 +47,8 @@ export function timeSince(millis) {
   if (i18n.global.locale) {
     if (i18n.global.locale == 'zh_TW') {
       setLocale = zhTW
+    } else if (i18n.global.locale == 'zh_CN') {
+      setLocale = zhCN
     }
   }
   return formatDistanceToNow(new Date(millis), {
