@@ -2,53 +2,53 @@
   "aboutUs": {
     "contribute": "(test translation, do not use)",
     "privacy": "Privacy policy",
-    "thank": "With additional thanks to:",
+    "thank": "Avec des remerciements supplémentaires à :",
     "title": "À propos de nous"
   },
   "chatBox": {
     "hide": "(hide)",
     "hopOnDis": "Or hop on our Discord for voice chat 🎤",
     "messageHide": "{length}{' messages hidden'}",
-    "placeholder": "Please be nice~",
+    "placeholder": "S'il vous plaît, soyez gentil ~",
     "roomChat": "Room Chat"
   },
   "frontPage": {
     "intro": {
       "justoneIntro0": "This is an online game based on",
-      "justoneIntro1": "Just One",
+      "justoneIntro1": "Seulement un",
       "justoneIntro2": ", a co-op word game for 3+ players.",
       "justoneIntro3": "In each of the 13 rounds, come up with a one-word hint for the guesser...",
-      "justoneIntro4": "But beware: duplicate hints are discarded!"
+      "justoneIntro4": "Mais attention : les indices en double sont jetés !"
     },
     "joinUs": "Join us on Discord!",
     "joinUsTime": "for our Weekly Game Nights: Monday at 6pm PT!",
-    "welcome": "Welcome!"
+    "welcome": "Bienvenue !"
   },
   "gameList": {
     "andOthers": "{' and '}{playernumber}{' others'}",
     "createPrivateModal": {
-      "cancel": "Not now",
+      "cancel": "Pas maintenant",
       "okay": "Become a supporter!",
       "text": "You'll also get other perks, like a custom avatar~",
       "title": "To create a private room, become a supporter!"
     },
-    "createRoom": "Create Private Room",
-    "enter": "Enter Room",
+    "createRoom": "Créer une salle privée",
+    "enter": "Entrée dans la salle",
     "openRoomList": "{', with '}{players}",
-    "openRooms": "Open Rooms",
+    "openRooms": "Salles ouvertes",
     "privateModal": {
-      "cancel": "Not now",
-      "okay": "Become a supporter!",
+      "cancel": "Pas maintenant",
+      "okay": "Devenez un supporteur !",
       "text": "To join, ask your teammates for the room name or link.\n\nTo make your own private room, become a supporter!",
-      "title": "This room is private 🔒"
+      "title": "Cette salle est privée 🔒"
     },
-    "privateRoom": "Private Rooms",
+    "privateRoom": "Salles Privées",
     "privateRoomList": "{'Private Room with '}{player}",
-    "signIn": "Jouez {gameName}!",
+    "signIn": "Jouez à {gameName} !",
     "welcomeText": "{'Hi, '}{user}{'! Room name:'}"
   },
   "linkFooter": {
-    "aboutUs": "About us",
+    "aboutUs": "À propos de nous",
     "buyGame": "Acheter le jeu de société",
     "joinDis": "Join us on Discord"
   },
@@ -61,31 +61,31 @@
   "loginModal": {
     "back": "Retourner",
     "continue": "Continuer",
-    "gameHistoryLost": "(Your game history will be lost)",
+    "gameHistoryLost": "(Votre historique de jeu sera perdu)",
     "name": "Nom",
     "or": "OU",
     "orPlayWithoutText": "Or play without an account",
     "playWithoutText": "Play without an account",
-    "signInText": "Sign in to get started!"
+    "signInText": "Connectez-vous pour commencer !"
   },
   "navBar": {
     "allGame": "Tous les jeux",
-    "becomeSupporter": "Become a supporter!",
+    "becomeSupporter": "Devenez un supporteur !",
     "designGame": "Design Your Own Game",
-    "discoverOther": "Discover other games...",
-    "language": "Language:",
+    "discoverOther": "Découvrir d'autres jeux...",
+    "language": "Langue :",
     "new": "New!",
     "signInAs": "{'Signed in as '}{user}{'!'}",
     "signUp": "Sign up",
-    "supporter": "Supporter",
+    "supporter": "Supporteur",
     "swag": "Swag"
   },
   "onewordGame": {
     "Round": "{'Round '}{roundnumber}{' of '}{totalround}",
     "backHome": "Back to home",
     "basicWordList": "Basic Wordlists",
-    "becomeTheMod": "Become the mod",
-    "clue": "Clue:",
+    "becomeTheMod": "Devenez le modérateur",
+    "clue": "Indice :",
     "clueingTime": "{'Clue:'}{time}{'s'}",
     "cluesForText": "{'The clues for '}{word}{' were:'}",
     "correctWordText": "{'Correct! The word was\"'}{word}{'\". Good job!'}",
