@@ -82,6 +82,7 @@
           <div class="locale-changer select pr-2">
             <select v-model="$i18n.locale">
               <option value="en" selected>English</option>
+              <option value="es">Español</option>
               <option value="zh_TW">繁體中文</option>
               <option value="zh_CN">简体中文</option>
             </select>
