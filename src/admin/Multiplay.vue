@@ -26,7 +26,7 @@ iframe {
 </style>
 
 <script setup>
-import { inject, onMounted } from '@vue/runtime-core'
+import { inject, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
 // Hide the Navbar since each multiplay window already has it

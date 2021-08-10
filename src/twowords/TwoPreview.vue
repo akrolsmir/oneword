@@ -41,7 +41,7 @@ import Input from './components/CraftInput.vue'
 import Sketchpad from './components/CraftSketchpad.vue'
 import SettingsPanel from './components/SettingsPanel.vue'
 import CraftExport from './components/CraftExport.vue'
-import { inject } from '@vue/runtime-core'
+import { inject } from 'vue'
 import { useRoom } from '../composables/useRoom'
 import TwoPrism from './TwoPrism.vue'
 
