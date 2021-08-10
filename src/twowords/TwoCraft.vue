@@ -85,7 +85,7 @@
                 <div class="column">
                   <!-- Where the per-state logic resides -->
                   <h2 class="subtitle">Logic for {{ state }}</h2>
-                  <TwoPrism v-model="local.code[state]" />
+                  <TwoMonaco v-model="local.code[state]" />
                 </div>
               </div>
             </template>
@@ -103,7 +103,7 @@
               </div>
 
               <h2 class="subtitle">Game data</h2>
-              <TwoPrism v-model="roomString" :readonly="true" />
+              <TwoMonaco v-model="roomString" :readonly="true" />
             </template>
 
             <template v-if="local.canvas === 'PUBLISH'">
@@ -132,7 +132,7 @@
             ><br />
 
             <h2 class="subtitle">Docs</h2>
-            <TwoPrism :modelValue="docString" :readonly="true" />
+            <TwoMonaco :modelValue="docString" :readonly="true" />
           </template>
 
           <template v-if="local.canvas === 'PLAYTEST'">
@@ -217,7 +217,7 @@ import SettingsPanel from './components/SettingsPanel.vue'
 import CraftExport from './components/CraftExport.vue'
 import { inject, onMounted } from 'vue'
 import { useRoom } from '../composables/useRoom'
-import TwoPrism from './TwoPrism.vue'
+import TwoMonaco from './TwoMonaco.vue'
 import { nanoid } from 'nanoid'
 import cloneDeep from 'lodash/cloneDeep'
 import { setRoom } from '../firebase/network'
@@ -316,7 +316,7 @@ export default {
     SettingsPanel,
     Blueprint,
     CraftExport,
-    TwoPrism,
+    TwoMonaco,
     BulmaTabs,
     PublishTab,
   },
