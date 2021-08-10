@@ -17,16 +17,30 @@
           >
             <Blueprint
               component="div"
-              class="blueprint"
-              v-tippy="{ content: 'Drag me 👉' }"
+              class="p-1"
+              v-tippy="{
+                content: `${COMPONENT_NAMES[item] || item}: Drag me 👉`,
+                placement: 'right',
+              }"
             >
-              {{ COMPONENT_NAMES[item] || item }}
+              <figure class="image is-32x32">
+                <img
+                  :src="`/images/tool-icons/${toolIcons[item]}`"
+                  width="32"
+                  height="32"
+                />
+              </figure>
               <template v-slot:blueprint>
                 <Canvas :component="item" />
               </template>
             </Blueprint>
-            <br />
           </template>
+
+          <div class="p-1 mt-6">
+            <figure class="image is-32x32 mt-6">
+              <img :src="`/images/tool-icons/HelpIcon32.svg`" />
+            </figure>
+          </div>
         </div>
 
         <!-- Center: Main editor area -->
@@ -174,12 +188,6 @@
   margin-top: 2rem;
 }
 
-div.blueprint {
-  text-align: center;
-  outline: 1px dashed gray;
-  padding: 0.25rem;
-}
-
 #app {
   background-color: #f3f4f6; /* Tailwind Gray 100  */
   /* Boilerplate to full-screen this div */
@@ -286,6 +294,19 @@ const resolverMap = {
   Image,
 }
 
+const toolIcons = {
+  Flex: 'AddComponentIcon32.svg',
+  Button: 'CircleToolIcon32.svg',
+  Sketchpad: 'DrawToolIcon32.svg',
+  // 'HelpIcon32.svg',
+  Image: 'ImageUploadIcon32.svg',
+  // 'LineToolIcon32.svg',
+  Input: 'NewScreenIcon32.svg',
+  // 'ProfilePlaceholderIcon32.svg',
+  Container: 'RectangleToolIcon32.svg',
+  Paragraph: 'TextToolIcon32.svg',
+}
+
 export default {
   name: 'App',
   components: {
@@ -311,6 +332,7 @@ export default {
         duplicateName: 'game-copy',
       },
       docString,
+      toolIcons,
     }
   },
   inject: ['$roomx', '$updatex', '$playerx'],
