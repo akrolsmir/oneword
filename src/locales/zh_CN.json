@@ -1,0 +1,302 @@
+{
+  "aboutUs": {
+    "contribute": "想要尽一份力吗？联络我们",
+    "privacy": "隐私权政策",
+    "thank": "特别感谢：",
+    "title": "关于我们"
+  },
+  "chatBox": {
+    "hide": "（隐藏）",
+    "hopOnDis": "或是登录Discord来语音🎤",
+    "messageHide": "{length}{'条隐藏讯息'}",
+    "placeholder": "记得要友善交流～",
+    "roomChat": "聊天室"
+  },
+  "frontPage": {
+    "intro": {
+      "justoneIntro0": "这个游戏启发于",
+      "justoneIntro1": "Just One",
+      "justoneIntro2": "，一个适合三人以上游玩的团队合作文字游戏。",
+      "justoneIntro3": "在这13回合中，每回合每人需要提供四个字以内的提示给猜题者......",
+      "justoneIntro4": "但要注意：重复的提示会被抵消的喔！"
+    },
+    "joinUs": "在Discord上加入我们！",
+    "joinUsTime": "每周游戏夜时间：周一 晚上六点 太平洋时间",
+    "welcome": "欢迎！"
+  },
+  "gameList": {
+    "andOthers": "{'和其他'}{playernumber}{'人'}",
+    "createPrivateModal": {
+      "cancel": "以后再说",
+      "okay": "成为支持者！",
+      "text": "你还会获得其他福利，比如自定义头像〜",
+      "title": "想要创建私人房间，就成为支持者吧！"
+    },
+    "createRoom": "创建私人房间",
+    "enter": "进入房间",
+    "openRoomList": "\b{'，与'}{players}",
+    "openRooms": "公共房间",
+    "privateModal": {
+      "cancel": "以后再说",
+      "okay": "成为支持者！",
+      "text": "如果想加入，请询问你的朋友房间名称或链结！\n\n想创建自己的私人房间，就成为支持者吧！",
+      "title": "这是个私人房间🔒"
+    },
+    "privateRoom": "私人房间",
+    "privateRoomList": "{'私人房间 与'}{player}",
+    "signIn": "遊玩{gameName}！",
+    "welcomeText": "{user}{'，你好！房间名称：'}"
+  },
+  "linkFooter": {
+    "aboutUs": "关于我们",
+    "buyGame": "购买桌游",
+    "joinDis": "在Discord上加入我们"
+  },
+  "list": {
+    "noun": {
+      "inline": "word",
+      "name": "Nouns"
+    }
+  },
+  "loginModal": {
+    "back": "返回",
+    "continue": "继续",
+    "gameHistoryLost": "（你的游戏历史记录将丢失）",
+    "name": "名称",
+    "or": "或",
+    "orPlayWithoutText": "或以访客模式游玩",
+    "playWithoutText": "以访客模式游玩",
+    "signInText": "登录以开始！"
+  },
+  "navBar": {
+    "allGame": "所有游戏",
+    "becomeSupporter": "成为支持者！",
+    "designGame": "设计自己的游戏",
+    "discoverOther": "查看其他游戏...",
+    "language": "语言：",
+    "new": "新！",
+    "signInAs": "{'以'}{user}{'的身份登录'}",
+    "signUp": "注册/登录",
+    "supporter": "支持者",
+    "swag": "周边产品"
+  },
+  "onewordGame": {
+    "Round": "{'第'}{roundnumber}{'回合，共'}{totalround}{'回合'}",
+    "backHome": "返回首页",
+    "basicWordList": "基本词汇表",
+    "becomeTheMod": "成为房主",
+    "clue": "提示：",
+    "clueingTime": "{'提示：'}{time}{'秒'}",
+    "cluesForText": "{'关于'}{word}{'的提示有：'}",
+    "correctWordText": "{'回答正确！答案就是\"'}{word}{'\"！真棒！ '}",
+    "currentWordText": "{guesser}{'要猜的'}{wordCategory}{'是'}",
+    "customPlaceholder": "输入你自己的单词，例如：「打喷嚏 欧洲 懒惰 数据 巨人」...",
+    "forChampion": "赞助者限定！",
+    "guess": "猜题：",
+    "guessHistory": "{guesser}{'猜是\"'}",
+    "guesserClues": "{'关于'}{wordCategory}{'的提示有：'}",
+    "guessingTime": "{'猜题'}{time}{'秒'}",
+    "hideModtools": "隐藏房主控制",
+    "history": "历史纪录",
+    "invitation": "邀请朋友一起玩！",
+    "joinGame": "加入游戏",
+    "markCorrect": "标示为正确",
+    "nextRound": "下一回合",
+    "nextStage": "下一阶段",
+    "noTimers": "无计时",
+    "privateRoom": "私人房间",
+    "publicRoom": "公开房间",
+    "realWordText": "你确定有这个词吗？",
+    "resetRoom": "重置房间",
+    "room": "房间",
+    "roomControl": "房间控制",
+    "save": "保存",
+    "saved": "已保存",
+    "sec": "秒",
+    "showChampionModal": {
+      "cancel": "以后再说",
+      "okayButton": "好！",
+      "text": "成为赞助者来解锁这项特权😍",
+      "title": "标示这项答案为正确？"
+    },
+    "showModtools": "显示房主控制",
+    "showSupportModal": {
+      "cancel": "以后再说",
+      "okayButton": "好！",
+      "text": "成为支持者来获得私人房间、自订头贴等特权😍",
+      "title": "想要建立私人房间？"
+    },
+    "showUniquifiedModal": {
+      "text": "{'另一名\"'}{player}{'\"已在房内......'}",
+      "title": "{'你现在是\"'}{player}{'\"！ }"
+    },
+    "similarClueText": "这个提示太接近答案了",
+    "skipWord": "跳过此题",
+    "spectatingText": "你正处于观察者模式！",
+    "startTimers": "开始计时",
+    "stopTimers": "停止计时",
+    "submit": "提交",
+    "submitted": "已提交",
+    "themedWordlists": "主题词汇表",
+    "tooLong": "这个提示太长了",
+    "transferMod": "更换房主",
+    "waitingGuesserText": "{'正在等待'}{guesser}{'的猜题......'}",
+    "waitingText": "正在等待3名玩家......",
+    "wrongGuessText": "{'真可惜，'}{guesser}{'觉得答案是\"'}{guessword}{'\"，但正确答案是\"'}{word}{'\"......'}",
+    "yourClue": "你的提示",
+    "yourGuess": "你的猜测",
+    "yourTurnText": "该你猜题了！正在等待提示......"
+  },
+  "onewordGameEnd": {
+    "and": "和",
+    "becomeSupporter": "成为支持者！",
+    "continuePlaying": "(还想继续玩吗？按这里继续！)",
+    "escalation": "!",
+    "finalScoreText": "{'最后成绩：'}{score}{'正确 / '}{round}{'回合'}",
+    "message0": "你真的了解这是一个团队合作游戏......对吧？ ！ ！ ！",
+    "message1": "至少你不会有更差到哪去的成绩了！",
+    "message10": "令人印象深刻！该不会是侥幸吧？",
+    "message11": "你真的达到一个新境界了呢！下次要不要试试看更难的主题呢？",
+    "message12": "我不信！你们一定有作弊！",
+    "message13": "哇，这根本是名人堂等级了吧！我甘拜下风！",
+    "message2": "呃...你真的有在试吗？",
+    "message3": "给你一个小技巧：别再那么有默契啦！",
+    "message4": "至少这不是我看过最糟的成绩...",
+    "message5": "看得出来你已经热好身了，准备好来一场真正的游戏了吗？",
+    "message6": "值得赞赏的一次尝试，要再试一次吗？",
+    "message7": "恩...至少这是个幸运数字？",
+    "message8": "不错嘛！开始有进展了喔！",
+    "message9": "真厉害--不过你能达到二位数的成绩吗？",
+    "textForSellingSupporter": "如果你喜欢这个游戏，欢迎支持我们！",
+    "textForSupporterPrivilege": "你可以享受特权，像是建立私人房间等等(顺便帮我们负担一些伺服器费用)。",
+    "textForSupporters": "{name}{'，希望你有一个愉快的体验！这一切都归功于像你一样的支持者😍'}",
+    "wrapUp": "这样就告一段落啦！",
+    "wrapUpText": "趁这个难得的机会，来看看我们另外两款新游戏："
+  },
+  "onewordUtil": {
+    "collision": "重复提示：",
+    "collisionLuck": "（呃...祝你好运。）",
+    "outOfWord": "没有更多自订词汇了喔......"
+  },
+  "profile": {
+    "avatar": "你的头贴",
+    "becomeSupporter": {
+      "message0": "成为",
+      "message1": "支持者",
+      "message2": "来更换你的头贴！"
+    },
+    "becomeone": "成为支持者！",
+    "careSignIn": "要登录吗？",
+    "changeAvatar": {
+      "message0": "你可以在",
+      "message1": "Gravatar",
+      "message2": "更换你的头贴。"
+    },
+    "manageSetting": "管理你的设置",
+    "notSupporter": "你目前还不是支持者喔😢",
+    "signOut": "登出",
+    "supporterSetting": "支持者设定",
+    "thankBecomeSupporter": "{'感谢你成为One Word的'}{supporter}{'!'}",
+    "thankPlayText": "感谢你的游玩！",
+    "thankSupporterText": "感谢您成为一名支持者！",
+    "welcome": "{'嘿，'}{name}{'。 '}",
+    "youHavent": "{'你还未游玩过'}{gametitle}{'喔...'}",
+    "yourGame": "你的游戏"
+  },
+  "shareLink": {
+    "copied": "已复制！",
+    "copy": "复制"
+  },
+  "sponsors": {
+    "gratefulText": "我们很高兴能拥有以下",
+    "sponsorBy": "赞助者",
+    "sponsors": "赞助者",
+    "thankyouNote": "谢谢你们的支持与鼓励！"
+  },
+  "supporter": {
+    "austinSayingHi": "嗨，你好！我是Austin，One Word的首席开发人员。如果你享受这个游戏的话，请考虑支持我们！",
+    "cancel": "你可以随时取消你的支持。如果你有任何不快，请让我们知道，我们会提供全额退费。",
+    "cantStopHere": "One Word无法满足你？",
+    "champion": {
+      "becomeone": "成为一名赞助者！ （＄6/月）",
+      "description": "成为一名赞助者，你将会获得两个特权。首先，你可以凌驾我们的分数计算系统，并将任何猜测标示为正确。",
+      "encourage": "赞助One Word！",
+      "getSupporter": "当然，你将获得所有支持者的特权，像是：私人房间与自订头贴！",
+      "img0": "游戏范例，Amey猜「斑点」，但答案是「点」。",
+      "img1": "同一局游戏，但这次「斑点」被标记为正确。",
+      "img2": "一些不同的字词列表，例如国家和精灵宝可梦。",
+      "markAs": "凌驾得分系统！",
+      "markCorrect": "你可以将其标示为正确！",
+      "name": "赞助者",
+      "privateRoom": "私人房间",
+      "speckled": "如果你认为答案够接近的话...",
+      "themed": "主题词汇表！",
+      "tryThese": "玩腻名词、动词与形容词了吗？试试这些：",
+      "unlockTheme": "你也能解锁这些特殊主题词汇表："
+    },
+    "explainCoverFee": "你将帮助我们负担伺服器与开发费用，我们也会回馈你酷炫特权！",
+    "perMonth": "/月",
+    "question": "一如以往，如果你有任何问题、需要帮助，请联络",
+    "ready": "准备好要支持One Word了吗？",
+    "sponsor": {
+      "becomeone": "成为一名凌驾者！ （$10/月）",
+      "custom": "自订造型！",
+      "description": "身为一名One Word的凌驾者，你将会显示在首页的特别感谢栏中！所有人都能看见！",
+      "encourage": "凌驾我们！",
+      "frontpage": "于首页特别感谢！",
+      "getAllPrivilege": "理所当然，你将能享受所有支持者与赞助者的特权。私人房间！凌驾得分系统！主题词汇表！你还在等什么？",
+      "img0": "首页的赞助者列表",
+      "img1": "Austin的头贴和用户名，但它看起来就是比别人好。",
+      "name": "凌驾者",
+      "purple": "紫色，代表着忠诚、帝王...和你！",
+      "purpleBorder": "而且，你将会获得＊紫色＊的显示框。区分你与其他支持者！",
+      "wordList": "主题词汇表",
+      "youTheBest": "真的，你最棒了！"
+    },
+    "supporter": {
+      "adFree": "支持者也将获得优先客服与无广告体验。听起来不错吧？",
+      "adFreeExp": "无广告体验",
+      "becomeOne": "成为一名支持者！ （$3/月）",
+      "configureAvatar": {
+        "message0": "你可以在",
+        "message1": "Gravatar",
+        "message2": "上变更你的头贴"
+      },
+      "customAvatar": "自订头贴！",
+      "description": {
+        "message0": "所有支持者将可以建立私人房间",
+        "message1": "这些房间将不会显示在首页上，并只能以连结邀请进入。"
+      },
+      "encourage": "支持我们！",
+      "img0": "在一个房主工具中的下拉菜单。它有两个选项，公共和私人，选择私人。",
+      "img1": "Austin与其他玩家列在一起，但Austin的头贴与名称外观比别人好。",
+      "name": "支持者",
+      "noRando": "不会再有陌生路人闯入你的房间",
+      "priority": "优先客服",
+      "privateRoom": "私人房间！",
+      "unlockAvatar": "你也将解锁金色显示框。向朋友炫耀你的支持者身份吧！"
+    },
+    "testies": {
+      "emily": "\"Our team at work loved playing One Word earlier this week in our weekly coffee social over zoom! I had played this game before in real life and I found your virtual version to be even easier to use because the words come up automatically and there's less transition time... You have fans on our team and we can't wait to play again!\" -Emily",
+      "eric": "\"I'm a 5th/6th grade Language Arts teacher in Ohio, and have been using the game/your site as a reward for students who get all their virtual assignments done... Thanks for your time and effort on this awesome project.\" -Eric",
+      "fanSays": "以下是我们粉丝想说的话：",
+      "harrison": "\"As a totally blind person I've been looking for games that I can play... Last Sunday, I had a play test with Sinclair, and those changes were made incredibly quickly. I played a few rounds this morning, and it was a much more enjoyable experience, and I believe in supporting developers who help their players. Thank you again.\" -Harrison",
+      "name": "感言",
+      "sandy": "\"We’ve been doing weekly Zoom game nights with extended family and this will be a great addition. It’s great for our large age range and really nice for older relatives who appreciate that you can play at your own pace.\" -Sandy"
+    },
+    "thankyou": "谢谢，祝你们提示愉快！",
+    "welcomeTitle": "支持One Word"
+  },
+  "thanks": {
+    "granted": "你刚刚获得你的支持者特权！",
+    "granting": "正在赋予你特权...",
+    "heart": "再一次诚心地感谢你：",
+    "meansAlot": "这对我们意义重大，希望你能尽情享受One Word。",
+    "somethingWentWrong": {
+      "message0": "（如果这需要一分钟以上的时间，代表某些东西出错了。哭脸",
+      "message1": "请联络 austin@oneword.games，我会帮你解决问题。 ）"
+    },
+    "title": "感谢您的支持！",
+    "youreBest": "说真的，你真的最棒了！"
+  }
+}
