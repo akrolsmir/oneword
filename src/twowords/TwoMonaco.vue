@@ -1,12 +1,6 @@
 <template>
-  <div id="root" ref="root"></div>
+  <div id="root" ref="root" :style="style"></div>
 </template>
-
-<style scoped>
-#root {
-  height: 40vh;
-}
-</style>
 
 <script>
 import * as monaco from 'monaco-editor'
@@ -15,7 +9,14 @@ import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
 import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker'
 import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker'
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
-import { defineComponent, ref, onMounted, onUnmounted } from 'vue'
+import {
+  defineComponent,
+  ref,
+  onMounted,
+  onUnmounted,
+  computed,
+  watch,
+} from 'vue'
 
 self.MonacoEnvironment = {
   getWorker(_, label) {
@@ -38,7 +39,12 @@ self.MonacoEnvironment = {
 export default defineComponent({
   props: {
     modelValue: String,
-    readonly: Boolean,
+    heightInVh: {
+      type: Number,
+      default: 40,
+    },
+    // E.g. options from https://microsoft.github.io/monaco-editor/playground.html#creating-the-editor-editor-basic-options
+    options: Object,
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
@@ -50,22 +56,34 @@ export default defineComponent({
         value: props.modelValue,
         automaticLayout: true,
         minimap: { enabled: false },
-        readOnly: props.readonly,
         scrollBeyondLastLine: false,
         scrollbar: {
           alwaysConsumeMouseWheel: false,
         },
+        ...props.options,
       })
-      // On each change, notify the Vue parent
+      // On each local change, notify the Vue parent
       editor.onDidChangeModelContent((event) => {
         emit('update:modelValue', editor.getValue())
       })
     })
+    // Update the local editor when parent's props changed
+    watch(
+      () => props.modelValue,
+      () => {
+        editor.setValue(props.modelValue)
+      }
+    )
     onUnmounted(() => {
       editor.dispose()
     })
+    const style = computed(() => ({
+      height: `${props.heightInVh}vh`,
+    }))
+
     return {
       root,
+      style,
     }
   },
 })

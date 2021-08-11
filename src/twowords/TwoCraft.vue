@@ -103,7 +103,11 @@
               </div>
 
               <h2 class="subtitle">Game data</h2>
-              <TwoMonaco v-model="roomString" :readonly="true" />
+              <TwoMonaco
+                v-model="roomString"
+                :heightInVh="60"
+                :options="{ readOnly: true }"
+              />
             </template>
 
             <template v-if="local.canvas === 'PUBLISH'">
@@ -113,7 +117,7 @@
         </div>
 
         <!-- Right: Settings, options, misc controls -->
-        <div class="column is-3 mx-2 mt-6">
+        <div class="column mx-2 mt-6">
           <SettingsPanel />
 
           <template v-if="local.canvas === 'LAYOUT'">
@@ -132,7 +136,16 @@
             ><br />
 
             <h2 class="subtitle">Docs</h2>
-            <TwoMonaco :modelValue="docString" :readonly="true" />
+            <TwoMonaco
+              :modelValue="docString"
+              :heightInVh="60"
+              :options="{
+                readOnly: true,
+                lineNumbers: 'off',
+                glyphMargin: false,
+                folding: false,
+              }"
+            />
           </template>
 
           <template v-if="local.canvas === 'PLAYTEST'">
@@ -409,10 +422,13 @@ export default {
         }
         return value
       }
-      // Return an object showing only these fields
+      // Return a copy without these fields:
+      const mask = ({ layouts, rules, code, ...rest }) => rest
+      // Return a copy with only these fields:
       // const mask = ({ state, round }) => ({ state, round })
-      const mask = (object) => object
-      return JSON.stringify(mask(this.$roomx), truncator, 2)
+      // Return a copy
+      // const mask = (object) => ({ ...object })
+      return 'let room = ' + JSON.stringify(mask(this.$roomx), truncator, 2)
     },
   },
 }
