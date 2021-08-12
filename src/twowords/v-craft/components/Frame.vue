@@ -13,6 +13,22 @@
 import Node from './Node.vue'
 import Indicator from './Indicator.vue'
 import createNodeFromVNode from '../utils/createNodeFromVNode'
+import { nanoid } from 'nanoid'
+
+function emptyLayout() {
+  return `[
+    {
+      "componentName": "Canvas",
+      "props": {
+        "component": "Container"
+      },
+      "children": [
+      ],
+      "addition": {},
+      "uuid": "${nanoid()}"
+    }
+  ]`
+}
 
 export default {
   components: {
@@ -33,12 +49,11 @@ export default {
       throw new Error('<Frame/> must be wrapped with <Editor/>.')
     }
 
-    // Show the Frame's slot contents, if Editor has nothing cached.
+    // Default to empty layout, if Editor has nothing cached.
     const isNullOrEmpty = (arr) => !arr || arr.length == 0
     const frame = this.editor.frames[this.frameId]
     if (isNullOrEmpty(frame)) {
-      const nodes = this.createNodesFromSlots()
-      this.editor.setTopLevelNodes(nodes)
+      this.editor.import(emptyLayout(), this.frameId)
     }
   },
   methods: {

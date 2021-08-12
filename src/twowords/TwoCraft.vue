@@ -249,34 +249,11 @@ import CraftExport from './components/CraftExport.vue'
 import { inject, onMounted } from 'vue'
 import { useRoom } from '../composables/useRoom'
 import TwoMonaco from './TwoMonaco.vue'
-import { nanoid } from 'nanoid'
 import cloneDeep from 'lodash/cloneDeep'
 import { setRoom } from '../firebase/network'
 import BulmaTabs from './BulmaTabs.vue'
 import PublishTab from './PublishTab.vue'
 import { docString } from './docs'
-
-function emptyLayout() {
-  return `[
-    {
-      "componentName": "Canvas",
-      "props": {
-        "component": "Container"
-      },
-      "children": [
-      ],
-      "addition": {},
-      "uuid": "${nanoid()}"
-    }
-  ]`
-}
-
-function buildLayouts(states, roles) {
-  const fromRoles = () =>
-    Object.fromEntries(roles.map((r) => [r, emptyLayout()]))
-
-  return Object.fromEntries(states.map((s) => [s, fromRoles()]))
-}
 
 function buildCode(states) {
   const emptyCode = `// TODO: Fill this in`
@@ -308,7 +285,7 @@ function makeNewRoom(name) {
     public: true,
     lastUpdateTime: Date.now(),
 
-    layouts: buildLayouts(rules.states, rules.roles),
+    layouts: {},
     rules,
     code: buildCode(rules.states),
   }
@@ -380,9 +357,9 @@ export default {
   watch: {
     currentLayout() {
       // Sync up local with $roomx when the user changes the state
-      for (const state of rules.states) {
+      for (const state of this.$roomx.rules.states) {
         this.$refs.editor.editor.import(
-          this.$roomx.layouts[state][this.local.role],
+          this.$roomx.layouts[state]?.[this.local.role],
           state
         )
         this.local.code = this.$roomx.code
@@ -399,7 +376,7 @@ export default {
   methods: {
     saveLayouts() {
       const updates = {}
-      for (const state of rules.states) {
+      for (const state of this.$roomx.rules.states) {
         updates[`layouts.${state}.${this.local.role}`] =
           this.$refs.editor.editor.export(state)
       }
@@ -407,7 +384,7 @@ export default {
     },
     saveCode() {
       const updates = {}
-      for (const state of rules.states) {
+      for (const state of this.$roomx.rules.states) {
         updates[`code.${state}`] = this.local.code[state]
       }
       this.$updatex(updates)
@@ -431,7 +408,7 @@ export default {
   },
   computed: {
     currentLayout() {
-      return this.$roomx.layouts[this.local.state][this.local.role] || []
+      return this.$roomx.layouts[this.local.state]?.[this.local.role] || []
     },
     roomString() {
       function truncator(key, value) {

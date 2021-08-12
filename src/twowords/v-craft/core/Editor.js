@@ -93,12 +93,16 @@ class Editor {
 
   import(plainNodesData, frameId = 'DEFAULT') {
     try {
+      // TODO next: Try defaulting to emptyLayout() when plainNodesData is undefined
       const nodesData = JSON.parse(plainNodesData)
       this.frames[frameId] = nodesData.map((data) =>
         Node.unserialize(this, data)
       )
-    } catch {
-      throw new Error('The input is not valid.')
+    } catch (e) {
+      // Don't error if this is a new screen (ie plainNodesData is `undefined`)
+      if (plainNodesData) {
+        throw new Error('Invalid node data: ', plainNodesData, '\n', e)
+      }
     }
   }
 }
