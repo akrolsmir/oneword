@@ -1,6 +1,7 @@
 import kebabCase from 'lodash/kebabCase'
 import Indicator from './Indicator'
 import Node from './Node'
+import { nanoid } from 'nanoid'
 
 class Editor {
   constructor(nodes = [], resolverMap = {}) {
@@ -93,18 +94,31 @@ class Editor {
 
   import(plainNodesData, frameId = 'DEFAULT') {
     try {
-      // TODO next: Try defaulting to emptyLayout() when plainNodesData is undefined
-      const nodesData = JSON.parse(plainNodesData)
+      // If plainNodesData is not provided, default to an empty container
+      const nodesData = JSON.parse(plainNodesData || emptyLayout())
       this.frames[frameId] = nodesData.map((data) =>
         Node.unserialize(this, data)
       )
     } catch (e) {
-      // Don't error if this is a new screen (ie plainNodesData is `undefined`)
-      if (plainNodesData) {
-        throw new Error('Invalid node data: ', plainNodesData, '\n', e)
-      }
+      throw new Error('Invalid node data: ', plainNodesData, '\n', e)
     }
   }
+}
+
+// Slight code smell: this ties Editor to our Container implementation
+function emptyLayout() {
+  return `[
+    {
+      "componentName": "Canvas",
+      "props": {
+        "component": "Container"
+      },
+      "children": [
+      ],
+      "addition": {},
+      "uuid": "${nanoid()}"
+    }
+  ]`
 }
 
 export default Editor

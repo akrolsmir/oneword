@@ -13,22 +13,6 @@
 import Node from './Node.vue'
 import Indicator from './Indicator.vue'
 import createNodeFromVNode from '../utils/createNodeFromVNode'
-import { nanoid } from 'nanoid'
-
-function emptyLayout() {
-  return `[
-    {
-      "componentName": "Canvas",
-      "props": {
-        "component": "Container"
-      },
-      "children": [
-      ],
-      "addition": {},
-      "uuid": "${nanoid()}"
-    }
-  ]`
-}
 
 export default {
   components: {
@@ -53,7 +37,7 @@ export default {
     const isNullOrEmpty = (arr) => !arr || arr.length == 0
     const frame = this.editor.frames[this.frameId]
     if (isNullOrEmpty(frame)) {
-      this.editor.import(emptyLayout(), this.frameId)
+      this.editor.import(undefined, this.frameId)
     }
   },
   methods: {
