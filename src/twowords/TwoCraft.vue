@@ -55,23 +55,14 @@
               <!-- For each state, create a screen -->
               <div class="columns">
                 <div class="column" v-for="state in $roomx.rules.states">
-                  <p class="has-text-centered">{{ state }} Screen</p>
-                  <!-- TODO remove temp hack setting DONE to DEFAULT -->
-                  <Frame component="div" :frame-id="state">
-                    <Canvas component="Container">
-                      <Paragraph content="Heyo~" />
-                      <Paragraph
-                        content="There comes a danger up in this club,"
-                      />
-                      <Paragraph
-                        content="When we get started and we ain't gonna stop..."
-                      />
-                      <Paragraph
-                        content="We gonna turn it up til it gets too hot."
-                      />
-                      <Button label="Heyo!" />
-                    </Canvas>
-                  </Frame>
+                  <h2 class="subtitle">{{ state }} Screen</h2>
+                  <div class="screen">
+                    <Frame component="div" :frame-id="state">
+                      <Canvas component="Container">
+                        <Paragraph content="Heyo~" />
+                      </Canvas>
+                    </Frame>
+                  </div>
                 </div>
               </div>
             </template>
@@ -79,7 +70,7 @@
             <template v-if="local.canvas === 'LOGIC'">
               <div class="columns" v-for="state in $roomx.rules.states">
                 <div class="column is-5">
-                  <h2 class="subtitle">Layout for {{ state }}</h2>
+                  <h2 class="subtitle">{{ state }} Screen</h2>
                   <Frame component="div" :frame-id="state"></Frame>
                 </div>
                 <div class="column">
@@ -93,7 +84,7 @@
             <template v-if="local.canvas === 'PLAYTEST'">
               <div class="columns">
                 <div class="column" v-for="name in $roomx.rules.testers">
-                  <h2 class="subtitle has-text-centered">{{ name }}</h2>
+                  <h2 class="subtitle">{{ name }}</h2>
                   <Frame
                     component="div"
                     :frame-id="$roomx.state"
@@ -211,9 +202,20 @@
 }
 
 .main-area {
-  background-color: lightgray;
-  padding: 1rem;
+  padding: 0 1rem;
   height: 100%;
+}
+
+.screen {
+  min-height: 50vh;
+  outline: 1px solid gray;
+  background: repeating-linear-gradient(
+    135deg,
+    #e9e9e9,
+    #e9e9e9 20px,
+    #f3f4f6 20px,
+    #f3f4f6 40px
+  );
 }
 </style>
 
