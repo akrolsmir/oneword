@@ -67,11 +67,13 @@ export default defineComponent({
         emit('update:modelValue', editor.getValue())
       })
     })
-    // Update the local editor when parent's props changed
     watch(
       () => props.modelValue,
-      () => {
-        editor.setValue(props.modelValue)
+      (newValue) => {
+        // Update the local editor when parent's props changed
+        if (editor.getValue() != newValue) {
+          editor.setValue(newValue)
+        }
       }
     )
     onUnmounted(() => {
