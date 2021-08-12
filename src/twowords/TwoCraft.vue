@@ -119,6 +119,22 @@
             >
               Save Layouts</button
             ><br />
+
+            <div class="control">
+              <h2 class="subtitle">Role</h2>
+              <template v-for="role in $roomx.rules.roles" :key="role">
+                <label class="radio">
+                  <input
+                    type="radio"
+                    name="role"
+                    :value="role"
+                    v-model="local.role"
+                  />
+                  {{ role }}</label
+                >
+                <br />
+              </template>
+            </div>
           </template>
 
           <template v-if="local.canvas === 'LOGIC'">
