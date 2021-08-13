@@ -27,4 +27,13 @@ const typed = room.round.GUESSING.Charlie.type-here
 inputs('DRAWING.@CLUER.next-phase')
 // returns:
 [true, true, false]
+
+
+// "assignRole()" sets the roles for a player or group.
+// Same as "room.round.roles.Alice = 'SPY'":
+assignRole('Alice', 'SPY')
+// Sets everyone to the GUESSER role:
+assignRole('EVERYONE', 'GUESSER')
+// Rotates who is the next CLUER:
+assignRole('NEXT_ALPHABETICAL', 'CLUER')
 `

@@ -1,6 +1,7 @@
 import { cloneDeep, isEmpty } from 'lodash'
 import { reactive, watch } from 'vue'
 import { updateRoom } from '../firebase/network'
+import { assignRole, lookup } from '../twowords/api'
 import { flattenPaths, getIn, objectDiff, sanitize } from '../utils'
 
 export function useStore() {
@@ -58,6 +59,8 @@ export function useStore() {
         // So only push when  1. There are changes and 2. the room name is the same
         /* no await */ updateRoom(roomx, changes)
         // TODO: Can we debounce changes here, instead of per-input?
+        // Note: Vue batches multiple updates within the same tick:
+        // https://v3.vuejs.org/guide/reactivity-computed-watchers.html#effect-flush-timing
       }
     }
   )
@@ -75,8 +78,9 @@ export function useStore() {
 function compute(room) {
   try {
     const sandbox = {
-      // Inject the room into the inputs function
+      // Inject the room into these functions
       inputs: (query) => inputs(room, query),
+      assignRole: (player, role) => assignRole(room, player, role),
       room,
       Boolean,
       console,
@@ -149,25 +153,6 @@ function inputs(room, query) {
     getIn(room, `round.${array.join('.')}`)
   )
   return r
-}
-
-function lookup(room, part) {
-  if (part.startsWith('@')) {
-    // Return all players with this role
-    const role = part.slice(1)
-    // TESTING: Return the test users
-    return room.rules.testers
-
-    // TESTING: Return everyone in the room
-    // return Object.keys(room.people)
-
-    // TODO: Reenable to return the matching roles
-    // return Object.entries(room.people)
-    //   .map(([name, entry]) => (entry.role === role ? name : ''))
-    //   .filter(Boolean)
-  }
-  // Not @ROLE syntax, so just return the original string wrapped in an array
-  return [part]
 }
 
 // Return a linear array of every possible combination

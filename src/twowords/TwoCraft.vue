@@ -83,8 +83,8 @@
 
             <template v-if="local.canvas === 'PLAYTEST'">
               <div class="columns">
-                <div class="column" v-for="name in $roomx.rules.testers">
-                  <h2 class="subtitle">{{ name }}</h2>
+                <div class="column" v-for="(role, name) in $roomx.round.roles">
+                  <h2 class="subtitle">{{ name }} - {{ role }}</h2>
                   <Frame
                     component="div"
                     :frame-id="$roomx.state"
@@ -145,7 +145,7 @@
             <h2 class="subtitle">Docs</h2>
             <TwoMonaco
               :modelValue="docString"
-              :heightInVh="60"
+              :heightInVh="70"
               :options="{
                 readOnly: true,
                 lineNumbers: 'off',
@@ -390,8 +390,14 @@ export default {
       this.$updatex(updates)
     },
     resetRound() {
-      this.$roomx.round = {}
+      this.$roomx.round = {
+        roles: {},
+      }
       this.$roomx.state = 'DRAWING'
+      for (const tester of this.$roomx.rules.testers) {
+        this.$roomx.round.roles[tester] = this.local.role
+        this.$roomx.people[tester] = {}
+      }
     },
     setPlayerx(name) {
       // TODO: @mouseover hack ignores tab focus
