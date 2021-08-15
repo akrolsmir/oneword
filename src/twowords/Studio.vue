@@ -412,7 +412,7 @@ export default {
       newRoom.name = duplicateName
       await setRoom(newRoom)
       // Navigate to the new room
-      this.$router.push(`/twocraft/${duplicateName}`)
+      this.$router.push(`/studio/${duplicateName}`)
     },
   },
   computed: {

@@ -47,7 +47,7 @@ function roomDb() {
     pairwise: 'pairwise',
     'asplos-2021': 'oneword-asplos',
     twowords: 'twowords',
-    twocraft: 'twowords',
+    studio: 'twowords',
     twopreview: 'twowords',
   }
   for (const [name, table] of Object.entries(TABLES)) {

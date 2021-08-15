@@ -38,7 +38,7 @@ export default {
   inject: ['editor'],
   data() {
     return {
-      // TODO: Deduplicate with TwoCraft.vue
+      // TODO: Deduplicate with Studio.vue
       COMPONENT_NAMES: {
         Paragraph: 'Text',
         Button: 'Button',

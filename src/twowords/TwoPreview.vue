@@ -45,7 +45,7 @@ import { inject } from 'vue'
 import { useRoom } from '../composables/useRoom'
 
 function makeNewRoom(name) {
-  // TODO: fill in. Right now, we only ever preview after creating in TwoCraft.
+  // TODO: fill in. Right now, we only ever preview after creating in Studio.
   return {}
 }
 
