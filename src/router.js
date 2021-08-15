@@ -14,8 +14,6 @@ import IncryptFrontPage from './incrypt/IncryptFrontPage.vue'
 import Incrypt from './incrypt/Incrypt.vue'
 import PairwiseFrontPage from './pairwise/PairwiseFrontPage.vue'
 import Pairwise from './pairwise/Pairwise.vue'
-import TwoWordsFrontPage from './twowords/TwoWordsFrontPage.vue'
-import TwoWords from './twowords/TwoWords.vue'
 import TwoCraft from './twowords/TwoCraft.vue'
 import TwoAbsolute from './twowords/TwoAbsolute.vue'
 import TwoPreview from './twowords/TwoPreview.vue'
@@ -76,12 +74,6 @@ const routes = [
     component: OneWord,
     meta: { title: 'ASPLOS 2021' },
   },
-  {
-    path: '/twowords',
-    component: TwoWordsFrontPage,
-    meta: { title: 'Two Words' },
-  },
-  { path: '/twowords/:id', component: TwoWords, meta: { title: 'Two Words' } },
   { path: '/twocraft', component: TwoCraft, meta: { title: 'Two Craft' } },
   { path: '/twocraft/:id', component: TwoCraft, meta: { title: 'Two Craft' } },
   {
