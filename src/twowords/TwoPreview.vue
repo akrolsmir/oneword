@@ -82,7 +82,7 @@ export default {
   inject: ['$roomx', '$updatex'],
   setup() {
     const user = inject('currentUser')
-    const roomHelpers = useRoom(user, makeNewRoom)
+    const roomHelpers = useRoom(user, makeNewRoom, undefined, true)
     return Object.assign(roomHelpers, { user })
   },
   mounted() {

@@ -349,7 +349,7 @@ export default {
     onMounted(() => showNavbar(false))
 
     const user = inject('currentUser')
-    const roomHelpers = useRoom(user, makeNewRoom)
+    const roomHelpers = useRoom(user, makeNewRoom, undefined, true)
     roomHelpers.player.timerLength = 90
     return Object.assign(roomHelpers, { user })
   },
