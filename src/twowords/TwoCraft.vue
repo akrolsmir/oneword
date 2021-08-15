@@ -83,8 +83,11 @@
 
             <template v-if="local.canvas === 'PLAYTEST'">
               <div class="columns">
-                <div class="column" v-for="(role, name) in $roomx.round.roles">
-                  <h2 class="subtitle">{{ name }} - {{ role }}</h2>
+                <!-- Keep stable sort order for player names -->
+                <div class="column" v-for="name in $roomx.players">
+                  <h2 class="subtitle">
+                    {{ name }} - {{ $roomx.round.roles?.[name] }}
+                  </h2>
                   <Frame
                     component="div"
                     :frame-id="$roomx.state"
