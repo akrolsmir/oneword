@@ -29,10 +29,10 @@
         <label class="subtitle"
           >View for {{ editor.state }}.{{ editor.role }}</label
         >
-        <TwoPrism v-model="editorViewCode" />
+        <TwoMonaco v-model="editorViewCode" />
         <br />
         <label class="subtitle">Rules for {{ editor.state }}</label>
-        <TwoPrism v-model="rules.code[editor.state]" />
+        <TwoMonaco v-model="rules.code[editor.state]" />
       </div>
     </template>
 
@@ -86,7 +86,7 @@
 
 <script>
 import { inject } from 'vue'
-import TwoPrism from './TwoPrism.vue'
+import TwoMonaco from './TwoMonaco.vue'
 import ElementList from './components/ElementList.vue'
 import BigColumn from '../components/BigColumn.vue'
 import Chatbox from '../components/Chatbox.vue'
@@ -163,7 +163,7 @@ export default {
     Nametag,
     ShareLink,
     ElementList,
-    TwoPrism,
+    TwoMonaco,
   },
   setup() {
     const user = inject('currentUser')

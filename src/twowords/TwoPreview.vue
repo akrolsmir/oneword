@@ -43,7 +43,6 @@ import SettingsPanel from './components/SettingsPanel.vue'
 import CraftExport from './components/CraftExport.vue'
 import { inject } from 'vue'
 import { useRoom } from '../composables/useRoom'
-import TwoPrism from './TwoPrism.vue'
 
 function makeNewRoom(name) {
   // TODO: fill in. Right now, we only ever preview after creating in TwoCraft.
@@ -66,7 +65,6 @@ export default {
     SettingsPanel,
     Blueprint,
     CraftExport,
-    TwoPrism,
   },
   data() {
     return {
