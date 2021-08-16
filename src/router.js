@@ -14,6 +14,8 @@ import IncryptFrontPage from './incrypt/IncryptFrontPage.vue'
 import Incrypt from './incrypt/Incrypt.vue'
 import PairwiseFrontPage from './pairwise/PairwiseFrontPage.vue'
 import Pairwise from './pairwise/Pairwise.vue'
+import Studio from './studio/Studio.vue'
+import StudioPreview from './studio/StudioPreview.vue'
 import Multiplay from './admin/Multiplay.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
@@ -70,6 +72,13 @@ const routes = [
     path: '/asplos-2021/:id',
     component: OneWord,
     meta: { title: 'ASPLOS 2021' },
+  },
+  { path: '/studio', component: Studio, meta: { title: 'Studio' } },
+  { path: '/studio/:id', component: Studio, meta: { title: 'Studio' } },
+  {
+    path: '/preview/:id',
+    component: StudioPreview,
+    meta: { title: 'Preview' },
   },
   {
     path: '/multiplay/:game/:id',

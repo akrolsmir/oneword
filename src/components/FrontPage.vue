@@ -30,6 +30,12 @@
   </BigColumn>
 </template>
 
+<style>
+.background {
+  background-color: #fffbeb;
+}
+</style>
+
 <script>
 import BigColumn from './BigColumn.vue'
 import GamesList from './GamesList.vue'

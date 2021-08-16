@@ -3,9 +3,10 @@
   "version": "2.0.0",
   "scripts": {
     "start": "vite",
-    "dev": "vite",
+    "dev": "vite --open",
     "build": "vite build",
     "serve": "vite preview",
+    "test": "web-test-runner \"src/**/*.test.js\" --node-resolve",
     "analytics": "streamlit run analytics/streamlit/streamlit_app.py",
     "resources": "cordova-res android --skip-config --copy && cordova-res ios --skip-config --copy",
     "android": "npx cap run android",
@@ -25,6 +26,8 @@
     "firebase": "^8.2.4",
     "firebaseui": "^4.7.1",
     "fontawesome": "^5.6.3",
+    "lodash": "^4.17.21",
+    "monaco-editor": "^0.26.1",
     "pluralize": "^8.0.0",
     "responsive-sketchpad": "^1.2.2",
     "rxjs": "^6.6.7",
@@ -50,11 +53,14 @@
     "vue3-carousel": "???"
   },
   "devDependencies": {
+    "@esm-bundle/chai": "^4.3.4",
     "@localazy/cli": "^1.4.5",
     "@vitejs/plugin-vue": "^1.1.4",
     "@vue/compiler-sfc": "^3.0.5",
+    "@web/test-runner": "^0.13.13",
     "cordova-res": "^0.15.3",
     "sass": "^1.32.8",
-    "vite": "^2.1.2"
+    "vite": "^2.1.2",
+    "vite-web-test-runner-plugin": "^0.1.0"
   }
 }

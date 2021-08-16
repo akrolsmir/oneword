@@ -1,4 +1,4 @@
-import { computed, onBeforeMount, reactive } from 'vue'
+import { computed, inject, onBeforeMount, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   getRoom,
@@ -26,8 +26,14 @@ function listPlayers(people) {
  * @param {*} user - Reactive user object from useUser()
  * @param {Function} makeNewRoom - Should return a new room with no one in it
  * @param {Function} [onJoin] - Callback, to do more init for player/room
+ * @param {Boolean} syncStore - Whether to automatically sync changes with useStore()
  */
-export function useRoom(user, makeNewRoom, onJoin = undefined) {
+export function useRoom(
+  user,
+  makeNewRoom,
+  onJoin = undefined,
+  syncStore = false
+) {
   // Contains local data about the player's choices; not yet synced to Firestore.
   const player = reactive({
     name: 'Eve',
@@ -51,10 +57,14 @@ export function useRoom(user, makeNewRoom, onJoin = undefined) {
     players: computed(() => listPlayers(room.people)),
   })
 
+  const $setx = inject('$setx')
   function loadFrom(newRoom) {
     // Strip out computed functions. They're readonly, but this prevents a console warning.
     delete newRoom.players
     Object.assign(room, newRoom)
+    if (syncStore) {
+      $setx(room)
+    }
   }
 
   const router = useRouter()
@@ -132,8 +142,12 @@ export function useRoom(user, makeNewRoom, onJoin = undefined) {
     }
   }
 
+  const $playerx = inject('$playerx')
   async function joinGame(alsoUpload = true) {
     uniquify(user.displayName || 'Anon')
+    if (syncStore) {
+      $playerx.name = player.name
+    }
     room.people[player.name] = {
       id: user.id,
       supporter: user.supporter,

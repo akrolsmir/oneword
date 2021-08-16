@@ -27,6 +27,14 @@ Merging code directly into `master` is okay, but if some work you're doing is:
 Every pull request will automatically get a separate preview URL; perfect for getting quick feedback.
 ![](https://i.imgur.com/K8ZaCYd.png)
 
+## Testing
+
+If you write some complicated logic, consider adding unit tests!
+Our testing framework combines [@web/test-runner](https://modern-web.dev/guides/test-runner/getting-started/), [this Vite plugin](https://github.com/material-svelte/vite-web-test-runner-plugin), and [Chai](https://www.chaijs.com/).
+
+- `$ yarn test` to run all tests
+- See `src/utils.test.js` for an example of how to add tests
+
 ## Deploying
 
 Just push to `master`, and the site will update automatically.
