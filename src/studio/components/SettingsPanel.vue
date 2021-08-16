@@ -34,20 +34,21 @@
 </style>
 
 <script>
+export const COMPONENT_NAMES = {
+  Paragraph: 'Text',
+  Button: 'Button',
+  Input: 'Text Input',
+  Container: 'Vertical Box',
+  Flex: 'Horizontal Box',
+  Sketchpad: 'Sketchpad',
+  Image: 'Image',
+}
+
 export default {
   inject: ['editor'],
   data() {
     return {
-      // TODO: Deduplicate with Studio.vue
-      COMPONENT_NAMES: {
-        Paragraph: 'Text',
-        Button: 'Button',
-        Input: 'Text Input',
-        Container: 'Vertical Box',
-        Flex: 'Horizontal Box',
-        Sketchpad: 'Sketchpad',
-        Image: 'Image',
-      },
+      COMPONENT_NAMES,
     }
   },
   computed: {

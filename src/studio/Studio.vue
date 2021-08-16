@@ -247,7 +247,7 @@ import Button from './components/CraftButton.vue'
 import Image from './components/CraftImage.vue'
 import Input from './components/CraftInput.vue'
 import Sketchpad from './components/CraftSketchpad.vue'
-import SettingsPanel from './components/SettingsPanel.vue'
+import SettingsPanel, { COMPONENT_NAMES } from './components/SettingsPanel.vue'
 import CraftExport from './components/CraftExport.vue'
 import { inject, onMounted } from 'vue'
 import { useRoom } from '../composables/useRoom'
@@ -267,16 +267,6 @@ const rules = {
   states: ['DRAWING', 'GUESSING', 'DONE'],
   roles: ['CLUER', 'GUESSER'],
   testers: ['Alpha', 'Beta', 'Charlie', 'Delta'],
-}
-
-const COMPONENT_NAMES = {
-  Paragraph: 'Text',
-  Button: 'Button',
-  Input: 'Text Input',
-  Container: 'Vertical Box',
-  Flex: 'Horizontal Box',
-  Sketchpad: 'Sketchpad',
-  Image: 'Image',
 }
 
 function makeNewRoom(name) {
