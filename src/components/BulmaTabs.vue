@@ -1,7 +1,11 @@
 <template>
   <div class="tabs">
     <ul>
-      <li v-for="title in titles" :class="{ 'is-active': modelValue == title }">
+      <li
+        v-for="title in titles"
+        :class="{ 'is-active': modelValue == title }"
+        :key="title"
+      >
         <a @click="select(title)">{{ title }}</a>
       </li>
     </ul>
@@ -9,6 +13,7 @@
 </template>
 
 <script>
+/** Usage: <BulmaTabs v-model="choice" :titles="['Tab1', 'Tab2', ...]" /> */
 export default {
   props: ['modelValue', 'titles'],
   emits: ['update:modelValue'],

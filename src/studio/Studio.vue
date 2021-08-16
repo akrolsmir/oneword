@@ -254,7 +254,7 @@ import { useRoom } from '../composables/useRoom'
 import MonacoEditor from './MonacoEditor.vue'
 import cloneDeep from 'lodash/cloneDeep'
 import { setRoom } from '../firebase/network'
-import BulmaTabs from './BulmaTabs.vue'
+import BulmaTabs from '../components/BulmaTabs.vue'
 import PublishTab from './PublishTab.vue'
 import { docString } from './docs'
 
