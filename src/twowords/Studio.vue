@@ -76,7 +76,7 @@
                 <div class="column">
                   <!-- Where the per-state logic resides -->
                   <h2 class="subtitle">Logic for {{ state }}</h2>
-                  <TwoMonaco v-model="local.code[state]" />
+                  <MonacoEditor v-model="local.code[state]" />
                 </div>
               </div>
             </template>
@@ -97,7 +97,7 @@
               </div>
 
               <h2 class="subtitle">Game data</h2>
-              <TwoMonaco
+              <MonacoEditor
                 v-model="roomString"
                 :heightInVh="60"
                 :options="{ readOnly: true }"
@@ -146,7 +146,7 @@
             ><br />
 
             <h2 class="subtitle">Docs</h2>
-            <TwoMonaco
+            <MonacoEditor
               :modelValue="docString"
               :heightInVh="70"
               :options="{
@@ -251,7 +251,7 @@ import SettingsPanel from './components/SettingsPanel.vue'
 import CraftExport from './components/CraftExport.vue'
 import { inject, onMounted } from 'vue'
 import { useRoom } from '../composables/useRoom'
-import TwoMonaco from './TwoMonaco.vue'
+import MonacoEditor from './MonacoEditor.vue'
 import cloneDeep from 'lodash/cloneDeep'
 import { setRoom } from '../firebase/network'
 import BulmaTabs from './BulmaTabs.vue'
@@ -327,7 +327,7 @@ export default {
     SettingsPanel,
     Blueprint,
     CraftExport,
-    TwoMonaco,
+    MonacoEditor,
     BulmaTabs,
     PublishTab,
   },
