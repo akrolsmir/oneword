@@ -1,23 +1,27 @@
-import FrontPage from './components/FrontPage.vue'
-import Profile from './components/Profile.vue'
-import About from './components/About.vue'
-import Privacy from './components/Privacy.vue'
-import Supporter from './components/Supporter.vue'
-import Thanks from './components/Thanks.vue'
-import OneWord from './oneword/OneWord.vue'
-import Asplos2021 from './oneword/conferences/Asplos2021.vue'
-import ListoramaFrontPage from './listorama/ListoramaFrontPage.vue'
-import Listorama from './listorama/Listorama.vue'
-import StorytimeFrontPage from './storytime/components/StorytimeFrontPage.vue'
-import Storytime from './storytime/Storytime.vue'
-import IncryptFrontPage from './incrypt/IncryptFrontPage.vue'
-import Incrypt from './incrypt/Incrypt.vue'
-import PairwiseFrontPage from './pairwise/PairwiseFrontPage.vue'
-import Pairwise from './pairwise/Pairwise.vue'
-import Studio from './studio/Studio.vue'
-import StudioPreview from './studio/StudioPreview.vue'
-import Multiplay from './admin/Multiplay.vue'
 import { createRouter, createWebHistory } from 'vue-router'
+
+// Lazy-loaded to reduce page load time. See:
+// https://next.router.vuejs.org/guide/advanced/lazy-loading.html
+const FrontPage = () => import('./components/FrontPage.vue')
+const Profile = () => import('./components/Profile.vue')
+const About = () => import('./components/About.vue')
+const Privacy = () => import('./components/Privacy.vue')
+const Supporter = () => import('./components/Supporter.vue')
+const Thanks = () => import('./components/Thanks.vue')
+const OneWord = () => import('./oneword/OneWord.vue')
+const Asplos2021 = () => import('./oneword/conferences/Asplos2021.vue')
+const ListoramaFrontPage = () => import('./listorama/ListoramaFrontPage.vue')
+const Listorama = () => import('./listorama/Listorama.vue')
+const StorytimeFrontPage = () =>
+  import('./storytime/components/StorytimeFrontPage.vue')
+const Storytime = () => import('./storytime/Storytime.vue')
+const IncryptFrontPage = () => import('./incrypt/IncryptFrontPage.vue')
+const Incrypt = () => import('./incrypt/Incrypt.vue')
+const PairwiseFrontPage = () => import('./pairwise/PairwiseFrontPage.vue')
+const Pairwise = () => import('./pairwise/Pairwise.vue')
+const Studio = () => import('./studio/Studio.vue')
+const StudioPreview = () => import('./studio/StudioPreview.vue')
+const Multiplay = () => import('./admin/Multiplay.vue')
 
 const routes = [
   { path: '/', component: FrontPage },
