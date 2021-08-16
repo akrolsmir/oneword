@@ -3,7 +3,7 @@
 
   <label class="label"
     >Preview URL:
-    <a :href="`/twopreview/${room.name}`">boardless.games/{{ room.name }}</a>
+    <a :href="`/preview/${room.name}`">boardless.games/{{ room.name }}</a>
   </label>
 
   <label class="label">Game title</label>

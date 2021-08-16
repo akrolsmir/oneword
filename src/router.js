@@ -16,7 +16,7 @@ import PairwiseFrontPage from './pairwise/PairwiseFrontPage.vue'
 import Pairwise from './pairwise/Pairwise.vue'
 import Studio from './twowords/Studio.vue'
 import TwoAbsolute from './twowords/TwoAbsolute.vue'
-import TwoPreview from './twowords/TwoPreview.vue'
+import StudioPreview from './twowords/StudioPreview.vue'
 import Multiplay from './admin/Multiplay.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
@@ -77,8 +77,8 @@ const routes = [
   { path: '/studio', component: Studio, meta: { title: 'Two Craft' } },
   { path: '/studio/:id', component: Studio, meta: { title: 'Two Craft' } },
   {
-    path: '/twopreview/:id',
-    component: TwoPreview,
+    path: '/preview/:id',
+    component: StudioPreview,
     meta: { title: 'Two Preview' },
   },
   {
