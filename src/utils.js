@@ -54,18 +54,20 @@ export function getIn(object, path) {
   return node
 }
 
-// Sets a value in the object tree, creating parent objects as necessary
+// Writes a value to a particular spot in the object, creating empty obj as necessary
+// Assumes object is defined
 export function setIn(object, path, value) {
-  let node = object
-  const [last] = path.split('.').slice(-1)
-  const rest = path.split('.').slice(0, -1)
-  for (const part of rest) {
-    if (!node[part]) {
-      node[part] = {}
-    }
-    node = node[part]
+  // Base case
+  if (!path.includes('.')) {
+    object[path] = value
+    return
   }
-  node[last] = value
+
+  // Create the next child obj if necessary
+  const [next, ...rest] = path.split('.')
+  object[next] = object[next] || {}
+  // Recurse!
+  setIn(object[next], rest.join('.'), value)
 }
 
 export function pickRandom(array, seed = '') {

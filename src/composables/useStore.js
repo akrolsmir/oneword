@@ -2,7 +2,7 @@ import { cloneDeep, isEmpty } from 'lodash'
 import { reactive, watch } from 'vue'
 import { updateRoom } from '../firebase/network'
 import { assignRole, lookup } from '../studio/api'
-import { flattenPaths, getIn, objectDiff, sanitize } from '../utils'
+import { flattenPaths, getIn, setIn, objectDiff, sanitize } from '../utils'
 
 export function useStore() {
   // $roomx is the same as this.room; eventually, deprecate the latter
@@ -94,22 +94,6 @@ function compute(room) {
     console.error(`Error with computing: ${e}`)
     console.error('Code was:', room.code?.[room.state])
   }
-}
-
-// Writes a value to a particular spot in the object, creating empty obj as necessary
-// Assumes object is defined
-export function setIn(object, path, value) {
-  // Base case
-  if (!path.includes('.')) {
-    object[path] = value
-    return
-  }
-
-  // Create the next child obj if necessary
-  const [next, ...rest] = path.split('.')
-  object[next] = object[next] || {}
-  // Recurse!
-  setIn(object[next], rest.join('.'), value)
 }
 
 // BUGS:
