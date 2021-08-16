@@ -249,8 +249,9 @@ import Input from './components/CraftInput.vue'
 import Sketchpad from './components/CraftSketchpad.vue'
 import SettingsPanel, { COMPONENT_NAMES } from './components/SettingsPanel.vue'
 import CraftExport from './components/CraftExport.vue'
-import { defineAsyncComponent, inject, markRaw, onMounted } from 'vue'
+import { inject, markRaw, onMounted } from 'vue'
 import { useRoom } from '../composables/useRoom'
+import MonacoEditor from './MonacoEditor.vue'
 import cloneDeep from 'lodash/cloneDeep'
 import { setRoom } from '../firebase/network'
 import BulmaTabs from '../components/BulmaTabs.vue'
@@ -318,10 +319,9 @@ export default {
     SettingsPanel,
     Blueprint,
     CraftExport,
+    MonacoEditor,
     BulmaTabs,
     PublishTab,
-    // Async load MonacoEditor, since editor.worker is huge & slow
-    MonacoEditor: defineAsyncComponent(() => import('./MonacoEditor.vue')),
   },
   data() {
     return {
