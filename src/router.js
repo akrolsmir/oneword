@@ -15,7 +15,6 @@ import Incrypt from './incrypt/Incrypt.vue'
 import PairwiseFrontPage from './pairwise/PairwiseFrontPage.vue'
 import Pairwise from './pairwise/Pairwise.vue'
 import Studio from './twowords/Studio.vue'
-import TwoAbsolute from './twowords/TwoAbsolute.vue'
 import StudioPreview from './twowords/StudioPreview.vue'
 import Multiplay from './admin/Multiplay.vue'
 import { createRouter, createWebHistory } from 'vue-router'
@@ -80,16 +79,6 @@ const routes = [
     path: '/preview/:id',
     component: StudioPreview,
     meta: { title: 'Two Preview' },
-  },
-  {
-    path: '/twoabsolute',
-    component: TwoAbsolute,
-    meta: { title: 'Two Absolute' },
-  },
-  {
-    path: '/twoabsolute/:id',
-    component: TwoAbsolute,
-    meta: { title: 'Two Absolute' },
   },
   {
     path: '/multiplay/:game/:id',
