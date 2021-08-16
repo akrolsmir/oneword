@@ -1,7 +1,7 @@
 import { cloneDeep, isEmpty } from 'lodash'
 import { reactive, watch } from 'vue'
 import { updateRoom } from '../firebase/network'
-import { assignRole, lookup } from '../twowords/api'
+import { assignRole, lookup } from '../studio/api'
 import { flattenPaths, getIn, objectDiff, sanitize } from '../utils'
 
 export function useStore() {

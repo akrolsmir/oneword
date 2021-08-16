@@ -46,9 +46,8 @@ function roomDb() {
     incrypt: 'incrypt',
     pairwise: 'pairwise',
     'asplos-2021': 'oneword-asplos',
-    twowords: 'twowords',
     studio: 'twowords',
-    twopreview: 'twowords',
+    preview: 'twowords',
   }
   for (const [name, table] of Object.entries(TABLES)) {
     if (window.location.pathname.startsWith(`/${name}`)) {
