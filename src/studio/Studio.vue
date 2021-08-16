@@ -249,7 +249,7 @@ import Input from './components/CraftInput.vue'
 import Sketchpad from './components/CraftSketchpad.vue'
 import SettingsPanel, { COMPONENT_NAMES } from './components/SettingsPanel.vue'
 import CraftExport from './components/CraftExport.vue'
-import { inject, onMounted } from 'vue'
+import { inject, markRaw, onMounted } from 'vue'
 import { useRoom } from '../composables/useRoom'
 import MonacoEditor from './MonacoEditor.vue'
 import cloneDeep from 'lodash/cloneDeep'
@@ -285,14 +285,16 @@ function makeNewRoom(name) {
 }
 
 const resolverMap = {
-  Canvas,
-  Container,
-  Paragraph,
-  Button,
-  Input,
-  Flex,
-  Sketchpad,
-  Image,
+  // markRaw() prevents these components from being react-ified when
+  // the resolverMap is passed into data, preventing an annoying warning.
+  Canvas: markRaw(Canvas),
+  Container: markRaw(Container),
+  Paragraph: markRaw(Paragraph),
+  Button: markRaw(Button),
+  Input: markRaw(Input),
+  Flex: markRaw(Flex),
+  Sketchpad: markRaw(Sketchpad),
+  Image: markRaw(Image),
 }
 
 const toolIcons = {
