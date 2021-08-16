@@ -1,3 +1,5 @@
+import { getIn } from '../utils'
+
 /**
  * Assigns the specified player(s) to the role.
  *
@@ -46,4 +48,30 @@ export function lookup(room, part) {
   }
   // Not @ROLE syntax, so just return the original string wrapped in an array
   return [part]
+}
+
+/**
+ * Expand query strings by replacing `@ROLE` with the actual roles
+ * E.g. 'CLUEING.@CLUER.favorite-pet' => ['cat', 'dog']
+ * @param {String} query In the form 'PHASE.@ROLE.input-label'
+ * @returns An array of matching inputs. Missing inputs will be `undefined`
+ */
+export function inputs(room, query) {
+  const parts = query.split('.').map((part) => lookup(room, part))
+  const r = powerset(parts).map((array) =>
+    getIn(room, `round.${array.join('.')}`)
+  )
+  return r
+}
+
+// Return a linear array of every possible combination
+// E.g. [[1], [2, 3], [4, 5]] => [[1, 2, 4], [1, 2, 5], [1, 3, 4], [1, 3, 5]]
+// TODO: encapsulate with unit tests: https://dev.to/vuesomedev/add-testing-to-vite-4b75
+export function powerset(parts) {
+  if (parts.length == 0) {
+    return [[]]
+  }
+  const first = parts[0]
+  const rest = powerset(parts.slice(1))
+  return first.flatMap((f) => rest.map((r) => [f].concat(r)))
 }

@@ -1,7 +1,7 @@
 import { cloneDeep, isEmpty } from 'lodash'
 import { reactive, watch } from 'vue'
 import { updateRoom } from '../firebase/network'
-import { assignRole, lookup } from '../studio/api'
+import { assignRole, inputs } from '../studio/api'
 import { flattenPaths, getIn, setIn, objectDiff, sanitize } from '../utils'
 
 export function useStore() {
@@ -127,26 +127,4 @@ function compileCode(src) {
     }
     return code(sandboxProxies.get(sandbox))
   }
-}
-
-// Expand query strings by replacing `@ROLE` with the actual roles
-// E.g. 'CLUEING.@CLUER' => ['CLUEING.Austin', 'CLUEING.Alex'] => ['cat', 'dog']
-function inputs(room, query) {
-  const parts = query.split('.').map((part) => lookup(room, part))
-  const r = powerset(parts).map((array) =>
-    getIn(room, `round.${array.join('.')}`)
-  )
-  return r
-}
-
-// Return a linear array of every possible combination
-// E.g. [[1], [2, 3], [4, 5]] => [[1, 2, 4], [1, 3, 4], [1, 2, 5], [1, 3, 5]]
-// TODO: encapsulate with unit tests: https://dev.to/vuesomedev/add-testing-to-vite-4b75
-function powerset(parts) {
-  if (parts.length == 0) {
-    return [[]]
-  }
-  const first = parts[0]
-  const rest = powerset(parts.slice(1))
-  return first.flatMap((f) => rest.map((r) => [f].concat(r)))
 }

@@ -1,5 +1,5 @@
 import { expect } from '@esm-bundle/chai'
-import { assignRole, lookup } from './api'
+import { assignRole, inputs, lookup, powerset } from './api'
 
 const makeRoom = () => ({
   round: { roles: {} },
@@ -42,4 +42,28 @@ it('Correctly rotates the cluer with NEXT_ALPHABETICAL', () => {
     Beta: 'CLUER',
     Charlie: 'GUESSER',
   })
+})
+
+it('Gets inputs from a room', () => {
+  const room = makeRoom()
+  assignRole(room, 'EVERYONE', 'GUESSER')
+  room.round.GUESSING = {
+    Alpha: { 'favorite-pet': 'dog' },
+    Beta: { 'favorite-pet': 'cat' },
+  }
+
+  expect(inputs(room, 'GUESSING.@GUESSER.favorite-pet')).to.deep.equal([
+    'dog',
+    'cat',
+    undefined,
+  ])
+})
+
+it('Calculates powersets', () => {
+  expect(powerset([[1], [2, 3], [4, 5]])).to.deep.equal([
+    [1, 2, 4],
+    [1, 2, 5],
+    [1, 3, 4],
+    [1, 3, 5],
+  ])
 })
