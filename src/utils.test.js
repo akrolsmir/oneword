@@ -21,3 +21,9 @@ it('correctly sets diffs for an object that is overwritten', () => {
   const o2 = { a: {} }
   expect(objectDiff(o1, o2)).to.deep.equal({ a: {} })
 })
+
+it('identifies the smallest possible diff', () => {
+  const o1 = { a: { b: 1 } }
+  const o2 = { a: { b: 1, c: 2 } }
+  expect(objectDiff(o1, o2)).to.deep.equal({ a: { c: 2 } })
+})

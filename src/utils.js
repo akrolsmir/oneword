@@ -114,7 +114,7 @@ export function objectDiff(o1, o2) {
     const v1 = o1?.[key] // Allow o1 to be undefined
     const v2 = o2[key]
     if (!isEqual(v1, v2)) {
-      result[key] = typeof value === 'object' ? objectDiff(v1, v2) : v2
+      result[key] = typeof v2 === 'object' ? objectDiff(v1, v2) : v2
     }
   }
   return result
