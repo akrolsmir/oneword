@@ -13,13 +13,7 @@ it('flattens paths', () => {
 it('diffs objects', () => {
   const o1 = { a: 1, c: 3 }
   const o2 = { a: 1, b: { c: 2 } }
-  expect(objectDiff(o1, o2)).to.deep.equal({ b: { c: 2 } })
-})
-
-it('correctly sets diffs for an object that is overwritten', () => {
-  const o1 = { a: { b: 1 } }
-  const o2 = { a: {} }
-  expect(objectDiff(o1, o2)).to.deep.equal({ a: {} })
+  expect(objectDiff(o1, o2)).to.deep.equal({ b: { c: 2 }, c: undefined })
 })
 
 it('identifies the smallest possible diff', () => {
@@ -29,7 +23,21 @@ it('identifies the smallest possible diff', () => {
 })
 
 it('handles array diffs by always overwriting', () => {
-  const o1 = { a: [1], b: {} }
-  const o2 = { a: [1, 2], b: [3] }
-  expect(objectDiff(o1, o2)).to.deep.equal({ a: [1, 2], b: [3] })
+  const o1 = { a: [1, 2], b: {} }
+  const o2 = { a: [1], b: [3] }
+  expect(objectDiff(o1, o2)).to.deep.equal({ a: [1], b: [3] })
+})
+
+it('marks deleted items as undefined', () => {
+  const o1 = { a: { b: 1 } }
+  const o2 = { a: {} }
+  expect(objectDiff(o1, o2)).to.deep.equal({ a: { b: undefined } })
+})
+
+it('marks more deleted items as undefined', () => {
+  const o1 = { a: { b: { b: 1 }, c: 2, d: 3 } }
+  const o2 = { a: { e: 4 } }
+  expect(objectDiff(o1, o2)).to.deep.equal({
+    a: { b: undefined, c: undefined, d: undefined, e: 4 },
+  })
 })

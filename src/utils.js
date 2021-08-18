@@ -121,6 +121,12 @@ export function objectDiff(o1, o2) {
       }
     }
   }
+  // Surface deleted keys as 'undefined'
+  for (const key of Object.keys(o1 || {})) {
+    if (!o2[key]) {
+      result[key] = undefined
+    }
+  }
   return result
 }
 
