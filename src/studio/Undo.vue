@@ -4,6 +4,7 @@
       <h1 class="title">Current</h1>
       <MonacoEditor v-model="localRoomString" />
       <!-- TODO: Maybe should need to click "edit" first -->
+      <!-- TODO: Prevent saving malformed versions? Indicate with error button. -->
       <button class="button is-primary" @click="saveRoom">
         Save Room (Ctrl + s)
       </button>
@@ -32,8 +33,8 @@ body {
 </style>
 
 <script>
-import { cloneDeep, isEmpty } from 'lodash'
-import { objectDiff, setIn } from '../utils'
+import { isEmpty } from 'lodash'
+import { objectDiff, flattenPaths, applyDiff, stripUndefined } from '../utils'
 import MonacoEditor from './MonacoEditor.vue'
 export default {
   components: { MonacoEditor },
@@ -91,7 +92,8 @@ export default {
   },
   methods: {
     stateAt(index) {
-      return this.diffs.slice(0, index + 1).reduce(applyDiffs)
+      const reapplied = this.diffs.slice(0, index + 1).reduce(applyDiff)
+      return stripUndefined(reapplied)
     },
     undo() {
       this.activeIndex = Math.max(0, this.activeIndex - 1)
@@ -104,7 +106,7 @@ export default {
         const oldRoom = this.stateAt(this.activeIndex)
         const newRoomString = this.localRoomString.slice('let room = '.length)
         const newRoom = JSON.parse(newRoomString)
-        const diff = objectDiff(oldRoom, newRoom)
+        const diff = flattenPaths(objectDiff(oldRoom, newRoom))
 
         if (!isEmpty(diff)) {
           // Start a new history chain from here
@@ -120,16 +122,8 @@ export default {
 
 function stringifyDiff(object) {
   // Show undefined, though JSON.stringify would normally remove them
-  const replacer = (k, v) => (v === undefined ? '(undefined)' : v)
+  const replacer = (k, v) => (v === undefined ? '(deleted)' : v)
 
   return JSON.stringify(object, replacer, 2)
-}
-
-function applyDiffs(original, diff) {
-  const copy = cloneDeep(original || {})
-  for (const [path, value] of Object.entries(diff)) {
-    setIn(copy, path, value)
-  }
-  return copy
 }
 </script>

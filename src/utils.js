@@ -105,9 +105,10 @@ export function orderedEntries(object) {
     .map(([k, v]) => [v, k]) // Swap so entries come before keys
 }
 
-// Find the deep properties of o2 that are new/changed from o1
-// e.g. diffs({a: 1, c: 3}, {a: 1, b: {c: 2}}) => {b: {c: 2}}
+// Find the deep properties of o2 that are new/changed/removed from o1
+// e.g. diffs({a: 1, c: 3}, {a: 1, b: {c: 2}}) => {b: {c: 2}, c: undefined}
 // Adapted from https://stackoverflow.com/a/37396358/1222351
+// TODO: maybe always output flat diffs
 export function objectDiff(o1, o2) {
   const result = {}
   for (const key of Object.keys(o2)) {
@@ -126,6 +127,57 @@ export function objectDiff(o1, o2) {
     if (!o2[key]) {
       result[key] = undefined
     }
+  }
+  return result
+}
+
+// Mirrors Firestore update(). Assumes diffs are already flattened.
+export function applyDiff(object, flatDiff) {
+  const copy = cloneDeep(object || {})
+  for (const [path, value] of Object.entries(flatDiff)) {
+    setIn(copy, path, value)
+  }
+  return copy
+}
+
+// Given a JSON-like object or array, recursively strip out undefined
+// This makes it safe for uploading to Firestore. E.g.:
+// 'blah' => 'blah'
+// {a: undefined, b: 3} => {b: 3}
+// [1, undefined, 3] => [1, 3]
+export function stripUndefined(object) {
+  if (typeof object !== 'object') {
+    return object
+  }
+  if (Array.isArray(object)) {
+    return object.filter((item) => item !== undefined).map(stripUndefined)
+  }
+  const result = {}
+  for (const [key, value] of Object.entries(object)) {
+    if (value !== undefined) {
+      result[key] = stripUndefined(value)
+    }
+  }
+  return result
+}
+
+/**
+ * Recursively replaces all target values with the specified new value
+ * @param {Object|Array} object
+ * @param {*} target
+ * @param {*} newValue
+ * @returns A copy of the object with the target values changed
+ */
+export function replaceValues(object, target, newValue) {
+  if (typeof object !== 'object') {
+    return object === target ? newValue : object
+  }
+  if (Array.isArray(object)) {
+    return object.map((item) => replaceValues(item, target, newValue))
+  }
+  const result = {}
+  for (const [key, value] of Object.entries(object)) {
+    result[key] = replaceValues(value, target, newValue)
   }
   return result
 }
