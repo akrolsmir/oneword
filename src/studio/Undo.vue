@@ -25,6 +25,13 @@
           :heightInVh="10"
         />
       </template>
+
+      <h1 class="title">All Changes</h1>
+      <div v-for="change in metaroom.changes" :key="change.timestamp">
+        <a href="#" @click="jump(change.timestamp)">
+          {{ change.author }} @ {{ new Date(change.timestamp).toUTCString() }}
+        </a>
+      </div>
     </div>
   </div>
 </template>
@@ -72,6 +79,9 @@ export default {
         },
         /* Which of the diffs is currently selected */
         active: 100000,
+        /* Timestamp of the latest change to include in history */
+        branch: 400000,
+        /* TODO: could also add a reflog, if we have "click to set active/branch" */
       },
       /* An editable string to set the room */
       localRoomString: '',
@@ -109,11 +119,21 @@ export default {
     document.removeEventListener('keydown', this.keyListener)
   },
   computed: {
-    // TODO handle treelike structure with diff parents
     changesArray() {
-      return Object.values(this.metaroom.changes).sort(
-        (d1, d2) => d1.timestamp - d2.timestamp
-      )
+      const linear = Object.keys(this.metaroom.changes)
+        .map(Number)
+        .sort((c1, c2) => c1 - c2)
+
+      let timestamp = this.metaroom.branch
+      const result = []
+      while (timestamp) {
+        const change = this.metaroom.changes[timestamp]
+        result.unshift(change)
+        // If parent is not explicitly set, we reconcile with the previous time
+        const prevTimestamp = linear[linear.indexOf(timestamp) - 1]
+        timestamp = change.parent || prevTimestamp
+      }
+      return result
     },
     diffs() {
       return this.changesArray.map((change) => change.diff)
@@ -141,6 +161,11 @@ export default {
       )
       this.metaroom.active = this.changesArray[newIndex].timestamp
     },
+    jump(timestamp) {
+      this.metaroom.active = timestamp
+      this.metaroom.branch = timestamp
+      // Bug: After jumping, didn't expect to reconcile...
+    },
     saveRoom() {
       try {
         const oldRoom = this.stateAt(this.metaroom.active)
@@ -150,14 +175,16 @@ export default {
 
         if (!isEmpty(diff)) {
           const timestamp = Date.now()
-          // Start a new history chain from here
           this.metaroom.changes[timestamp] = {
             timestamp,
             author: 'Austin',
             diff,
-            // TODO: add parent pointer if not up-to-date
           }
-          this.metaroom.active = timestamp
+          if (this.metaroom.active !== this.metaroom.branch) {
+            // Start a new branch, rather than reconciling
+            this.metaroom.changes[timestamp].parent = this.metaroom.active
+          }
+          this.jump(timestamp)
         }
       } catch (e) {
         console.error('Failed to edit room:\n', e)
