@@ -14,11 +14,16 @@
       <button class="button" @click="undo">Undo (Ctrl + z)</button>
       <button class="button" @click="redo">Redo (Ctrl + Shift + z)</button>
       <br />
-      <template v-for="(diff, index) in diffStrings" :key="diff">
+      <template v-for="change in changesArray" :key="change.timestamp">
         <label class="label">
-          {{ index == activeIndex ? 'ACTIVE:' : '' }} Diff {{ index }}</label
-        >
-        <MonacoEditor :modelValue="`diff${index} = ${diff}`" :heightInVh="10" />
+          {{ change.author }} @
+          {{ new Date(change.timestamp).toUTCString() }}
+          {{ change.timestamp == metaroom.active ? ' - ACTIVE' : '' }}
+        </label>
+        <MonacoEditor
+          :modelValue="`diff = ${stringifyDiff(change.diff)}`"
+          :heightInVh="10"
+        />
       </template>
     </div>
   </div>
@@ -40,26 +45,44 @@ export default {
   components: { MonacoEditor },
   data() {
     return {
-      /* Diffs are updates that work in Firestore */
-      diffs: [
-        {},
-        { title: 'initial', a: 'b' },
-        { title: 'changed', 'foo.bar': 3 },
-        // TODO: Handle undefined-type diffs as removals in Firestore
-        { a: undefined },
-      ],
-      /* Which of the diffs is currently selected */
-      activeIndex: 0,
+      metaroom: {
+        /* Diffs are updates that work in Firestore */
+        changes: {
+          // Single change object:
+          100000: {
+            timestamp: 100000,
+            author: 'Alpha',
+            diff: {},
+          },
+          200000: {
+            timestamp: 200000,
+            author: 'Beta',
+            diff: { title: 'initial', a: 'b' },
+          },
+          300000: {
+            timestamp: 300000,
+            author: 'Alpha',
+            diff: { title: 'changed', 'foo.bar': 3 },
+          },
+          400000: {
+            timestamp: 400000,
+            author: 'Charlie',
+            diff: { a: undefined },
+          },
+        },
+        /* Which of the diffs is currently selected */
+        active: 100000,
+      },
       /* An editable string to set the room */
       localRoomString: '',
     }
   },
   created() {
-    this.activeIndex = 2 // To trigger the watch
+    this.metaroom.active = 300000 // To trigger the watch
   },
   watch: {
-    activeIndex() {
-      const localRoom = this.stateAt(this.activeIndex)
+    'metaroom.active'() {
+      const localRoom = this.stateAt(this.metaroom.active)
       this.localRoomString = 'let room = ' + JSON.stringify(localRoom, null, 2)
     },
   },
@@ -86,32 +109,55 @@ export default {
     document.removeEventListener('keydown', this.keyListener)
   },
   computed: {
-    diffStrings() {
-      return this.diffs.map(stringifyDiff)
+    // TODO handle treelike structure with diff parents
+    changesArray() {
+      return Object.values(this.metaroom.changes).sort(
+        (d1, d2) => d1.timestamp - d2.timestamp
+      )
+    },
+    diffs() {
+      return this.changesArray.map((change) => change.diff)
     },
   },
   methods: {
-    stateAt(index) {
-      const reapplied = this.diffs.slice(0, index + 1).reduce(applyDiff)
+    stringifyDiff,
+    index(timestamp) {
+      return this.changesArray.indexOf(this.metaroom.changes[timestamp])
+    },
+    stateAt(timestamp) {
+      const reapplied = this.diffs
+        .slice(0, this.index(timestamp) + 1)
+        .reduce(applyDiff)
       return stripUndefined(reapplied)
     },
     undo() {
-      this.activeIndex = Math.max(0, this.activeIndex - 1)
+      const newIndex = Math.max(0, this.index(this.metaroom.active) - 1)
+      this.metaroom.active = this.changesArray[newIndex].timestamp
     },
     redo() {
-      this.activeIndex = Math.min(this.diffs.length - 1, this.activeIndex + 1)
+      const newIndex = Math.min(
+        this.changesArray.length - 1,
+        this.index(this.metaroom.active) + 1
+      )
+      this.metaroom.active = this.changesArray[newIndex].timestamp
     },
     saveRoom() {
       try {
-        const oldRoom = this.stateAt(this.activeIndex)
+        const oldRoom = this.stateAt(this.metaroom.active)
         const newRoomString = this.localRoomString.slice('let room = '.length)
         const newRoom = JSON.parse(newRoomString)
         const diff = flattenPaths(objectDiff(oldRoom, newRoom))
 
         if (!isEmpty(diff)) {
+          const timestamp = Date.now()
           // Start a new history chain from here
-          this.diffs = [...this.diffs.slice(0, this.activeIndex + 1), diff]
-          this.redo()
+          this.metaroom.changes[timestamp] = {
+            timestamp,
+            author: 'Austin',
+            diff,
+            // TODO: add parent pointer if not up-to-date
+          }
+          this.metaroom.active = timestamp
         }
       } catch (e) {
         console.error('Failed to edit room:\n', e)
