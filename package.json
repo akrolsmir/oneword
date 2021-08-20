@@ -17,6 +17,7 @@
     "@capacitor/cli": "^3.0.0-rc.0",
     "@capacitor/core": "^3.0.0-rc.0",
     "@capacitor/ios": "^3.0.0-rc.0",
+    "@ckpack/vue-color": "^0.0.3",
     "@stripe/stripe-js": "^1.12.1",
     "animate.css": "^4.1.1",
     "bulma": "^0.9.1",

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :style="{ 'background-color': color }">
     <slot />
   </div>
 </template>
@@ -8,6 +8,24 @@
 div {
   padding: 30px;
   outline: 1px solid gray;
-  background-color: #e5e7eb;
 }
 </style>
+
+<script>
+import ColorSetting from './ColorSetting.vue'
+
+export default {
+  props: {
+    color: String,
+  },
+  craft: {
+    tag: 'Div',
+    defaultProps: {
+      color: '#e5e7eb',
+    },
+    settings: {
+      ColorSetting,
+    },
+  },
+}
+</script>
