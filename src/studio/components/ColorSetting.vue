@@ -10,9 +10,9 @@
 <style scoped>
 .preview-square {
   cursor: pointer;
-  margin: 0.5rem;
-  width: 32px;
-  height: 32px;
+  margin: 0.5rem 0.5rem 0 0;
+  width: 40px;
+  height: 40px;
   position: relative;
   border-radius: 4px;
   display: inline-block;

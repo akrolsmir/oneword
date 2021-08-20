@@ -1,7 +1,7 @@
 <template>
   <BulmaDropdown
     class="m-2"
-    :options="['8pt', '12pt', '24pt', '36pt']"
+    :options="['8pt', '12pt', '20pt', '32pt']"
     v-model="fontSize"
   />
 </template>
