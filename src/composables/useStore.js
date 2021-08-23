@@ -55,18 +55,17 @@ export function useStore() {
     () => cloneDeep($roomx),
     (roomx, prev) => {
       // Run game logic and update room as appropriate
-      // NOTE: seems to be causing update loops in normal games; test + fix
-      // before merging into master
       compute(roomx)
 
       // Identify the new paths in this room -- to scope down Firestore push
       const diff = flattenPaths(objectDiff(prev, roomx))
+      // If there are no changes, we just got back from a Firestore pull
+      // If the room name changed, we swapped from initial zero state
+      // So only push when: 1. There are changes, and 2. the room name is the same
       if (!(isEmpty(diff) || 'name' in diff)) {
-        // If there are no changes, we just got back from a Firestore pull
-        // If the room name changed, we swapped from initial zero state
-        // So only push when  1. There are changes and 2. the room name is the same
         const DELETE = firebase.firestore.FieldValue.delete()
         const deleteDiff = replaceValues(diff, undefined, DELETE)
+        console.warn('Applying diff:', deleteDiff)
         /* no await */ updateRoom(roomx, deleteDiff)
 
         // TODO: Can we debounce changes here, instead of per-input?
