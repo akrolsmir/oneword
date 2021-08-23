@@ -2,7 +2,7 @@ import { cloneDeep, isEmpty } from 'lodash'
 import { reactive, watch } from 'vue'
 import firebase from 'firebase/app'
 import { updateRoom } from '../firebase/network'
-import { assignRole, inputs } from '../studio/api'
+import { assignRole, inputs, inputy } from '../studio/api'
 import {
   flattenPaths,
   getIn,
@@ -36,13 +36,12 @@ export function useStore() {
   // TODO: Ensure label => id mapping is unique?
   function $inputx(label, value) {
     $updatex({
-      [`round.${$roomx.state}.${$playerx.name}.${sanitize(label)}`]: value,
+      [`round.${sanitize(label)}.${$playerx.name}`]: value,
     })
   }
 
   function $interpolatex(text) {
-    const replacer = (match, label) => {
-      const path = `round.${$roomx.state}.${$playerx.name}.${sanitize(label)}`
+    const replacer = (match, path) => {
       return getIn($roomx, path) || '<empty>'
     }
 
@@ -90,6 +89,7 @@ function compute(room) {
     const sandbox = {
       // Inject the room into these functions
       inputs: (query) => inputs(room, query),
+      inputy: (inputId) => inputy(room, inputId),
       assignRole: (player, role) => assignRole(room, player, role),
       room,
       Boolean,

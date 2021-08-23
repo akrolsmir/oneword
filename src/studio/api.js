@@ -52,6 +52,15 @@ export function lookup(room, part) {
 }
 
 /**
+ * Just dig out all the player inputs for a particular id
+ * E.g. inputy('next-round') => {Austin: 3, Alex: 4}
+ */
+export function inputy(room, inputId) {
+  return room.round[inputId] || {}
+  // TODO: should missing inputs be undefined? null?
+}
+
+/**
  * Expand query strings by replacing `@ROLE` with the actual roles
  * E.g. 'CLUEING.@CLUER.favorite-pet' => ['cat', 'dog']
  * @param {String} query In the form 'PHASE.@ROLE.input-label'

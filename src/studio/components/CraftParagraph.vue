@@ -8,6 +8,7 @@
 p {
   line-height: 1.3;
   padding-bottom: 0.5rem;
+  white-space: pre-line;
 }
 </style>
 
