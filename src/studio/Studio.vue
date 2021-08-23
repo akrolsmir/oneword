@@ -57,7 +57,7 @@
                 <div class="column" v-for="state in $roomx.rules.states">
                   <h2 class="subtitle">{{ state }} Screen</h2>
                   <div class="screen">
-                    <Frame component="div" :frame-id="state">
+                    <Frame component="div" :frame-id="`${state}.${local.role}`">
                       <Canvas component="Container">
                         <Paragraph content="Heyo~" />
                       </Canvas>
@@ -71,7 +71,10 @@
               <div class="columns" v-for="state in $roomx.rules.states">
                 <div class="column is-5">
                   <h2 class="subtitle">{{ state }} Screen</h2>
-                  <Frame component="div" :frame-id="state"></Frame>
+                  <Frame
+                    component="div"
+                    :frame-id="`${state}.${local.role}`"
+                  ></Frame>
                 </div>
                 <div class="column">
                   <!-- Where the per-state logic resides -->
@@ -90,7 +93,7 @@
                   </h2>
                   <Frame
                     component="div"
-                    :frame-id="$roomx.state"
+                    :frame-id="`${$roomx.state}.${$roomx.round.roles?.[name]}`"
                     @mouseover="setPlayerx(name)"
                   ></Frame>
                 </div>
@@ -357,10 +360,12 @@ export default {
     currentLayout() {
       // Sync up local with $roomx when the user changes the state
       for (const state of this.$roomx.rules.states) {
-        this.$refs.editor.editor.import(
-          this.$roomx.layouts[state]?.[this.local.role],
-          state
-        )
+        for (const role of this.$roomx.rules.roles) {
+          this.$refs.editor.editor.import(
+            this.$roomx.layouts[state]?.[role],
+            `${state}.${role}`
+          )
+        }
         this.local.code = this.$roomx.code
       }
     },
@@ -376,8 +381,11 @@ export default {
     saveLayouts() {
       const updates = {}
       for (const state of this.$roomx.rules.states) {
-        updates[`layouts.${state}.${this.local.role}`] =
-          this.$refs.editor.editor.export(state)
+        for (const role of this.$roomx.rules.roles) {
+          const frameId = `${state}.${role}`
+          updates[`layouts.${frameId}`] =
+            this.$refs.editor.editor.export(frameId)
+        }
       }
       this.$updatex(updates)
     },
