@@ -392,6 +392,7 @@ export default {
       this.$roomx.round = {
         roles: {},
       }
+      this.$roomx.people = {}
       this.$roomx.state = 'DRAWING'
       for (const tester of this.$roomx.rules.testers) {
         this.$roomx.round.roles[tester] = this.local.role
