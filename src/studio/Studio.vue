@@ -389,6 +389,8 @@ export default {
       this.$updatex(updates)
     },
     resetRound() {
+      // MESSY: should start from makeNewRoom(), probably
+      this.$roomx.history = []
       this.$roomx.round = {
         roles: {},
       }
