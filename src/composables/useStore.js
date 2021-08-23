@@ -69,6 +69,17 @@ export function useStore() {
         const deleteDiff = replaceValues(diff, undefined, DELETE)
         /* no await */ updateRoom(roomx, deleteDiff)
 
+        // const change = {
+        //   timestamp: Date.now(),
+        //   author: $playerx.name,
+        //   diff,
+        // }
+        // /* no await */ updateIngot(`ingot/${roomx.name}`, change)
+
+        // TODO: instead of overwriting room here, just remember the change itself
+        // Then make Roomx represent the latest up-to-date application of all changes
+        //
+
         // TODO: Can we debounce changes here, instead of per-input?
         // Note: Vue batches multiple updates within the same tick:
         // https://v3.vuejs.org/guide/reactivity-computed-watchers.html#effect-flush-timing
