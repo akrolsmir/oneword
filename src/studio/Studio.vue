@@ -98,7 +98,7 @@
 
               <h2 class="subtitle">Game data</h2>
               <MonacoEditor
-                v-model="roomString"
+                :modelValue="roomString"
                 :heightInVh="60"
                 :options="{ readOnly: true }"
               />
