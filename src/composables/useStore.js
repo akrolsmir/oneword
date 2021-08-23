@@ -1,8 +1,16 @@
 import { cloneDeep, isEmpty } from 'lodash'
 import { reactive, watch } from 'vue'
+import firebase from 'firebase/app'
 import { updateRoom } from '../firebase/network'
 import { assignRole, inputs } from '../studio/api'
-import { flattenPaths, getIn, setIn, objectDiff, sanitize } from '../utils'
+import {
+  flattenPaths,
+  getIn,
+  setIn,
+  objectDiff,
+  sanitize,
+  replaceValues,
+} from '../utils'
 
 export function useStore() {
   // $roomx is the same as this.room; eventually, deprecate the latter
@@ -52,12 +60,15 @@ export function useStore() {
       compute(roomx)
 
       // Identify the new paths in this room -- to scope down Firestore push
-      const changes = flattenPaths(objectDiff(prev, roomx))
-      if (!(isEmpty(changes) || 'name' in changes)) {
+      const diff = flattenPaths(objectDiff(prev, roomx))
+      if (!(isEmpty(diff) || 'name' in diff)) {
         // If there are no changes, we just got back from a Firestore pull
         // If the room name changed, we swapped from initial zero state
         // So only push when  1. There are changes and 2. the room name is the same
-        /* no await */ updateRoom(roomx, changes)
+        const DELETE = firebase.firestore.FieldValue.delete()
+        const deleteDiff = replaceValues(diff, undefined, DELETE)
+        /* no await */ updateRoom(roomx, deleteDiff)
+
         // TODO: Can we debounce changes here, instead of per-input?
         // Note: Vue batches multiple updates within the same tick:
         // https://v3.vuejs.org/guide/reactivity-computed-watchers.html#effect-flush-timing
@@ -91,7 +102,7 @@ function compute(room) {
     compiled(sandbox)
   } catch (e) {
     // TODO: Map stack trace to user's code? And surface to user.
-    console.error(`Error with computing: ${e}`)
+    console.error(`Error with computing: ${e.stack}`)
     console.error('Code was:', room.code?.[room.state])
   }
 }
