@@ -1,4 +1,4 @@
-import { getIn } from '../utils'
+import { getIn, setIn } from '../utils'
 
 /**
  * Assigns the specified player(s) to the role.
@@ -13,7 +13,8 @@ export function assignRole(room, player, role) {
   switch (player) {
     case 'EVERYONE':
       for (const name of room.players) {
-        room.round.roles[name] = role
+        // Use setIn, in case the roles object does not yet exist
+        setIn(room, `round.roles.${name}`, role)
       }
       break
     case 'NEXT_ALPHABETICAL':
@@ -21,10 +22,10 @@ export function assignRole(room, player, role) {
       const [oldName, _] =
         Object.entries(oldRoles).find(([name, r]) => r === role) || []
       const name = nextItem(oldName, room.players)
-      room.round.roles[name] = role
+      setIn(room, `round.roles.${name}`, role)
       break
     default:
-      room.round.roles[player] = role
+      setIn(room, `round.roles.${player}`, role)
   }
 }
 
@@ -42,7 +43,7 @@ export function lookup(room, part) {
   if (part.startsWith('@')) {
     // Return all players with this role
     const role = part.slice(1)
-    return Object.entries(room.round.roles)
+    return Object.entries(room.round.roles || {})
       .map(([name, r]) => (r === role ? name : ''))
       .filter(Boolean)
   }
