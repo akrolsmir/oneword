@@ -41,8 +41,11 @@ export function useStore() {
   }
 
   function $interpolatex(text) {
-    const replacer = (match, path) => {
-      return getIn($roomx, path) || '<empty>'
+    function clean(obj) {
+      return typeof obj === 'object' ? JSON.stringify(obj, null, 2) : obj
+    }
+    function replacer(match, path) {
+      return clean(getIn($roomx, path)) || `<${match}>`
     }
 
     return text.replace(/\[\[(.+?)\]\]/, replacer)
