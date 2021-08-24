@@ -71,10 +71,12 @@
               <div class="columns" v-for="state in $roomx.rules.states">
                 <div class="column is-5">
                   <h2 class="subtitle">{{ state }} Screen</h2>
-                  <Frame
-                    component="div"
-                    :frame-id="`${state}.${local.role}`"
-                  ></Frame>
+                  <div class="screen">
+                    <Frame
+                      component="div"
+                      :frame-id="`${state}.${local.role}`"
+                    ></Frame>
+                  </div>
                 </div>
                 <div class="column">
                   <!-- Where the per-state logic resides -->
@@ -91,11 +93,13 @@
                   <h2 class="subtitle">
                     {{ name }} - {{ $roomx.round.roles?.[name] }}
                   </h2>
-                  <Frame
-                    component="div"
-                    :frame-id="`${$roomx.state}.${$roomx.round.roles?.[name]}`"
-                    @mouseover="setPlayerx(name)"
-                  ></Frame>
+                  <div class="screen">
+                    <Frame
+                      component="div"
+                      :frame-id="`${$roomx.state}.${$roomx.round.roles?.[name]}`"
+                      @mouseover="setPlayerx(name)"
+                    ></Frame>
+                  </div>
                 </div>
               </div>
 
@@ -236,7 +240,7 @@ body {
 }
 
 .screen {
-  min-height: 50vh;
+  min-height: 500px;
   outline: 1px solid gray;
   background: repeating-linear-gradient(
     135deg,
