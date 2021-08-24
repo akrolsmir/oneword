@@ -29,6 +29,21 @@ export function assignRole(room, player, role) {
   }
 }
 
+/**
+ * Finds all players matching a specified role
+ * @param {*} role The role to lookup; if falsy, returns everyone.
+ * @returns An array of player names matching the role
+ */
+export function getPlayers(room, role) {
+  const result = []
+  for (const [player, r] of Object.entries(room.round.roles)) {
+    if (!role || r === role) {
+      result.push(player)
+    }
+  }
+  return result
+}
+
 // Copied from oneword-utils.js
 function nextItem(item, list) {
   const nextIndex = (list.indexOf(item) + 1 + list.length) % list.length

@@ -1,8 +1,8 @@
-import { cloneDeep, isEmpty } from 'lodash'
+import { cloneDeep, isEmpty, mapValues } from 'lodash'
 import { reactive, watch } from 'vue'
 import firebase from 'firebase/app'
 import { updateRoom } from '../firebase/network'
-import { assignRole, inputs, inputy } from '../studio/api'
+import { assignRole, inputs, inputy, getPlayers } from '../studio/api'
 import {
   flattenPaths,
   getIn,
@@ -86,11 +86,19 @@ export function useStore() {
 
 function compute(room) {
   try {
+    const API = {
+      inputs,
+      inputy,
+      assignRole,
+      getPlayers,
+    }
+    function curry(func) {
+      return (...params) => func(room, ...params)
+    }
+    // Inject the room into these functions
+    const CURRIED_API = mapValues(API, curry)
     const sandbox = {
-      // Inject the room into these functions
-      inputs: (query) => inputs(room, query),
-      inputy: (inputId) => inputy(room, inputId),
-      assignRole: (player, role) => assignRole(room, player, role),
+      ...CURRIED_API,
       room,
       Boolean,
       console,
