@@ -121,9 +121,9 @@
             <!-- TODO: Autosave instead of having to click this -->
             <button
               class="button is-primary is-light mt-6"
-              @click="saveLayouts"
+              @click="saveRuleset"
             >
-              Save Layouts</button
+              Save Changes</button
             ><br />
 
             <div class="control">
@@ -144,8 +144,11 @@
           </template>
 
           <template v-if="local.canvas === 'LOGIC'">
-            <button class="button is-primary is-light mt-6" @click="saveCode">
-              Save Code</button
+            <button
+              class="button is-primary is-light mt-6"
+              @click="saveRuleset"
+            >
+              Save Changes</button
             ><br />
 
             <h2 class="subtitle">Docs</h2>
@@ -378,21 +381,15 @@ export default {
     },
   },
   methods: {
-    saveLayouts() {
+    saveRuleset() {
       const updates = {}
       for (const state of this.$roomx.rules.states) {
+        updates[`code.${state}`] = this.local.code[state]
         for (const role of this.$roomx.rules.roles) {
           const frameId = `${state}.${role}`
           updates[`layouts.${frameId}`] =
             this.$refs.editor.editor.export(frameId)
         }
-      }
-      this.$updatex(updates)
-    },
-    saveCode() {
-      const updates = {}
-      for (const state of this.$roomx.rules.states) {
-        updates[`code.${state}`] = this.local.code[state]
       }
       this.$updatex(updates)
     },
