@@ -1,4 +1,5 @@
-import { computed, inject, onBeforeMount, reactive } from 'vue'
+import { isEmpty } from 'lodash'
+import { computed, inject, onBeforeMount, reactive, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   getRoom,
@@ -202,6 +203,22 @@ export function useRoom(
     /* no await */ createOrEnterRoom()
   })
 
+  /** Usage: redirectRoom('/incrypt/random-fork') */
+  async function redirectRoom(redirect) {
+    await updateRoom(room, { redirect })
+  }
+
+  // When room.redirect changes while we're listening, route to the redirect
+  watch(
+    () => [room.redirect, room.people],
+    async ([redirect, people], [prevRedirect, prevPeople]) => {
+      // If prevPeople is empty, we just entered this room (eg from home page)
+      if (!isEmpty(prevPeople) && redirect && redirect !== prevRedirect) {
+        await router.push(redirect)
+      }
+    }
+  )
+
   return {
     // Reactive objects
     player,
@@ -213,5 +230,6 @@ export function useRoom(
     saveRoom,
     kickPlayer,
     makeMod,
+    redirectRoom,
   }
 }
