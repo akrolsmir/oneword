@@ -83,9 +83,10 @@ export function useRoom(
     const fetchedRoom = await getRoom(room)
 
     if (!fetchedRoom) {
-      // 1. If the room doesn't exist, create it, then return
+      // 1. If the room doesn't exist yet, create it
+      // merge = true so we don't clobber the room's existing people
       // Known issue: Creating as a guest leads to 'Anon'
-      await resetRoom()
+      await resetRoom(true)
 
       // 1.5. If room should be private ('?private=1'), privatize & clean the URL
       if (route.query.private) {
@@ -163,12 +164,12 @@ export function useRoom(
     }
   }
 
-  async function resetRoom() {
+  async function resetRoom(merge = false) {
     loadFrom(makeNewRoom(room.name))
     await joinGame(false)
     const roomCopy = { ...room }
     delete roomCopy.players
-    await setRoom(roomCopy)
+    await setRoom(roomCopy, merge)
   }
 
   async function saveRoom(...props) {

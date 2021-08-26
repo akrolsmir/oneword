@@ -59,11 +59,14 @@ function roomDb() {
 
 const db = firebase.firestore()
 
-export async function setRoom(room) {
+/**
+ * @param {Boolean} merge If true, will merge instead of overwriting the room
+ */
+export async function setRoom(room, merge = false) {
   if (roomDb() == 'rooms') {
     await serverLog(room.name, `setRoom`, room)
   }
-  await db.collection(roomDb()).doc(room.name).set(room)
+  await db.collection(roomDb()).doc(room.name).set(room, { merge })
 }
 
 export async function updateRoom(room, update) {
