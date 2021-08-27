@@ -81,6 +81,11 @@
   resolved "https://registry.yarnpkg.com/@capacitor/ios/-/ios-3.0.0-rc.0.tgz#36e71a6abea071c69a158c875bc627c64a52609f"
   integrity sha512-c92qeHIKoC/HPBB9Ji+kdn9LJ2HPeRoWpamV/7OOlS2SAB+GjHWHWjuP8aWLnUFqFZxI7Mfrfo65Gd6N4haoGw==
 
+"@ckpack/vue-color@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@ckpack/vue-color/-/vue-color-0.0.3.tgz#0774f2d2878e5a5833987f2547a9b2cb52c0e855"
+  integrity sha512-UAVYBLbE6vLZRB+UEkYU3QMBrHc8UJGbckRSASgs5x1GKLdH/hg1wwrg0vHtYhBkKze+GrSCc91V1dvoFTY6Kw==
+
 "@esm-bundle/chai@^4.3.4":
   version "4.3.4"
   resolved "https://registry.yarnpkg.com/@esm-bundle/chai/-/chai-4.3.4.tgz#74ed4a0794b3a9f9517ff235744ac6f4be0d34dc"

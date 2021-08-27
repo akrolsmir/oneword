@@ -22,6 +22,7 @@ const Pairwise = () => import('./pairwise/Pairwise.vue')
 const Studio = () => import('./studio/Studio.vue')
 const StudioPreview = () => import('./studio/StudioPreview.vue')
 const Multiplay = () => import('./admin/Multiplay.vue')
+const Undo = () => import('./studio/Undo.vue')
 
 const routes = [
   { path: '/', component: FrontPage },
@@ -88,6 +89,11 @@ const routes = [
     path: '/multiplay/:game/:id',
     component: Multiplay,
     meta: { title: 'Multiplay' },
+  },
+  {
+    path: '/undo',
+    component: Undo,
+    meta: { title: 'Undo' },
   },
 ]
 

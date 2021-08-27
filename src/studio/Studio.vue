@@ -57,7 +57,7 @@
                 <div class="column" v-for="state in $roomx.rules.states">
                   <h2 class="subtitle">{{ state }} Screen</h2>
                   <div class="screen">
-                    <Frame component="div" :frame-id="state">
+                    <Frame component="div" :frame-id="`${state}.${local.role}`">
                       <Canvas component="Container">
                         <Paragraph content="Heyo~" />
                       </Canvas>
@@ -71,7 +71,12 @@
               <div class="columns" v-for="state in $roomx.rules.states">
                 <div class="column is-5">
                   <h2 class="subtitle">{{ state }} Screen</h2>
-                  <Frame component="div" :frame-id="state"></Frame>
+                  <div class="screen">
+                    <Frame
+                      component="div"
+                      :frame-id="`${state}.${local.role}`"
+                    ></Frame>
+                  </div>
                 </div>
                 <div class="column">
                   <!-- Where the per-state logic resides -->
@@ -88,17 +93,19 @@
                   <h2 class="subtitle">
                     {{ name }} - {{ $roomx.round.roles?.[name] }}
                   </h2>
-                  <Frame
-                    component="div"
-                    :frame-id="$roomx.state"
-                    @mouseover="setPlayerx(name)"
-                  ></Frame>
+                  <div class="screen">
+                    <Frame
+                      component="div"
+                      :frame-id="`${$roomx.state}.${$roomx.round.roles?.[name]}`"
+                      @mouseover="setPlayerx(name)"
+                    ></Frame>
+                  </div>
                 </div>
               </div>
 
               <h2 class="subtitle">Game data</h2>
               <MonacoEditor
-                v-model="roomString"
+                :modelValue="roomString"
                 :heightInVh="60"
                 :options="{ readOnly: true }"
               />
@@ -118,9 +125,9 @@
             <!-- TODO: Autosave instead of having to click this -->
             <button
               class="button is-primary is-light mt-6"
-              @click="saveLayouts"
+              @click="saveRuleset"
             >
-              Save Layouts</button
+              Save Changes</button
             ><br />
 
             <div class="control">
@@ -141,8 +148,11 @@
           </template>
 
           <template v-if="local.canvas === 'LOGIC'">
-            <button class="button is-primary is-light mt-6" @click="saveCode">
-              Save Code</button
+            <button
+              class="button is-primary is-light mt-6"
+              @click="saveRuleset"
+            >
+              Save Changes</button
             ><br />
 
             <h2 class="subtitle">Docs</h2>
@@ -230,7 +240,7 @@ body {
 }
 
 .screen {
-  min-height: 50vh;
+  min-height: 500px;
   outline: 1px solid gray;
   background: repeating-linear-gradient(
     135deg,
@@ -357,10 +367,12 @@ export default {
     currentLayout() {
       // Sync up local with $roomx when the user changes the state
       for (const state of this.$roomx.rules.states) {
-        this.$refs.editor.editor.import(
-          this.$roomx.layouts[state]?.[this.local.role],
-          state
-        )
+        for (const role of this.$roomx.rules.roles) {
+          this.$refs.editor.editor.import(
+            this.$roomx.layouts[state]?.[role],
+            `${state}.${role}`
+          )
+        }
         this.local.code = this.$roomx.code
       }
     },
@@ -373,25 +385,25 @@ export default {
     },
   },
   methods: {
-    saveLayouts() {
-      const updates = {}
-      for (const state of this.$roomx.rules.states) {
-        updates[`layouts.${state}.${this.local.role}`] =
-          this.$refs.editor.editor.export(state)
-      }
-      this.$updatex(updates)
-    },
-    saveCode() {
+    saveRuleset() {
       const updates = {}
       for (const state of this.$roomx.rules.states) {
         updates[`code.${state}`] = this.local.code[state]
+        for (const role of this.$roomx.rules.roles) {
+          const frameId = `${state}.${role}`
+          updates[`layouts.${frameId}`] =
+            this.$refs.editor.editor.export(frameId)
+        }
       }
       this.$updatex(updates)
     },
     resetRound() {
+      // MESSY: should start from makeNewRoom(), probably
+      this.$roomx.history = []
       this.$roomx.round = {
         roles: {},
       }
+      this.$roomx.people = {}
       this.$roomx.state = 'DRAWING'
       for (const tester of this.$roomx.rules.testers) {
         this.$roomx.round.roles[tester] = this.local.role

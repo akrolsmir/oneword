@@ -19,7 +19,7 @@
         :node="selectedNode"
       ></component>
 
-      <button class="button is-danger is-small mt-2" @click="removeSelected">
+      <button class="button is-danger mt-2" @click="removeSelected">
         Delete
       </button>
     </div>
@@ -29,7 +29,7 @@
 <style scoped>
 .settings {
   outline: 1px solid gray;
-  padding: 0.5rem;
+  padding: 1rem;
 }
 </style>
 

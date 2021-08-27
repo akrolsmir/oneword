@@ -111,7 +111,8 @@ function emptyLayout() {
     {
       "componentName": "Canvas",
       "props": {
-        "component": "Container"
+        "component": "Container",
+        "color": "#E5E7EB"
       },
       "children": [
       ],

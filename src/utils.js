@@ -1,6 +1,6 @@
 import { singular, plural as pluralur } from 'pluralize'
 import { seededRandom } from './vendor/rng'
-import { isEmpty, isEqual } from 'lodash'
+import { cloneDeep, isEmpty, isEqual } from 'lodash'
 
 // Compile these regexes for performance
 const RE_MATCH_LETTER_DASH = /[^\p{L}-]/gu // dash, or letter in any language
@@ -105,17 +105,79 @@ export function orderedEntries(object) {
     .map(([k, v]) => [v, k]) // Swap so entries come before keys
 }
 
-// Find the deep properties of o2 that are new/changed from o1
-// e.g. diffs({a: 1, c: 3}, {a: 1, b: {c: 2}}) => {b: {c: 2}}
+// Find the deep properties of o2 that are new/changed/removed from o1
+// e.g. diffs({a: 1, c: 3}, {a: 1, b: {c: 2}}) => {b: {c: 2}, c: undefined}
 // Adapted from https://stackoverflow.com/a/37396358/1222351
+// TODO: maybe always output flat diffs
 export function objectDiff(o1, o2) {
   const result = {}
   for (const key of Object.keys(o2)) {
     const v1 = o1?.[key] // Allow o1 to be undefined
     const v2 = o2[key]
     if (!isEqual(v1, v2)) {
-      result[key] = typeof value === 'object' ? objectDiff(v1, v2) : v2
+      if (typeof v2 === 'object' && !Array.isArray(v2)) {
+        result[key] = objectDiff(v1, v2)
+      } else {
+        result[key] = cloneDeep(v2)
+      }
     }
+  }
+  // Surface deleted keys as 'undefined'
+  for (const key of Object.keys(o1 || {})) {
+    if (!o2[key]) {
+      result[key] = undefined
+    }
+  }
+  return result
+}
+
+// Mirrors Firestore update(). Assumes diffs are already flattened.
+export function applyDiff(object, flatDiff) {
+  const copy = cloneDeep(object || {})
+  for (const [path, value] of Object.entries(flatDiff)) {
+    setIn(copy, path, value)
+  }
+  return copy
+}
+
+// Given a JSON-like object or array, recursively strip out undefined
+// This makes it safe for uploading to Firestore. E.g.:
+// 'blah' => 'blah'
+// {a: undefined, b: 3} => {b: 3}
+// [1, undefined, 3] => [1, 3]
+export function stripUndefined(object) {
+  if (typeof object !== 'object') {
+    return object
+  }
+  if (Array.isArray(object)) {
+    return object.filter((item) => item !== undefined).map(stripUndefined)
+  }
+  const result = {}
+  for (const [key, value] of Object.entries(object)) {
+    if (value !== undefined) {
+      result[key] = stripUndefined(value)
+    }
+  }
+  return result
+}
+
+/**
+ * Recursively replaces all target values with the specified new value
+ * @param {Object|Array} object
+ * @param {*} target
+ * @param {*} newValue
+ * @returns A copy of the object with the target values changed
+ */
+export function replaceValues(object, target, newValue) {
+  if (typeof object !== 'object') {
+    return object === target ? newValue : object
+  }
+  if (Array.isArray(object)) {
+    return object.map((item) => replaceValues(item, target, newValue))
+  }
+  const result = {}
+  for (const [key, value] of Object.entries(object)) {
+    result[key] = replaceValues(value, target, newValue)
   }
   return result
 }

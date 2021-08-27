@@ -1,4 +1,4 @@
-import { getIn } from '../utils'
+import { getIn, setIn } from '../utils'
 
 /**
  * Assigns the specified player(s) to the role.
@@ -13,7 +13,8 @@ export function assignRole(room, player, role) {
   switch (player) {
     case 'EVERYONE':
       for (const name of room.players) {
-        room.round.roles[name] = role
+        // Use setIn, in case the roles object does not yet exist
+        setIn(room, `round.roles.${name}`, role)
       }
       break
     case 'NEXT_ALPHABETICAL':
@@ -21,11 +22,26 @@ export function assignRole(room, player, role) {
       const [oldName, _] =
         Object.entries(oldRoles).find(([name, r]) => r === role) || []
       const name = nextItem(oldName, room.players)
-      room.round.roles[name] = role
+      setIn(room, `round.roles.${name}`, role)
       break
     default:
-      room.round.roles[player] = role
+      setIn(room, `round.roles.${player}`, role)
   }
+}
+
+/**
+ * Finds all players matching a specified role
+ * @param {*} role The role to lookup; if falsy, returns everyone.
+ * @returns An array of player names matching the role
+ */
+export function getPlayers(room, role) {
+  const result = []
+  for (const [player, r] of Object.entries(room.round.roles)) {
+    if (!role || r === role) {
+      result.push(player)
+    }
+  }
+  return result
 }
 
 // Copied from oneword-utils.js
@@ -42,12 +58,21 @@ export function lookup(room, part) {
   if (part.startsWith('@')) {
     // Return all players with this role
     const role = part.slice(1)
-    return Object.entries(room.round.roles)
+    return Object.entries(room.round.roles || {})
       .map(([name, r]) => (r === role ? name : ''))
       .filter(Boolean)
   }
   // Not @ROLE syntax, so just return the original string wrapped in an array
   return [part]
+}
+
+/**
+ * Just dig out all the player inputs for a particular id
+ * E.g. inputy('next-round') => {Austin: 3, Alex: 4}
+ */
+export function inputy(room, inputId) {
+  return room.round[inputId] || {}
+  // TODO: should missing inputs be undefined? null?
 }
 
 /**
