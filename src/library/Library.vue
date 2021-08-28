@@ -63,8 +63,7 @@ export default {
   },
   methods: {
     navigateTo(rulesetId) {
-      console.log(`Navigating to ${rulesetId}`)
-      this.$router.push(`/${rulesetId}`)
+      this.$router.push(`/library/${rulesetId}`)
     },
   },
 }

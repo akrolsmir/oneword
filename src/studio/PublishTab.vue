@@ -5,11 +5,7 @@
         >Preview URL:
         <a :href="`/preview/${room.name}`">boardless.games/{{ room.name }}</a>
       </label>
-      <img
-        :src="
-          metadata.thumbnail || 'https://www.tibs.org.tw/images/default.jpg'
-        "
-      />
+      <BulmaThumbnail :imageUrl="metadata.thumbnail" />
     </div>
     <div class="column">
       <label class="label">Game title</label>
@@ -121,8 +117,10 @@ But beware: duplicate hints are discarded!"
 
 <script>
 import cloneDeep from 'lodash/cloneDeep'
+import BulmaThumbnail from '../library/BulmaThumbnail.vue'
 
 export default {
+  components: { BulmaThumbnail },
   props: ['room'],
   data() {
     return {

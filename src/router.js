@@ -24,6 +24,7 @@ const StudioPreview = () => import('./studio/StudioPreview.vue')
 const Multiplay = () => import('./admin/Multiplay.vue')
 const Undo = () => import('./studio/Undo.vue')
 const Library = () => import('./library/Library.vue')
+const GamesListing = () => import('./library/GamesListing.vue')
 
 const routes = [
   { path: '/', component: FrontPage },
@@ -100,6 +101,11 @@ const routes = [
     path: '/library',
     component: Library,
     meta: { title: 'Library' },
+  },
+  {
+    path: '/library/:rulesetId',
+    component: GamesListing,
+    meta: { title: 'Games Listing' },
   },
 ]
 

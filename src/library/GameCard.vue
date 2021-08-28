@@ -2,14 +2,7 @@
   <!-- Horizontal card mostly copied from https://stackoverflow.com/a/62174317/1222351 -->
   <div class="card is-horizontal clickable">
     <div class="card-image">
-      <figure class="image is-square">
-        <img
-          :src="
-            metadata.thumbnail || 'https://www.tibs.org.tw/images/default.jpg'
-          "
-          alt="Placeholder image"
-        />
-      </figure>
+      <BulmaThumbnail :imageUrl="metadata.thumbnail" />
     </div>
     <div class="card-stacked">
       <div class="card-content">
@@ -39,13 +32,6 @@
 </template>
 
 <style>
-/* Crop images instead of stretching them. From:
-https://github.com/jgthms/bulma/issues/2023#issuecomment-414129646 */
-.image img {
-  height: 100%;
-  object-fit: cover;
-}
-
 .card.is-horizontal {
   display: flex;
 }
@@ -68,7 +54,9 @@ https://github.com/jgthms/bulma/issues/2023#issuecomment-414129646 */
 </style>
 
 <script>
+import BulmaThumbnail from './BulmaThumbnail.vue'
 export default {
+  components: { BulmaThumbnail },
   props: ['ruleset'],
   computed: {
     metadata() {
