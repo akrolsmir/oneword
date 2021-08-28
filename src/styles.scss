@@ -39,3 +39,16 @@ html {
   margin-top: 0;
   font-size: 100%;
 }
+
+.clickable {
+  transition: all 0.1s ease-out;
+  cursor: pointer;
+}
+
+.clickable:hover {
+  transform: translateY(-5px);
+}
+
+.clickable:active {
+  transform: translateY(0);
+}
