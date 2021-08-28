@@ -221,17 +221,9 @@
   margin-top: 2rem;
 }
 
-body {
-  height: 100%;
-}
-
 #app {
+  height: 100vh;
   background-color: #f3f4f6; /* Tailwind Gray 100  */
-  /* Boilerplate to full-screen this div */
-  margin: 0;
-  height: 100%;
-  position: relative;
-  overflow: auto;
 }
 
 .main-area {
