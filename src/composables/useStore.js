@@ -23,6 +23,33 @@ export function useStore() {
   // Pros: Components can share additional info (e.g. player.name)
   // Cons: More ambiguity/complexity?
 
+  // $consolex is just for local debugging; not synced to firestore
+  const $consolex = reactive([])
+  // Extract all methods of the builtin console
+  const consoleMethods = Object.getOwnPropertyNames(console).filter(
+    (name) => typeof console[name] === 'function'
+  )
+  //  Record all calls to console in consolex
+  const consoleProxy = Object.fromEntries(
+    consoleMethods.map((name) => [
+      name,
+      (...args) => {
+        let stackTrace
+        try {
+          throw new Error('Fake error')
+        } catch (e) {
+          stackTrace = e.stack.split('\n').slice(2).join('\n')
+        }
+        $consolex.push({ name, args, stackTrace })
+        console[name](...args)
+      },
+    ])
+  )
+  // const consoleProxy = new Proxy(console, handler)
+  consoleProxy.log('TESTING!!!')
+  // consoleProxy.log('a', JSON.stringify($consolex))
+  // console.log('b', JSON.stringify($consolex))
+
   // All writes to $roomx
   function $updatex(changes) {
     Object.entries(changes).map(([path, value]) => setIn($roomx, path, value))
@@ -57,7 +84,7 @@ export function useStore() {
     () => cloneDeep($roomx),
     (roomx, prev) => {
       // Run game logic and update room as appropriate
-      compute(roomx)
+      compute(roomx, consoleProxy)
 
       // Identify the new paths in this room -- to scope down Firestore push
       const diff = flattenPaths(objectDiff(prev, roomx))
@@ -84,10 +111,11 @@ export function useStore() {
     $playerx,
     $inputx,
     $interpolatex,
+    $consolex,
   }
 }
 
-function compute(room) {
+function compute(room, console) {
   try {
     const API = {
       inputs,

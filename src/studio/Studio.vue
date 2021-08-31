@@ -103,12 +103,32 @@
                 </div>
               </div>
 
-              <h2 class="subtitle">Game data</h2>
-              <MonacoEditor
-                :modelValue="roomString"
-                :heightInVh="60"
-                :options="{ readOnly: true }"
+              <BulmaTabs
+                v-model="local.debug"
+                :titles="['GAME DATA', 'CONSOLE']"
               />
+
+              <template v-if="local.debug === 'GAME DATA'">
+                <h2 class="subtitle">Game data</h2>
+                <MonacoEditor
+                  :modelValue="roomString"
+                  :heightInVh="60"
+                  :options="{ readOnly: true }"
+                />
+              </template>
+
+              <template v-if="local.debug === 'CONSOLE'">
+                <h2 class="subtitle">Console</h2>
+                <!-- Create a console-like area for each entry in $consolex -->
+                <div class="console">
+                  <div v-for="{ name, args, stackTrace } of $consolex">
+                    <b>{{ name }}</b>
+                    {{ name }}({{ args.join(', ') }})
+                    <!-- <p>{{ stackTrace }}</p> -->
+                    <hr />
+                  </div>
+                </div>
+              </template>
             </template>
 
             <template v-if="local.canvas === 'PUBLISH'">
@@ -242,6 +262,14 @@
     #f3f4f6 40px
   );
 }
+
+.console {
+  white-space: pre-wrap;
+  font-family: monospace;
+  font-size: 0.8rem;
+  height: 300px;
+  overflow-y: scroll;
+}
 </style>
 
 <script>
@@ -338,13 +366,14 @@ export default {
         role: rules.roles[0],
         code: buildCode(rules.states),
         canvas: 'LAYOUT',
+        debug: 'GAME DATA',
         duplicateName: 'game-copy',
       },
       docString,
       toolIcons,
     }
   },
-  inject: ['$roomx', '$updatex', '$playerx'],
+  inject: ['$roomx', '$updatex', '$playerx', '$consolex'],
   setup() {
     const showNavbar = inject('showNavbar')
     onMounted(() => showNavbar(false))
