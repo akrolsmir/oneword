@@ -53,7 +53,7 @@ export default defineComponent({
     onMounted(() => {
       editor = monaco.editor.create(root.value, {
         language: 'javascript',
-        value: props.modelValue,
+        value: props.modelValue || '',
         automaticLayout: true,
         minimap: { enabled: false },
         scrollBeyondLastLine: false,
