@@ -365,7 +365,7 @@ export default {
             `${state}.${role}`
           )
         }
-        this.local.code = this.$roomx.code
+        this.local.code = cloneDeep(this.$roomx.code)
       }
     },
     'local.canvas'() {
