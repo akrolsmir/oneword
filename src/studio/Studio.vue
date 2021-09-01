@@ -121,7 +121,9 @@
         <div class="column mx-2 mt-6">
           <SettingsPanel />
 
-          <template v-if="local.canvas === 'LAYOUT'">
+          <template
+            v-if="local.canvas === 'LAYOUT' || local.canvas === 'LOGIC'"
+          >
             <!-- TODO: Autosave instead of having to click this -->
             <button
               class="button is-primary is-light mt-6"
@@ -148,13 +150,6 @@
           </template>
 
           <template v-if="local.canvas === 'LOGIC'">
-            <button
-              class="button is-primary is-light mt-6"
-              @click="saveRuleset"
-            >
-              Save Changes</button
-            ><br />
-
             <h2 class="subtitle">Docs</h2>
             <MonacoEditor
               :modelValue="docString"
