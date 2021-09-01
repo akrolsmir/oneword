@@ -46,18 +46,21 @@
         <!-- Center: Main editor area -->
         <div class="column is-8 mx-2">
           <BulmaTabs
-            v-model="local.canvas"
+            v-model="selection.canvas"
             :titles="['LAYOUT', 'LOGIC', 'PLAYTEST', 'PUBLISH']"
           />
 
           <div class="main-area">
-            <template v-if="local.canvas === 'LAYOUT'">
+            <template v-if="selection.canvas === 'LAYOUT'">
               <!-- For each state, create a screen -->
               <div class="columns">
                 <div class="column" v-for="state in $roomx.rules.states">
                   <h2 class="subtitle">{{ state }} Screen</h2>
                   <div class="screen">
-                    <Frame component="div" :frame-id="`${state}.${local.role}`">
+                    <Frame
+                      component="div"
+                      :frame-id="`${state}.${selection.role}`"
+                    >
                       <Canvas component="Container">
                         <Paragraph content="Heyo~" />
                       </Canvas>
@@ -67,26 +70,26 @@
               </div>
             </template>
 
-            <template v-if="local.canvas === 'LOGIC'">
+            <template v-if="selection.canvas === 'LOGIC'">
               <div class="columns" v-for="state in $roomx.rules.states">
                 <div class="column is-5">
                   <h2 class="subtitle">{{ state }} Screen</h2>
                   <div class="screen">
                     <Frame
                       component="div"
-                      :frame-id="`${state}.${local.role}`"
+                      :frame-id="`${state}.${selection.role}`"
                     ></Frame>
                   </div>
                 </div>
                 <div class="column">
                   <!-- Where the per-state logic resides -->
                   <h2 class="subtitle">Logic for {{ state }}</h2>
-                  <MonacoEditor v-model="local.code[state]" />
+                  <MonacoEditor v-model="draftCode[state]" />
                 </div>
               </div>
             </template>
 
-            <template v-if="local.canvas === 'PLAYTEST'">
+            <template v-if="selection.canvas === 'PLAYTEST'">
               <div class="columns">
                 <!-- Keep stable sort order for player names -->
                 <div class="column" v-for="name in $roomx.players">
@@ -111,7 +114,7 @@
               />
             </template>
 
-            <template v-if="local.canvas === 'PUBLISH'">
+            <template v-if="selection.canvas === 'PUBLISH'">
               <PublishTab :room="$roomx" />
             </template>
           </div>
@@ -122,7 +125,7 @@
           <SettingsPanel />
 
           <template
-            v-if="local.canvas === 'LAYOUT' || local.canvas === 'LOGIC'"
+            v-if="selection.canvas === 'LAYOUT' || selection.canvas === 'LOGIC'"
           >
             <!-- TODO: Autosave instead of having to click this -->
             <button
@@ -140,7 +143,7 @@
                     type="radio"
                     name="role"
                     :value="role"
-                    v-model="local.role"
+                    v-model="selection.role"
                   />
                   {{ role }}</label
                 >
@@ -149,7 +152,7 @@
             </div>
           </template>
 
-          <template v-if="local.canvas === 'LOGIC'">
+          <template v-if="selection.canvas === 'LOGIC'">
             <h2 class="title is-4 mt-4">
               <a
                 target="_blank"
@@ -171,7 +174,7 @@
             </h2>
           </template>
 
-          <template v-if="local.canvas === 'PLAYTEST'">
+          <template v-if="selection.canvas === 'PLAYTEST'">
             <!-- Jump to a specific state. -->
             <div class="control">
               <h2 class="subtitle">State</h2>
@@ -193,9 +196,12 @@
               Reset game data</button
             ><br />
 
-            <input class="input mt-6" v-model="local.duplicateName" />
-            <button class="button" @click="duplicateRoom(local.duplicateName)">
-              Duplicate as "{{ local.duplicateName }}"
+            <input class="input mt-6" v-model="selection.duplicateName" />
+            <button
+              class="button"
+              @click="duplicateRoom(selection.duplicateName)"
+            >
+              Duplicate as "{{ selection.duplicateName }}"
             </button>
           </template>
         </div>
@@ -281,7 +287,7 @@ const rules = {
 function makeNewRoom(name) {
   return {
     name,
-    state: 'DRAWING', // or "GUESSING", or "DONE"
+    state: rules[0], // or "GUESSING", or "DONE"
     round: {},
     history: [],
     public: true,
@@ -290,6 +296,14 @@ function makeNewRoom(name) {
     layouts: {},
     rules,
     code: buildCode(rules.states),
+
+    // The last editor options chosen by maker; also synced to cloud
+    selection: {
+      state: rules.states[0],
+      role: rules.roles[0],
+      canvas: 'LAYOUT',
+      duplicateName: 'game-copy',
+    },
   }
 }
 
@@ -336,13 +350,6 @@ export default {
     return {
       resolverMap,
       COMPONENT_NAMES,
-      local: {
-        state: rules.states[0],
-        role: rules.roles[0],
-        code: buildCode(rules.states),
-        canvas: 'LAYOUT',
-        duplicateName: 'game-copy',
-      },
       docString,
       toolIcons,
     }
@@ -360,7 +367,7 @@ export default {
   // We use watches instead of computed functions, to invoke Editor's methods
   watch: {
     currentLayout() {
-      // Sync up local with $roomx when the user changes the state
+      // Sync up layouts and draft code when $roomx is loaded
       for (const state of this.$roomx.rules.states) {
         for (const role of this.$roomx.rules.roles) {
           this.$refs.editor.editor.import(
@@ -368,11 +375,11 @@ export default {
             `${state}.${role}`
           )
         }
-        this.local.code = cloneDeep(this.$roomx.code)
+        this.draftCode = cloneDeep(this.$roomx.code)
       }
     },
-    'local.canvas'() {
-      if (this.local.canvas == 'PLAYTEST') {
+    'selection.canvas'() {
+      if (this.selection.canvas == 'PLAYTEST') {
         this.$refs.editor.editor.disable()
       } else {
         this.$refs.editor.editor.enable()
@@ -383,7 +390,7 @@ export default {
     saveRuleset() {
       const updates = {}
       for (const state of this.$roomx.rules.states) {
-        updates[`code.${state}`] = this.local.code[state]
+        updates[`code.${state}`] = this.draftCode[state]
         for (const role of this.$roomx.rules.roles) {
           const frameId = `${state}.${role}`
           updates[`layouts.${frameId}`] =
@@ -401,7 +408,7 @@ export default {
       this.$roomx.people = {}
       this.$roomx.state = 'DRAWING'
       for (const tester of this.$roomx.rules.testers) {
-        this.$roomx.round.roles[tester] = this.local.role
+        this.$roomx.round.roles[tester] = this.selection.role
         this.$roomx.people[tester] = {}
       }
     },
@@ -420,7 +427,9 @@ export default {
   },
   computed: {
     currentLayout() {
-      return this.$roomx.layouts[this.local.state]?.[this.local.role] || []
+      return (
+        this.$roomx.layouts[this.selection.state]?.[this.selection.role] || []
+      )
     },
     roomString() {
       function truncator(key, value) {
@@ -430,12 +439,15 @@ export default {
         return value
       }
       // Return a copy without these fields:
-      const mask = ({ layouts, rules, code, ...rest }) => rest
+      const mask = ({ layouts, rules, code, selection, ...rest }) => rest
       // Return a copy with only these fields:
       // const mask = ({ state, round }) => ({ state, round })
       // Return a copy
       // const mask = (object) => ({ ...object })
       return 'let room = ' + JSON.stringify(mask(this.$roomx), truncator, 2)
+    },
+    selection() {
+      return this.$roomx.selection
     },
   },
 }
