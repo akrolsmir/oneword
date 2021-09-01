@@ -150,17 +150,25 @@
           </template>
 
           <template v-if="local.canvas === 'LOGIC'">
-            <h2 class="subtitle">Docs</h2>
-            <MonacoEditor
-              :modelValue="docString"
-              :heightInVh="70"
-              :options="{
-                readOnly: true,
-                lineNumbers: 'off',
-                glyphMargin: false,
-                folding: false,
-              }"
-            />
+            <h2 class="title is-4 mt-4">
+              <a
+                target="_blank"
+                href="https://www.notion.so/boardless/Boardless-Games-API-3982d7177d9946e3923a1273b9aa8eaa"
+                >Documentation</a
+              >
+            </h2>
+            <h2 class="title is-4">
+              <a
+                target="_blank"
+                href="https://www.notion.so/boardless/Boardless-Games-API-3982d7177d9946e3923a1273b9aa8eaa"
+                >Game examples</a
+              >
+            </h2>
+            <h2 class="title is-4">
+              <a target="_blank" href="https://discord.com/invite/AP7ssVPPCr"
+                >Stuck? Chat with us on Discord!</a
+              >
+            </h2>
           </template>
 
           <template v-if="local.canvas === 'PLAYTEST'">
