@@ -1,4 +1,37 @@
 <template>
+  <h1 class="title mt-6">Game setup</h1>
+
+  <div class="columns">
+    <div class="column" v-for="listName in ['states', 'roles', 'testers']">
+      <label class="label">{{ listName.toLocaleUpperCase() }}</label>
+      <div class="content">
+        <ol>
+          <li v-for="item in room.rules[listName]">
+            {{ item }} <a @click="remove(listName, item)">❌</a>
+          </li>
+        </ol>
+      </div>
+
+      <div class="field has-addons">
+        <div class="control">
+          <input
+            type="text"
+            class="input"
+            placeholder="New item"
+            v-model="local[listName]"
+          />
+        </div>
+        <div class="control">
+          <button class="button" @click="add(listName, local[listName])">
+            ➕
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h1 class="title mt-6">Publish game</h1>
+
   <div class="columns">
     <div class="column is-one-third">
       <label class="label"
@@ -75,37 +108,6 @@ But beware: duplicate hints are discarded!"
   </div>
 
   <button class="button is-success" @click="publish">Publish</button>
-
-  <h1 class="title mt-6 mb-0">Modify game rules</h1>
-
-  <div class="columns">
-    <div class="column" v-for="listName in ['states', 'roles', 'testers']">
-      <label class="label">{{ listName.toLocaleUpperCase() }}</label>
-      <div class="content">
-        <ol>
-          <li v-for="item in room.rules[listName]">
-            {{ item }} <a @click="remove(listName, item)">❌</a>
-          </li>
-        </ol>
-      </div>
-
-      <div class="field has-addons">
-        <div class="control">
-          <input
-            type="text"
-            class="input"
-            placeholder="New item"
-            v-model="local[listName]"
-          />
-        </div>
-        <div class="control">
-          <button class="button" @click="add(listName, local[listName])">
-            ➕
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
 </template>
 
 <style scoped>

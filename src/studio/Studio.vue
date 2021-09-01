@@ -47,7 +47,7 @@
         <div class="column is-8 mx-2">
           <BulmaTabs
             v-model="selection.canvas"
-            :titles="['LAYOUT', 'LOGIC', 'PLAYTEST', 'PUBLISH']"
+            :titles="['SETTINGS', 'LAYOUT', 'LOGIC', 'PLAYTEST']"
           />
 
           <div class="main-area">
@@ -114,7 +114,7 @@
               />
             </template>
 
-            <template v-if="selection.canvas === 'PUBLISH'">
+            <template v-if="selection.canvas === 'SETTINGS'">
               <PublishTab :room="$roomx" />
             </template>
           </div>
