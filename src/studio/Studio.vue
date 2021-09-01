@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="pt-4">
+  <div id="studio" class="pt-4">
     <Editor ref="editor" component="div" :resolverMap="resolverMap">
       <div class="columns is-gapless">
         <div class="column is-narrow mx-2 mt-6">
@@ -216,8 +216,8 @@
   margin-top: 2rem;
 }
 
-#app {
-  height: 100vh;
+#studio {
+  min-height: 100vh;
   background-color: #f3f4f6; /* Tailwind Gray 100  */
 }
 
@@ -312,7 +312,7 @@ const toolIcons = {
 }
 
 export default {
-  name: 'App',
+  name: 'Studio',
   components: {
     ...resolverMap,
     Editor,
