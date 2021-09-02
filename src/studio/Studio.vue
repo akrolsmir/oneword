@@ -195,14 +195,6 @@
             <button class="button is-primary is-light mt-6" @click="resetRound">
               Reset game data</button
             ><br />
-
-            <input class="input mt-6" v-model="selection.duplicateName" />
-            <button
-              class="button"
-              @click="duplicateRoom(selection.duplicateName)"
-            >
-              Duplicate as "{{ selection.duplicateName }}"
-            </button>
           </template>
         </div>
       </div>
@@ -268,7 +260,6 @@ import { inject, markRaw, onMounted } from 'vue'
 import { useRoom } from '../composables/useRoom'
 import MonacoEditor from './MonacoEditor.vue'
 import cloneDeep from 'lodash/cloneDeep'
-import { setRoom } from '../firebase/network'
 import BulmaTabs from '../components/BulmaTabs.vue'
 import PublishTab from './PublishTab.vue'
 import { docString } from './docs'
@@ -416,13 +407,6 @@ export default {
       // TODO: @mouseover hack ignores tab focus
       // Also, need People to match up somehow (ideally with roles)
       this.$playerx.name = name
-    },
-    async duplicateRoom(duplicateName) {
-      const newRoom = cloneDeep(this.$roomx)
-      newRoom.name = duplicateName
-      await setRoom(newRoom)
-      // Navigate to the new room
-      this.$router.push(`/studio/${duplicateName}`)
     },
   },
   computed: {

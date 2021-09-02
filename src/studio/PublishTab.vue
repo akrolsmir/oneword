@@ -1,5 +1,24 @@
 <template>
   <h1 class="title mt-6">Game setup</h1>
+  <label class="label"
+    >Game ID (preview:
+    <a :href="`/preview/${local.name}`"
+      >https://boardless.games/{{ local.name }}</a
+    >)</label
+  >
+  <div class="field has-addons">
+    <div class="control">
+      <input
+        type="text"
+        class="input"
+        placeholder="One Word"
+        v-model="local.name"
+      />
+    </div>
+    <div class="control">
+      <button class="button" @click="duplicate(local.name)">Change ID</button>
+    </div>
+  </div>
 
   <div class="columns">
     <div class="column" v-for="listName in ['states', 'roles', 'testers']">
@@ -34,10 +53,6 @@
 
   <div class="columns">
     <div class="column is-one-third">
-      <label class="label"
-        >Preview URL:
-        <a :href="`/preview/${room.name}`">boardless.games/{{ room.name }}</a>
-      </label>
       <BulmaThumbnail :imageUrl="metadata.thumbnail" />
     </div>
     <div class="column">
@@ -118,7 +133,9 @@ But beware: duplicate hints are discarded!"
 </style>
 
 <script>
-import cloneDeep from 'lodash/cloneDeep'
+import { cloneDeep, isEmpty } from 'lodash'
+import { setRoom } from '../firebase/network'
+import { getRuleset } from '../firebase/rulesets'
 import BulmaThumbnail from '../library/BulmaThumbnail.vue'
 
 export default {
@@ -133,6 +150,7 @@ export default {
   },
   created() {
     this.metadata = cloneDeep(this.room.metadata) || {}
+    this.local.name = this.room.name
   },
   methods: {
     // TODO: New states shouldn't null-ify
@@ -145,8 +163,26 @@ export default {
       this.room.rules[listName] = filtered
     },
     publish() {
-      this.room.metadata = cloneDeep(this.metadata)
+      this.room.metadata = { ...this.metadata, status: 'PUBLISHED' }
+      // TODO: Could suppport 'IN_REVIEW' status too
       alert('Successfully published!')
+    },
+    async duplicate(duplicateName) {
+      // Ensure game doesn't already exist
+      const existing = await getRuleset(duplicateName)
+      if (!isEmpty(existing)) {
+        alert(`Game with ID "${duplicateName}" already exists!`)
+        return
+      }
+
+      const newRoom = cloneDeep(this.room)
+      newRoom.metadata.status = 'DRAFT'
+      newRoom.name = duplicateName
+      await setRoom(newRoom)
+
+      // Force a reload to the new room
+      alert(`Successfully duplicated as ${duplicateName}!`)
+      window.location = `/studio/${duplicateName}`
     },
   },
 }
