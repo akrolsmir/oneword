@@ -197,6 +197,17 @@ class Node {
       uuid: this.uuid,
     }
   }
+
+  clone() {
+    return new Node(
+      this.componentName,
+      this.props,
+      this.parent,
+      this.children.map((node) => node.clone()),
+      this.rules,
+      this.addition
+    )
+  }
 }
 
 Node.unserialize = (editor, nodeData, parent = null) => {
