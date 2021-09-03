@@ -23,6 +23,8 @@ const Studio = () => import('./studio/Studio.vue')
 const StudioPreview = () => import('./studio/StudioPreview.vue')
 const Multiplay = () => import('./admin/Multiplay.vue')
 const Undo = () => import('./studio/Undo.vue')
+const Library = () => import('./library/Library.vue')
+const GamesListing = () => import('./library/GamesListing.vue')
 
 const routes = [
   { path: '/', component: FrontPage },
@@ -80,6 +82,8 @@ const routes = [
   },
   { path: '/studio', component: Studio, meta: { title: 'Studio' } },
   { path: '/studio/:id', component: Studio, meta: { title: 'Studio' } },
+  { path: '/builder', component: Studio, meta: { title: 'Builder' } },
+  { path: '/builder/:id', component: Studio, meta: { title: 'Builder' } },
   {
     path: '/preview/:id',
     component: StudioPreview,
@@ -94,6 +98,16 @@ const routes = [
     path: '/undo',
     component: Undo,
     meta: { title: 'Undo' },
+  },
+  {
+    path: '/library',
+    component: Library,
+    meta: { title: 'Library' },
+  },
+  {
+    path: '/library/:rulesetId',
+    component: GamesListing,
+    meta: { title: 'Games Listing' },
   },
 ]
 

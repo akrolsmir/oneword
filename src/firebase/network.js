@@ -46,8 +46,9 @@ function roomDb() {
     incrypt: 'incrypt',
     pairwise: 'pairwise',
     'asplos-2021': 'oneword-asplos',
-    studio: 'twowords',
-    preview: 'twowords',
+    studio: 'rulesets-v0',
+    builder: 'rulesets-v0',
+    preview: 'rulesets-v0',
   }
   for (const [name, table] of Object.entries(TABLES)) {
     if (window.location.pathname.startsWith(`/${name}`)) {
@@ -59,11 +60,14 @@ function roomDb() {
 
 const db = firebase.firestore()
 
-export async function setRoom(room) {
+/**
+ * @param {Boolean} merge If true, will merge instead of overwriting the room
+ */
+export async function setRoom(room, merge = false) {
   if (roomDb() == 'rooms') {
     await serverLog(room.name, `setRoom`, room)
   }
-  await db.collection(roomDb()).doc(room.name).set(room)
+  await db.collection(roomDb()).doc(room.name).set(room, { merge })
 }
 
 export async function updateRoom(room, update) {

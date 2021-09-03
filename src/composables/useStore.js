@@ -2,7 +2,13 @@ import { cloneDeep, isEmpty, mapValues } from 'lodash'
 import { reactive, watch } from 'vue'
 import firebase from 'firebase/app'
 import { updateRoom } from '../firebase/network'
-import { assignRole, inputs, inputy, getPlayers } from '../studio/api'
+import {
+  assignRole,
+  inputs,
+  inputy,
+  getPlayers,
+  pickRandom,
+} from '../studio/api'
 import {
   flattenPaths,
   getIn,
@@ -11,6 +17,7 @@ import {
   sanitize,
   replaceValues,
 } from '../utils'
+import { adjectives, nouns, verbs } from '../words/parts-of-speech'
 
 export function useStore() {
   // $roomx is the same as this.room; eventually, deprecate the latter
@@ -95,6 +102,11 @@ function compute(room) {
       assignRole,
       getPlayers,
     }
+    const WORDLISTS = {
+      NOUNS: nouns,
+      ADJECTIVES: adjectives,
+      VERBS: verbs,
+    }
     function curry(func) {
       return (...params) => func(room, ...params)
     }
@@ -102,6 +114,8 @@ function compute(room) {
     const CURRIED_API = mapValues(API, curry)
     const sandbox = {
       ...CURRIED_API,
+      pickRandom,
+      WORDLISTS,
       room,
       Boolean,
       console,

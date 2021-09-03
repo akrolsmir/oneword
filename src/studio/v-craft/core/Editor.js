@@ -71,6 +71,13 @@ class Editor {
     }
   }
 
+  duplicateNode(node) {
+    const newNode = node.clone()
+    // Untether from parent so makeOrphan works correctly
+    newNode.parent = null
+    newNode.insertAfter(node)
+  }
+
   getCraftConfig(node) {
     let resolver
     if (node.isCanvas()) {

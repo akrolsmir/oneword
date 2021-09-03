@@ -62,6 +62,13 @@ it('marks more deleted items as undefined', () => {
   expect(applyNestedDiff(o1, diff)).to.deep.equal(o2)
 })
 
+it('Treats undefined items as deleted in the new version', () => {
+  const o1 = { a: { b: 1 } }
+  const o2 = { a: { b: 1, c: undefined } }
+  const diff = { a: { c: undefined } }
+  expect(objectDiff(o1, o2)).to.deep.equal(diff)
+})
+
 it('strips out undefined', () => {
   expect(stripUndefined('blah')).to.equal('blah')
   expect(stripUndefined(undefined)).to.equal(undefined)

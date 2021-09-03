@@ -19,9 +19,9 @@
         :node="selectedNode"
       ></component>
 
-      <button class="button is-danger mt-2" @click="removeSelected">
-        Delete
-      </button>
+      <button class="button mt-2" @click="duplicateSelected">Copy</button>
+
+      <button class="button mt-2" @click="removeSelected">Delete</button>
     </div>
   </div>
 </template>
@@ -68,9 +68,6 @@ export default {
 
       return this.editor.getSettings(this.selectedNode)
     },
-    removeSelected() {
-      return this.editor.removeNode(this.selectedNode)
-    },
   },
   methods: {
     toggleState() {
@@ -79,6 +76,12 @@ export default {
       } else {
         this.editor.enable()
       }
+    },
+    duplicateSelected() {
+      this.editor.duplicateNode(this.selectedNode)
+    },
+    removeSelected() {
+      this.editor.removeNode(this.selectedNode)
     },
   },
 }

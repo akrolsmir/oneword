@@ -100,3 +100,7 @@ export function powerset(parts) {
   const rest = powerset(parts.slice(1))
   return first.flatMap((f) => rest.map((r) => [f].concat(r)))
 }
+
+export function pickRandom(array) {
+  return array[Math.floor(Math.random() * array.length)]
+}

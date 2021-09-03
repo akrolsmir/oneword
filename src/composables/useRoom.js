@@ -1,4 +1,5 @@
-import { computed, inject, onBeforeMount, reactive } from 'vue'
+import { isEmpty } from 'lodash'
+import { computed, inject, onBeforeMount, reactive, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   getRoom,
@@ -83,9 +84,10 @@ export function useRoom(
     const fetchedRoom = await getRoom(room)
 
     if (!fetchedRoom) {
-      // 1. If the room doesn't exist, create it, then return
-      // Known issue: Creating as a guest leads to 'Anon'
-      await resetRoom()
+      // 1. If the room doesn't exist yet, create it
+      // (merge = true so we don't clobber the room's existing people,
+      // which could happen when many clients resetRoom() at once)
+      await resetRoom(true)
 
       // 1.5. If room should be private ('?private=1'), privatize & clean the URL
       if (route.query.private) {
@@ -163,12 +165,12 @@ export function useRoom(
     }
   }
 
-  async function resetRoom() {
+  async function resetRoom(merge = false) {
     loadFrom(makeNewRoom(room.name))
     await joinGame(false)
     const roomCopy = { ...room }
     delete roomCopy.players
-    await setRoom(roomCopy)
+    await setRoom(roomCopy, merge)
   }
 
   async function saveRoom(...props) {
@@ -201,6 +203,22 @@ export function useRoom(
     /* no await */ createOrEnterRoom()
   })
 
+  /** Usage: redirectRoom('/incrypt/random-fork') */
+  async function redirectRoom(redirect) {
+    await updateRoom(room, { redirect })
+  }
+
+  // When room.redirect changes while we're listening, route to the redirect
+  watch(
+    () => [room.redirect, room.people],
+    async ([redirect, people], [prevRedirect, prevPeople]) => {
+      // If prevPeople is empty, we just entered this room (eg from home page)
+      if (!isEmpty(prevPeople) && redirect && redirect !== prevRedirect) {
+        await router.push(redirect)
+      }
+    }
+  )
+
   return {
     // Reactive objects
     player,
@@ -212,5 +230,6 @@ export function useRoom(
     saveRoom,
     kickPlayer,
     makeMod,
+    redirectRoom,
   }
 }
