@@ -64,6 +64,14 @@
         placeholder="One Word"
       />
 
+      <label class="label">Creator</label>
+      <input
+        type="text"
+        class="input"
+        :modelValue="metadata.creatorName"
+        placeholder="Albert Einstein"
+      />
+
       <label class="label">Thumbnail URL</label>
       <input
         type="text"

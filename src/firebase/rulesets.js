@@ -19,7 +19,7 @@ export async function listActiveGames(rulesetId) {
   const games = await db
     .collection('games-v0')
     .where('rulesetId', '==', rulesetId)
-    .orderBy('lastUpdatedAt', 'desc')
+    .orderBy('lastUpdateTime', 'desc')
     .limit(20)
     .get()
   return games.docs.map((doc) => doc.data())
@@ -28,4 +28,18 @@ export async function listActiveGames(rulesetId) {
 export async function getRuleset(rulesetId) {
   const ruleset = await db.collection('rulesets-v0').doc(rulesetId).get()
   return ruleset.data()
+}
+
+// TODO: rename 'game' to something less ambiguous
+export async function createGame(ruleset, roomId) {
+  const newGame = {
+    rulesetId: ruleset.name,
+    // TODO: rename to lastUpdateTime
+    lastUpdateTime: Date.now(),
+    layouts: ruleset.layouts,
+    rules: ruleset.rules,
+    code: ruleset.code,
+    name: roomId,
+  }
+  await db.collection('games-v0').add(newGame)
 }

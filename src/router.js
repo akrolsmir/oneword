@@ -83,9 +83,9 @@ const routes = [
   { path: '/studio', component: Studio, meta: { title: 'Studio' } },
   { path: '/studio/:id', component: Studio, meta: { title: 'Studio' } },
   {
-    path: '/preview/:id',
+    path: '/play/:rulesetId/:gameId',
     component: StudioPreview,
-    meta: { title: 'Preview' },
+    meta: { title: 'Play' },
   },
   {
     path: '/multiplay/:game/:id',
