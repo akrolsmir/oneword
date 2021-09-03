@@ -360,7 +360,6 @@ export default {
   },
   async created() {
     // If no ID was provided by vue router, create a new room
-    // TODO: Force the player to login first
     if (this.$route.params.id === undefined) {
       const template = await getRuleset('wordone')
       const gameName =
@@ -427,6 +426,12 @@ export default {
         }
       }
       this.$updatex(updates)
+
+      // Ask guests to sign in. Ideally we'd block on this, but
+      // signIn flow from Firestore is arbitrarily async.
+      if (!this.user.id) {
+        this.user.signIn()
+      }
     },
     resetRound() {
       // MESSY: should start from makeNewRoom(), probably
