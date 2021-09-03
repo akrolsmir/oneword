@@ -263,6 +263,9 @@ import cloneDeep from 'lodash/cloneDeep'
 import BulmaTabs from '../components/BulmaTabs.vue'
 import PublishTab from './PublishTab.vue'
 import { docString } from './docs'
+import { getRuleset } from '../firebase/rulesets'
+import { setRoom } from '../firebase/network'
+import { randomWord } from '../words/lists'
 
 function buildCode(states) {
   const emptyCode = `// TODO: Fill this in`
@@ -355,6 +358,26 @@ export default {
     roomHelpers.player.timerLength = 90
     return Object.assign(roomHelpers, { user })
   },
+  async created() {
+    // If no ID was provided by vue router, create a new room
+    // TODO: Force the player to login first
+    if (this.$route.params.id === undefined) {
+      const template = await getRuleset('wordone')
+      const gameName =
+        randomWord('adjectives') + '-' + randomWord('nouns') + '-game'
+
+      const newRoom = cloneDeep(template)
+      newRoom.metadata.status = 'DRAFT'
+      newRoom.metadata.creatorId = this.user.id
+      newRoom.metadata.creatorName = this.user.name
+      newRoom.name = gameName
+      await setRoom(newRoom)
+
+      // Force a reload to the new room
+      alert(`Creating a new game: ${gameName}!`)
+      window.location = `/builder/${gameName}`
+    }
+  },
   // We use watches instead of computed functions, to invoke Editor's methods
   watch: {
     currentLayout() {
@@ -379,7 +402,22 @@ export default {
   },
   methods: {
     saveRuleset() {
-      const updates = {}
+      // Alert the user if the game is owned by someone else.
+      if (
+        this.$roomx.metadata.creatorId &&
+        this.$roomx.metadata.creatorId !== this.user.id
+      ) {
+        alert(
+          `This game is owned by ${this.$roomx.metadata.creatorName}.\n` +
+            `To edit it, make a copy from 'SETTINGS' > 'Change ID'`
+        )
+        return
+      }
+
+      const updates = {
+        'metadata.creatorName': this.user.name,
+        'metadata.creatorId': this.user.id,
+      }
       for (const state of this.$roomx.rules.states) {
         updates[`code.${state}`] = this.draftCode[state]
         for (const role of this.$roomx.rules.roles) {
