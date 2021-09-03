@@ -423,7 +423,8 @@ export default {
         return value
       }
       // Return a copy without these fields:
-      const mask = ({ layouts, rules, code, selection, ...rest }) => rest
+      const mask = ({ layouts, rules, code, selection, metadata, ...rest }) =>
+        rest
       // Return a copy with only these fields:
       // const mask = ({ state, round }) => ({ state, round })
       // Return a copy
