@@ -85,8 +85,8 @@ export function useRoom(
 
     if (!fetchedRoom) {
       // 1. If the room doesn't exist yet, create it
-      // merge = true so we don't clobber the room's existing people
-      // Known issue: Creating as a guest leads to 'Anon'
+      // (merge = true so we don't clobber the room's existing people,
+      // which could happen when many clients resetRoom() at once)
       await resetRoom(true)
 
       // 1.5. If room should be private ('?private=1'), privatize & clean the URL

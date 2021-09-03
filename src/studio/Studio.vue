@@ -296,7 +296,6 @@ function makeNewRoom(name) {
       state: rules.states[0],
       role: rules.roles[0],
       canvas: 'LAYOUT',
-      duplicateName: 'game-copy',
     },
   }
 }
