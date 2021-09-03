@@ -82,6 +82,8 @@ const routes = [
   },
   { path: '/studio', component: Studio, meta: { title: 'Studio' } },
   { path: '/studio/:id', component: Studio, meta: { title: 'Studio' } },
+  { path: '/builder', component: Studio, meta: { title: 'Builder' } },
+  { path: '/builder/:id', component: Studio, meta: { title: 'Builder' } },
   {
     path: '/preview/:id',
     component: StudioPreview,
