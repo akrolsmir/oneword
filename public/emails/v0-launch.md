@@ -2,9 +2,7 @@
 
 Hi there,
 
-Thanks for your interest in One Word's Game Builder!
-I'm excited to share the very first prototype of our Builder with you.
-Check it out here: https://oneword.games/builder
+Today, we're launching our Game Builder prototype to a small group of creators (including you!) Check it out at https://oneword.games/builder 😁
 
 Right now, what's supported:
 
@@ -12,14 +10,14 @@ Right now, what's supported:
 - Program simple game logic in Javascript
 - Playtest and debug your creation
 
-Over the next coming weeks, we'll be adding more features:
+And here's what we're working on, over the next few weeks:
 
 - Publish your game for anyone to play online
 - Undo/redo support
 - More game templates, components, and word lists
 
-Things are still _super_ rough, but we really want to hear
-your questions and feedback - just reply to this email,
+Things are still _super_ rough, so any questions or feedback would be
+really valuable - just reply to this email,
 or join us on [Discord](https://discord.com/invite/AP7ssVPPCr)!
 
 Best,  
