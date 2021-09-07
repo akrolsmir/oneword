@@ -19,11 +19,7 @@
           <p class="subtitle is-6">{{ metadata.description }}</p>
 
           <p>
-            Made by Austin · Inspired by
-            <a
-              href="https://www.boardgamegeek.com/boardgame/2938/the-spyfall-game"
-              >The Spyfall Game</a
-            >
+            <i>By {{ metadata.creatorName }}</i>
           </p>
         </div>
       </div>
