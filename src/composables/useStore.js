@@ -8,6 +8,7 @@ import {
   inputy,
   getPlayers,
   pickRandom,
+  shuffle,
 } from '../studio/api'
 import {
   flattenPaths,
@@ -116,6 +117,7 @@ function compute(room) {
     const sandbox = {
       ...CURRIED_API,
       pickRandom,
+      shuffle,
       WORDLISTS,
       room,
       Boolean,
