@@ -37,6 +37,7 @@ export function useStore() {
 
   function $setx(room) {
     // Effectively `$roomx = room`, but keeps the same reactive reference
+    Object.keys($roomx).forEach((key) => delete $roomx[key])
     Object.assign($roomx, room)
   }
 
