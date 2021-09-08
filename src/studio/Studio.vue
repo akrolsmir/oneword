@@ -192,7 +192,10 @@
               </template>
             </div>
 
-            <button class="button is-primary is-light mt-6" @click="resetRound">
+            <button
+              class="button is-primary is-light mt-6"
+              @click="resetPlaytest"
+            >
               Reset game data</button
             ><br />
           </template>
@@ -259,7 +262,7 @@ import CraftExport from './components/CraftExport.vue'
 import { inject, markRaw, onMounted } from 'vue'
 import { useRoom } from '../composables/useRoom'
 import MonacoEditor from './MonacoEditor.vue'
-import cloneDeep from 'lodash/cloneDeep'
+import { cloneDeep, pickBy } from 'lodash'
 import BulmaTabs from '../components/BulmaTabs.vue'
 import PublishTab from './PublishTab.vue'
 import { docString } from './docs'
@@ -347,7 +350,7 @@ export default {
       toolIcons,
     }
   },
-  inject: ['$roomx', '$updatex', '$playerx'],
+  inject: ['$roomx', '$updatex', '$playerx', '$setx'],
   setup() {
     const showNavbar = inject('showNavbar')
     onMounted(() => showNavbar(false))
@@ -432,14 +435,23 @@ export default {
         this.user.signIn()
       }
     },
-    resetRound() {
-      // MESSY: should start from makeNewRoom(), probably
+    resetPlaytest() {
+      // Strip out everything but the ruleset data
+      const newRoom = pickBy(this.$roomx, (v, k) =>
+        ['name', 'layouts', 'rules', 'code', 'selection', 'metadata'].includes(
+          k
+        )
+      )
+      this.$setx(newRoom)
+
+      // Then re-initialize gameplay data
       this.$roomx.history = []
       this.$roomx.round = {
         roles: {},
       }
       this.$roomx.people = {}
-      this.$roomx.state = 'DRAWING'
+      this.$roomx.players = []
+      this.$roomx.state = this.$roomx.rules.states[0]
       for (const tester of this.$roomx.rules.testers) {
         this.$roomx.round.roles[tester] = this.selection.role
         this.$roomx.people[tester] = {}
