@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <meta charset="utf-8" />
 
-<!-- Buefy isn't on Vue3 yet, so this is a Vue2 file -->
+<!-- Buefy isn't on Vue3 yet, so this is a Vue2 file
+  TODO: Consider porting to Vue3 using AGGrid: https://www.npmjs.com/package/ag-grid-vue3
+  This would allow code sharing of network code -->
 
 <head>
   <title>One Word Admin</title>
@@ -128,6 +130,9 @@
       </b-table>
       <button class="button" @click="fetchUsers">Refresh users</button>
       <button class="button" @click="exportUsers">Export users to CSV</button>
+      <button class="button" @click="exportCreators">
+        Export creators to CSV
+      </button>
       <button class="button" @click="uploadContacts">
         Upload newest 100 contacts
       </button>
@@ -144,6 +149,7 @@
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-firestore.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-functions.js"></script>
+<script src="../src/firebase/users.js"></script>
 
 <!-- My code -->
 <script type="module">
@@ -245,6 +251,11 @@
         writeToFile('users.csv', csv)
         // Note: Also try sticking in lastUpdateTime for recency info
       },
+      async exportCreators() {
+        const creators = await listCreators()
+        const csv = usersToMailjetCsv(creators)
+        writeToFile('creators.csv', csv)
+      },
       async uploadContacts() {
         const response = await addContactsToMailjet()
         console.log('Uploaded contacts', response)
@@ -310,5 +321,47 @@
   function countGames(user, roomDb) {
     const gamesList = Object.values(user.games || {})
     return gamesList.filter((game) => game.roomDb === roomDb).length
+  }
+
+  async function listCreators() {
+    // First, get a list of all rulesets
+    const query = await firebase.firestore().collection('rulesets-v0').get()
+    const rulesets = query.docs
+      .map((doc) => doc.data())
+      .slice()
+      .reverse()
+
+    // Then, find the valid creatorIds for these rulesets
+    const creatorIds = rulesets
+      .map((ruleset) => ruleset.metadata.creatorId)
+      .filter(Boolean)
+    return await listUsersByIdBatch(creatorIds)
+  }
+
+  async function listUsersById(userIds) {
+    const users = await firebase
+      .firestore()
+      .collection('users')
+      .where('id', 'in', userIds)
+      .get()
+    return users.docs.map((doc) => doc.data())
+  }
+
+  // Reimplementation of lodash's chunk()
+  function chunk(array, size) {
+    const chunked = []
+    for (let i = 0; i < array.length; i += size) {
+      chunked.push(array.slice(i, i + size))
+    }
+    return chunked
+  }
+
+  // Firestore limits `where id in X` queries to 10 ids, so we fanout here.
+  async function listUsersByIdBatch(userIds) {
+    const userIdsChunks = chunk(userIds, 10)
+    const users = await Promise.all(
+      userIdsChunks.map((userIdsChunk) => listUsersById(userIdsChunk))
+    )
+    return users.flat()
   }
 </script>
