@@ -8,6 +8,7 @@ import {
   inputy,
   getPlayers,
   pickRandom,
+  shuffle,
 } from '../studio/api'
 import {
   flattenPaths,
@@ -37,6 +38,7 @@ export function useStore() {
 
   function $setx(room) {
     // Effectively `$roomx = room`, but keeps the same reactive reference
+    Object.keys($roomx).forEach((key) => delete $roomx[key])
     Object.assign($roomx, room)
   }
 
@@ -115,6 +117,7 @@ function compute(room) {
     const sandbox = {
       ...CURRIED_API,
       pickRandom,
+      shuffle,
       WORDLISTS,
       room,
       Boolean,

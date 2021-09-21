@@ -41,7 +41,7 @@
 
 /* Set the background to be full-height and blue */
 #library {
-  height: 100vh;
+  min-height: 100vh;
   background-color: #1e40af;
 }
 </style>
@@ -60,6 +60,10 @@ export default {
   async created() {
     // Load rulesets from Firestore
     this.rulesets = await listRulesets()
+    // Only show rulesets that have metadata.creatorName filled in
+    this.rulesets = this.rulesets.filter(
+      (ruleset) => ruleset.metadata.creatorName
+    )
   },
   methods: {
     navigateTo(rulesetId) {
