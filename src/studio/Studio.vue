@@ -35,12 +35,6 @@
               </template>
             </Blueprint>
           </template>
-
-          <div class="p-1 mt-6">
-            <figure class="image is-32x32 mt-6">
-              <img :src="`/images/tool-icons/HelpIcon32.svg`" />
-            </figure>
-          </div>
         </div>
 
         <!-- Center: Main editor area -->
@@ -83,7 +77,22 @@
                 </div>
                 <div class="column">
                   <!-- Where the per-state logic resides -->
-                  <h2 class="subtitle">Logic for {{ state }}</h2>
+                  <h2 class="subtitle">
+                    Logic for {{ state }}
+                    <a
+                      target="_blank"
+                      href="https://boardless.notion.site/Boardless-Games-API-3982d7177d9946e3923a1273b9aa8eaa"
+                      v-tippy="{
+                        content: `Logic help`,
+                        placement: 'right',
+                      }"
+                    >
+                      <span class="icon is-small ml-2">
+                        <img
+                          :src="`/images/tool-icons/HelpIcon32.svg`"
+                        /> </span
+                    ></a>
+                  </h2>
                   <MonacoEditor v-model="draftCode[state]" />
                 </div>
               </div>
@@ -150,28 +159,6 @@
                 <br />
               </template>
             </div>
-          </template>
-
-          <template v-if="selection.canvas === 'LOGIC'">
-            <h2 class="title is-4 mt-4">
-              <a
-                target="_blank"
-                href="https://www.notion.so/boardless/Boardless-Games-API-3982d7177d9946e3923a1273b9aa8eaa"
-                >Documentation</a
-              >
-            </h2>
-            <h2 class="title is-4">
-              <a
-                target="_blank"
-                href="https://www.notion.so/boardless/Boardless-Games-API-3982d7177d9946e3923a1273b9aa8eaa"
-                >Game examples</a
-              >
-            </h2>
-            <h2 class="title is-4">
-              <a target="_blank" href="https://discord.com/invite/AP7ssVPPCr"
-                >Stuck? Chat with us on Discord!</a
-              >
-            </h2>
           </template>
 
           <template v-if="selection.canvas === 'PLAYTEST'">
