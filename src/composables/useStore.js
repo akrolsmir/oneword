@@ -127,6 +127,7 @@ function compute(room, $playerx) {
     const compiled = compileCode(room.code[room.state])
     // Run the code on our sandbox
     compiled(sandbox)
+    $playerx.errors = {}
   } catch (e) {
     // Ugly hack: Expose to Studio by communicating over $playerx.errors
     $playerx.errors = { [room.state]: e.stack }
