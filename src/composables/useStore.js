@@ -124,13 +124,16 @@ function compute(room, $playerx) {
       console,
     }
     // Just compile the rule that we need:
-    const compiled = compileCode(room.code[room.state])
+    const codeString = room.code[room.state]
+    const compiled = compileCode(codeString)
     // Run the code on our sandbox
     compiled(sandbox)
     $playerx.errors = {}
   } catch (e) {
     // Ugly hack: Expose to Studio by communicating over $playerx.errors
-    $playerx.errors = { [room.state]: e.stack }
+    // Show just the first line of the stack trace
+    const stack = e.stack.split('\n').slice(0, 1).join('\n')
+    $playerx.errors = { [room.state]: stack }
   }
 }
 
@@ -148,6 +151,7 @@ function compute(room, $playerx) {
 // Maybe solve with iframes and postMessage?
 // See: https://medium.com/zendesk-engineering/sandboxing-javascript-e4def55e855e
 // Maybe solve with a sandbox library: https://github.com/asvd/jailed
+// Jailed is complex (supports Node.js), and old; try just grabbing it as vendor code?
 const sandboxProxies = new WeakMap()
 
 function compileCode(src) {
