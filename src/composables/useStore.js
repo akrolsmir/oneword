@@ -66,7 +66,7 @@ export function useStore() {
     () => cloneDeep($roomx),
     (roomx, prev) => {
       // Run game logic and update room as appropriate
-      compute(roomx)
+      compute(roomx, $playerx)
 
       // Identify the new paths in this room -- to scope down Firestore push
       const diff = flattenPaths(objectDiff(prev, roomx))
@@ -96,7 +96,7 @@ export function useStore() {
   }
 }
 
-function compute(room) {
+function compute(room, $playerx) {
   try {
     const API = {
       inputs,
@@ -128,9 +128,8 @@ function compute(room) {
     // Run the code on our sandbox
     compiled(sandbox)
   } catch (e) {
-    // TODO: Map stack trace to user's code? And surface to user.
-    console.error(`Error with computing: ${e.stack}`)
-    console.error('Code was:', room.code?.[room.state])
+    // Ugly hack: Expose to Studio by communicating over $playerx.errors
+    $playerx.errors = { [room.state]: e.stack }
   }
 }
 

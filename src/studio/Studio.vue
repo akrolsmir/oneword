@@ -94,6 +94,8 @@
                     ></a>
                   </h2>
                   <MonacoEditor v-model="draftCode[state]" />
+                  <!-- Warn on errors -->
+                  <ErrorTrace :trace="$playerx.errors?.[state]" />
                 </div>
               </div>
             </template>
@@ -249,6 +251,7 @@ import CraftExport from './components/CraftExport.vue'
 import { inject, markRaw, onMounted } from 'vue'
 import { useRoom } from '../composables/useRoom'
 import MonacoEditor from './MonacoEditor.vue'
+import ErrorTrace from './ErrorTrace.vue'
 import { cloneDeep, pickBy } from 'lodash'
 import BulmaTabs from '../components/BulmaTabs.vue'
 import PublishTab from './PublishTab.vue'
@@ -326,6 +329,7 @@ export default {
     Blueprint,
     CraftExport,
     MonacoEditor,
+    ErrorTrace,
     BulmaTabs,
     PublishTab,
   },
