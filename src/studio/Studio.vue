@@ -259,6 +259,7 @@ import { docString } from './docs'
 import { getRuleset } from '../firebase/rulesets'
 import { setRoom } from '../firebase/network'
 import { randomWord } from '../words/lists'
+import { useHotkey } from '../composables/useHotkey'
 
 function buildCode(states) {
   const emptyCode = `// TODO: Fill this in`
@@ -341,7 +342,7 @@ export default {
       toolIcons,
     }
   },
-  inject: ['$roomx', '$updatex', '$playerx', '$setx'],
+  inject: ['$roomx', '$updatex', '$playerx', '$setx', '$undo', '$redo'],
   setup() {
     const showNavbar = inject('showNavbar')
     onMounted(() => showNavbar(false))
@@ -369,6 +370,12 @@ export default {
       alert(`Creating a new game: ${gameName}!`)
       window.location = `/builder/${gameName}`
     }
+
+    useHotkey({
+      'c+shift+z': this.$redo,
+      'c+z': this.$undo,
+      'c+s': this.saveRuleset,
+    })
   },
   // We use watches instead of computed functions, to invoke Editor's methods
   watch: {
