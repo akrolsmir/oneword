@@ -47,6 +47,7 @@ body {
 <script>
 import MonacoEditor from './MonacoEditor.vue'
 import { useIngot } from '../composables/useIngot'
+import { useHotkey } from '../composables/useHotkey'
 
 export default {
   components: { MonacoEditor },
@@ -63,34 +64,17 @@ export default {
   created() {
     this.ingotx.active = 300000 // To trigger the watch
     console.log('ingot.changesArray', this.changesArray)
+    useHotkey({
+      'c+s': this.saveRoom,
+      'c+shift+z': this.redo,
+      'c+z': this.undo,
+    })
   },
   watch: {
     'ingotx.active'() {
       const localRoom = this.current
       this.localRoomString = 'let room = ' + JSON.stringify(localRoom, null, 2)
     },
-  },
-  // Listen for ctrl+z and ctrl+shift+z codes
-  // TODO: Could pull out into useKeyboard hook
-  mounted() {
-    this.keyListener = document.addEventListener('keydown', (event) => {
-      if (event.code == 'KeyZ' && (event.ctrlKey || event.metaKey)) {
-        if (event.shiftKey) {
-          this.redo()
-        } else {
-          this.undo()
-        }
-        event.preventDefault()
-      }
-      if (event.code == 'KeyS' && (event.ctrlKey || event.metaKey)) {
-        this.saveRoom()
-        event.preventDefault()
-      }
-    })
-  },
-  unmounted() {
-    // We don't want the listener to exist after we exit this component
-    document.removeEventListener('keydown', this.keyListener)
   },
   methods: {
     stringifyDiff,
