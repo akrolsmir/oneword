@@ -8,7 +8,7 @@
     >
       <div class="columns is-gapless">
         <div class="column is-narrow mx-2 mt-6">
-          <!-- Left: For each component, create a draggable Blueprint -->
+          <!-- Left Toolbar: For each component, create a draggable Blueprint -->
           <template
             v-for="item in [
               'Paragraph',
@@ -40,6 +40,39 @@
               </template>
             </Blueprint>
           </template>
+
+          <!-- Undo/Redo icons, a bit below the Blueprints -->
+          <div class="mt-6">
+            <figure
+              class="image is-32x32 tool"
+              v-tippy="{
+                content: `Undo (Ctrl + Z)`,
+                placement: 'right',
+              }"
+              @click="$undo"
+            >
+              <img
+                :src="`/images/tool-icons/undo_black_36dp.svg`"
+                width="32"
+                height="32"
+              />
+            </figure>
+
+            <figure
+              class="image is-32x32 tool"
+              v-tippy="{
+                content: `Redo (Ctrl + Shift + Z)`,
+                placement: 'right',
+              }"
+              @click="$redo"
+            >
+              <img
+                :src="`/images/tool-icons/redo_black_36dp.svg`"
+                width="32"
+                height="32"
+              />
+            </figure>
+          </div>
         </div>
 
         <!-- Center: Main editor area -->
@@ -148,7 +181,7 @@
               class="button is-primary is-light mt-6"
               @click="saveRuleset"
             >
-              Save Changes</button
+              Save Changes (Ctrl + S)</button
             ><br />
 
             <div class="control">
@@ -212,6 +245,10 @@
 [draggable='true']:hover {
   box-shadow: 0px 0px 4px 4px rgba(0, 128, 0, 0.432);
   cursor: move;
+}
+
+.tool {
+  cursor: pointer;
 }
 
 .subtitle {
