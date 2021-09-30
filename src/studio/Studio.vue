@@ -1,6 +1,11 @@
 <template>
   <div id="studio" class="pt-4">
-    <Editor ref="editor" component="div" :resolverMap="resolverMap">
+    <Editor
+      ref="editor"
+      component="div"
+      :resolverMap="resolverMap"
+      @change="debouncedSaveRuleset"
+    >
       <div class="columns is-gapless">
         <div class="column is-narrow mx-2 mt-6">
           <!-- Left: For each component, create a draggable Blueprint -->
@@ -260,6 +265,7 @@ import { getRuleset } from '../firebase/rulesets'
 import { setRoom } from '../firebase/network'
 import { randomWord } from '../words/lists'
 import { useHotkey } from '../composables/useHotkey'
+import { debounce } from '../utils'
 
 function buildCode(states) {
   const emptyCode = `// TODO: Fill this in`
@@ -376,6 +382,8 @@ export default {
       'c+z': this.$undo,
       'c+s': this.saveRuleset,
     })
+
+    this.debouncedSaveRuleset = debounce(this.saveRuleset, 1000)
   },
   // We use watches instead of computed functions, to invoke Editor's methods
   watch: {

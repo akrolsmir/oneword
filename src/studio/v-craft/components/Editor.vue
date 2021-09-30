@@ -21,6 +21,15 @@ export default {
       editor: new Editor([], this.resolverMap),
     }
   },
+  emits: ['change'],
+  watch: {
+    'editor.frames': {
+      handler(editor) {
+        this.$emit('change')
+      },
+      deep: true,
+    },
+  },
   created() {
     if (this.import) {
       this.editor.import(this.import)
