@@ -20,6 +20,15 @@ export function useHotkey(config) {
     cmd: ['metaKey'],
   }
 
+  // Create a mapping of lowercase letters to KeyboardEvent.code values
+  // E.g. {a: 'KeyA', s: 'KeyS', ...}
+  // See https://javascript.info/keyboard-events#event-code-and-event-key
+  const codes = {}
+  const alphabet = 'abcdefghijklmnopqrstuvwxyz'
+  for (const char of alphabet) {
+    codes[char] = `Key${char.toUpperCase()}`
+  }
+
   // Example condition: {key: 's', modifiers: ['ctrl', 'shift'], action: save}
   const conditions = Object.keys(config).map((shortcut) => {
     const [key, ...modifiers] = shortcut.split('+').reverse()
@@ -39,12 +48,10 @@ export function useHotkey(config) {
   onMounted(() => {
     listener = window.addEventListener('keydown', (event) => {
       for (const condition of conditions) {
-        if (
-          condition.key === event.key &&
-          condition.modifiers.every((modifier) =>
-            checkModifier(modifier, event)
-          )
-        ) {
+        const modifiersPressed = condition.modifiers.every((modifier) =>
+          checkModifier(modifier, event)
+        )
+        if (codes[condition.key] === event.code && modifiersPressed) {
           condition.action()
           event.preventDefault()
           // Exit after the first match
