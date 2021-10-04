@@ -19,7 +19,7 @@
         :node="selectedNode"
       ></component>
 
-      <button class="button mt-2" @click="duplicateSelected">Copy</button>
+      <button class="button mt-2" @click="duplicateSelected">Duplicate</button>
 
       <button class="button mt-2" @click="removeSelected">Delete</button>
     </div>

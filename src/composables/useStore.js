@@ -19,6 +19,7 @@ import {
   replaceValues,
 } from '../utils'
 import { adjectives, nouns, verbs } from '../words/parts-of-speech'
+import { useIngot } from './useIngot'
 
 export function useStore() {
   // $roomx is the same as this.room; eventually, deprecate the latter
@@ -31,6 +32,8 @@ export function useStore() {
   // Pros: Components can share additional info (e.g. player.name)
   // Cons: More ambiguity/complexity?
 
+  const ingot = useIngot()
+
   // All writes to $roomx
   function $updatex(changes) {
     Object.entries(changes).map(([path, value]) => setIn($roomx, path, value))
@@ -38,6 +41,12 @@ export function useStore() {
 
   function $setx(room) {
     // Effectively `$roomx = room`, but keeps the same reactive reference
+    setWithoutIngot(room)
+    ingot.set(room)
+  }
+
+  // Escape hatch for undoing/redoing to set roomx without leaving a diff
+  function setWithoutIngot(room) {
     Object.keys($roomx).forEach((key) => delete $roomx[key])
     Object.assign($roomx, room)
   }
@@ -60,16 +69,30 @@ export function useStore() {
     return text.replace(/\[\[(.+?)\]\]/, replacer)
   }
 
+  const $undo = function () {
+    ingot.undo()
+    setWithoutIngot(ingot.current.value)
+  }
+  const $redo = function () {
+    ingot.redo()
+    setWithoutIngot(ingot.current.value)
+  }
+
   // Whenever props of roomx change, push the corresponding change to Firestore
   // From https://v3.vuejs.org/guide/reactivity-computed-watchers.html#watching-reactive-objects
   watch(
-    () => cloneDeep($roomx),
-    (roomx, prev) => {
+    () => [cloneDeep($roomx), ingot.ingotx.active],
+    ([roomx, active], [prevRoomx, prevActive]) => {
+      if (active != prevActive) {
+        // If the active pointer changed, this is an undo/redo; don't push to Firestore
+        return
+      }
+
       // Run game logic and update room as appropriate
-      compute(roomx)
+      compute(roomx, $playerx)
 
       // Identify the new paths in this room -- to scope down Firestore push
-      const diff = flattenPaths(objectDiff(prev, roomx))
+      const diff = flattenPaths(objectDiff(prevRoomx, roomx))
       // If there are no changes, we just got back from a Firestore pull
       // If the room name changed, we swapped from initial zero state
       // So only push when: 1. There are changes, and 2. the room name is the same
@@ -78,6 +101,9 @@ export function useStore() {
         const deleteDiff = replaceValues(diff, undefined, DELETE)
         console.warn('Applying diff:', deleteDiff)
         /* no await */ updateRoom(roomx, deleteDiff)
+
+        // Also register the diff in ingot
+        ingot.apply(diff)
 
         // TODO: Can we debounce changes here, instead of per-input?
         // Note: Vue batches multiple updates within the same tick:
@@ -93,10 +119,12 @@ export function useStore() {
     $playerx,
     $inputx,
     $interpolatex,
+    $undo,
+    $redo,
   }
 }
 
-function compute(room) {
+function compute(room, $playerx) {
   try {
     const API = {
       inputs,
@@ -124,13 +152,16 @@ function compute(room) {
       console,
     }
     // Just compile the rule that we need:
-    const compiled = compileCode(room.code[room.state])
+    const codeString = room.code[room.state]
+    const compiled = compileCode(codeString)
     // Run the code on our sandbox
     compiled(sandbox)
+    $playerx.errors = {}
   } catch (e) {
-    // TODO: Map stack trace to user's code? And surface to user.
-    console.error(`Error with computing: ${e.stack}`)
-    console.error('Code was:', room.code?.[room.state])
+    // Ugly hack: Expose to Studio by communicating over $playerx.errors
+    // Show just the first line of the stack trace
+    const stack = e.stack.split('\n').slice(0, 1).join('\n')
+    $playerx.errors = { [room.state]: stack }
   }
 }
 
@@ -148,6 +179,7 @@ function compute(room) {
 // Maybe solve with iframes and postMessage?
 // See: https://medium.com/zendesk-engineering/sandboxing-javascript-e4def55e855e
 // Maybe solve with a sandbox library: https://github.com/asvd/jailed
+// Jailed is complex (supports Node.js), and old; try just grabbing it as vendor code?
 const sandboxProxies = new WeakMap()
 
 function compileCode(src) {

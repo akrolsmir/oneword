@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import Editor from '../core/Editor';
+import Editor from '../core/Editor'
 
 export default {
   props: {
@@ -19,17 +19,26 @@ export default {
   data() {
     return {
       editor: new Editor([], this.resolverMap),
-    };
+    }
+  },
+  emits: ['change'],
+  watch: {
+    'editor.frames': {
+      handler(editor) {
+        this.$emit('change')
+      },
+      deep: true,
+    },
   },
   created() {
     if (this.import) {
-      this.editor.import(this.import);
+      this.editor.import(this.import)
     }
   },
   provide() {
     return {
       editor: this.editor,
-    };
+    }
   },
-};
+}
 </script>

@@ -55,6 +55,14 @@ class Editor {
     this.selectedNode = node
   }
 
+  // Selects the node with the same uuid
+  // Use after re-importing, because importing creates a new node object.
+  reselectNode() {
+    if (this.selectedNode) {
+      this.selectNode(this.findNode(this.selectedNode.uuid))
+    }
+  }
+
   dragNode(node) {
     this.draggedNode = node
   }
@@ -103,9 +111,10 @@ class Editor {
     try {
       // If plainNodesData is not provided, default to an empty container
       const nodesData = JSON.parse(plainNodesData || emptyLayout())
-      this.frames[frameId] = nodesData.map((data) =>
-        Node.unserialize(this, data)
-      )
+      const nodes = nodesData.map((data) => Node.unserialize(this, data))
+      this.frames[frameId] = nodes
+      this.initializeNodeMap(nodes)
+      this.reselectNode()
     } catch (e) {
       throw new Error('Invalid node data: ', plainNodesData, '\n', e)
     }

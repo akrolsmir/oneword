@@ -1,9 +1,14 @@
 <template>
   <div id="studio" class="pt-4">
-    <Editor ref="editor" component="div" :resolverMap="resolverMap">
+    <Editor
+      ref="editor"
+      component="div"
+      :resolverMap="resolverMap"
+      @change="debouncedSaveRuleset"
+    >
       <div class="columns is-gapless">
         <div class="column is-narrow mx-2 mt-6">
-          <!-- Left: For each component, create a draggable Blueprint -->
+          <!-- Left Toolbar: For each component, create a draggable Blueprint -->
           <template
             v-for="item in [
               'Paragraph',
@@ -36,9 +41,36 @@
             </Blueprint>
           </template>
 
-          <div class="p-1 mt-6">
-            <figure class="image is-32x32 mt-6">
-              <img :src="`/images/tool-icons/HelpIcon32.svg`" />
+          <!-- Undo/Redo icons, a bit below the Blueprints -->
+          <div class="mt-6">
+            <figure
+              class="image is-32x32 tool"
+              v-tippy="{
+                content: `Undo (Ctrl + Z)`,
+                placement: 'right',
+              }"
+              @click="$undo"
+            >
+              <img
+                :src="`/images/tool-icons/undo_black_36dp.svg`"
+                width="32"
+                height="32"
+              />
+            </figure>
+
+            <figure
+              class="image is-32x32 tool"
+              v-tippy="{
+                content: `Redo (Ctrl + Shift + Z)`,
+                placement: 'right',
+              }"
+              @click="$redo"
+            >
+              <img
+                :src="`/images/tool-icons/redo_black_36dp.svg`"
+                width="32"
+                height="32"
+              />
             </figure>
           </div>
         </div>
@@ -83,8 +115,25 @@
                 </div>
                 <div class="column">
                   <!-- Where the per-state logic resides -->
-                  <h2 class="subtitle">Logic for {{ state }}</h2>
+                  <h2 class="subtitle">
+                    Logic for {{ state }}
+                    <a
+                      target="_blank"
+                      href="https://boardless.notion.site/Boardless-Games-API-3982d7177d9946e3923a1273b9aa8eaa"
+                      v-tippy="{
+                        content: `Logic help`,
+                        placement: 'right',
+                      }"
+                    >
+                      <span class="icon is-small ml-2">
+                        <img
+                          :src="`/images/tool-icons/HelpIcon32.svg`"
+                        /> </span
+                    ></a>
+                  </h2>
                   <MonacoEditor v-model="draftCode[state]" />
+                  <!-- Warn on errors -->
+                  <ErrorTrace :trace="$playerx.errors?.[state]" />
                 </div>
               </div>
             </template>
@@ -132,7 +181,7 @@
               class="button is-primary is-light mt-6"
               @click="saveRuleset"
             >
-              Save Changes</button
+              Save Changes (Ctrl + S)</button
             ><br />
 
             <div class="control">
@@ -150,28 +199,6 @@
                 <br />
               </template>
             </div>
-          </template>
-
-          <template v-if="selection.canvas === 'LOGIC'">
-            <h2 class="title is-4 mt-4">
-              <a
-                target="_blank"
-                href="https://www.notion.so/boardless/Boardless-Games-API-3982d7177d9946e3923a1273b9aa8eaa"
-                >Documentation</a
-              >
-            </h2>
-            <h2 class="title is-4">
-              <a
-                target="_blank"
-                href="https://www.notion.so/boardless/Boardless-Games-API-3982d7177d9946e3923a1273b9aa8eaa"
-                >Game examples</a
-              >
-            </h2>
-            <h2 class="title is-4">
-              <a target="_blank" href="https://discord.com/invite/AP7ssVPPCr"
-                >Stuck? Chat with us on Discord!</a
-              >
-            </h2>
           </template>
 
           <template v-if="selection.canvas === 'PLAYTEST'">
@@ -220,6 +247,10 @@
   cursor: move;
 }
 
+.tool {
+  cursor: pointer;
+}
+
 .subtitle {
   margin-bottom: 0.5rem !important;
   margin-top: 2rem;
@@ -262,6 +293,7 @@ import CraftExport from './components/CraftExport.vue'
 import { inject, markRaw, onMounted } from 'vue'
 import { useRoom } from '../composables/useRoom'
 import MonacoEditor from './MonacoEditor.vue'
+import ErrorTrace from './ErrorTrace.vue'
 import { cloneDeep, pickBy } from 'lodash'
 import BulmaTabs from '../components/BulmaTabs.vue'
 import PublishTab from './PublishTab.vue'
@@ -269,6 +301,8 @@ import { docString } from './docs'
 import { getRuleset } from '../firebase/rulesets'
 import { setRoom } from '../firebase/network'
 import { randomWord } from '../words/lists'
+import { useHotkey } from '../composables/useHotkey'
+import { debounce } from '../utils'
 
 function buildCode(states) {
   const emptyCode = `// TODO: Fill this in`
@@ -339,6 +373,7 @@ export default {
     Blueprint,
     CraftExport,
     MonacoEditor,
+    ErrorTrace,
     BulmaTabs,
     PublishTab,
   },
@@ -350,7 +385,7 @@ export default {
       toolIcons,
     }
   },
-  inject: ['$roomx', '$updatex', '$playerx', '$setx'],
+  inject: ['$roomx', '$updatex', '$playerx', '$setx', '$undo', '$redo'],
   setup() {
     const showNavbar = inject('showNavbar')
     onMounted(() => showNavbar(false))
@@ -378,6 +413,14 @@ export default {
       alert(`Creating a new game: ${gameName}!`)
       window.location = `/builder/${gameName}`
     }
+
+    useHotkey({
+      'c+shift+z': this.$redo,
+      'c+z': this.$undo,
+      'c+s': this.saveRuleset,
+    })
+
+    this.debouncedSaveRuleset = debounce(this.saveRuleset, 1000)
   },
   // We use watches instead of computed functions, to invoke Editor's methods
   watch: {

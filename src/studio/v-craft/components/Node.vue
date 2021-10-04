@@ -15,8 +15,8 @@
 </template>
 
 <script>
-import Node from '../core/Node';
-import NodeService from '../core/services/NodeService';
+import Node from '../core/Node'
+import NodeService from '../core/services/NodeService'
 
 export default {
   name: 'Node',
@@ -27,68 +27,68 @@ export default {
   data() {
     return {
       nodeService: new NodeService(this),
-    };
+    }
   },
   computed: {
     isSelected() {
-      return this.node === this.editor.selectedNode;
+      return this.node === this.editor.selectedNode
     },
     isDraggable() {
-      return this.editor.enabled && this.node.isDraggable();
+      return this.editor.enabled && this.node.isDraggable()
     },
   },
   provide() {
     return {
       node: this.node,
-    };
+    }
   },
   methods: {
     cancelDefault(event) {
-      event.stopPropagation();
-      event.preventDefault();
+      event.stopPropagation()
+      event.preventDefault()
     },
     handleDragStart(event) {
-      event.stopPropagation();
+      event.stopPropagation()
 
       if (!this.editor.enabled) {
         // it is used to cancel dragging
-        event.preventDefault();
-        return;
+        event.preventDefault()
+        return
       }
 
-      this.editor.dragNode(this.node);
+      this.editor.dragNode(this.node)
     },
     handleDragOver(event) {
-      this.cancelDefault(event);
+      this.cancelDefault(event)
 
       this.nodeService.handleDragOver({
         clientX: event.clientX,
         clientY: event.clientY,
-      });
+      })
     },
     handleDrop(event) {
-      this.cancelDefault(event);
+      this.cancelDefault(event)
 
       this.nodeService.handleDrop({
         clientX: event.clientX,
         clientY: event.clientY,
-      });
+      })
     },
     handleDragEnd(event) {
-      event.stopPropagation();
+      event.stopPropagation()
 
-      this.editor.dragNode(null);
-      this.editor.indicator.hide();
+      this.editor.dragNode(null)
+      this.editor.indicator.hide()
     },
     selectNode(event) {
-      event.stopPropagation();
+      event.stopPropagation()
 
       if (!this.editor.enabled) {
-        return;
+        return
       }
 
-      this.editor.selectNode(this.node);
+      this.editor.selectNode(this.node)
     },
   },
-};
+}
 </script>
