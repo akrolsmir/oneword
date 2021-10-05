@@ -1,0 +1,17 @@
+export const axisCards = [
+  ['Good', 'Evil'],
+  ['Lawful', 'Chaotic'],
+  ['Fast', 'Slow'],
+  ['Strong', 'Weak'],
+  ['Big', 'Small'],
+  ['Science', 'Magic'],
+  ['Water', 'Fire'],
+  ['Loud', 'Quiet'],
+  ['Light', 'Dark'],
+  ['Cold', 'Hot'],
+  ['Expensive', 'Cheap'],
+  ['Old', 'New'],
+  ['Fun', 'Boring'],
+  ['High', 'Low'],
+  ['Funny', 'Serious'],
+]

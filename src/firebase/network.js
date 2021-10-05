@@ -45,6 +45,7 @@ function roomDb() {
     listorama: 'listography',
     incrypt: 'incrypt',
     pairwise: 'pairwise',
+    alignit: 'alignit',
     'asplos-2021': 'oneword-asplos',
     studio: 'rulesets-v0',
     builder: 'rulesets-v0',
