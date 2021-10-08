@@ -10,27 +10,39 @@
       />
     </template>
 
-    <h2 class="subtitle">{{ room.state }}</h2>
+    <p>Players: {{ room.players.join(', ') }}</p>
 
     <!-- 2 x 2 Grid with labeled axis -->
-    <div class="columns">
-      <div class="column"></div>
-      <div class="column">{{ room.round.xAxis?.[0] }}</div>
-      <div class="column">{{ room.round.xAxis?.[1] }}</div>
-    </div>
-    <div class="columns">
-      <div class="column">{{ room.round.yAxis?.[0] }}</div>
-      <div class="column">A</div>
-      <div class="column">B</div>
-    </div>
-    <div class="columns">
-      <div class="column">{{ room.round.yAxis?.[1] }}</div>
-      <div class="column">C</div>
-      <div class="column">D</div>
+    <div v-if="room.state !== 'START'">
+      <div class="columns pt-4">
+        <div class="column"></div>
+        <div class="column">{{ room.round.xAxis?.[0] }}</div>
+        <div class="column">{{ room.round.xAxis?.[1] }}</div>
+      </div>
+      <div class="columns">
+        <div class="column">{{ room.round.yAxis?.[0] }}</div>
+        <div class="column">A</div>
+        <div class="column">B</div>
+      </div>
+      <div class="columns">
+        <div class="column">{{ room.round.yAxis?.[1] }}</div>
+        <div class="column">C</div>
+        <div class="column">D</div>
+      </div>
     </div>
 
-    <div class="card p-4">
-      <div v-if="room.state === 'CLUING'">
+    <div class="card p-4 mt-4">
+      <div v-if="room.state === 'START'">
+        <div v-if="room.players.length < 3">
+          <p>Waiting for 3 players...</p>
+          <ShareLink />
+        </div>
+        <div v-else>
+          <button class="button primary" @click="nextRound">Start game!</button>
+        </div>
+      </div>
+
+      <div v-else-if="room.state === 'CLUING'">
         <div v-if="room.round.cluer === player.name">
           <p>Give a clue that for this alignment chart!</p>
           <p>(Try to cover as many quadrants as possible)</p>
@@ -43,17 +55,39 @@
           <p>Waiting for {{ room.round.cluer }} to give a clue...</p>
         </div>
       </div>
+
       <div v-else-if="room.state === 'VOTING'">
         What quadrant does "{{ room.round.clue }}" go in?
-        <button
-          v-for="quadrant in ['A', 'B', 'C', 'D']"
-          class="button"
-          @click="submitVote(quadrant)"
-        >
-          {{ quadrant }}
+        <div v-if="room.round.cluer === player.name">
+          Waiting for everyone to vote...
+        </div>
+        <div v-else>
+          <button
+            v-for="quadrant in ['A', 'B', 'C', 'D']"
+            class="button"
+            :class="{
+              'is-primary': room.round.votes?.[player.name] === quadrant,
+            }"
+            @click="submitVote(quadrant)"
+          >
+            {{ quadrant }}
+          </button>
+        </div>
+      </div>
+
+      <div v-else-if="room.state === 'DONE'">
+        The votes are in!
+        <p v-for="(vote, voter) in room.round.votes">
+          {{ voter }} voted for {{ vote }}
+        </p>
+        <p>
+          {{ room.round.cluer }} gets
+          {{ tallyPoints(room.round.votes) }} points!
+        </p>
+        <button class="button is-primary mt-2" @click="nextRound">
+          Next Round
         </button>
       </div>
-      <div v-else-if="room.state === 'DONE'"></div>
     </div>
 
     <!-- Mod tools -->
@@ -129,27 +163,30 @@ import { nextGuesser } from '../oneword/oneword-utils'
 function makeNewRoom(name) {
   return {
     name,
-    state: 'CLUING', // "CLUING", "VOTING", "DONE"
+    state: 'START', // "CLUING", "VOTING", "DONE"
     winningScore: 10,
     people: {},
     round: {
+      xAxis: pickRandom(axisCards),
+      yAxis: pickRandom(axisCards),
+
       // /** */ Example:
-      xAxis: ['Good', 'Evil'],
-      yAxis: ['New', 'Old'],
+      // xAxis: ['Good', 'Evil'],
+      // yAxis: ['New', 'Old'],
 
       // Grid structure should look like:
       //      Good  Evil
       // New  A     B
       // Old  C     D
 
-      cluer: 'Austin',
-      clue: 'Twitter',
+      // cluer: 'Austin',
+      // clue: 'Twitter',
 
-      votes: {
-        Alice: 'A',
-        Bob: 'B',
-        Carol: 'C',
-      },
+      // votes: {
+      //   Alice: 'A',
+      //   Bob: 'B',
+      //   Carol: 'C',
+      // },
       //*/
     },
     history: [],
@@ -172,11 +209,15 @@ export default {
     const user = inject('currentUser')
     const roomHelpers = useRoom(user, makeNewRoom)
     roomHelpers.player.timerLength = 90
-    console.log('setting up', roomHelpers)
     return Object.assign(roomHelpers, { user })
   },
-  computed: {},
+  computed: {
+    voters() {
+      return this.room.players.filter((p) => p !== this.room.round.cluer)
+    },
+  },
   methods: {
+    tallyPoints,
     submitClue() {
       updateRoom(this.room, {
         'round.clue': this.player.clue,
@@ -184,17 +225,15 @@ export default {
       })
     },
     submitVote(quadrant) {
-      const update = {
-        ['round.votes.' + this.player.name]: quadrant,
-      }
+      this.room.round.votes[this.player.name] = quadrant
+      const toSave = ['round.votes.' + this.player.name]
       // Continue to end if everyone has voted
-      if (
-        Object.keys(this.room.round.votes).length === this.room.players.length
-      ) {
-        update['state'] = 'DONE'
+      if (Object.keys(this.room.round.votes).length === this.voters.length) {
+        this.room.state = 'DONE'
+        toSave.push('state')
       }
 
-      updateRoom(this.room, update)
+      this.saveRoom(...toSave)
     },
     nextRound() {
       // Alternate between changing out the xAxis and yAxis
@@ -204,11 +243,19 @@ export default {
       this.room.history.push(this.room.round)
       this.room.round = {
         cluer: nextGuesser(this.room.round.cluer, this.room.players),
+        xAxis: this.room.round.xAxis,
+        yAxis: this.room.round.yAxis,
+        votes: {},
         [nextAxis]: pickRandom(axisCards), // TODO pick from bag instead
       }
 
       this.saveRoom('state', 'history', 'round')
     },
   },
+}
+
+function tallyPoints(votes) {
+  // Return the number of unique values in votes, by converting to a set
+  return new Set(Object.values(votes)).size
 }
 </script>
