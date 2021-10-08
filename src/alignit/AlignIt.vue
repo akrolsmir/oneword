@@ -10,11 +10,27 @@
       />
     </template>
 
-    <p>Players: {{ room.players.join(', ') }}</p>
+    <h2 class="subtitle">Players</h2>
+    <!-- Players -->
+    <div class="field is-grouped is-grouped-multiline">
+      <Nametag
+        v-for="[tagged, score] in playerScores"
+        :key="tagged"
+        class="p-1"
+        :name="tagged"
+        :score="score"
+        :user="room.people[tagged]"
+        :self="tagged === player.name"
+        :modtag="room.people && room.people[tagged]?.state === 'MOD'"
+        :mod="player.isMod"
+        @kick="kickPlayer(tagged)"
+      />
+    </div>
 
     <!-- 2 x 2 Grid with labeled axis -->
-    <div v-if="room.state !== 'START'">
-      <div class="columns pt-4">
+    <div v-if="room.state !== 'START'" class="pt-4">
+      <h2 class="subtitle">Alignment Chart</h2>
+      <div class="columns">
         <div class="column"></div>
         <div class="column">{{ room.round.xAxis?.[0] }}</div>
         <div class="column">{{ room.round.xAxis?.[1] }}</div>
@@ -38,7 +54,9 @@
           <ShareLink />
         </div>
         <div v-else>
-          <button class="button primary" @click="nextRound">Start game!</button>
+          <button class="button is-primary" @click="nextRound">
+            Start game!
+          </button>
         </div>
       </div>
 
@@ -138,6 +156,9 @@
 .background {
   background-color: #e0e7ff;
 }
+.subtitle {
+  margin-bottom: 0.25rem;
+}
 </style>
 
 <script>
@@ -215,6 +236,25 @@ export default {
     voters() {
       return this.room.players.filter((p) => p !== this.room.round.cluer)
     },
+    // Returns a sorted list eg [['Victor', 10], ['Hugo', 6]...]
+    playerScores() {
+      // Initialize scores to 0 for all players
+      let scores = {}
+      for (const player of this.room.players) {
+        scores[player] = 0
+      }
+
+      // For each round in history, tally up the points for that player
+      for (const round of this.room.history) {
+        if (this.room.players.includes(round.cluer)) {
+          scores[round.cluer] += tallyPoints(round.votes)
+        }
+      }
+      console.log('scores', scores)
+      return Object.entries(scores).sort(
+        ([p1, s1], [p2, s2]) => s2 - s1 || p1 < p2
+      )
+    },
   },
   methods: {
     tallyPoints,
@@ -230,7 +270,8 @@ export default {
       // Continue to end if everyone has voted
       if (Object.keys(this.room.round.votes).length === this.voters.length) {
         this.room.state = 'DONE'
-        toSave.push('state')
+        this.room.history.push(this.room.round)
+        toSave.push('state', 'history')
       }
 
       this.saveRoom(...toSave)
@@ -240,7 +281,6 @@ export default {
       const nextAxis = this.room.history.length % 2 === 0 ? 'xAxis' : 'yAxis'
 
       this.room.state = 'CLUING'
-      this.room.history.push(this.room.round)
       this.room.round = {
         cluer: nextGuesser(this.room.round.cluer, this.room.players),
         xAxis: this.room.round.xAxis,
@@ -249,13 +289,13 @@ export default {
         [nextAxis]: pickRandom(axisCards), // TODO pick from bag instead
       }
 
-      this.saveRoom('state', 'history', 'round')
+      this.saveRoom('state', 'round')
     },
   },
 }
 
 function tallyPoints(votes) {
   // Return the number of unique values in votes, by converting to a set
-  return new Set(Object.values(votes)).size
+  return new Set(Object.values(votes || {})).size
 }
 </script>
