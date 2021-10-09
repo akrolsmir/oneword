@@ -816,11 +816,12 @@ export default {
       await this.saveRoom('history')
     },
     async skipWord() {
-      const category = pickRandom(this.enabledCategories)
+      // Add the current word to a fake history, to generate a new random seed
+      const fakeHistory = [...this.room.history, this.room.currentRound]
       await updateRoom(this.room, {
         'currentRound.word': nextWord(
-          this.room.history,
-          category,
+          fakeHistory,
+          this.room.currentRound.category,
           this.customWordList,
           this.$t
         ),
