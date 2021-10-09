@@ -8,6 +8,9 @@
       <button class="button is-primary" @click="saveRoom">
         Save Room (Ctrl + s)
       </button>
+      <button class="button" @click="importIngot">
+        Import Ingot from JSON
+      </button>
     </div>
     <div class="column">
       <h1 class="title">History</h1>
@@ -86,6 +89,10 @@ export default {
       } catch (e) {
         console.error('Failed to edit room:\n', e)
       }
+    },
+    importIngot() {
+      const newIngot = prompt('Paste JSON version of ingot')
+      this.setIngot(JSON.parse(newIngot))
     },
   },
 }

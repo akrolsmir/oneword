@@ -111,6 +111,12 @@ export function useIngot(ingot) {
     apply(diff)
   }
 
+  function setIngot(newIngot) {
+    ingotx.changes = newIngot.changes
+    ingotx.active = newIngot.active
+    ingotx.branch = newIngot.branch
+  }
+
   return {
     ingotx,
 
@@ -121,5 +127,6 @@ export function useIngot(ingot) {
     redo,
     jump,
     changesArray,
+    setIngot,
   }
 }
