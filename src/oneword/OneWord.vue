@@ -245,7 +245,7 @@
               </button>
             </span>
             <span class="control">
-              <button class="button is-small" @click="newRound(true)">
+              <button class="button is-small" @click="skipWord">
                 {{ $t('onewordGame.skipWord') }}
               </button>
             </span>
@@ -512,9 +512,9 @@
         :rounds-in-game="room.roundsInGame"
         :name="user.displayName"
         :supporter="user.isSupporter"
-        @continue-game="newRound(false)"
+        @continue-game="newRound"
       ></GameEnd>
-      <button v-else class="button" @click="newRound(false)">
+      <button v-else class="button" @click="newRound">
         {{ $t('onewordGame.nextRound') }}
       </button>
     </div>
@@ -815,14 +815,23 @@ export default {
       // Note: Possible race condition with "Next Round"; could fix by object-ifying history
       await this.saveRoom('history')
     },
-    async newRound(sameGuesser = false) {
+    async skipWord() {
+      const category = pickRandom(this.enabledCategories)
+      await updateRoom(this.room, {
+        'currentRound.word': nextWord(
+          this.room.history,
+          category,
+          this.customWordList,
+          this.$t
+        ),
+      })
+    },
+    async newRound() {
       this.room.history.push(this.room.currentRound)
       const category = pickRandom(this.enabledCategories)
       this.room.currentRound = {
         state: 'CLUEING',
-        guesser: sameGuesser
-          ? this.room.currentRound.guesser
-          : nextGuesser(this.room.currentRound.guesser, this.room.players),
+        guesser: nextGuesser(this.room.currentRound.guesser, this.room.players),
         guess: '',
         word: nextWord(
           this.room.history,
