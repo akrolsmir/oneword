@@ -226,7 +226,8 @@ export function useRoom(
 
     // Methods to manipulate rooms
     enterRoom,
-    resetRoom,
+    // Outside this file, resetRoom should always overwrite instead of merging
+    resetRoom: async () => await resetRoom(false),
     saveRoom,
     kickPlayer,
     makeMod,

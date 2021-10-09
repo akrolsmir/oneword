@@ -19,6 +19,8 @@ const IncryptFrontPage = () => import('./incrypt/IncryptFrontPage.vue')
 const Incrypt = () => import('./incrypt/Incrypt.vue')
 const PairwiseFrontPage = () => import('./pairwise/PairwiseFrontPage.vue')
 const Pairwise = () => import('./pairwise/Pairwise.vue')
+const AlignItFrontPage = () => import('./alignit/AlignItFrontPage.vue')
+const AlignIt = () => import('./alignit/AlignIt.vue')
 const Studio = () => import('./studio/Studio.vue')
 const StudioPreview = () => import('./studio/StudioPreview.vue')
 const Multiplay = () => import('./admin/Multiplay.vue')
@@ -70,6 +72,13 @@ const routes = [
     meta: { title: 'Pairwise' },
   },
   { path: '/pairwise/:id', component: Pairwise, meta: { title: 'Pairwise' } },
+  {
+    path: '/alignit',
+    component: AlignItFrontPage,
+    meta: { title: 'Align It' },
+  },
+  { path: '/alignit/:id', component: AlignIt, meta: { title: 'Align It' } },
+
   {
     path: '/asplos-2021',
     component: Asplos2021,
