@@ -47,6 +47,7 @@
             @click="submitVote('A')"
           >
             <img src="/images/illustrations/AlignItGradient.png" />
+            <p class="quad-voters">{{ quadVoters('A') }}</p>
           </td>
           <td
             class="square"
@@ -54,6 +55,7 @@
             @click="submitVote('B')"
           >
             <img src="/images/illustrations/AlignItGradient.png" />
+            <p class="quad-voters">{{ quadVoters('B') }}</p>
           </td>
           <td rowspan="2">
             <div class="x-axis end">{{ room.round.xAxis?.[1] }}</div>
@@ -66,6 +68,7 @@
             @click="submitVote('C')"
           >
             <img src="/images/illustrations/AlignItGradient.png" />
+            <p class="quad-voters">{{ quadVoters('C') }}</p>
           </td>
           <td
             class="square"
@@ -73,6 +76,7 @@
             @click="submitVote('D')"
           >
             <img src="/images/illustrations/AlignItGradient.png" />
+            <p class="quad-voters">{{ quadVoters('D') }}</p>
           </td>
         </tr>
         <tr>
@@ -113,18 +117,15 @@
       </div>
 
       <div v-else-if="room.state === 'VOTING'">
-        Pick the quadrant that "{{ room.round.clue }}" goes in!
         <div v-if="room.round.cluer === player.name">
-          Waiting for everyone to vote...
+          Waiting for everyone to pick quadrants for "{{ room.round.clue }}"...
         </div>
+        <div v-else>Pick the quadrant for "{{ room.round.clue }}"!</div>
       </div>
 
       <div v-else-if="room.state === 'DONE'">
-        The votes are in!
-        <p v-for="(vote, voter) in room.round.votes">
-          {{ voter }} voted for {{ vote }}
-        </p>
         <p>
+          The votes are in for "{{ room.round.clue }}".<br />
           {{ room.round.cluer }} gets
           {{ tallyPoints(room.round.votes) }} points!
         </p>
@@ -224,6 +225,15 @@
 
 .end {
   transform: rotate(0deg);
+}
+
+.quad-voters {
+  line-height: normal;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 45%;
+  padding: 0 1rem;
 }
 </style>
 
@@ -377,6 +387,16 @@ export default {
         case 'DONE':
           return Object.values(this.room.round.votes).includes(quadrant)
       }
+    },
+    quadVoters(quadrant) {
+      if (this.room.state === 'DONE') {
+        return Object.entries(this.room.round.votes)
+          .filter(([voter, vote]) => vote === quadrant)
+          .map(([voter, vote]) => voter)
+          .sort()
+          .join(', ')
+      }
+      return ''
     },
   },
 }
