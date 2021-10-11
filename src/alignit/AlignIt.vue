@@ -120,7 +120,43 @@
         <div v-if="room.round.cluer === player.name">
           Waiting for everyone to pick quadrants for "{{ room.round.clue }}"...
         </div>
-        <div v-else>Pick the quadrant for "{{ room.round.clue }}"!</div>
+        <div v-else>
+          Pick the quadrant for "{{ room.round.clue }}"!<br /><br />
+
+          (Is this clue irrelevant? If so,
+          <a href="#" @click="startChallenge"> challenge it.</a>)
+        </div>
+      </div>
+
+      <div v-else-if="room.state === 'CHALLENGE'">
+        "{{ room.round.clue }}" has been challenged as irrelevant!<br /><br />
+        <div v-if="room.round.cluer === player.name">
+          Waiting for everyone to vote...
+        </div>
+        <div v-else>
+          Is "{{ room.round.clue }}" relevant to this alignment chart?<br />
+          <button
+            class="button"
+            :class="{
+              'is-primary': room.round.challenge[player.name] === 'YES',
+            }"
+            @click="submitChallengeVote('YES')"
+          >
+            Yes
+          </button>
+          or
+          <button
+            class="button"
+            :class="{
+              'is-danger': room.round.challenge[player.name] === 'NO',
+            }"
+            @click="submitChallengeVote('NO')"
+          >
+            No</button
+          ><br />
+          (If half or more players vote 'No', {{ room.round.cluer }} will need
+          to pick a new clue.)
+        </div>
       </div>
 
       <div v-else-if="room.state === 'DONE'">
@@ -260,31 +296,37 @@ import { nextGuesser } from '../oneword/oneword-utils'
 function makeNewRoom(name) {
   return {
     name,
-    state: 'START', // "CLUING", "VOTING", "DONE"
+    state: 'START', // "CLUING", "VOTING", "CHALLENGE", "DONE"
     winningScore: 10,
     people: {},
     round: {
       xAxis: pickRandom(axisCards),
       yAxis: pickRandom(axisCards),
 
-      // /** */ Example:
-      // xAxis: ['Good', 'Evil'],
-      // yAxis: ['New', 'Old'],
+      /** Example:
+      xAxis: ['Good', 'Evil'],
+      yAxis: ['New', 'Old'],
 
-      // Grid structure should look like:
-      //      Good  Evil
-      // New  A     B
-      // Old  C     D
+      Grid structure should look like:
+           Good  Evil
+      New  A     B
+      Old  C     D
 
-      // cluer: 'Austin',
-      // clue: 'Twitter',
+      cluer: 'Austin',
+      clue: 'Twitter',
 
-      // votes: {
-      //   Alice: 'A',
-      //   Bob: 'B',
-      //   Carol: 'C',
-      // },
-      //*/
+      votes: {
+        Alice: 'A',
+        Bob: 'B',
+        Carol: 'C',
+      },
+
+      challenge: {
+        Alice: 'YES',
+        Bob: 'NO',
+        Carol: 'NO',
+      }
+      */
     },
     history: [],
     invalidEntries: {},
@@ -326,7 +368,6 @@ export default {
           scores[round.cluer] += tallyPoints(round.votes)
         }
       }
-      console.log('scores', scores)
       return Object.entries(scores).sort(
         ([p1, s1], [p2, s2]) => s2 - s1 || p1 < p2
       )
@@ -397,6 +438,36 @@ export default {
           .join(', ')
       }
       return ''
+    },
+    startChallenge() {
+      updateRoom(this.room, {
+        state: 'CHALLENGE',
+        [`round.challenge.${this.player.name}`]: 'NO',
+      })
+    },
+    submitChallengeVote(vote) {
+      this.room.round.challenge[this.player.name] = vote
+      let toSave = ['round.challenge.' + this.player.name]
+      // Resolve challenge when everyone has voted
+      if (Object.keys(this.room.round.challenge).length >= this.voters.length) {
+        const challenges = Object.values(this.room.round.challenge).filter(
+          (c) => c === 'NO'
+        ).length
+        if (challenges >= this.voters.length / 2) {
+          // Challenge succeeded; reset the clue and votes
+          this.room.state = 'CLUING'
+          this.room.round.challenge = {}
+          this.room.round.clue = ''
+          this.room.round.votes = {}
+          toSave = ['state', 'round']
+        } else {
+          this.room.state = 'VOTING'
+          this.room.round.challenge = {}
+          toSave = ['state', 'round.challenge']
+        }
+      }
+
+      this.saveRoom(...toSave)
     },
   },
 }
