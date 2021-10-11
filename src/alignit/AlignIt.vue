@@ -41,10 +41,18 @@
           <td rowspan="2">
             <div class="x-axis">{{ room.round.xAxis?.[0] }}</div>
           </td>
-          <td class="square">
+          <td
+            class="square"
+            :class="{ colored: colored('A') }"
+            @click="submitVote('A')"
+          >
             <img src="/images/illustrations/AlignItGradient.png" />
           </td>
-          <td class="square">
+          <td
+            class="square"
+            :class="{ colored: colored('B') }"
+            @click="submitVote('B')"
+          >
             <img src="/images/illustrations/AlignItGradient.png" />
           </td>
           <td rowspan="2">
@@ -52,10 +60,18 @@
           </td>
         </tr>
         <tr>
-          <td class="square">
+          <td
+            class="square"
+            :class="{ colored: colored('C') }"
+            @click="submitVote('C')"
+          >
             <img src="/images/illustrations/AlignItGradient.png" />
           </td>
-          <td class="square">
+          <td
+            class="square"
+            :class="{ colored: colored('D') }"
+            @click="submitVote('D')"
+          >
             <img src="/images/illustrations/AlignItGradient.png" />
           </td>
         </tr>
@@ -97,21 +113,9 @@
       </div>
 
       <div v-else-if="room.state === 'VOTING'">
-        What quadrant does "{{ room.round.clue }}" go in?
+        Pick the quadrant that "{{ room.round.clue }}" goes in!
         <div v-if="room.round.cluer === player.name">
           Waiting for everyone to vote...
-        </div>
-        <div v-else>
-          <button
-            v-for="quadrant in ['A', 'B', 'C', 'D']"
-            class="button"
-            :class="{
-              'is-primary': room.round.votes?.[player.name] === quadrant,
-            }"
-            @click="submitVote(quadrant)"
-          >
-            {{ quadrant }}
-          </button>
         </div>
       </div>
 
@@ -190,6 +194,10 @@
   line-height: 0;
 
   filter: grayscale(100%);
+}
+
+.square.colored {
+  filter: grayscale(0%);
 }
 
 .square:hover {
@@ -323,6 +331,14 @@ export default {
       })
     },
     submitVote(quadrant) {
+      // Votes may only be submited by voters during 'VOTING'
+      if (
+        this.room.state !== 'VOTING' ||
+        !this.voters.includes(this.player.name)
+      ) {
+        return
+      }
+
       this.room.round.votes[this.player.name] = quadrant
       const toSave = ['round.votes.' + this.player.name]
       // Continue to end if everyone has voted
@@ -348,6 +364,19 @@ export default {
       }
 
       this.saveRoom('state', 'round')
+    },
+    colored(quadrant) {
+      // While CLUING, all quadrants are grayscale.
+      // While VOTING, only the quadrant that the player voted for is colored.
+      // While DONE, all voted quadrants are colored.
+      switch (this.room.state) {
+        case 'CLUING':
+          return false
+        case 'VOTING':
+          return this.room.round.votes[this.player.name] === quadrant
+        case 'DONE':
+          return Object.values(this.room.round.votes).includes(quadrant)
+      }
     },
   },
 }
