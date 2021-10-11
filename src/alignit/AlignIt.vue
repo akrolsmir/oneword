@@ -27,24 +27,46 @@
       />
     </div>
 
-    <!-- 2 x 2 Grid with labeled axis -->
+    <!-- 2 x 2 Table with labeled axis -->
     <div v-if="room.state !== 'START'" class="pt-4">
-      <h2 class="subtitle">Alignment Chart</h2>
-      <div class="columns">
-        <div class="column"></div>
-        <div class="column">{{ room.round.xAxis?.[0] }}</div>
-        <div class="column">{{ room.round.xAxis?.[1] }}</div>
-      </div>
-      <div class="columns">
-        <div class="column">{{ room.round.yAxis?.[0] }}</div>
-        <div class="column">A</div>
-        <div class="column">B</div>
-      </div>
-      <div class="columns">
-        <div class="column">{{ room.round.yAxis?.[1] }}</div>
-        <div class="column">C</div>
-        <div class="column">D</div>
-      </div>
+      <table>
+        <tr>
+          <td></td>
+          <td colspan="2">
+            <div class="y-axis">{{ room.round.yAxis?.[0] }}</div>
+          </td>
+          <td></td>
+        </tr>
+        <tr>
+          <td rowspan="2">
+            <div class="x-axis">{{ room.round.xAxis?.[0] }}</div>
+          </td>
+          <td class="square">
+            <img src="/images/illustrations/AlignItGradient.png" />
+          </td>
+          <td class="square">
+            <img src="/images/illustrations/AlignItGradient.png" />
+          </td>
+          <td rowspan="2">
+            <div class="x-axis end">{{ room.round.xAxis?.[1] }}</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="square">
+            <img src="/images/illustrations/AlignItGradient.png" />
+          </td>
+          <td class="square">
+            <img src="/images/illustrations/AlignItGradient.png" />
+          </td>
+        </tr>
+        <tr>
+          <td></td>
+          <td colspan="2">
+            <div class="y-axis">{{ room.round.yAxis?.[1] }}</div>
+          </td>
+          <td></td>
+        </tr>
+      </table>
     </div>
 
     <div class="card p-4 mt-4">
@@ -158,6 +180,42 @@
 }
 .subtitle {
   margin-bottom: 0.25rem;
+}
+
+.square {
+  width: 230px;
+  height: 200px;
+  text-align: center;
+  padding: 0;
+  line-height: 0;
+
+  filter: grayscale(100%);
+}
+
+.square:hover {
+  cursor: pointer;
+  filter: grayscale(0%);
+}
+
+.y-axis {
+  font-size: 2rem;
+  text-align: center;
+}
+
+.x-axis {
+  font-size: 2rem;
+  text-align: center;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 14em;
+}
+
+.end {
+  transform: rotate(0deg);
 }
 </style>
 
