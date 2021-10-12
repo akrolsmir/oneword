@@ -396,7 +396,6 @@ export const nouns = [
   'zipper',
   'shirt',
   'plate',
-  'hot',
   'store',
   'breath',
   'company',
