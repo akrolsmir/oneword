@@ -46,7 +46,7 @@
             :class="{ colored: colored('A') }"
             @click="submitVote('A')"
           >
-            <img src="/images/illustrations/AlignItGradient.png" />
+            <img src="/images/illustrations/alignit/GradientTL.png" />
             <p class="quad-voters">{{ quadVoters('A') }}</p>
           </td>
           <td
@@ -54,7 +54,7 @@
             :class="{ colored: colored('B') }"
             @click="submitVote('B')"
           >
-            <img src="/images/illustrations/AlignItGradient.png" />
+            <img src="/images/illustrations/alignit/GradientTR.png" />
             <p class="quad-voters">{{ quadVoters('B') }}</p>
           </td>
           <td rowspan="2">
@@ -67,7 +67,7 @@
             :class="{ colored: colored('C') }"
             @click="submitVote('C')"
           >
-            <img src="/images/illustrations/AlignItGradient.png" />
+            <img src="/images/illustrations/alignit/GradientBL.png" />
             <p class="quad-voters">{{ quadVoters('C') }}</p>
           </td>
           <td
@@ -75,7 +75,7 @@
             :class="{ colored: colored('D') }"
             @click="submitVote('D')"
           >
-            <img src="/images/illustrations/AlignItGradient.png" />
+            <img src="/images/illustrations/alignit/GradientBR.png" />
             <p class="quad-voters">{{ quadVoters('D') }}</p>
           </td>
         </tr>
@@ -227,10 +227,10 @@
   width: 230px;
   height: 200px;
   text-align: center;
-  padding: 0;
+  padding: 0.25rem;
   line-height: 0;
 
-  filter: grayscale(100%);
+  filter: grayscale(75%);
 }
 
 .square.colored {
