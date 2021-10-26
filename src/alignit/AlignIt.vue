@@ -106,7 +106,12 @@
         <div v-if="room.round.cluer === player.name">
           <p>Give a clue that for this alignment chart!</p>
           <p>(Try to cover as many quadrants as possible)</p>
-          <input type="text" class="input" v-model="player.clue" />
+          <input
+            type="text"
+            class="input"
+            v-model="player.clue"
+            @keyup.enter="submitClue"
+          />
           <button class="button is-primary" @click="submitClue">
             Submit Clue
           </button>
