@@ -5,6 +5,7 @@ import {
   objectDiff,
   replaceValues,
   stripUndefined,
+  pickFromBag,
 } from './utils'
 
 function applyNestedDiff(object, diff) {
@@ -89,4 +90,14 @@ it('replaces values', () => {
       /* newValue = */ 'new'
     )
   ).to.deep.equal([{ a: 'new', b: 3, c: ['new'] }, 'new'])
+})
+
+it('Never picks an item from the history', () => {
+  for (let i = 0; i < 1000; i++) {
+    expect(pickFromBag(['a', 'b'], ['a'])).to.equal('b')
+    expect(pickFromBag([['a'], ['b']], [['a']])).to.deep.equal(['b'])
+    expect(pickFromBag([{ a: 'a' }, { b: 'b' }], [{ a: 'a' }])).to.deep.equal({
+      b: 'b',
+    })
+  }
 })

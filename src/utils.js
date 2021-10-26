@@ -81,8 +81,13 @@ export function pickFromBag(bag, history) {
   const numDrawn = history.length % bag.length
   const drawnStart = Math.max(0, history.length - numDrawn)
   const drawn = history.slice(drawnStart)
-  const undrawn = bag.filter((item) => !drawn.includes(item)) // warning: O(N^2)
+  const undrawn = bag.filter((item) => !some(drawn, item)) // warning: O(N^2)
   return pickRandom(undrawn.length > 0 ? undrawn : bag)
+}
+
+// Custom version of lodash's `some` that works for objects & arrays
+function some(array, value) {
+  return array.some((item) => isEqual(item, value))
 }
 
 // Function wrapper that waits delayMs after the last call before firing.

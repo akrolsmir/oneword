@@ -312,6 +312,7 @@ function makeNewRoom(name) {
     winningScore: 10,
     people: {},
     round: {
+      // Axis might collide, but nextRound() will fix this.
       xAxis: pickRandom(axisCards),
       yAxis: pickRandom(axisCards),
 
@@ -416,6 +417,7 @@ export default {
     nextRound() {
       // Alternate between changing out the xAxis and yAxis
       const nextAxis = this.room.history.length % 2 === 0 ? 'xAxis' : 'yAxis'
+      const currentAxes = [this.room.round.xAxis, this.room.round.yAxis]
 
       this.room.state = 'CLUING'
       this.room.round = {
@@ -423,7 +425,7 @@ export default {
         xAxis: this.room.round.xAxis,
         yAxis: this.room.round.yAxis,
         votes: {},
-        [nextAxis]: pickRandom(axisCards), // TODO pick from bag instead
+        [nextAxis]: pickFromBag(axisCards, currentAxes),
       }
 
       this.saveRoom('state', 'round')
