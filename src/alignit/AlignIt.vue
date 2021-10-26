@@ -170,9 +170,16 @@
           {{ room.round.cluer }} gets
           {{ tallyPoints(room.round.votes) }} points!
         </p>
-        <button class="button is-primary mt-2" @click="nextRound">
+        <button
+          v-if="room.round.cluer === player.name"
+          class="button is-primary mt-2"
+          @click="nextRound"
+        >
           Next Round
         </button>
+        <div v-else>
+          Waiting for {{ room.round.cluer }} to start the next round...
+        </div>
       </div>
     </div>
 
