@@ -47,7 +47,7 @@
             @click="submitVote('A')"
           >
             <img src="/images/illustrations/alignit/GradientTL.png" />
-            <p class="quad-voters">{{ quadVoters('A') }}</p>
+            <p class="quad-voters">{{ quadText('A') }}</p>
           </td>
           <td
             class="square"
@@ -55,7 +55,7 @@
             @click="submitVote('B')"
           >
             <img src="/images/illustrations/alignit/GradientTR.png" />
-            <p class="quad-voters">{{ quadVoters('B') }}</p>
+            <p class="quad-voters">{{ quadText('B') }}</p>
           </td>
           <td rowspan="2">
             <div class="x-axis end">{{ room.round.xAxis?.[1] }}</div>
@@ -68,7 +68,7 @@
             @click="submitVote('C')"
           >
             <img src="/images/illustrations/alignit/GradientBL.png" />
-            <p class="quad-voters">{{ quadVoters('C') }}</p>
+            <p class="quad-voters">{{ quadText('C') }}</p>
           </td>
           <td
             class="square"
@@ -76,7 +76,7 @@
             @click="submitVote('D')"
           >
             <img src="/images/illustrations/alignit/GradientBR.png" />
-            <p class="quad-voters">{{ quadVoters('D') }}</p>
+            <p class="quad-voters">{{ quadText('D') }}</p>
           </td>
         </tr>
         <tr>
@@ -106,7 +106,12 @@
         <div v-if="room.round.cluer === player.name">
           <p>Give a clue that for this alignment chart!</p>
           <p>(Try to cover as many quadrants as possible)</p>
-          <input type="text" class="input" v-model="player.clue" />
+          <input
+            type="text"
+            class="input"
+            v-model="player.clue"
+            @keyup.enter="submitClue"
+          />
           <button class="button is-primary" @click="submitClue">
             Submit Clue
           </button>
@@ -165,9 +170,16 @@
           {{ room.round.cluer }} gets
           {{ tallyPoints(room.round.votes) }} points!
         </p>
-        <button class="button is-primary mt-2" @click="nextRound">
+        <button
+          v-if="room.round.cluer === player.name"
+          class="button is-primary mt-2"
+          @click="nextRound"
+        >
           Next Round
         </button>
+        <div v-else>
+          Waiting for {{ room.round.cluer }} to start the next round...
+        </div>
       </div>
     </div>
 
@@ -231,15 +243,18 @@
   line-height: 0;
 
   filter: grayscale(75%);
+  color: transparent;
 }
 
 .square.colored {
   filter: grayscale(0%);
+  color: black;
 }
 
 .square:hover {
   cursor: pointer;
   filter: grayscale(0%);
+  color: black;
 }
 
 .y-axis {
@@ -300,6 +315,7 @@ function makeNewRoom(name) {
     winningScore: 10,
     people: {},
     round: {
+      // Axis might collide, but nextRound() will fix this.
       xAxis: pickRandom(axisCards),
       yAxis: pickRandom(axisCards),
 
@@ -404,6 +420,7 @@ export default {
     nextRound() {
       // Alternate between changing out the xAxis and yAxis
       const nextAxis = this.room.history.length % 2 === 0 ? 'xAxis' : 'yAxis'
+      const currentAxes = [this.room.round.xAxis, this.room.round.yAxis]
 
       this.room.state = 'CLUING'
       this.room.round = {
@@ -411,7 +428,7 @@ export default {
         xAxis: this.room.round.xAxis,
         yAxis: this.room.round.yAxis,
         votes: {},
-        [nextAxis]: pickRandom(axisCards), // TODO pick from bag instead
+        [nextAxis]: pickFromBag(axisCards, currentAxes),
       }
 
       this.saveRoom('state', 'round')
@@ -429,7 +446,8 @@ export default {
           return Object.values(this.room.round.votes).includes(quadrant)
       }
     },
-    quadVoters(quadrant) {
+    quadText(quadrant) {
+      // At the end of a round, show who clicked on the quadrant
       if (this.room.state === 'DONE') {
         return Object.entries(this.room.round.votes)
           .filter(([voter, vote]) => vote === quadrant)
@@ -437,7 +455,8 @@ export default {
           .sort()
           .join(', ')
       }
-      return ''
+      // Otherwise, show the intersection e.g. 'Good & Old'
+      return wordify(quadrant, this.room.round.xAxis, this.room.round.yAxis)
     },
     startChallenge() {
       updateRoom(this.room, {
@@ -470,6 +489,12 @@ export default {
       this.saveRoom(...toSave)
     },
   },
+}
+
+// E.g. wordify('A', ['Good', 'Bad'], ['Old, 'New']) => 'Good & Old'
+function wordify(quandrant, xAxis, yAxis) {
+  const [x, y] = { A: [0, 0], B: [1, 0], C: [0, 1], D: [1, 1] }[quandrant]
+  return `${xAxis[x]} & ${yAxis[y]}`
 }
 
 function tallyPoints(votes) {
