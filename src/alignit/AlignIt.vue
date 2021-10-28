@@ -236,8 +236,15 @@
 .background {
   background-color: #e0e7ff;
 }
+
+@font-face {
+  font-family: 'Grand Slang';
+  src: url('/fonts/GrandSlang-Roman.woff2') format('woff2');
+}
+
 .subtitle {
   margin-bottom: 0.25rem;
+  font-family: 'Grand Slang';
 }
 
 .square {
@@ -264,11 +271,13 @@
 
 .y-axis {
   font-size: 2rem;
+  font-family: 'Grand Slang';
   text-align: center;
 }
 
 .x-axis {
   font-size: 2rem;
+  font-family: 'Grand Slang';
   text-align: center;
   writing-mode: vertical-rl;
   transform: rotate(180deg);
