@@ -170,8 +170,13 @@
           {{ room.round.cluer }} gets
           {{ tallyPoints(room.round.votes) }} points!
         </p>
+        <div v-if="shouldEndGame">
+          <br />
+          <h2 class="subtitle">Good game! Final scores:</h2>
+          <p v-for="[name, score] in playerScores">{{ name }}: {{ score }}</p>
+        </div>
         <button
-          v-if="room.round.cluer === player.name"
+          v-else-if="room.round.cluer === player.name"
           class="button is-primary mt-2"
           @click="nextRound"
         >
@@ -387,6 +392,24 @@ export default {
       return Object.entries(scores).sort(
         ([p1, s1], [p2, s2]) => s2 - s1 || p1 < p2
       )
+    },
+    shouldEndGame() {
+      // End the game if somebody has hit 10 points and we're at the end of a cycle
+      const tenPointsReached = this.playerScores.some(
+        ([player, points]) => points >= 10
+      )
+      if (!tenPointsReached) {
+        return false
+      }
+      // This is the end of a cycle if the next player going would get more turns
+      // than anybody else total
+      const playerTurns = {}
+      for (const round of this.room.history) {
+        playerTurns[round.cluer] = (playerTurns[round.cluer] || 0) + 1
+      }
+      const maxTurns = Math.max(...Object.values(playerTurns))
+      const nextCluer = nextGuesser(this.room.round.cluer, this.room.players)
+      return playerTurns[nextCluer] === maxTurns
     },
   },
   methods: {
