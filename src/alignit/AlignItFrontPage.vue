@@ -1,7 +1,7 @@
 <template>
   <BigColumn>
     <div>
-      <h1 class="fancy big">Quad Squad</h1>
+      <h1>Quad Squad</h1>
       Cleverly categorize the world in less-than-obvious ways! Three rules:<br />
       <div class="content">
         <ul>
@@ -41,6 +41,32 @@ export default {
 }
 </script>
 <style scoped>
+@import url('https://use.typekit.net/aph6szs.css');
+
+.background {
+  background-color: #eeeeee;
+}
+
+@font-face {
+  font-family: 'Grand Slang';
+  src: url('/fonts/GrandSlang-Roman.woff2') format('woff2');
+}
+
+div {
+  font-family: neue-haas-grotesk-display, sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 1rem;
+  letter-spacing: 0.3px;
+}
+
+h1 {
+  font-family: 'Grand Slang';
+  font-size: 4rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
 .background {
   background-color: #e0e7ff;
 }
