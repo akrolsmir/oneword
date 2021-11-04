@@ -233,13 +233,22 @@
 </template>
 
 <style scoped>
+@import url('https://use.typekit.net/aph6szs.css');
+
 .background {
-  background-color: #e0e7ff;
+  background-color: #eeeeee;
 }
 
 @font-face {
   font-family: 'Grand Slang';
   src: url('/fonts/GrandSlang-Roman.woff2') format('woff2');
+}
+
+div {
+  font-family: neue-haas-grotesk-display, sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 1.25rem;
 }
 
 .subtitle {
@@ -273,12 +282,17 @@
   font-size: 2rem;
   font-family: 'Grand Slang';
   text-align: center;
+  letter-spacing: 4px;
+  text-transform: uppercase;
 }
 
 .x-axis {
   font-size: 2rem;
   font-family: 'Grand Slang';
   text-align: center;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+
   writing-mode: vertical-rl;
   transform: rotate(180deg);
 
