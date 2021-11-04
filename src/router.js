@@ -73,11 +73,11 @@ const routes = [
   },
   { path: '/pairwise/:id', component: Pairwise, meta: { title: 'Pairwise' } },
   {
-    path: '/alignit',
+    path: '/quadsquad',
     component: AlignItFrontPage,
-    meta: { title: 'Align It' },
+    meta: { title: 'Quad Squad' },
   },
-  { path: '/alignit/:id', component: AlignIt, meta: { title: 'Align It' } },
+  { path: '/quadsquad/:id', component: AlignIt, meta: { title: 'Quad Squad' } },
 
   {
     path: '/asplos-2021',

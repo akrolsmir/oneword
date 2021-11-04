@@ -1,7 +1,7 @@
 <template>
   <BigColumn>
     <div>
-      <h1 class="fancy big">Align It!</h1>
+      <h1 class="fancy big">Quad Squad</h1>
       Cleverly categorize the world in less-than-obvious ways! Three rules:<br />
       <div class="content">
         <ul>
@@ -22,7 +22,7 @@
         >Cardboard Edison</a
       >.<br />
     </div>
-    <GamesList roomDirectory="/alignit/" gameName="AlignIt" />
+    <GamesList roomDirectory="/quadsquad/" gameName="QuadSquad" />
     <br /><br />
   </BigColumn>
 </template>
