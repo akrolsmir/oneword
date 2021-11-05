@@ -53,11 +53,10 @@ export default {
 }
 
 div {
-  font-family: neue-haas-grotesk-display, sans-serif;
+  font-family: neue-haas-grotesk-text, sans-serif;
   font-weight: 400;
   font-style: normal;
   font-size: 1rem;
-  letter-spacing: 0.3px;
 }
 
 h1 {
@@ -65,9 +64,6 @@ h1 {
   font-size: 4rem;
   letter-spacing: 2px;
   text-transform: uppercase;
-}
-
-.background {
-  background-color: #e0e7ff;
+  margin-bottom: 2rem;
 }
 </style>

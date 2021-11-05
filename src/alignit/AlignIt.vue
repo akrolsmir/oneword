@@ -10,7 +10,7 @@
       />
     </template>
 
-    <h2 class="subtitle">Players</h2>
+    <h2>Players</h2>
     <!-- Players -->
     <div class="field is-grouped is-grouped-multiline">
       <Nametag
@@ -245,10 +245,18 @@
 }
 
 div {
-  font-family: neue-haas-grotesk-display, sans-serif;
+  font-family: neue-haas-grotesk-text, sans-serif;
   font-weight: 400;
   font-style: normal;
-  font-size: 1.25rem;
+  font-size: 1rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-family: neue-haas-grotesk-text, sans-serif !important;
+  font-weight: 400;
+  font-style: normal;
+  margin-bottom: 0.5rem;
 }
 
 .subtitle {
