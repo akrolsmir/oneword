@@ -43,7 +43,7 @@
           <td></td>
         </tr>
         <tr>
-          <td rowspan="2">
+          <td rowspan="2" style="min-width: 3rem">
             <div class="x-axis">{{ room.round.xAxis?.[0] }}</div>
           </td>
           <td
@@ -257,6 +257,8 @@ h2 {
 
   filter: grayscale(75%);
   color: transparent;
+
+  position: relative;
 }
 
 .square.colored {
