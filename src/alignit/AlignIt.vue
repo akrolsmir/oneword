@@ -26,6 +26,11 @@
         @kick="kickPlayer(tagged)"
       />
     </div>
+    <div v-if="computedNoMod">
+      <button class="button is-ghost p-0" @click.prevent="makeMod(player.name)">
+        Become the mod
+      </button>
+    </div>
 
     <!-- 2 x 2 Table with labeled axis -->
     <div v-if="room.state !== 'START'" class="pt-4">
@@ -192,11 +197,11 @@
     <!-- Copied from Incrypt -->
     <div v-if="player.isMod" class="notification mx-3 mt-4 mb-6">
       <h2>Mod tools</h2>
-      <br />
       <div class="columns">
         <div class="column">
-          <button class="button is-small is-danger" @click="nextStage">
-            End round
+          (Danger: this may mess up your game score!)<br /><br />
+          <button class="button is-small is-danger" @click="nextRound">
+            Skip round
           </button>
           <button
             v-if="player.isDev"
@@ -205,27 +210,6 @@
           >
             Reset game
           </button>
-        </div>
-        <div class="column is-size-7">
-          <div class="field has-addons">
-            <div class="control">
-              <input
-                class="input is-small"
-                style="flex: 1 2 48px"
-                v-model.number="player.timerLength"
-              />
-            </div>
-            <div class="control">
-              <button class="button is-small" @click="updateTimer">
-                Set round timer (secs)
-              </button>
-            </div>
-          </div>
-          <br />
-          <b>Timer suggestion</b><br />
-          90 secs for a new group<br />
-          60 secs for an experienced group<br />
-          0 secs to disable timers<br />
         </div>
       </div>
     </div>
@@ -388,6 +372,19 @@ function makeNewRoom(name) {
   }
 }
 
+function onJoin(room, player) {
+  if (noMod(room)) {
+    room.people[player.name].state = 'MOD'
+  }
+}
+
+// TODO: Move this logic into useRoom?
+function noMod(room) {
+  return !Object.values(room.people || {}).some(
+    (person) => person.state === 'MOD'
+  )
+}
+
 export default {
   components: {
     BigColumn,
@@ -398,7 +395,7 @@ export default {
   },
   setup() {
     const user = inject('currentUser')
-    const roomHelpers = useRoom(user, makeNewRoom)
+    const roomHelpers = useRoom(user, makeNewRoom, onJoin)
     roomHelpers.player.timerLength = 90
     return Object.assign(roomHelpers, { user })
   },
@@ -441,6 +438,9 @@ export default {
       const maxTurns = Math.max(...Object.values(playerTurns))
       const nextCluer = nextGuesser(this.room.round.cluer, this.room.players)
       return playerTurns[nextCluer] === maxTurns
+    },
+    computedNoMod() {
+      return noMod(this.room)
     },
   },
   methods: {
