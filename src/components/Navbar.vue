@@ -51,12 +51,12 @@
             </router-link>
             <router-link class="navbar-item" to="/storytime">
               Storytime
-              <span class="tag is-link is-light ml-1">{{
-                $t('navBar.new')
-              }}</span>
             </router-link>
             <router-link class="navbar-item" to="/pairwise">
               Pairwise
+            </router-link>
+            <router-link class="navbar-item" to="/quadsquad">
+              Quad Squad
               <span class="tag is-link is-light ml-1">{{
                 $t('navBar.new')
               }}</span>
