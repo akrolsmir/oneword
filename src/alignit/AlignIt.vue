@@ -96,8 +96,8 @@
 
     <div class="card p-4 mt-4">
       <div v-if="room.state === 'START'">
-        <div v-if="room.players.length < 3">
-          <p>Waiting for 3 players...</p>
+        <div v-if="room.players.length < 4">
+          <p>Waiting for 4 players...</p>
           <ShareLink />
         </div>
         <div v-else>
