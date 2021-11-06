@@ -308,6 +308,7 @@
   }
 
   function splitName(name) {
+    if (!name) return ['', '']
     // Austin Chen => Austin, Chen
     // Hillary => Hillary, Hillary
     // Barack Hussein Obama => Barack, Hussein Obama
