@@ -66,7 +66,7 @@ function wordify(quandrant, xAxis, yAxis) {
   color: black;
 }
 
-.y-axis {
+.axis-label {
   font-size: 2rem;
   font-family: 'Grand Slang';
   text-align: center;
@@ -75,18 +75,13 @@ function wordify(quandrant, xAxis, yAxis) {
 }
 
 .x-axis {
-  font-size: 2rem;
-  font-family: 'Grand Slang';
-  text-align: center;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-
   writing-mode: vertical-rl;
   transform: rotate(180deg);
 
   display: flex;
   justify-content: center;
   align-items: center;
+  min-height: min-content;
   min-height: 14em;
 }
 
@@ -110,13 +105,13 @@ function wordify(quandrant, xAxis, yAxis) {
     <tr>
       <td></td>
       <td colspan="2">
-        <div class="y-axis">{{ round.yAxis?.[0] }}</div>
+        <div class="axis-label">{{ round.yAxis?.[0] }}</div>
       </td>
       <td></td>
     </tr>
     <tr>
       <td rowspan="2" style="min-width: 3rem">
-        <div class="x-axis">{{ round.xAxis?.[0] }}</div>
+        <div class="axis-label x-axis">{{ round.xAxis?.[0] }}</div>
       </td>
       <td>
         <button
@@ -139,7 +134,7 @@ function wordify(quandrant, xAxis, yAxis) {
         </button>
       </td>
       <td rowspan="2">
-        <div class="x-axis end">{{ round.xAxis?.[1] }}</div>
+        <div class="axis-label x-axis end">{{ round.xAxis?.[1] }}</div>
       </td>
     </tr>
     <tr>
@@ -167,7 +162,7 @@ function wordify(quandrant, xAxis, yAxis) {
     <tr>
       <td></td>
       <td colspan="2">
-        <div class="y-axis">{{ round.yAxis?.[1] }}</div>
+        <div class="axis-label">{{ round.yAxis?.[1] }}</div>
       </td>
       <td></td>
     </tr>
