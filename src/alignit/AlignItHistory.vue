@@ -1,5 +1,7 @@
 <script setup>
 import AlignItQuads from './AlignItQuads.vue'
+import { ref } from '@vue/reactivity'
+
 const props = defineProps({
   history: {
     type: Array,
@@ -19,6 +21,8 @@ function voters(quadrant, round) {
     .map(([voter, vote]) => voter)
     .join(', ')
 }
+
+const visible = ref(true)
 </script>
 
 <style>
@@ -28,18 +32,41 @@ function voters(quadrant, round) {
   top: 1rem;
   right: 1rem;
 }
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.3s ease-out;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  transform: translateY(20px);
+  opacity: 0;
+}
 </style>
 
 <template>
   <!-- One Bulma card for each item in history -->
-  <h2 class="subtitle mt-4">History</h2>
-  <div
-    class="box p-4 mb-4 has-background-grey-lighter"
-    v-for="(round, i) in history.slice().reverse()"
-    style="position: relative"
-  >
-    <h3 class="is-size-4 mb-4">{{ round.cluer }}'s clue: "{{ round.clue }}"</h3>
-    <div class="round-marker">Round {{ history.length - i }}</div>
-    <AlignItQuads :round="round" state="DONE" />
-  </div>
+  <p class="mt-6">
+    <span class="is-size-4">History</span>
+    <button class="button is-ghost" @click="visible = !visible">
+      <span v-if="visible">(hide)</span>
+      <span v-else>(show)</span>
+    </button>
+  </p>
+  <transition name="fade">
+    <div class="wrapper" v-if="visible">
+      <div
+        class="box p-4 mb-4 has-background-grey-lighter"
+        v-for="(round, i) in history.slice().reverse()"
+        style="position: relative"
+      >
+        <h3 class="mb-4 is-size-5">
+          {{ round.cluer }}'s clue: "{{ round.clue }}"
+        </h3>
+        <div class="round-marker">Round {{ history.length - i }}</div>
+        <AlignItQuads :round="round" state="DONE" />
+      </div>
+    </div>
+  </transition>
 </template>
