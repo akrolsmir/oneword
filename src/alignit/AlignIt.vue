@@ -41,10 +41,11 @@
       />
     </div>
 
-    <div class="card p-4 mt-4">
+    <!-- Instructions for the players -->
+    <div class="card p-4 mt-4" role="alert">
       <div v-if="room.state === 'START'">
         <div v-if="room.players.length < 4">
-          <p role="alert">Waiting for 4 players...</p>
+          <p>Waiting for 4 players...</p>
           <ShareLink />
         </div>
         <div v-else>
@@ -56,7 +57,7 @@
 
       <div v-else-if="room.state === 'CLUING'">
         <div v-if="room.round.cluer === player.name">
-          <p role="alert">Give a clue that for this alignment chart!</p>
+          <p>Give a clue that for this alignment chart!</p>
           <p>(Try to cover as many quadrants as possible)</p>
           <input
             type="text"
@@ -68,17 +69,15 @@
             Submit Clue
           </button>
         </div>
-        <div v-else role="alert">
-          Waiting for {{ room.round.cluer }} to give a clue...
-        </div>
+        <div v-else>Waiting for {{ room.round.cluer }} to give a clue...</div>
       </div>
 
       <div v-else-if="room.state === 'VOTING'">
-        <div v-if="room.round.cluer === player.name" role="alert">
+        <div v-if="room.round.cluer === player.name">
           Waiting for everyone to pick quadrants for "{{ room.round.clue }}"...
         </div>
         <div v-else>
-          <p role="alert">Pick the quadrant for "{{ room.round.clue }}"!</p>
+          <p>Pick the quadrant for "{{ room.round.clue }}"!</p>
           <br /><br />
 
           (Is this clue irrelevant? If so,
@@ -88,10 +87,10 @@
 
       <div v-else-if="room.state === 'CHALLENGE'">
         "{{ room.round.clue }}" has been challenged as irrelevant!<br /><br />
-        <div v-if="room.round.cluer === player.name" role="alert">
+        <div v-if="room.round.cluer === player.name">
           Waiting for everyone to vote on this challenge...
         </div>
-        <div v-else role="alert">
+        <div v-else>
           Is "{{ room.round.clue }}" relevant to this alignment chart?<br />
           <button
             class="button"
@@ -118,7 +117,7 @@
       </div>
 
       <div v-else-if="room.state === 'DONE'">
-        <p role="alert">
+        <p>
           The votes are in for "{{ room.round.clue }}".<br />
           {{ room.round.cluer }} gets
           {{ tallyPoints(room.round.votes) }} points!
