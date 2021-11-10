@@ -57,7 +57,7 @@
 
       <div v-else-if="room.state === 'CLUING'">
         <div v-if="room.round.cluer === player.name">
-          <p>Give a clue that for this alignment chart!</p>
+          <p>Give a clue for this alignment chart!</p>
           <p>(Try to cover as many quadrants as possible)</p>
           <input
             type="text"
