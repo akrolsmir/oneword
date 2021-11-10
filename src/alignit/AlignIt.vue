@@ -346,6 +346,7 @@ export default {
         'round.clue': this.player.clue,
         state: 'VOTING',
       })
+      this.player.clue = ''
     },
     submitVote(quadrant) {
       // Votes may only be submited by voters during 'VOTING'
