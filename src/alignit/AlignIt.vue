@@ -128,16 +128,9 @@
           <h2 class="subtitle">Good game! Final scores:</h2>
           <p v-for="[name, score] in playerScores">{{ name }}: {{ score }}</p>
         </div>
-        <button
-          v-else-if="room.round.cluer === player.name"
-          class="button is-primary mt-2"
-          @click="nextRound"
-        >
+        <button v-else class="button is-primary mt-2" @click="nextRound">
           Next Round
         </button>
-        <div v-else>
-          Waiting for {{ room.round.cluer }} to start the next round...
-        </div>
       </div>
     </div>
 
