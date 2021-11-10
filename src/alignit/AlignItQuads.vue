@@ -3,6 +3,7 @@ const props = defineProps({
   round: Object,
   state: String,
   playerName: String,
+  submitVote: Function,
 })
 
 function colored(quadrant) {
@@ -41,8 +42,9 @@ function wordify(quandrant, xAxis, yAxis) {
 
 <style>
 .square {
-  width: 230px;
-  height: 200px;
+  background-color: transparent;
+  border: none;
+  font-size: 1rem;
   text-align: center;
   padding: 0.25rem;
   line-height: 0;
@@ -116,42 +118,50 @@ function wordify(quandrant, xAxis, yAxis) {
       <td rowspan="2" style="min-width: 3rem">
         <div class="x-axis">{{ round.xAxis?.[0] }}</div>
       </td>
-      <td
-        class="square"
-        :class="{ colored: colored('A') }"
-        @click="submitVote('A')"
-      >
-        <img src="/images/illustrations/alignit/GradientTL.png" />
-        <p class="quad-voters">{{ quadText('A') }}</p>
+      <td>
+        <button
+          class="square"
+          :class="{ colored: colored('A') }"
+          @click="submitVote('A')"
+        >
+          <img src="/images/illustrations/alignit/GradientTL.png" />
+          <p class="quad-voters">{{ quadText('A') }}</p>
+        </button>
       </td>
-      <td
-        class="square"
-        :class="{ colored: colored('B') }"
-        @click="submitVote('B')"
-      >
-        <img src="/images/illustrations/alignit/GradientTR.png" />
-        <p class="quad-voters">{{ quadText('B') }}</p>
+      <td>
+        <button
+          class="square"
+          :class="{ colored: colored('B') }"
+          @click="submitVote('B')"
+        >
+          <img src="/images/illustrations/alignit/GradientTR.png" />
+          <p class="quad-voters">{{ quadText('B') }}</p>
+        </button>
       </td>
       <td rowspan="2">
         <div class="x-axis end">{{ round.xAxis?.[1] }}</div>
       </td>
     </tr>
     <tr>
-      <td
-        class="square"
-        :class="{ colored: colored('C') }"
-        @click="submitVote('C')"
-      >
-        <img src="/images/illustrations/alignit/GradientBL.png" />
-        <p class="quad-voters">{{ quadText('C') }}</p>
+      <td>
+        <button
+          class="square"
+          :class="{ colored: colored('C') }"
+          @click="submitVote('C')"
+        >
+          <img src="/images/illustrations/alignit/GradientBL.png" />
+          <p class="quad-voters">{{ quadText('C') }}</p>
+        </button>
       </td>
-      <td
-        class="square"
-        :class="{ colored: colored('D') }"
-        @click="submitVote('D')"
-      >
-        <img src="/images/illustrations/alignit/GradientBR.png" />
-        <p class="quad-voters">{{ quadText('D') }}</p>
+      <td>
+        <button
+          class="square"
+          :class="{ colored: colored('D') }"
+          @click="submitVote('D')"
+        >
+          <img src="/images/illustrations/alignit/GradientBR.png" />
+          <p class="quad-voters">{{ quadText('D') }}</p>
+        </button>
       </td>
     </tr>
     <tr>

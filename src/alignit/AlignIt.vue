@@ -38,6 +38,7 @@
         :round="room.round"
         :state="room.state"
         :playerName="player.name"
+        :submitVote="submitVote"
       />
     </div>
 
