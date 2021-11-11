@@ -38,6 +38,17 @@ function wordify(quandrant, xAxis, yAxis) {
   const [x, y] = { A: [0, 0], B: [1, 0], C: [0, 1], D: [1, 1] }[quandrant]
   return `${xAxis[x]} & ${yAxis[y]}`
 }
+
+function gradientSrc(quadrant) {
+  const corners = {
+    A: 'TL',
+    B: 'TR',
+    C: 'BL',
+    D: 'BR',
+  }
+  const g = 'E' // One of A-E. TODO: generate based on the index
+  return `/images/illustrations/alignit/Gradient${g}${corners[quadrant]}.png`
+}
 </script>
 
 <style>
@@ -82,7 +93,7 @@ function wordify(quandrant, xAxis, yAxis) {
   justify-content: center;
   align-items: center;
   min-height: min-content;
-  min-height: 14em;
+  min-height: 13em;
 }
 
 .end {
@@ -101,7 +112,7 @@ function wordify(quandrant, xAxis, yAxis) {
 </style>
 
 <template>
-  <table>
+  <table style="margin: auto">
     <tr>
       <td></td>
       <td colspan="2">
@@ -119,7 +130,7 @@ function wordify(quandrant, xAxis, yAxis) {
           :class="{ colored: colored('A') }"
           @click="submitVote('A')"
         >
-          <img src="/images/illustrations/alignit/GradientTL.png" />
+          <img :src="gradientSrc('A')" />
           <p class="quad-voters">{{ quadText('A') }}</p>
         </button>
       </td>
@@ -129,7 +140,7 @@ function wordify(quandrant, xAxis, yAxis) {
           :class="{ colored: colored('B') }"
           @click="submitVote('B')"
         >
-          <img src="/images/illustrations/alignit/GradientTR.png" />
+          <img :src="gradientSrc('B')" />
           <p class="quad-voters">{{ quadText('B') }}</p>
         </button>
       </td>
@@ -144,7 +155,7 @@ function wordify(quandrant, xAxis, yAxis) {
           :class="{ colored: colored('C') }"
           @click="submitVote('C')"
         >
-          <img src="/images/illustrations/alignit/GradientBL.png" />
+          <img :src="gradientSrc('C')" />
           <p class="quad-voters">{{ quadText('C') }}</p>
         </button>
       </td>
@@ -154,7 +165,7 @@ function wordify(quandrant, xAxis, yAxis) {
           :class="{ colored: colored('D') }"
           @click="submitVote('D')"
         >
-          <img src="/images/illustrations/alignit/GradientBR.png" />
+          <img :src="gradientSrc('D')" />
           <p class="quad-voters">{{ quadText('D') }}</p>
         </button>
       </td>
