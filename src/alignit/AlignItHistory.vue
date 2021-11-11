@@ -65,7 +65,7 @@ const visible = ref(true)
           {{ round.cluer }}'s clue: "{{ round.clue }}"
         </h3>
         <div class="round-marker">Round {{ history.length - i }}</div>
-        <AlignItQuads :round="round" state="DONE" />
+        <AlignItQuads :round="round" state="DONE" :index="history.length - i" />
       </div>
     </div>
   </transition>

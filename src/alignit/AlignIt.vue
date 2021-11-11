@@ -39,6 +39,7 @@
         :state="room.state"
         :playerName="player.name"
         :submitVote="submitVote"
+        :index="room.history.length + 1"
       />
     </div>
 

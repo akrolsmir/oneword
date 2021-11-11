@@ -4,6 +4,10 @@ const props = defineProps({
   state: String,
   playerName: String,
   submitVote: Function,
+  index: {
+    type: Number,
+    default: 0,
+  },
 })
 
 function colored(quadrant) {
@@ -46,8 +50,9 @@ function gradientSrc(quadrant) {
     C: 'BL',
     D: 'BR',
   }
-  const g = 'E' // One of A-E. TODO: generate based on the index
-  return `/images/illustrations/alignit/Gradient${g}${corners[quadrant]}.png`
+  // Pick a letter from A-E, based on index mod 5
+  const letter = String.fromCharCode(65 + (props.index % 5))
+  return `/images/illustrations/alignit/Gradient${letter}${corners[quadrant]}.png`
 }
 </script>
 
