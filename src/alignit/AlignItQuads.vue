@@ -10,17 +10,15 @@ const props = defineProps({
   },
 })
 
-function colored(quadrant) {
-  // While CLUING, all quadrants are grayscale.
-  // While VOTING, only the quadrant that the player voted for is colored.
-  // While DONE, all voted quadrants are colored.
+function classify(quadrant) {
+  // Use 'voted' and 'done' classes to make square text visible
   switch (props.state) {
     case 'CLUING':
-      return false
+      return ''
     case 'VOTING':
-      return props.round.votes[props.playerName] === quadrant
+      return props.round.votes[props.playerName] === quadrant ? 'voted' : ''
     case 'DONE':
-      return Object.values(props.round.votes).includes(quadrant)
+      return 'done'
   }
 }
 
@@ -50,8 +48,7 @@ function gradientSrc(quadrant) {
     C: 'BL',
     D: 'BR',
   }
-  // Pick a letter from A-E, based on index mod 5
-  const letter = String.fromCharCode(65 + (props.index % 5))
+  const letter = ['A', 'B', 'C', 'D', 'E'][props.index % 5]
   return `/images/illustrations/alignit/Gradient${letter}${corners[quadrant]}.png`
 }
 </script>
@@ -65,21 +62,26 @@ function gradientSrc(quadrant) {
   padding: 0.25rem;
   line-height: 0;
 
-  filter: grayscale(75%);
+  filter: opacity(100%);
   color: transparent;
 
   position: relative;
 }
 
-.square.colored {
-  filter: grayscale(0%);
+.square.done,
+.square.voted {
   color: black;
 }
 
 .square:hover {
   cursor: pointer;
-  filter: grayscale(0%);
+  filter: opacity(80%);
   color: black;
+}
+
+.square.done:hover {
+  cursor: default;
+  filter: opacity(100%);
 }
 
 .axis-label {
@@ -130,21 +132,13 @@ function gradientSrc(quadrant) {
         <div class="axis-label x-axis">{{ round.xAxis?.[0] }}</div>
       </td>
       <td>
-        <button
-          class="square"
-          :class="{ colored: colored('A') }"
-          @click="submitVote('A')"
-        >
+        <button class="square" :class="classify('A')" @click="submitVote('A')">
           <img :src="gradientSrc('A')" />
           <p class="quad-voters">{{ quadText('A') }}</p>
         </button>
       </td>
       <td>
-        <button
-          class="square"
-          :class="{ colored: colored('B') }"
-          @click="submitVote('B')"
-        >
+        <button class="square" :class="classify('B')" @click="submitVote('B')">
           <img :src="gradientSrc('B')" />
           <p class="quad-voters">{{ quadText('B') }}</p>
         </button>
@@ -155,21 +149,13 @@ function gradientSrc(quadrant) {
     </tr>
     <tr>
       <td>
-        <button
-          class="square"
-          :class="{ colored: colored('C') }"
-          @click="submitVote('C')"
-        >
+        <button class="square" :class="classify('C')" @click="submitVote('C')">
           <img :src="gradientSrc('C')" />
           <p class="quad-voters">{{ quadText('C') }}</p>
         </button>
       </td>
       <td>
-        <button
-          class="square"
-          :class="{ colored: colored('D') }"
-          @click="submitVote('D')"
-        >
+        <button class="square" :class="classify('D')" @click="submitVote('D')">
           <img :src="gradientSrc('D')" />
           <p class="quad-voters">{{ quadText('D') }}</p>
         </button>

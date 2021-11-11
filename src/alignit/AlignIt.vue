@@ -39,7 +39,7 @@
         :state="room.state"
         :playerName="player.name"
         :submitVote="submitVote"
-        :index="room.history.length + 1"
+        :index="room.history.length + (room.state === 'DONE' ? 0 : 1)"
       />
     </div>
 
