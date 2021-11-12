@@ -34,67 +34,17 @@
 
     <!-- 2 x 2 Table with labeled axis -->
     <div v-if="room.state !== 'START'" class="pt-4">
-      <table>
-        <tr>
-          <td></td>
-          <td colspan="2">
-            <div class="y-axis">{{ room.round.yAxis?.[0] }}</div>
-          </td>
-          <td></td>
-        </tr>
-        <tr>
-          <td rowspan="2" style="min-width: 3rem">
-            <div class="x-axis">{{ room.round.xAxis?.[0] }}</div>
-          </td>
-          <td
-            class="square"
-            :class="{ colored: colored('A') }"
-            @click="submitVote('A')"
-          >
-            <img src="/images/illustrations/alignit/GradientTL.png" />
-            <p class="quad-voters">{{ quadText('A') }}</p>
-          </td>
-          <td
-            class="square"
-            :class="{ colored: colored('B') }"
-            @click="submitVote('B')"
-          >
-            <img src="/images/illustrations/alignit/GradientTR.png" />
-            <p class="quad-voters">{{ quadText('B') }}</p>
-          </td>
-          <td rowspan="2">
-            <div class="x-axis end">{{ room.round.xAxis?.[1] }}</div>
-          </td>
-        </tr>
-        <tr>
-          <td
-            class="square"
-            :class="{ colored: colored('C') }"
-            @click="submitVote('C')"
-          >
-            <img src="/images/illustrations/alignit/GradientBL.png" />
-            <p class="quad-voters">{{ quadText('C') }}</p>
-          </td>
-          <td
-            class="square"
-            :class="{ colored: colored('D') }"
-            @click="submitVote('D')"
-          >
-            <img src="/images/illustrations/alignit/GradientBR.png" />
-            <p class="quad-voters">{{ quadText('D') }}</p>
-          </td>
-        </tr>
-        <tr>
-          <td></td>
-          <td colspan="2">
-            <div class="y-axis">{{ room.round.yAxis?.[1] }}</div>
-          </td>
-          <td></td>
-        </tr>
-      </table>
+      <AlignItQuads
+        :round="room.round"
+        :state="room.state"
+        :playerName="player.name"
+        :submitVote="submitVote"
+        :index="room.history.length + (room.state === 'DONE' ? 0 : 1)"
+      />
     </div>
 
-    <div class="card p-4 mt-4">
+    <!-- Instructions for the players -->
+    <div class="card p-4 mt-4" role="alert">
       <div v-if="room.state === 'START'">
         <div v-if="room.players.length < 4">
           <p>Waiting for 4 players...</p>
@@ -109,7 +59,7 @@
 
       <div v-else-if="room.state === 'CLUING'">
         <div v-if="room.round.cluer === player.name">
-          <p>Give a clue that for this alignment chart!</p>
+          <p>Give a clue for this alignment chart!</p>
           <p>(Try to cover as many quadrants as possible)</p>
           <input
             type="text"
@@ -121,9 +71,7 @@
             Submit Clue
           </button>
         </div>
-        <div v-else>
-          <p>Waiting for {{ room.round.cluer }} to give a clue...</p>
-        </div>
+        <div v-else>Waiting for {{ room.round.cluer }} to give a clue...</div>
       </div>
 
       <div v-else-if="room.state === 'VOTING'">
@@ -131,7 +79,8 @@
           Waiting for everyone to pick quadrants for "{{ room.round.clue }}"...
         </div>
         <div v-else>
-          Pick the quadrant for "{{ room.round.clue }}"!<br /><br />
+          <p>Pick the quadrant for "{{ room.round.clue }}"!</p>
+          <br /><br />
 
           (Is this clue irrelevant? If so,
           <a href="#" @click="startChallenge"> challenge it.</a>)
@@ -141,7 +90,7 @@
       <div v-else-if="room.state === 'CHALLENGE'">
         "{{ room.round.clue }}" has been challenged as irrelevant!<br /><br />
         <div v-if="room.round.cluer === player.name">
-          Waiting for everyone to vote...
+          Waiting for everyone to vote on this challenge...
         </div>
         <div v-else>
           Is "{{ room.round.clue }}" relevant to this alignment chart?<br />
@@ -180,18 +129,14 @@
           <h2 class="subtitle">Good game! Final scores:</h2>
           <p v-for="[name, score] in playerScores">{{ name }}: {{ score }}</p>
         </div>
-        <button
-          v-else-if="room.round.cluer === player.name"
-          class="button is-primary mt-2"
-          @click="nextRound"
-        >
+        <button v-else class="button is-primary mt-2" @click="nextRound">
           Next Round
         </button>
-        <div v-else>
-          Waiting for {{ room.round.cluer }} to start the next round...
-        </div>
       </div>
     </div>
+
+    <!-- History -->
+    <AlignItHistory :history="room.history" />
 
     <!-- Mod tools -->
     <!-- Copied from Incrypt -->
@@ -247,67 +192,6 @@ h2 {
   margin-bottom: 0.25rem;
   font-family: 'Grand Slang';
 }
-
-.square {
-  width: 230px;
-  height: 200px;
-  text-align: center;
-  padding: 0.25rem;
-  line-height: 0;
-
-  filter: grayscale(75%);
-  color: transparent;
-
-  position: relative;
-}
-
-.square.colored {
-  filter: grayscale(0%);
-  color: black;
-}
-
-.square:hover {
-  cursor: pointer;
-  filter: grayscale(0%);
-  color: black;
-}
-
-.y-axis {
-  font-size: 2rem;
-  font-family: 'Grand Slang';
-  text-align: center;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-}
-
-.x-axis {
-  font-size: 2rem;
-  font-family: 'Grand Slang';
-  text-align: center;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 14em;
-}
-
-.end {
-  transform: rotate(0deg);
-}
-
-.quad-voters {
-  line-height: normal;
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 45%;
-  padding: 0 1rem;
-}
 </style>
 
 <script>
@@ -317,6 +201,8 @@ import Chatbox from '../components/Chatbox.vue'
 import Timer from '../components/Timer.vue'
 import Nametag from '../components/Nametag.vue'
 import ShareLink from '../components/ShareLink.vue'
+import AlignItHistory from './AlignItHistory.vue'
+import AlignItQuads from './AlignItQuads.vue'
 import { axisCards } from './cards.js'
 import { useRoom } from '../composables/useRoom.js'
 import {
@@ -394,6 +280,8 @@ export default {
     Timer,
     Nametag,
     ShareLink,
+    AlignItQuads,
+    AlignItHistory,
   },
   setup() {
     const user = inject('currentUser')
@@ -452,6 +340,7 @@ export default {
         'round.clue': this.player.clue,
         state: 'VOTING',
       })
+      this.player.clue = ''
     },
     submitVote(quadrant) {
       // Votes may only be submited by voters during 'VOTING'
@@ -489,31 +378,6 @@ export default {
 
       this.saveRoom('state', 'round')
     },
-    colored(quadrant) {
-      // While CLUING, all quadrants are grayscale.
-      // While VOTING, only the quadrant that the player voted for is colored.
-      // While DONE, all voted quadrants are colored.
-      switch (this.room.state) {
-        case 'CLUING':
-          return false
-        case 'VOTING':
-          return this.room.round.votes[this.player.name] === quadrant
-        case 'DONE':
-          return Object.values(this.room.round.votes).includes(quadrant)
-      }
-    },
-    quadText(quadrant) {
-      // At the end of a round, show who clicked on the quadrant
-      if (this.room.state === 'DONE') {
-        return Object.entries(this.room.round.votes)
-          .filter(([voter, vote]) => vote === quadrant)
-          .map(([voter, vote]) => voter)
-          .sort()
-          .join(', ')
-      }
-      // Otherwise, show the intersection e.g. 'Good & Old'
-      return wordify(quadrant, this.room.round.xAxis, this.room.round.yAxis)
-    },
     startChallenge() {
       updateRoom(this.room, {
         state: 'CHALLENGE',
@@ -545,12 +409,6 @@ export default {
       this.saveRoom(...toSave)
     },
   },
-}
-
-// E.g. wordify('A', ['Good', 'Bad'], ['Old, 'New']) => 'Good & Old'
-function wordify(quandrant, xAxis, yAxis) {
-  const [x, y] = { A: [0, 0], B: [1, 0], C: [0, 1], D: [1, 1] }[quandrant]
-  return `${xAxis[x]} & ${yAxis[y]}`
 }
 
 function tallyPoints(votes) {
