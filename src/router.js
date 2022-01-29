@@ -27,6 +27,7 @@ const Multiplay = () => import('./admin/Multiplay.vue')
 const Undo = () => import('./studio/Undo.vue')
 const Library = () => import('./library/Library.vue')
 const GamesListing = () => import('./library/GamesListing.vue')
+const Stats = () => import('./admin/Stats.vue')
 
 const routes = [
   { path: '/', component: FrontPage },
@@ -117,6 +118,11 @@ const routes = [
     path: '/library/:rulesetId',
     component: GamesListing,
     meta: { title: 'Games Listing' },
+  },
+  {
+    path: '/stats',
+    component: Stats,
+    meta: { title: 'Stats' },
   },
 ]
 
