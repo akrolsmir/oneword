@@ -64,7 +64,7 @@
             <hr class="navbar-divider" />
             <a
               class="navbar-item"
-              href="https://boredgames.gg"
+              href="https://boredgames-gg.netlify.app/"
               target="_blank"
               rel="noopener"
             >
