@@ -281,6 +281,7 @@
 </template>
 
 <script>
+import { inject } from 'vue'
 import 'bulma-pricingtable/dist/css/bulma-pricingtable.min.css'
 import { firebaseLogEvent } from '../firebase/network'
 import BigColumn from './BigColumn.vue'
@@ -293,6 +294,9 @@ async function importStripe() {
 
 export default {
   components: { BigColumn },
+  setup() {
+    return { user: inject('currentUser') }
+  },
   data() {
     return {
       planValues: { supporter: 3, champion: 6, sponsor: 10 },
@@ -303,6 +307,11 @@ export default {
   },
   methods: {
     async checkout(planName) {
+      if (!(this.user && this.user.uid)) {
+        alert('Sign in to become a supporter!')
+        return
+      }
+
       firebaseLogEvent('purchase', {
         value: this.planValues[planName],
         currency: 'USD',
