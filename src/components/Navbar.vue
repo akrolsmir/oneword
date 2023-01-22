@@ -72,9 +72,6 @@
             </a>
           </div>
         </div>
-        <a class="navbar-item" href="/platform">{{
-          $t('navBar.designGame')
-        }}</a>
       </div>
 
       <div class="navbar-end">
