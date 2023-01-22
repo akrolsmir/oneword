@@ -84,7 +84,7 @@
 
 <script>
 import { inject } from 'vue'
-import { customerPortal, firebaseLogout } from '../firebase/network.js'
+import { launchCustomerPortal, firebaseLogout } from '../firebase/network.js'
 import { timeSince } from '../i18n.js'
 import BigColumn from './BigColumn.vue'
 
@@ -122,19 +122,7 @@ export default {
     listGames(db) {
       return this.gamesByTime.filter((game) => game.roomDb === db)
     },
-    async launchCustomerPortal() {
-      try {
-        const resp = await customerPortal({
-          returnUrl: window.location.toString(),
-        })
-        const url = resp.data
-        window.open(url, '_blank')
-      } catch (error) {
-        alert(
-          `Whoops, our system broke! Please contact austin@oneword.games\n\n${error}`
-        )
-      }
-    },
+    launchCustomerPortal,
   },
   computed: {
     displayName() {

@@ -297,3 +297,17 @@ const functions = firebase.functions()
 // NOTE: if testing server-side updateRoom logging, comment out user.isAdmin in OneWord.vue to expose resetRoom button
 
 export const customerPortal = functions.httpsCallable('customerPortal')
+
+export async function launchCustomerPortal() {
+  try {
+    const resp = await customerPortal({
+      returnUrl: window.location.toString(),
+    })
+    const url = resp.data
+    window.open(url, '_blank')
+  } catch (error) {
+    alert(
+      `Whoops, our system broke! Please contact austin@oneword.games\n\n${error}`
+    )
+  }
+}

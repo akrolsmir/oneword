@@ -1,6 +1,19 @@
 <template>
   <BigColumn>
     <h1>{{ $t('supporter.welcomeTitle') }}</h1>
+    <div v-if="user.isSupporter" class="box">
+      <h2 class="title">
+        {{
+          $t('profile.thankBecomeSupporter', {
+            supporter: user.supporterString,
+          })
+        }}
+      </h2>
+      <button class="button is-ghost p-0" @click.prevent="launchCustomerPortal">
+        {{ $t('profile.manageSetting') }}
+      </button>
+    </div>
+
     <article class="message container">
       <div class="message-header">{{ $t('supporter.cantStopHere') }}</div>
       <div class="message-body">
@@ -283,7 +296,7 @@
 <script>
 import { inject } from 'vue'
 import 'bulma-pricingtable/dist/css/bulma-pricingtable.min.css'
-import { firebaseLogEvent } from '../firebase/network'
+import { firebaseLogEvent, launchCustomerPortal } from '../firebase/network'
 import BigColumn from './BigColumn.vue'
 
 // Dynamically import Stripe to reduce bundle size
@@ -306,6 +319,7 @@ export default {
     /* no await */ importStripe()
   },
   methods: {
+    launchCustomerPortal,
     async checkout(planName) {
       if (!(this.user && this.user.uid)) {
         alert('Sign in to become a supporter!')
