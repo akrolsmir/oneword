@@ -57,9 +57,9 @@
             </router-link>
             <router-link class="navbar-item" to="/quadsquad">
               Quad Squad
-              <span class="tag is-link is-light ml-1">{{
+              <!-- <span class="tag is-link is-light ml-1">{{
                 $t('navBar.new')
-              }}</span>
+              }}</span> -->
             </router-link>
             <hr class="navbar-divider" />
             <a
