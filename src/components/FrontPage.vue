@@ -25,7 +25,6 @@
       {{ $t('frontPage.intro.justoneIntro4') }}<br />
     </div>
     <GamesList roomDirectory="/room/" gameName="One Word" />
-    <Sponsors />
     <br /><br />
   </BigColumn>
 </template>
