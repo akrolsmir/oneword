@@ -1,7 +1,7 @@
 <template>
   <BigColumn>
     <div>
-      <span v-if="todayIsMonday">
+      <!-- <span v-if="todayIsMonday">
         <div class="notification is-info py-2 has-text-centered">
           <a
             target="_blank"
@@ -11,7 +11,7 @@
           >
           {{ $t('frontPage.joinUsTime') }}
         </div>
-      </span>
+      </span> -->
       <div class="fancy big">{{ $t('frontPage.welcome') }}</div>
       {{ $t('frontPage.intro.justoneIntro0') }}
       <a
